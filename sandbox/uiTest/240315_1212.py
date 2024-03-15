@@ -26,7 +26,6 @@ def dispatch_get_main_queue():
 
 
 UIViewController = ObjCClass('UIViewController')
-#NSThread = ObjCClass('NSThread')
 UIColor = ObjCClass('UIColor')
 
 
@@ -40,10 +39,7 @@ def main() -> None:
     root_vc = root_vc.presentedViewController
 
   vc = UIViewController.new()
-  #pdbr.state(UIColor)
-
   vc.view.setBackgroundColor_(UIColor.systemDarkRedColor())
-  #pdbr.state(vc.view.setBackgroundColor_)
   vc.setModalPresentationStyle_(1)
   root_vc.presentViewController_animated_completion_(vc, True, None)
 
