@@ -55,8 +55,7 @@ def onmainthread(func):
                          Block(new_func, None, c_void_p))
 
 
-@onmainthread
-def main(a) -> None:
+def main() -> None:
   app = ObjCClass('UIApplication').sharedApplication
   window = app.keyWindow if app.keyWindow else app.windows[0]
   root_vc = window.rootViewController
@@ -67,8 +66,13 @@ def main(a) -> None:
   vc = UIViewController.new()
   vc.view.setBackgroundColor_(UIColor.systemDarkRedColor())
   vc.setModalPresentationStyle_(1)
-  root_vc.presentViewController_animated_completion_(vc, True, None)
+
+  @Block
+  def processing() -> None:
+    root_vc.presentViewController_animated_completion_(vc, True, None)
+
+  dispatch_sync(dispatch_get_main_queue(), processing)
 
 
-main(a='h')
+main()
 
