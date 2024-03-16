@@ -1,4 +1,5 @@
 from ctypes import byref, cast, Structure, c_void_p
+import functools
 
 from rubicon.objc import ObjCClass
 from rubicon.objc import ObjCInstance, Block
@@ -26,12 +27,35 @@ def dispatch_get_main_queue():
   return ObjCInstance(cast(byref(_dispatch_main_q), objc_id))
 
 
+UINavigationController = ObjCClass('UINavigationController')
 UIViewController = ObjCClass('UIViewController')
+
 UIColor = ObjCClass('UIColor')
 
 
-@Block
-def main() -> None:
+def run_controller(view_controller):
+  pass
+
+
+#@Block
+
+#dispatch_sync(dispatch_get_main_queue(), main)
+
+
+def onmainthread(func):
+
+  @functools.wraps(func)
+  def new_func(*args, **kwargs):
+    return func(*args, **kwargs)
+
+  if ObjCClass('NSThread').isMainThread:
+    return dispatch_sync(dispatch_get_main_queue(), Block(new_func, None, c_void_p))
+  else:
+    new_func
+
+
+@onmainthread
+def main(a)->None:
   app = ObjCClass('UIApplication').sharedApplication
   window = app.keyWindow if app.keyWindow else app.windows[0]
   root_vc = window.rootViewController
@@ -44,6 +68,4 @@ def main() -> None:
   vc.setModalPresentationStyle_(1)
   root_vc.presentViewController_animated_completion_(vc, True, None)
 
-
-dispatch_sync(dispatch_get_main_queue(), main)
-
+main('h')
