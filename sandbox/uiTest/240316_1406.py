@@ -36,15 +36,18 @@ UIColor = ObjCClass('UIColor')
 
 
 class ANavigationController(UINavigationController,
-                           protocols=[UINavigationControllerDelegate]):
+                            protocols=[UINavigationControllerDelegate],
+                            auto_rename=True):
 
   @objc_method
   def initWithRootViewController_(self, rootViewController):
-    
+
     return self.autorelease()
+
 
 nv = ANavigationController.new()
 #nv.autorelease
+
 
 def main() -> None:
   app = ObjCClass('UIApplication').sharedApplication
@@ -67,3 +70,4 @@ def main() -> None:
 
 main()
 #del ANavigationController
+
