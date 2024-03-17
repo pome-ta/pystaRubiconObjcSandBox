@@ -40,6 +40,11 @@ class MainNavigationController(UINavigationController,
                                auto_rename=True):
 
   @objc_method
+  def doneButtonTapped_(self, sender):
+    visibleViewController = self.visibleViewController
+    visibleViewController.dismissViewControllerAnimated_completion_(True, None)
+
+  @objc_method
   def navigationController_willShowViewController_animated_(
       self, navigationController, viewController, animated):
     appearance = UINavigationBarAppearance.alloc()
@@ -52,6 +57,14 @@ class MainNavigationController(UINavigationController,
     navigationBar.compactScrollEdgeAppearance = appearance
 
     viewController.setEdgesForExtendedLayout_(0)
+
+    done_btn = UIBarButtonItem.alloc(
+    ).initWithBarButtonSystemItem_target_action_(0, navigationController,
+                                                 SEL('doneButtonTapped:'))
+    visibleViewController = navigationController.visibleViewController
+    navigationItem = visibleViewController.navigationItem
+
+    navigationItem.rightBarButtonItem = done_btn
 
 
 def main() -> None:
