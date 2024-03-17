@@ -36,22 +36,18 @@ UIColor = ObjCClass('UIColor')
 
 
 class NavigationController(UINavigationController,
-                            protocols=[UINavigationControllerDelegate],
-                            auto_rename=True):
+                           protocols=[UINavigationControllerDelegate],
+                           auto_rename=True):
 
-  
-  
   @objc_method
   def initWithRootViewController_(self, rootViewController):
 
     return self
-  
-    
-  
-  @objc_method
-  def navigationController_willShowViewController_animated_(self, _navigationController, _viewController, _animated):
-    print('h')
 
+  @objc_method
+  def navigationController_willShowViewController_animated_(
+      self, _navigationController, _viewController, _animated):
+    print('h')
 
 
 #nv.autorelease

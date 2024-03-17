@@ -35,33 +35,23 @@ UIViewController = ObjCClass('UIViewController')
 UIColor = ObjCClass('UIColor')
 
 
-class NavigationController(UINavigationController,
-                           protocols=[UINavigationControllerDelegate],
-                           auto_rename=True):
-  pass
-
-
-'''
-  @objc_method
-  def initWithRootViewController_(self, _rootViewController):
-    self = send_super(__class__, self,
-                      'initWithRootViewController:', _rootViewController)
-
-    print('hoge')
-    return self
+class MainNavigationController(UINavigationController,
+                               protocols=[UINavigationControllerDelegate],
+                               auto_rename=True):
 
   @objc_method
   def navigationController_willShowViewController_animated_(
-      self, _navigationController, _viewController, _animated):
-    print('h')
+      self, navigationController, viewController, animated):
+    appearance = UINavigationBarAppearance.alloc()
+    appearance.configureWithDefaultBackground()
 
-'''
-#nv.autorelease
+    navigationBar = navigationController.navigationBar
+    navigationBar.standardAppearance = appearance
+    navigationBar.scrollEdgeAppearance = appearance
+    navigationBar.compactAppearance = appearance
+    navigationBar.compactScrollEdgeAppearance = appearance
 
-#class NavigationControllerDelegate()
-nv = NavigationController.new()
-pdbr.state(nv)
-#pdbr.state(UINavigationControllerDelegate)
+    viewController.setEdgesForExtendedLayout_(0)
 
 
 def main() -> None:
@@ -75,15 +65,15 @@ def main() -> None:
   vc = UIViewController.new()
   vc.view.setBackgroundColor_(UIColor.systemDarkRedColor())
   vc.setModalPresentationStyle_(1)
-  #nv = NavigationController.alloc().initWithRootViewController_(vc)
-  #pdbr.state(UINavigationController.alloc())
 
   @Block
   def processing() -> None:
-    nv = NavigationController.alloc().initWithRootViewController_(vc)
+    nv = MainNavigationController.alloc().initWithRootViewController_(vc)
+    nv.delegate = nv
+
     root_vc.presentViewController_animated_completion_(nv, True, None)
 
-  #dispatch_sync(dispatch_get_main_queue(), processing)
+  dispatch_sync(dispatch_get_main_queue(), processing)
 
 
 main()
