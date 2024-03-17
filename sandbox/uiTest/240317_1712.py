@@ -3,7 +3,7 @@ import functools
 
 from rubicon.objc import ObjCClass, ObjCProtocol, objc_method
 from rubicon.objc import ObjCInstance, Block
-from rubicon.objc.runtime import objc_id, load_library
+from rubicon.objc.runtime import objc_id, load_library, send_super, SEL
 
 import pdbr
 
@@ -36,25 +36,32 @@ UIColor = ObjCClass('UIColor')
 
 
 class NavigationController(UINavigationController,
-                            protocols=[UINavigationControllerDelegate],
-                            auto_rename=True):
+                           protocols=[UINavigationControllerDelegate],
+                           auto_rename=True):
+  pass
 
-  
-  
+
+'''
   @objc_method
-  def initWithRootViewController_(self, rootViewController):
+  def initWithRootViewController_(self, _rootViewController):
+    self = send_super(__class__, self,
+                      'initWithRootViewController:', _rootViewController)
 
+    print('hoge')
     return self
-  
-    
-  
+
   @objc_method
-  def navigationController_willShowViewController_animated_(self, _navigationController, _viewController, _animated):
+  def navigationController_willShowViewController_animated_(
+      self, _navigationController, _viewController, _animated):
     print('h')
 
-
-
+'''
 #nv.autorelease
+
+#class NavigationControllerDelegate()
+nv = NavigationController.new()
+pdbr.state(nv)
+#pdbr.state(UINavigationControllerDelegate)
 
 
 def main() -> None:
@@ -76,7 +83,7 @@ def main() -> None:
     nv = NavigationController.alloc().initWithRootViewController_(vc)
     root_vc.presentViewController_animated_completion_(nv, True, None)
 
-  dispatch_sync(dispatch_get_main_queue(), processing)
+  #dispatch_sync(dispatch_get_main_queue(), processing)
 
 
 main()
