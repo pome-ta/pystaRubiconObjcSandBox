@@ -35,17 +35,25 @@ UIViewController = ObjCClass('UIViewController')
 UIColor = ObjCClass('UIColor')
 
 
-class ANavigationController(UINavigationController,
+class NavigationController(UINavigationController,
                             protocols=[UINavigationControllerDelegate],
                             auto_rename=True):
 
+  
+  '''
   @objc_method
   def initWithRootViewController_(self, rootViewController):
 
-    return self.autorelease()
+    return self
+  
+    
+  '''
+  @objc_method
+  def navigationController_willShowViewController_animated_(self, _navigationController, _viewController, _animated):
+    print('h')
 
 
-nv = ANavigationController.new()
+
 #nv.autorelease
 
 
@@ -60,12 +68,15 @@ def main() -> None:
   vc = UIViewController.new()
   vc.view.setBackgroundColor_(UIColor.systemDarkRedColor())
   vc.setModalPresentationStyle_(1)
+  #nv = NavigationController.alloc().initWithRootViewController_(vc)
+  #pdbr.state(UINavigationController.alloc())
 
   @Block
   def processing() -> None:
-    root_vc.presentViewController_animated_completion_(vc, True, None)
+    nv = NavigationController.alloc().initWithRootViewController_(vc)
+    root_vc.presentViewController_animated_completion_(nv, True, None)
 
-  #dispatch_sync(dispatch_get_main_queue(), processing)
+  dispatch_sync(dispatch_get_main_queue(), processing)
 
 
 main()
