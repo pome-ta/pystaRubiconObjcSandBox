@@ -5,7 +5,7 @@ from rubicon.objc import ObjCClass, ObjCProtocol, objc_method
 from rubicon.objc import ObjCInstance, Block
 from rubicon.objc.runtime import objc_id, load_library, send_super, SEL
 
-import pdbr
+#import pdbr
 
 libSystem = load_library('System')
 libdispatch = libSystem
