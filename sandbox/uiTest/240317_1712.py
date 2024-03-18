@@ -77,7 +77,6 @@ def main() -> None:
 
   vc = UIViewController.new()
   vc.view.setBackgroundColor_(UIColor.systemDarkRedColor())
-  #vc.setModalPresentationStyle_(0)
 
   @Block
   def processing() -> None:
