@@ -1,6 +1,8 @@
 from ctypes import byref, cast, Structure, c_void_p
 import functools
 
+#from objc_util import on_main_thread
+
 from rubicon.objc import ObjCClass, ObjCProtocol, objc_method
 from rubicon.objc import ObjCInstance, Block
 from rubicon.objc.runtime import objc_id, load_library, send_super, SEL
@@ -67,6 +69,13 @@ class MainNavigationController(UINavigationController,
     navigationItem.rightBarButtonItem = done_btn
 
 
+def on_mainthread(func):
+  @functools.wraps
+  def _wrapper(*args, **kwargs):
+    func(*args, **kwargs)
+  return dispatch_sync(dispatch_get_main_queue(), Block(func))
+
+'''
 def main() -> None:
   app = ObjCClass('UIApplication').sharedApplication
   window = app.keyWindow if app.keyWindow else app.windows[0]
@@ -86,11 +95,28 @@ def main() -> None:
 
     root_vc.presentViewController_animated_completion_(nv, True, None)
 
-  processing_block = Block(processing)
+  #processing_block = Block(processing)
   #dispatch_sync(dispatch_get_main_queue(), processing)
-  dispatch_sync(dispatch_get_main_queue(), processing_block)
+  #dispatch_sync(dispatch_get_main_queue(), processing_block)
+  dispatch_sync(dispatch_get_main_queue(), Block(processing))
+'''
+@on_mainthread
+def main(v) -> None:
+  app = ObjCClass('UIApplication').sharedApplication
+  window = app.keyWindow if app.keyWindow else app.windows[0]
+  root_vc = window.rootViewController
 
+  while root_vc.presentedViewController:
+    root_vc = root_vc.presentedViewController
+
+  vc = UIViewController.new()
+  vc.view.setBackgroundColor_(UIColor.systemDarkRedColor())
+  nv = MainNavigationController.alloc().initWithRootViewController_(vc)
+  nv.delegate = nv
+  nv.setModalPresentationStyle_(v)
+
+  root_vc.presentViewController_animated_completion_(nv, True, None)
 
 if __name__ == "__main__":
-  main()
+  main(0)
 
