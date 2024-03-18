@@ -5,7 +5,7 @@ from rubicon.objc import ObjCClass, ObjCProtocol, objc_method
 from rubicon.objc import ObjCInstance, Block
 from rubicon.objc.runtime import objc_id, load_library, send_super, SEL
 
-#import pdbr
+import pdbr
 
 libSystem = load_library('System')
 libdispatch = libSystem
@@ -62,8 +62,8 @@ class MainNavigationController(UINavigationController,
     ).initWithBarButtonSystemItem_target_action_(0, navigationController,
                                                  SEL('doneButtonTapped:'))
     visibleViewController = navigationController.visibleViewController
-    navigationItem = visibleViewController.navigationItem
 
+    navigationItem = visibleViewController.navigationItem
     navigationItem.rightBarButtonItem = done_btn
 
 
@@ -89,6 +89,6 @@ def main() -> None:
   dispatch_sync(dispatch_get_main_queue(), processing)
 
 
-main()
-#del ANavigationController
+if __name__ == "__main__":
+  main()
 
