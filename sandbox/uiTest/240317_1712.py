@@ -77,12 +77,13 @@ def main() -> None:
 
   vc = UIViewController.new()
   vc.view.setBackgroundColor_(UIColor.systemDarkRedColor())
-  vc.setModalPresentationStyle_(1)
+  #vc.setModalPresentationStyle_(0)
 
   @Block
   def processing() -> None:
     nv = MainNavigationController.alloc().initWithRootViewController_(vc)
     nv.delegate = nv
+    nv.setModalPresentationStyle_(0)
 
     root_vc.presentViewController_animated_completion_(nv, True, None)
 
