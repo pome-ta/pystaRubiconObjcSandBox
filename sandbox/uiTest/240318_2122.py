@@ -72,8 +72,8 @@ class MainNavigationController(UINavigationController,
 def on_mainthread(func):
   @functools.wraps
   def _wrapper(*args, **kwargs):
-    func(*args, **kwargs)
-  return dispatch_sync(dispatch_get_main_queue(), Block(func))
+    return func(*args, **kwargs)
+  return dispatch_sync(dispatch_get_main_queue(), Block(_wrapper))
 
 '''
 def main() -> None:

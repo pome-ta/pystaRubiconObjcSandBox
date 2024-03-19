@@ -47,7 +47,9 @@ class MainNavigationController(UINavigationController,
     navigationItem.rightBarButtonItem = done_btn
 
 
-def present_controller(view_controller, navigation_controller=None):
+def present_controller(view_controller,
+                       navigation_controller=None,
+                       modalPresentationStyle=0):
   # --- set up
   class struct_dispatch_queue_s(Structure):
     pass  # No _fields_, because this is an opaque structure.
@@ -64,14 +66,17 @@ def present_controller(view_controller, navigation_controller=None):
 
   def dispatch_get_main_queue():
     return ObjCInstance(cast(byref(_dispatch_main_q), objc_id))
-    
+
   # --- present
   app = ObjCClass('UIApplication').sharedApplication
   window = app.keyWindow if app.keyWindow else app.windows[0]
   root_vc = window.rootViewController
-  
+
   while root_vc.presentedViewController:
     root_vc = root_vc.presentedViewController
+    
+  v = view_controller
+  
 
 
 def main() -> None:
