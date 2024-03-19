@@ -54,6 +54,41 @@ class WrapNavigationController(UINavigationController,
     navigationItem.rightBarButtonItem = done_btn
 
 
+vc = TopViewController.new()
+print(vc._cached_objects)
+
+def pr_dir(ins):
+  pass
+
+
+
+'''
+def __dir__(self):
+		objc_class_ptr = object_getClass(self.ptr)
+		py_methods = []
+		while objc_class_ptr is not None:
+			num_methods = c_uint(0)
+			method_list_ptr = class_copyMethodList(objc_class_ptr, byref(num_methods))
+			for i in xrange(num_methods.value):
+				selector = method_getName(method_list_ptr[i])
+				sel_name = sel_getName(selector)
+				if PY3:
+					sel_name = sel_name.decode('ascii')
+				py_method_name = sel_name.replace(':', '_')
+				if '.' not in py_method_name:
+					py_methods.append(py_method_name)
+			free(method_list_ptr)
+			# Walk up the class hierarchy to add methods from superclasses:
+			objc_class_ptr = class_getSuperclass(objc_class_ptr)
+			if objc_class_ptr == NSObject.ptr:
+				# Don't list all NSObject methods (too much cruft from categories...)
+				py_methods += NSObject_instance_methods
+				break
+		return sorted(set(py_methods))
+
+	
+'''
+
 def main():
   app = ObjCClass('UIApplication').sharedApplication
   window = app.keyWindow if app.keyWindow else app.windows[0]
@@ -62,7 +97,16 @@ def main():
   while root_vc.presentedViewController:
     root_vc = root_vc.presentedViewController
 
-  vc = TopViewController.new()
+  #vc = TopViewController.new()
+  #pdbr.state(vc)
+  #print(vc._ivarDescription)
+  #print(vc.objc_class)
+  #print(dir(vc.objc_class))
+  #vc.view.setBackgroundColor_(UIColor.systemDarkRedColor())
+  #print(dir(vc))
+  #print(vars(vc))
+  #print(vc.__repr__())
+  #print(vc)
 
   @Block
   def processing() -> None:
@@ -72,7 +116,7 @@ def main():
 
     root_vc.presentViewController_animated_completion_(nv, True, None)
 
-  dispatch_sync(processing)
+  #dispatch_sync(processing)
 
 
 if __name__ == "__main__":
