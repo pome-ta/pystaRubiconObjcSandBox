@@ -1,6 +1,6 @@
 from rubicon.objc import ObjCClass, ObjCProtocol, objc_method
 from rubicon.objc import Block
-from rubicon.objc.runtime import SEL, send_super
+from rubicon.objc.runtime import libobjc,SEL, send_super
 
 from dispatchSync import dispatch_sync
 
