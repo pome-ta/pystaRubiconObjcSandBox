@@ -4,14 +4,20 @@ from rubicon.objc.runtime import libobjc
 from pprint import pprint
 
 NSString = ObjCClass('NSString')
-'''
-print(NSString)
-pprint(dir(NSString))
-'''
 
-print(libobjc)
+# print(libobjc)
 #pprint(*dir(libobjc))
-objc_class_ptr = libobjc.objc_getClass(NSString.ptr)
+objc_class_ptr = libobjc.objc_getClass(NSString.new())
+print(objc_class_ptr)
+
+
+
+print(NSString)
+print(dir(NSString))
+
+
+pprint(dir(NSString.objc_class))
+
 '''
 <CDLL '/usr/lib/libobjc.dylib', handle 36244e708 at 0x11023f1f0>
 ['_FuncPtr',
