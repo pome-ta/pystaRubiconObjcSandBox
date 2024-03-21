@@ -1,3 +1,4 @@
+import ctypes
 from rubicon.objc import ObjCClass
 from rubicon.objc.runtime import libobjc
 
@@ -7,17 +8,32 @@ NSString = ObjCClass('NSString')
 
 # print(libobjc)
 #pprint(*dir(libobjc))
-objc_class_ptr = libobjc.objc_getClass(NSString.new())
-print(objc_class_ptr)
 
+objct_class = libobjc.object_getClass(NSString)
+py_methods = []
+'''
+while objct_class is not None:
+  num_methods = ctypes.c_uint(0)
+  method_list = libobjc.class_copyMethodList(objct_class,
+                                             ctypes.byref(num_methods))
+  print(method_list.contents.value)
+  print(dir(method_list.contents))
+  #print(dir(method_list))
+  break
+'''
 
+num_methods = ctypes.c_uint(0)
+method_list = libobjc.class_copyMethodList(objct_class,
+                                           ctypes.byref(num_methods))
 
-print(NSString)
-print(dir(NSString))
-
-
-pprint(dir(NSString.objc_class))
-
+selector = libobjc.method_getName(method_list[0])
+sel_name = libobjc.sel_getName(selector).decode('ascii')
+py_method_name = sel_name.replace(':', '_')
+#print(dir(method_list))
+#print(method_list.__sizeof__())
+print(num_methods.value)
+print(method_list[0])
+#print(objc_class_ptr)
 '''
 <CDLL '/usr/lib/libobjc.dylib', handle 36244e708 at 0x11023f1f0>
 ['_FuncPtr',

@@ -10,6 +10,8 @@ import pdbr
 
 UIViewController = ObjCClass('UIViewController')
 UIColor = ObjCClass('UIColor')
+NSString = ObjCClass('NSString')
+
 
 
 class TopViewController(UIViewController, auto_rename=True):
@@ -75,6 +77,8 @@ def pr_dir(ins):
     num_methods = ctypes.c_uint(0)
     method_list_ptr = class_copyMethodList(objc_class_ptr,
                                            ctypes.byref(num_methods))
+    print(num_methods)
+    print(dir())
     for i in range(num_methods.value):
       selector = method_getName(method_list_ptr[i])
 
@@ -94,9 +98,9 @@ def pr_dir(ins):
     return sorted(set(py_methods))
 
 
-a = pr_dir(UIViewController.new())
+a = pr_dir(NSString)
 from pprint import pprint
-pprint(a)
+#pprint(a)
 
 '''
 def __dir__(self):
