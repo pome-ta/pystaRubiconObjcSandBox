@@ -1,5 +1,5 @@
 import ctypes
-from rubicon.objc import ObjCClass, NSObject
+from rubicon.objc import ObjCClass, NSObject, ObjCInstance
 from rubicon.objc.runtime import libobjc
 
 from pprint import pprint
@@ -16,8 +16,10 @@ NSObject_instance_methods = [
 
 
 def objins(obj):
+  print(obj.objc_class)
+  print(dir(obj.objc_class))
   objct_class = libobjc.object_getClass(obj)
-  print(objct_class)
+  #print(objct_class)
   py_methods = []
 
   while objct_class is not None:
@@ -33,6 +35,7 @@ def objins(obj):
         py_methods.append(py_method_name)
     libobjc.free(method_list_ptr)
     objct_class = libobjc.class_getSuperclass(objct_class)
+    #print(objct_class.value)
 
     if objct_class.value == NSObject.ptr.value:
       py_methods += NSObject_instance_methods
