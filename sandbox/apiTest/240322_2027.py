@@ -26,18 +26,18 @@ def objins(obj):
     print(obj.objc_class.ptr)
     print(dir(obj.objc_class.ptr))
     print('=====')
-  except:
+  except :
     pass
   '''
-  objct_class = libobjc.object_getClass(obj)
-  '''
+  objct_class = libobjc.object_getClass(obj.objc_class.ptr)
+  objct_class = obj.objc_class
   print(objct_class)
   print(dir(objct_class))
   print('____')
-  '''
   py_methods = []
 
   while objct_class is not None:
+    print('h')
     num_methods = ctypes.c_uint(0)
     method_list_ptr = libobjc.class_copyMethodList(objct_class,
                                                    ctypes.byref(num_methods))
@@ -49,12 +49,15 @@ def objins(obj):
       if '.' not in py_method_name:
         py_methods.append(py_method_name)
     libobjc.free(method_list_ptr)
-    objct_class = libobjc.class_getSuperclass(objct_class)
-    #print(objct_class.value)
-
-    if objct_class.value == NSObject.ptr.value:
+    #objct_class = libobjc.class_getSuperclass(objct_class)
+    objc_class = ObjCInstance(libobjc.class_getSuperclass(objct_class).value).objc_class
+    #print(dir(ObjCInstance(objct_class.value)))
+    if objct_class == NSObject.objc_class:
       py_methods += NSObject_instance_methods
       break
+    else:
+      #objct_class = ObjCInstance(objct_class.value).objc_class
+      pass
   return sorted(set(py_methods))
 
 
@@ -71,10 +74,9 @@ class TopViewController(UIViewController, auto_rename=True):
     self.view.backgroundColor = UIColor.systemDarkRedColor()
 
 
-vc = TopViewController#.new()
+vc = TopViewController.new()
 #vc = UIViewController#.new()
 a = objins(vc)
-pprint(a)
 #b = libobjc.class_getSuperclass(vc.objc_class)
 #c = libobjc.object_getClass(vc.objc_class)
 #print(ObjCInstance(b.value))
@@ -87,6 +89,11 @@ objc = vc.objc_class
 objc_ptr = objc.ptr
 
 getClass = libobjc.object_getClass(objc_ptr)
+ggetClass = libobjc.object_getClass(objc)
+
 getSuperclass = libobjc.class_getSuperclass(getClass)
 ins = ObjCInstance(getSuperclass.value)
+
+print(NSObject.objc_class)
+
 

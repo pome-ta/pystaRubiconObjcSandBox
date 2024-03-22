@@ -71,7 +71,7 @@ class TopViewController(UIViewController, auto_rename=True):
     self.view.backgroundColor = UIColor.systemDarkRedColor()
 
 
-vc = TopViewController#.new()
+vc = TopViewController  #.new()
 #vc = UIViewController#.new()
 a = objins(vc)
 pprint(a)
