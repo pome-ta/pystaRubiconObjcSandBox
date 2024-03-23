@@ -16,19 +16,7 @@ NSObject_instance_methods = [
 
 
 def objins(obj):
-  #print(obj.objc_class)
-  #print(dir(obj.objc_class))
-  '''
-  try:
-    print(obj)
-    print(dir(obj))
-    print('----')
-    print(obj.objc_class.ptr)
-    print(dir(obj.objc_class.ptr))
-    print('=====')
-  except:
-    pass
-  '''
+  
   objct_class = libobjc.object_getClass(obj)
   '''
   print(objct_class)
