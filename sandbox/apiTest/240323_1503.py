@@ -60,7 +60,7 @@ class TopViewController(UIViewController, auto_rename=True):
 
 vc = TopViewController.new()
 #vc = UIViewController#.new()
-a = objc_dir(vc)
-data = json.dumps(a, indent=1)
+objc_pr_dic = objc_dir(vc)
+data = json.dumps(objc_pr_dic, indent=2)
 print(data)
 
