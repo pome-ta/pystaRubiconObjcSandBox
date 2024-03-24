@@ -20,7 +20,12 @@ class TopViewController(UIViewController, auto_rename=True):
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     self.view.backgroundColor = UIColor.systemDarkRedColor()
-
+'''
+  @objc_method
+  def viewWillDisappear_(self, animated):
+    #print(animated)
+    pass
+'''
 
 class WrapNavigationController(UINavigationController,
                                protocols=[UINavigationControllerDelegate],
@@ -63,6 +68,7 @@ def main():
     root_vc = root_vc.presentedViewController
 
   vc = TopViewController.new()
+  pdbr.state(vc)
 
   @Block
   def processing() -> None:

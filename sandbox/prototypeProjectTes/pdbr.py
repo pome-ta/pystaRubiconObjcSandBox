@@ -44,7 +44,7 @@ def _get_className_methods(rubicon_object):
     if objct_class.value == NSObject.ptr.value:
       py_className_methods[str(NSObject)] = NSObject_instance_methods
       break
-  return py_className_methods
+  return dict(reversed(list(py_className_methods.items())))
 
 
 def state(rubicon_obj):
