@@ -20,12 +20,12 @@ class TopViewController(UIViewController, auto_rename=True):
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     self.view.backgroundColor = UIColor.systemDarkRedColor()
-'''
+
   @objc_method
   def viewWillDisappear_(self, animated):
     #print(animated)
-    pass
-'''
+    send_super(__class__, self, 'viewWillDisappear_', [animated,])
+
 
 class WrapNavigationController(UINavigationController,
                                protocols=[UINavigationControllerDelegate],
@@ -34,8 +34,13 @@ class WrapNavigationController(UINavigationController,
   @objc_method
   def doneButtonTapped_(self, sender):
     visibleViewController = self.visibleViewController
-    visibleViewController.dismissViewControllerAnimated_completion_(True, None)
+    @Block
+    def processing() -> None:
+      visibleViewController.dismissViewControllerAnimated_completion_(True, None)
 
+    dispatch_sync(processing)
+
+    
   @objc_method
   def navigationController_willShowViewController_animated_(
       self, navigationController, viewController, animated):
@@ -68,7 +73,7 @@ def main():
     root_vc = root_vc.presentedViewController
 
   vc = TopViewController.new()
-  pdbr.state(vc)
+  #pdbr.state(vc)
 
   @Block
   def processing() -> None:

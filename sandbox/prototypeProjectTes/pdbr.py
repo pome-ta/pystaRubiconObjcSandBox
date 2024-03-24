@@ -50,5 +50,6 @@ def _get_className_methods(rubicon_object):
 def state(rubicon_obj):
   _dic = _get_className_methods(rubicon_obj)
   data = json.dumps(_dic, indent=2)
+  print(f'name: {rubicon_obj}')
   print(data)
 
