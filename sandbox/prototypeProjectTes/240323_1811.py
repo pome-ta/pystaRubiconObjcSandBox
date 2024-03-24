@@ -32,6 +32,7 @@ class WrapNavigationController(UINavigationController,
 
   @objc_method
   def doneButtonTapped_(self, sender):
+    pdbr.state(sender)
     visibleViewController = self.visibleViewController
     visibleViewController.dismissViewControllerAnimated_completion_(True, None)
 
