@@ -1,6 +1,6 @@
 import ctypes
 
-from pyrubicon.objc import ObjCInstance, ObjCClass, NSObject, ObjCProtocol, objc_method, objc_property, py_from_ns
+from pyrubicon.objc import ObjCInstance, ObjCClass, NSObject, ObjCProtocol, objc_method, objc_property, py_from_ns, objc_block
 from pyrubicon.objc import Block
 from pyrubicon.objc.runtime import SEL, send_super
 
@@ -44,7 +44,7 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
   @objc_method
   def initGenerator(self):
     audioEngine = AVAudioEngine.new()
-    
+
     mainMixer = audioEngine.mainMixerNode
     outputNode = audioEngine.outputNode
     format = outputNode.inputFormatForBus_(0)
@@ -56,11 +56,22 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
       format.commonFormat, py_from_ns(self.sampleRate), CHANNEL,
       format.isInterleaved)
 
-    
+    #pdbr.state(inputFormat)
     sourceNode = AVAudioSourceNode.alloc()
-    
+    sourceNode.initWithFormat_renderBlock_(inputFormat, self.renderBlock)
+
     self.audioEngine = audioEngine
     return self
+
+  @objc_method
+  def renderBlock(self) -> objc_block:
+
+    def sourceNodeRenderBlock(isSilence: bool, timestamp: ctypes.c_void_p,
+                              frameCount: ctypes.c_void_p,
+                              outputData: ctypes.POINTER) -> ctypes.c_int32:
+      return ctypes.c_int32
+
+    return sourceNodeRenderBlock
 
 
 ag = AudioEngeneWaveGenerator.alloc().initGenerator()
