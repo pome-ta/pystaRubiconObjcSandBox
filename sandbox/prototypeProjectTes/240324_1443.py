@@ -1,6 +1,6 @@
 import ctypes
 
-from pyrubicon.objc import ObjCInstance, ObjCClass, NSObject, ObjCProtocol, objc_method, objc_property
+from pyrubicon.objc import ObjCInstance, ObjCClass, NSObject, ObjCProtocol, objc_method, objc_property, py_from_ns
 from pyrubicon.objc import Block
 from pyrubicon.objc.runtime import SEL, send_super
 
@@ -16,8 +16,8 @@ AVAudioEngine = ObjCClass('AVAudioEngine')
 AVAudioSourceNode = ObjCClass('AVAudioSourceNode')
 AVAudioFormat = ObjCClass('AVAudioFormat')
 
-AVAudioMixerNode = ObjCClass('AVAudioMixerNode')  # todo: 定義のみ
-AVAudioOutputNode = ObjCClass('AVAudioOutputNode')  # todo: 定義のみ
+#AVAudioMixerNode = ObjCClass('AVAudioMixerNode')  # todo: 定義のみ
+#AVAudioOutputNode = ObjCClass('AVAudioOutputNode')  # todo: 定義のみ
 
 
 class AudioBuffer(ctypes.Structure):
@@ -37,17 +37,29 @@ class AudioBufferList(ctypes.Structure):
 
 class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
   audioEngine: AVAudioEngine = objc_property()
-  sampleRate: float = objc_property()
-  time: float = objc_property()
+  sampleRate: float = objc_property()  # xxx: わざわざ不要か？
   deltaTime: float = objc_property()
-  toneA: float = objc_property()
-  mainMixer: AVAudioMixerNode = objc_property()
-  outputNode: AVAudioOutputNode = objc_property()
-  format: AVAudioFormat = objc_property()
-  
+  timex: float = objc_property()
+
   @objc_method
   def initGenerator(self):
-    self.audioEngine = AVAudioEngine.new()
+    audioEngine = AVAudioEngine.new()
+    
+    mainMixer = audioEngine.mainMixerNode
+    outputNode = audioEngine.outputNode
+    format = outputNode.inputFormatForBus_(0)
+
+    self.sampleRate = format.sampleRate
+    self.deltaTime = 1 / py_from_ns(self.sampleRate)
+    inputFormat = AVAudioFormat.alloc(
+    ).initWithCommonFormat_sampleRate_channels_interleaved_(
+      format.commonFormat, py_from_ns(self.sampleRate), CHANNEL,
+      format.isInterleaved)
+
+    
+    sourceNode = AVAudioSourceNode.alloc()
+    
+    self.audioEngine = audioEngine
     return self
 
 
