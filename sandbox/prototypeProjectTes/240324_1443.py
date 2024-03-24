@@ -1,10 +1,59 @@
-from pyrubicon.objc import ObjCClass, ObjCProtocol, objc_method
+import ctypes
+
+from pyrubicon.objc import ObjCInstance, ObjCClass, NSObject, ObjCProtocol, objc_method, objc_property
 from pyrubicon.objc import Block
 from pyrubicon.objc.runtime import SEL, send_super
 
 from dispatchSync import dispatch_sync
 
 import pdbr
+
+CHANNEL = 1
+
+OSStatus = ctypes.c_int32
+
+AVAudioEngine = ObjCClass('AVAudioEngine')
+AVAudioSourceNode = ObjCClass('AVAudioSourceNode')
+AVAudioFormat = ObjCClass('AVAudioFormat')
+
+AVAudioMixerNode = ObjCClass('AVAudioMixerNode')  # todo: 定義のみ
+AVAudioOutputNode = ObjCClass('AVAudioOutputNode')  # todo: 定義のみ
+
+
+class AudioBuffer(ctypes.Structure):
+  _fields_ = [
+    ('mNumberChannels', ctypes.c_uint32),
+    ('mDataByteSize', ctypes.c_uint32),
+    ('mData', ctypes.c_void_p),
+  ]
+
+
+class AudioBufferList(ctypes.Structure):
+  _fields_ = [
+    ('mNumberBuffers', ctypes.c_uint32),
+    ('mBuffers', AudioBuffer * CHANNEL),
+  ]
+
+
+class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
+  audioEngine: AVAudioEngine = objc_property()
+  sampleRate: float = objc_property()
+  time: float = objc_property()
+  deltaTime: float = objc_property()
+  toneA: float = objc_property()
+  mainMixer: AVAudioMixerNode = objc_property()
+  outputNode: AVAudioOutputNode = objc_property()
+  format: AVAudioFormat = objc_property()
+  
+  @objc_method
+  def initGenerator(self):
+    self.audioEngine = AVAudioEngine.new()
+    return self
+
+
+ag = AudioEngeneWaveGenerator.alloc().initGenerator()
+
+#pdbr.state(AudioEngeneWaveGenerator)
 
 UINavigationController = ObjCClass('UINavigationController')
 UINavigationControllerDelegate = ObjCProtocol('UINavigationControllerDelegate')
@@ -67,13 +116,12 @@ def main():
     root_vc = root_vc.presentedViewController
 
   vc = TopViewController.new()
-  #pdbr.state(vc)
 
   @Block
   def processing() -> None:
     nv = WrapNavigationController.alloc().initWithRootViewController_(vc)
     nv.delegate = nv
-    nv.setModalPresentationStyle_(0)
+    nv.setModalPresentationStyle_(1)
 
     root_vc.presentViewController_animated_completion_(nv, True, None)
 
