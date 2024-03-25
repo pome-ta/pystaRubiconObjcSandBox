@@ -1,6 +1,6 @@
 import ctypes
 
-from pyrubicon.objc import ObjCInstance, ObjCClass, NSObject, ObjCProtocol, objc_method, objc_property, py_from_ns, objc_block
+from pyrubicon.objc import ObjCInstance, ObjCClass, NSObject, ObjCProtocol, objc_method, objc_property, py_from_ns, objc_block, ObjCBlock
 from pyrubicon.objc import Block
 from pyrubicon.objc.runtime import SEL, send_super
 
@@ -56,19 +56,37 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
       format.commonFormat, py_from_ns(self.sampleRate), CHANNEL,
       format.isInterleaved)
 
-    #pdbr.state(inputFormat)
     sourceNode = AVAudioSourceNode.alloc()
-    #pdbr.state(sourceNode)
 
-    #sourceNode.initWithFormat_renderBlock_(inputFormat, )
+    @Block
+    def rb(isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
+           frameCount: ctypes.c_void_p,
+           outputData: ctypes.c_void_p) -> OSStatus:
+      print(type(frameCount))
+      return 0
+
+    sourceNode.initWithFormat_renderBlock_(inputFormat, rb)
+    #pdbr.state(sourceNode)
+    audioEngine.attachNode_(sourceNode)
+    sourceNode.volume = 0.1
+
+    audioEngine.connect_to_format_(sourceNode, mainMixer, inputFormat)
+    audioEngine.connect_to_format_(mainMixer, outputNode, inputFormat)
+
+    audioEngine.prepare()
+    #pdbr.state(audioEngine)
 
     self.audioEngine = audioEngine
     return self
 
+  @objc_method
+  def start(self):
+    self.audioEngine.startAndReturnError_(None)
 
-ag = AudioEngeneWaveGenerator.alloc().initGenerator()
+  @objc_method
+  def stop(self):
+    self.audioEngine.stop()
 
-#pdbr.state(AudioEngeneWaveGenerator)
 
 UINavigationController = ObjCClass('UINavigationController')
 UINavigationControllerDelegate = ObjCProtocol('UINavigationControllerDelegate')
@@ -79,15 +97,18 @@ UIColor = ObjCClass('UIColor')
 
 
 class TopViewController(UIViewController, auto_rename=True):
+  generator = objc_property()
 
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
-    self.view.backgroundColor = UIColor.systemDarkRedColor()
+    #self.view.backgroundColor = UIColor.systemDarkRedColor()
+    self.generator = AudioEngeneWaveGenerator.alloc().initGenerator()
+    self.generator.start()
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
-    pass
+    self.generator.stop()
 
 
 class WrapNavigationController(UINavigationController,
