@@ -58,21 +58,30 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
 
     #pdbr.state(inputFormat)
     sourceNode = AVAudioSourceNode.alloc()
-    sourceNode.initWithFormat_renderBlock_(inputFormat, self.renderBlock)
+    #pdbr.state(sourceNode)
+
+    
+  @Block
+  def renderBlock(self:ObjCInstance,isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
+                  frameCount: ctypes.c_void_p,
+                  outputData: ctypes.POINTER) -> OSStatus:
+    return 0
+    
+
+    '''
+    sourceNode.initWithFormat_renderBlock_(
+      inputFormat,
+      Block(renderBlock, OSStatus, 
+        ctypes.c_void_p,
+        ctypes.c_void_p,
+        ctypes.c_void_p,
+        ctypes.POINTER
+      ))
+    '''
+    #sourceNode.initWithFormat_renderBlock_(inputFormat, )
 
     self.audioEngine = audioEngine
     return self
-
-  @objc_method
-  def renderBlock(self) -> objc_block:
-
-    def sourceNodeRenderBlock(isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
-                              frameCount: ctypes.c_void_p,
-                              outputData: ctypes.POINTER) -> None:
-      #return 0
-      pass
-
-    return sourceNodeRenderBlock
 
 
 ag = AudioEngeneWaveGenerator.alloc().initGenerator()
