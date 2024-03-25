@@ -9,7 +9,7 @@ from dispatchSync import dispatch_sync
 
 import pdbr
 
-CHANNEL = 1
+CHANNEL = 2
 
 OSStatus = ctypes.c_int32
 
@@ -59,6 +59,7 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
     format = outputNode.inputFormatForBus_(0)
 
     #self.sampleRate = format.sampleRate
+    #print(self.sampleRate)
     self.deltaTime = 1 / self.sampleRate  #py_from_ns(self.sampleRate)
     '''
     inputFormat = AVAudioFormat.alloc(
@@ -71,32 +72,38 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
       format.commonFormat, self.sampleRate, CHANNEL, format.isInterleaved)
 
     sourceNode = AVAudioSourceNode.alloc()
-    _pointer = ctypes.POINTER(AudioBufferList)
+    bufferList_pointer = ctypes.POINTER(AudioBufferList)
 
     @Block
     def renderBlock(isSilence: ctypes.c_bool, timestamp: ctypes.c_void_p,
                     frameCount: ctypes.c_void_p,
                     outputData: objc_id) -> OSStatus:
 
-      #ablPointer = at(outputData)
-      #print(ctypes.byref(outputData))
-      #print(ctypes.POINTER(outputData))
-      #print(ablPointer)
-      #print(ObjCInstance(outputData))
-      #print(ctypes.cast(outputData))
-      #print(py_from_ns(outputData))
-      #print(dir(outputData))
-      #print(dir(outputData.from_param))
+      '''
+      
+      ablPointer = ctypes.cast(outputData, bufferList_pointer).contents
+      for frame in range(frameCount):
+        sampleVal = sin(440.0 * 2.0 * pi * self.timex)
+        self.timex += self.deltaTime
+      
+        
 
-      ablPointer = ctypes.cast(outputData, _pointer).contents
-
-      #print(dir(ablPointer))
-      #print(ablPointer.mNumberBuffers)
-      self.timex += self.deltaTime
-      print(self.timex)
+        for buffer in range(ablPointer.mNumberBuffers):
+          #_mData = ablPointer.mBuffers[bufferr].mData
+          #_pointer = ctypes.POINTER(ctypes.c_float * frameCount)
+          #print(type(buffer))
+          print(buffer)
+          
+          #print(bufferr)
+          #buffer = ctypes.cast(_mData, _f_pointer).contents
+          #buffer[frame] = sampleVal
+          #print(sampleVal)
+      
+      '''
 
       return 0
 
+    
     sourceNode.initWithFormat_renderBlock_(inputFormat, renderBlock)
     #pdbr.state(sourceNode)
     audioEngine.attachNode_(sourceNode)
@@ -107,6 +114,7 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
 
     audioEngine.prepare()
     #pdbr.state(audioEngine)
+    
 
     self.audioEngine = audioEngine
     return self
