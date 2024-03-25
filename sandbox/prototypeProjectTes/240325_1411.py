@@ -1,6 +1,7 @@
+from math import sin, pi
 import ctypes
 
-from pyrubicon.objc import ObjCInstance, ObjCClass, NSObject, ObjCProtocol, objc_method, objc_property, py_from_ns, objc_block, ObjCBlock
+from pyrubicon.objc import ObjCInstance, ObjCClass, NSObject, ObjCProtocol, objc_method, objc_property, py_from_ns, objc_block, at, objc_id  #, ObjCBlock
 from pyrubicon.objc import Block
 from pyrubicon.objc.runtime import SEL, send_super
 
@@ -37,35 +38,66 @@ class AudioBufferList(ctypes.Structure):
 
 class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
   audioEngine: AVAudioEngine = objc_property()
-  sampleRate: float = objc_property()  # xxx: わざわざ不要か？
-  deltaTime: float = objc_property()
-  timex: float = objc_property()
+  #sampleRate: float = objc_property()  # xxx: わざわざ不要か？
+  #deltaTime: float = objc_property()
+  #timex: float = objc_property()
+
+  #sampleRate: float = 44100.0
+  #deltaTime: float = 0.0
+  #timex: float = 0.0
 
   @objc_method
   def initGenerator(self):
+    self.sampleRate: float = 44100.0
+    self.deltaTime: float = 0.0
+    self.timex: float = 0.0
+
     audioEngine = AVAudioEngine.new()
 
     mainMixer = audioEngine.mainMixerNode
     outputNode = audioEngine.outputNode
     format = outputNode.inputFormatForBus_(0)
 
-    self.sampleRate = format.sampleRate
-    self.deltaTime = 1 / py_from_ns(self.sampleRate)
+    #self.sampleRate = format.sampleRate
+    self.deltaTime = 1 / self.sampleRate  #py_from_ns(self.sampleRate)
+    '''
     inputFormat = AVAudioFormat.alloc(
     ).initWithCommonFormat_sampleRate_channels_interleaved_(
       format.commonFormat, py_from_ns(self.sampleRate), CHANNEL,
       format.isInterleaved)
+    '''
+    inputFormat = AVAudioFormat.alloc(
+    ).initWithCommonFormat_sampleRate_channels_interleaved_(
+      format.commonFormat, self.sampleRate, CHANNEL, format.isInterleaved)
 
     sourceNode = AVAudioSourceNode.alloc()
+    _pointer = ctypes.POINTER(AudioBufferList)
 
     @Block
-    def rb(isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
-           frameCount: ctypes.c_void_p,
-           outputData: ctypes.c_void_p) -> OSStatus:
-      print(type(frameCount))
+    def renderBlock(isSilence: ctypes.c_bool, timestamp: ctypes.c_void_p,
+                    frameCount: ctypes.c_void_p,
+                    outputData: objc_id) -> OSStatus:
+
+      #ablPointer = at(outputData)
+      #print(ctypes.byref(outputData))
+      #print(ctypes.POINTER(outputData))
+      #print(ablPointer)
+      #print(ObjCInstance(outputData))
+      #print(ctypes.cast(outputData))
+      #print(py_from_ns(outputData))
+      #print(dir(outputData))
+      #print(dir(outputData.from_param))
+
+      ablPointer = ctypes.cast(outputData, _pointer).contents
+
+      #print(dir(ablPointer))
+      #print(ablPointer.mNumberBuffers)
+      self.timex += self.deltaTime
+      print(self.timex)
+
       return 0
 
-    sourceNode.initWithFormat_renderBlock_(inputFormat, rb)
+    sourceNode.initWithFormat_renderBlock_(inputFormat, renderBlock)
     #pdbr.state(sourceNode)
     audioEngine.attachNode_(sourceNode)
     sourceNode.volume = 0.1
