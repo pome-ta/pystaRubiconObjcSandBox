@@ -2,7 +2,7 @@ from pyrubicon.objc.api import ObjCInstance, ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import objc_property, objc_method
 from pyrubicon.objc.api import NSObject
 from pyrubicon.objc.api import Block
-from pyrubicon.objc.runtime import SEL#, send_super
+from pyrubicon.objc.runtime import SEL  #, send_super
 
 from dispatchSync import dispatch_sync
 
@@ -90,17 +90,39 @@ class TopViewController(UIViewController, auto_rename=True):
 # --- AVAudioEngine
 
 AVAudioEngine = ObjCClass('AVAudioEngine')
+AVAudioFormat = ObjCClass('AVAudioFormat')
+# xxx: 定義用での呼び出しのみ？
+AVAudioMixerNode = ObjCClass('AVAudioMixerNode')
+AVAudioOutputNode = ObjCClass('AVAudioOutputNode')
 
 
 class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
   audioEngine: AVAudioEngine = objc_property()
-  #audioEngine = AVAudioEngine.new()
-  
+  sampleRate: float
+  deltaTime: float
+  mainMixer: AVAudioMixerNode = property()
+  outputNode: AVAudioOutputNode = property()
+  format: AVAudioFormat = property()
+
+  @objc_method
+  def callInitialize(self):
+    # todo: rubicon -> python としての変数定義的な
+    self.audioEngine = AVAudioEngine.new()
+    self.sampleRate = 44100.0
+    self.deltaTime = 0.0
 
   @objc_method
   def initAudioEngene(self):
-    self.audioEngine = AVAudioEngine.new()
-    pdbr.state(self.audioEngine)
+    self.callInitialize()
+
+    self.mainMixer = self.audioEngine.mainMixerNode
+    self.outputNode = self.audioEngine.outputNode
+    self.format = self.outputNode.inputFormatForBus_(0)
+
+    self.sampleRate = self.format.sampleRate
+    self.deltaTime = 1 / self.sampleRate
+    
+
     return self
 
 
