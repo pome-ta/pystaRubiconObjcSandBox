@@ -77,16 +77,17 @@ class TopViewController(UIViewController, auto_rename=True):
 
   @objc_method
   def viewDidLoad(self):
-    #send_super(__class__, self, 'viewDidLoad')
-    pass
+    self.generator = AudioEngeneWaveGenerator.alloc().initAudioEngene()
+    self.generator.start()
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
-    #self.generator.stop()
-    pass
+    self.generator.stop()
 
 
 # --- AVAudioEngine
+
+OSStatus = ctypes.c_int32
 
 AVAudioEngine = ObjCClass('AVAudioEngine')
 AVAudioFormat = ObjCClass('AVAudioFormat')
@@ -103,6 +104,7 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
   mainMixer: AVAudioMixerNode = property()
   outputNode: AVAudioOutputNode = property()
   format: AVAudioFormat = property()
+  sourceNode = property()
 
   @objc_method
   def callInitialize(self):
@@ -112,6 +114,16 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
     self.deltaTime = 0.0
     self.time = 0.0
     self.toneA = 440.0
+
+    @Block
+    def renderBlock(isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
+                    frameCount: ctypes.c_void_p,
+                    outputData: ctypes.c_void_p) -> OSStatus:
+      print(type(outputData))
+      return 0
+
+    self.sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(
+      renderBlock)
 
   @objc_method
   def initAudioEngene(self):
@@ -124,33 +136,30 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
     self.sampleRate = self.format.sampleRate
     self.deltaTime = 1 / self.sampleRate
 
-    @Block
-    def renderBlock(isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
-                    frameCount: ctypes.c_void_p,
-                    outputData: ctypes.c_void_p) -> ctypes.c_void_p:
-      return 0
-
-    sourceNode = AVAudioSourceNode.alloc()
-
-    inputFormat = AVAudioFormat.alloc(
-    ).initWithCommonFormat_sampleRate_channels_interleaved_(
-      self.format.commonFormat, self.sampleRate, 1, self.format.isInterleaved)
-
-    #pdbr.state(inputFormat)
-    #
-    #self.format.commonFormat
-    #self.format.isInterleaved
-    pdbr.state(inputFormat)
-
     return self
 
   @objc_method
   def start(self):
-    inputFormat = None
+    inputFormat = AVAudioFormat.alloc(
+    ).initWithCommonFormat_sampleRate_channels_interleaved_(
+      self.format.commonFormat, self.sampleRate, 1, self.format.isInterleaved)
+
+    self.audioEngine.attachNode_(self.sourceNode)
+    self.audioEngine.connect_to_format_(self.sourceNode, self.mainMixer,
+                                        inputFormat)
+    self.audioEngine.connect_to_format_(self.mainMixer, self.outputNode, None)
+    self.mainMixer.outputVolume = 0.1
+
+    self.audioEngine.startAndReturnError_(None)
+
+  @objc_method
+  def stop(self):
+    self.audioEngine.stop()
 
 
 if __name__ == "__main__":
   _vc = TopViewController.new()
-  _generator = AudioEngeneWaveGenerator.alloc().initAudioEngene()
+  #_generator = AudioEngeneWaveGenerator.alloc().initAudioEngene()
+  #_vc.generator = _generator
   present_ViewController(_vc)
 
