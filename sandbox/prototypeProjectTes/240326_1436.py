@@ -1,3 +1,5 @@
+import ctypes
+
 from pyrubicon.objc.api import ObjCInstance, ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import objc_property, objc_method
 from pyrubicon.objc.api import NSObject
@@ -78,9 +80,6 @@ class TopViewController(UIViewController, auto_rename=True):
     #send_super(__class__, self, 'viewDidLoad')
     pass
 
-    #self.generator = AudioEngeneWaveGenerator.alloc().initGenerator()
-    #self.generator.start()
-
   @objc_method
   def viewWillDisappear_(self, animated: bool):
     #self.generator.stop()
@@ -91,6 +90,7 @@ class TopViewController(UIViewController, auto_rename=True):
 
 AVAudioEngine = ObjCClass('AVAudioEngine')
 AVAudioFormat = ObjCClass('AVAudioFormat')
+AVAudioSourceNode = ObjCClass('AVAudioSourceNode')
 # xxx: 定義用での呼び出しのみ？
 AVAudioMixerNode = ObjCClass('AVAudioMixerNode')
 AVAudioOutputNode = ObjCClass('AVAudioOutputNode')
@@ -110,6 +110,8 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
     self.audioEngine = AVAudioEngine.new()
     self.sampleRate = 44100.0
     self.deltaTime = 0.0
+    self.time = 0.0
+    self.toneA = 440.0
 
   @objc_method
   def initAudioEngene(self):
@@ -121,9 +123,30 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
 
     self.sampleRate = self.format.sampleRate
     self.deltaTime = 1 / self.sampleRate
-    
+
+    @Block
+    def renderBlock(isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
+                    frameCount: ctypes.c_void_p,
+                    outputData: ctypes.c_void_p) -> ctypes.c_void_p:
+      return 0
+
+    sourceNode = AVAudioSourceNode.alloc()
+
+    inputFormat = AVAudioFormat.alloc(
+    ).initWithCommonFormat_sampleRate_channels_interleaved_(
+      self.format.commonFormat, self.sampleRate, 1, self.format.isInterleaved)
+
+    #pdbr.state(inputFormat)
+    #
+    #self.format.commonFormat
+    #self.format.isInterleaved
+    pdbr.state(inputFormat)
 
     return self
+
+  @objc_method
+  def start(self):
+    inputFormat = None
 
 
 if __name__ == "__main__":
