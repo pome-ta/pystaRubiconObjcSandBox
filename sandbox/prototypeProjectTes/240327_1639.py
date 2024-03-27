@@ -86,6 +86,7 @@ class TopViewController(UIViewController, auto_rename=True):
 
 
 # --- AVAudioEngine
+from math import sin, pi
 
 OSStatus = ctypes.c_int32
 
@@ -110,7 +111,7 @@ class AudioBuffer(ctypes.Structure):
 class AudioBufferList(ctypes.Structure):
   _fields_ = [
     ('mNumberBuffers', ctypes.c_uint32),
-    ('mBuffers', AudioBuffer * CHANNEL),
+    ('mBuffers', AudioBuffer * 1),
   ]
 
 
@@ -135,12 +136,46 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
     self.time = 0.0
     self.toneA = 440.0
 
+    bufferList_pointer = ctypes.POINTER(AudioBufferList)
     @Block
     def renderBlock(isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
                     frameCount: ctypes.c_void_p,
                     outputData: ctypes.c_void_p) -> OSStatus:
       #print(dir(ctypes.c_void_p(outputData)))
-      print(dir(AudioBufferList(outputData)))
+      #abl = ctypes.pointer(AudioBufferList(outputData)).contents
+      #print(dir(abl))
+      #print(dir(abl.contents))
+      #mBuffers', 'mNumberBuffers
+      #print(abl.mNumberBuffers)
+      ablPointer = ctypes.cast(outputData, bufferList_pointer).contents
+      #abl = AudioBufferList(outputData)
+      #print(abl.mNumberBuffers)
+      #print(dir(abl.mNumberBuffers))
+      #print(ablPointer.mNumberBuffers)
+      #print(dir(ablPointer.mNumberBuffers))
+      
+      for frame in range(frameCount):
+        sampleVal = sin(self.toneA * 2.0 * pi * self.time)
+        self.time += self.deltaTime
+        #print(abl.mNumberBuffers)
+        '''
+        for buffer in abl.mBuffers:
+          #print(buffer.mDataByteSize)
+          pass
+        
+        for buffer in abl.mBuffers:
+          #print(buffer.mData)
+          _mData =buffer.mData
+          _pointer = ctypes.POINTER(ctypes.c_float * frameCount)
+          _buf = ctypes.cast(_mData, _pointer).contents
+          _buf[frame] = sampleVal
+        '''
+        
+        for buffer in range(ablPointer.mNumberBuffers):
+          _mData = ablPointer.mBuffers[buffer].mData
+          print(_mData)
+        
+
       return 0
 
     #r = Block(renderBlock,OSStatus,ctypes.c_void_p,ctypes.c_void_p,ctypes.c_void_p,ctypes.POINTER(AudioBufferList))
@@ -169,6 +204,7 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
       self.format.commonFormat, self.sampleRate, CHANNEL,
       self.format.isInterleaved)
 
+    #pdbr.state(inputFormat)
     self.audioEngine.attachNode_(self.sourceNode)
     self.audioEngine.connect_to_format_(self.sourceNode, self.mainMixer,
                                         inputFormat)

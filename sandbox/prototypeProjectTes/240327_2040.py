@@ -86,6 +86,7 @@ class TopViewController(UIViewController, auto_rename=True):
 
 
 # --- AVAudioEngine
+from math import sin, pi
 
 OSStatus = ctypes.c_int32
 
@@ -110,11 +111,8 @@ class AudioBuffer(ctypes.Structure):
 class AudioBufferList(ctypes.Structure):
   _fields_ = [
     ('mNumberBuffers', ctypes.c_uint32),
-    ('mBuffers', AudioBuffer * CHANNEL),
+    ('mBuffers', AudioBuffer * 1),
   ]
-
-
-#print(dir(AudioBuffer))
 
 
 class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
@@ -135,18 +133,31 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
     self.time = 0.0
     self.toneA = 440.0
 
+    bufferList_pointer = ctypes.POINTER(AudioBufferList)
+
     @Block
     def renderBlock(isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
                     frameCount: ctypes.c_void_p,
                     outputData: ctypes.c_void_p) -> OSStatus:
-      #print(dir(ctypes.c_void_p(outputData)))
-      print(dir(AudioBufferList(outputData)))
+
+      ablPointer = ctypes.cast(outputData, bufferList_pointer).contents
+
+      for frame in range(frameCount):
+        sampleVal = sin(self.toneA * 2.0 * pi * self.time)
+        self.time += self.deltaTime
+
+        for buffer in range(ablPointer.mNumberBuffers):
+          _mData = ablPointer.mBuffers[buffer].mData
+          _pointer = ctypes.POINTER(ctypes.c_float * frameCount)
+          _buf = ctypes.cast(_mData, _pointer).contents
+          _old = _buf[frame]
+          _buf[frame] = sampleVal
+          #print(f'{_old} : {_buf[frame]}')
+
       return 0
 
-    #r = Block(renderBlock,OSStatus,ctypes.c_void_p,ctypes.c_void_p,ctypes.c_void_p,ctypes.POINTER(AudioBufferList))
     self.sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(
       renderBlock)
-    #self.sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(r)
 
   @objc_method
   def initAudioEngene(self):
@@ -169,12 +180,13 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
       self.format.commonFormat, self.sampleRate, CHANNEL,
       self.format.isInterleaved)
 
+    #pdbr.state(inputFormat)
     self.audioEngine.attachNode_(self.sourceNode)
     self.audioEngine.connect_to_format_(self.sourceNode, self.mainMixer,
                                         inputFormat)
 
     self.audioEngine.connect_to_format_(self.mainMixer, self.outputNode, None)
-    self.mainMixer.outputVolume = 0.1
+    self.mainMixer.outputVolume = 0.5
 
     self.audioEngine.startAndReturnError_(None)
 
@@ -185,7 +197,5 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
 
 if __name__ == "__main__":
   _vc = TopViewController.new()
-  #_generator = AudioEngeneWaveGenerator.alloc().initAudioEngene()
-  #_vc.generator = _generator
   present_ViewController(_vc)
 
