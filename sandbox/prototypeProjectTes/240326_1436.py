@@ -158,8 +158,9 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
 
     #pdbr.state(inputFormat)
     
-    self.audioEngine.attachNode_(self.sourceNode)
     pdbr.state(self.audioEngine)
+    self.audioEngine.attachNode_(self.sourceNode)
+    #pdbr.state(self.audioEngine)
     
     #self.audioEngine.connect_to_format_(self.sourceNode, self.mainMixer, inputFormat)
     '''
