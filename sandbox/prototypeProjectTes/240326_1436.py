@@ -97,6 +97,17 @@ AVAudioMixerNode = ObjCClass('AVAudioMixerNode')
 AVAudioOutputNode = ObjCClass('AVAudioOutputNode')
 
 
+CHANNEL = 2
+
+class AudioBuffer(ctypes.Structure):
+  _fields_ = [
+    ('mNumberChannels', ctypes.c_uint32),
+    ('mDataByteSize', ctypes.c_uint32),
+    ('mData', ctypes.c_void_p),
+  ]
+
+#print(dir(AudioBuffer))
+
 class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
   audioEngine: AVAudioEngine = objc_property()
   sampleRate: float
@@ -119,7 +130,8 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
     def renderBlock(isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
                     frameCount: ctypes.c_void_p,
                     outputData: ctypes.c_void_p) -> OSStatus:
-      print(type(outputData))
+      #print(dir(ctypes.c_void_p(outputData)))
+      print(outputData)
       return 0
 
     self.sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(
@@ -142,15 +154,20 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
   def start(self):
     inputFormat = AVAudioFormat.alloc(
     ).initWithCommonFormat_sampleRate_channels_interleaved_(
-      self.format.commonFormat, self.sampleRate, 1, self.format.isInterleaved)
+      self.format.commonFormat, self.sampleRate, CHANNEL, self.format.isInterleaved)
 
+    #pdbr.state(inputFormat)
+    
     self.audioEngine.attachNode_(self.sourceNode)
-    self.audioEngine.connect_to_format_(self.sourceNode, self.mainMixer,
-                                        inputFormat)
+    pdbr.state(self.audioEngine)
+    
+    #self.audioEngine.connect_to_format_(self.sourceNode, self.mainMixer, inputFormat)
+    '''
     self.audioEngine.connect_to_format_(self.mainMixer, self.outputNode, None)
     self.mainMixer.outputVolume = 0.1
 
     self.audioEngine.startAndReturnError_(None)
+    '''
 
   @objc_method
   def stop(self):
