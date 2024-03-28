@@ -169,8 +169,8 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
       ablPointer = ctypes.cast(outputData, bufferList_pointer).contents
 
       for frame in range(frameCount):
-        #sampleVal = sin(self.toneA * 2.0 * pi * self.time)
-        sampleVal = random()
+        sampleVal = sin(self.toneA * 2.0 * pi * self.time)
+        #sampleVal = random()
         self.time += self.deltaTime
 
         for buffer in range(ablPointer.mNumberBuffers):
@@ -202,6 +202,7 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
     session.setActive_error_(True, None)
 
     self.audioEngine.startAndReturnError_(None)
+    pdbr.state(self.audioEngine)
 
   @objc_method
   def stop(self):
