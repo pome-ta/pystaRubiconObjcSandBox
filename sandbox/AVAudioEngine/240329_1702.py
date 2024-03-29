@@ -1,8 +1,11 @@
 from math import sin, pi
 import ctypes
 from pyrubicon.objc.api import ObjCClass, Block
+from pyrubicon.objc.runtime import load_library
 
 import pdbr
+
+load_library('AVFoundation')
 
 AVAudioEngine = ObjCClass('AVAudioEngine')
 AVAudioPlayerNode = ObjCClass('AVAudioPlayerNode')
