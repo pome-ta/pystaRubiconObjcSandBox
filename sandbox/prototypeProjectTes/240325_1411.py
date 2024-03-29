@@ -78,7 +78,6 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
     def renderBlock(isSilence: ctypes.c_bool, timestamp: ctypes.c_void_p,
                     frameCount: ctypes.c_void_p,
                     outputData: objc_id) -> OSStatus:
-
       '''
       
       ablPointer = ctypes.cast(outputData, bufferList_pointer).contents
@@ -103,7 +102,6 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
 
       return 0
 
-    
     sourceNode.initWithFormat_renderBlock_(inputFormat, renderBlock)
     #pdbr.state(sourceNode)
     audioEngine.attachNode_(sourceNode)
@@ -114,7 +112,6 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
 
     audioEngine.prepare()
     #pdbr.state(audioEngine)
-    
 
     self.audioEngine = audioEngine
     return self
