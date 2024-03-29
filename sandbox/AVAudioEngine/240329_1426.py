@@ -1,6 +1,7 @@
 from math import sin, pi
 import ctypes
-from pyrubicon.objc.api import ObjCInstance, ObjCClass
+from pyrubicon.objc.api import ObjCClass
+from pyrubicon.objc.api import Block
 
 import pdbr
 
@@ -31,11 +32,20 @@ for ch in range(channels):
   samples = buffer.floatChannelData[ch]
   for n in range(buffer.frameLength):
     samples[n] = sin(2.0 * pi * 440.0 * float(n) / sampleRate)
-#print(buffer)
-#pdbr.state(audioFormat.channelCount)
-#print(buffer.frameLength)
 
-#print(channels)
+audioEngine.attachNode_(player)
+mixer = audioEngine.mainMixerNode
+audioEngine.connect_to_format_(player, mixer, audioFormat)
 
-#pdbr.state(buffer.floatChannelData)
-print(sampleRate)
+
+@Block
+def completionHandler() -> ctypes.c_void_p:
+  print('Play completed')
+
+player.scheduleBuffer_completionHandler_(buffer, completionHandler)
+
+audioEngine.startAndReturnError_(None)
+#pdbr.state(player)
+player.play()
+
+
