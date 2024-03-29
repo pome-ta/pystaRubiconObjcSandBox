@@ -43,10 +43,12 @@ def playSineWave():
     pdbr.state(audioEngine)
 
   player.scheduleBuffer_completionHandler_(buffer, completionHandler)
+  pdbr.state(player)
 
   try:
     audioEngine.startAndReturnError_(None)
     player.play()
+    print('play')
   except:
     print('error')
 
