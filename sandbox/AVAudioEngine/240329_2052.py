@@ -119,6 +119,7 @@ def playSineWave():
   try:
     audioEngine.startAndReturnError_(None)
     player.play()
+    pdbr.state(audioEngine)
   except:
     print('error')
 
