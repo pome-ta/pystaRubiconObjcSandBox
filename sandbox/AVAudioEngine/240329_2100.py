@@ -36,7 +36,17 @@ def playSineWave(call_time: float = 3.0):
 
   #pdbr.state(buffer.audioBufferList)
   #print(dir(buffer.audioBufferList))
-  print(dir(buffer.audioBufferList.contents))
+  pr = buffer#.audioBufferList.contents.field_1
+  
+  print(pr)
+  print(type(pr))
+  print(dir(pr))
+  
+  pdbr.state(pr)
+  '''
+  for i in pr:
+    print(dir(i))
+  '''
   audioEngine.attachNode_(player)
   mixer = audioEngine.mainMixerNode
   mixer.outputVolume = 0.1
