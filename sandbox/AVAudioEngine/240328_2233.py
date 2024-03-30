@@ -105,15 +105,15 @@ CHANNEL = 1
 
 class AudioBuffer(ctypes.Structure):
   _fields_ = [
-    ('mNumberChannels', ctypes.c_uint32),
-    ('mDataByteSize', ctypes.c_uint32),
+    ('mNumberChannels', ctypes.c_uint),
+    ('mDataByteSize', ctypes.c_uint),
     ('mData', ctypes.c_void_p),
   ]
 
 
 class AudioBufferList(ctypes.Structure):
   _fields_ = [
-    ('mNumberBuffers', ctypes.c_uint32),
+    ('mNumberBuffers', ctypes.c_uint),
     ('mBuffers', AudioBuffer * 1),
   ]
 
@@ -194,15 +194,17 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
 
     self.audioEngine.connect_to_format_(self.mainMixer, self.outputNode, None)
     self.mainMixer.outputVolume = 0.5
+    '''
 
     session = AVAudioSession.sharedInstance()
 
     session.setCategory_error_('AVAudioSessionCategoryPlayback', None)
     #pdbr.state(session)
     session.setActive_error_(True, None)
+    '''
 
     self.audioEngine.startAndReturnError_(None)
-    pdbr.state(self.audioEngine)
+    #pdbr.state(self.audioEngine)
 
   @objc_method
   def stop(self):

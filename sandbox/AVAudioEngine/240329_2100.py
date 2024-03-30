@@ -36,7 +36,7 @@ def playSineWave(call_time: float = 3.0):
 
   #pdbr.state(buffer.audioBufferList)
   #print(dir(buffer.audioBufferList))
-  pr = buffer.audioBufferList.contents.field_0
+  pr = buffer.audioBufferList.contents.field_1
   #field_0:  UInt32      mNumberBuffers; -> 2
   #field_1:  AudioBuffer mBuffers[1];    -> [1]
   
