@@ -1,8 +1,12 @@
 from math import sin, pi
 import ctypes
 from pyrubicon.objc.api import ObjCClass, Block
+from pyrubicon.objc.runtime import load_library
 
 import pdbr
+
+load_library('AVFoundation')
+AVAudioSession = ObjCClass('AVAudioSession')
 
 AVAudioEngine = ObjCClass('AVAudioEngine')
 AVAudioPlayerNode = ObjCClass('AVAudioPlayerNode')
@@ -36,7 +40,7 @@ def playSineWave(call_time: float = 3.0):
 
   #pdbr.state(buffer.audioBufferList)
   #print(dir(buffer.audioBufferList))
-  print(dir(buffer.audioBufferList.contents))
+  # print(dir(buffer.audioBufferList.contents))
   audioEngine.attachNode_(player)
   mixer = audioEngine.mainMixerNode
   mixer.outputVolume = 0.1
@@ -44,12 +48,16 @@ def playSineWave(call_time: float = 3.0):
 
   @Block
   def completionHandler() -> ctypes.c_void_p:
-    #print('Play completed')
-    pass
+    print('Play completed')
+    # pass
 
   player.scheduleBuffer_completionHandler_(buffer, completionHandler)
 
   try:
+    session = AVAudioSession.sharedInstance()
+    session.setCategory_error_('AVAudioSessionCategoryPlayback', None)
+    session.setActive_error_(True, None)
+    pdbr.state(session)
     audioEngine.startAndReturnError_(None)
     player.play()
     #print(audioEngine)
@@ -58,5 +66,5 @@ def playSineWave(call_time: float = 3.0):
 
 
 if __name__ == "__main__":
-  playSineWave(0.1)
+  playSineWave(3.0)
 
