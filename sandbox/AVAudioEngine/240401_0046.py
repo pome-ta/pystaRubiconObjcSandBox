@@ -136,7 +136,7 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
 
 
   #@Block
-  @objc_method
+  #@objc_method
   def renderBlock(self, isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
                   frameCount: ctypes.c_int32,
                   outputData: ctypes.c_void_p) -> OSStatus:
