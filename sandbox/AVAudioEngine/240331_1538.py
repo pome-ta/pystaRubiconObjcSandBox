@@ -4,8 +4,87 @@ from pyrubicon.objc.api import ObjCInstance, ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import objc_property, objc_method
 from pyrubicon.objc.api import NSObject
 from pyrubicon.objc.api import Block
+from pyrubicon.objc.runtime import SEL  #, send_super
+
+from dispatchSync import dispatch_sync
 
 import pdbr
+
+
+
+def present_ViewController(viewController_instance):
+  vc = viewController_instance
+  app = ObjCClass('UIApplication').sharedApplication
+  window = app.keyWindow if app.keyWindow else app.windows[0]
+  root_vc = window.rootViewController
+
+  while root_vc.presentedViewController:
+    root_vc = root_vc.presentedViewController
+
+  @Block
+  def processing() -> None:
+    nv = WrapNavigationController.alloc().initWithRootViewController_(vc)
+    nv.delegate = nv
+    nv.setModalPresentationStyle_(1)
+
+    root_vc.presentViewController_animated_completion_(nv, True, None)
+
+  dispatch_sync(processing)
+
+
+UINavigationController = ObjCClass('UINavigationController')
+UINavigationControllerDelegate = ObjCProtocol('UINavigationControllerDelegate')
+UINavigationBarAppearance = ObjCClass('UINavigationBarAppearance')
+UIBarButtonItem = ObjCClass('UIBarButtonItem')
+
+UIViewController = ObjCClass('UIViewController')
+UIColor = ObjCClass('UIColor')
+
+
+class WrapNavigationController(UINavigationController,
+                               protocols=[UINavigationControllerDelegate],
+                               auto_rename=True):
+
+  @objc_method
+  def doneButtonTapped_(self, sender):
+    visibleViewController = self.visibleViewController
+    visibleViewController.dismissViewControllerAnimated_completion_(True, None)
+
+  @objc_method
+  def navigationController_willShowViewController_animated_(
+      self, navigationController, viewController, animated):
+    appearance = UINavigationBarAppearance.alloc()
+    appearance.configureWithDefaultBackground()
+
+    navigationBar = navigationController.navigationBar
+    navigationBar.standardAppearance = appearance
+    navigationBar.scrollEdgeAppearance = appearance
+    navigationBar.compactAppearance = appearance
+    navigationBar.compactScrollEdgeAppearance = appearance
+
+    viewController.setEdgesForExtendedLayout_(0)
+
+    done_btn = UIBarButtonItem.alloc(
+    ).initWithBarButtonSystemItem_target_action_(0, navigationController,
+                                                 SEL('doneButtonTapped:'))
+    visibleViewController = navigationController.visibleViewController
+
+    navigationItem = visibleViewController.navigationItem
+    navigationItem.rightBarButtonItem = done_btn
+
+
+class TopViewController(UIViewController, auto_rename=True):
+
+  @objc_method
+  def viewDidLoad(self):
+    self.wg = AudioEngeneWaveGenerator.alloc().initAudioEngene()
+    self.wg.start()
+
+  @objc_method
+  def viewWillDisappear_(self, animated: bool):
+    self.wg.stop()
+
+
 
 # --- AVAudioEngine
 from math import sin, pi
@@ -67,6 +146,9 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
 
       for frame in range(frameCount):
         sampleVal = random()
+        #sampleVal = sin(self.toneA * 2.0 * pi * self.time)
+        #sampleVal = random()
+        #self.time += self.deltaTime
 
         for buffer in range(ablPointer.mNumberBuffers):
           _mData = ablPointer.mBuffers[buffer].mData
@@ -115,6 +197,8 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
 
 
 if __name__ == "__main__":
-  wg = AudioEngeneWaveGenerator.alloc().initAudioEngene()
-  wg.start()
+  #wg = AudioEngeneWaveGenerator.alloc().initAudioEngene()
+  #wg.start()
+  _vc = TopViewController.new()
+  present_ViewController(_vc)
 
