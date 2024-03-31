@@ -67,7 +67,7 @@ def renderBlock(isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
   #print('h')
 
   for frame in range(frameCount):
-    sampleVal = sin(toneA * 2.0 * pi * timex)
+    sampleVal = random()#sin(toneA * 2.0 * pi * timex)
     #timex += deltaTime
 
     for buffer in range(ablPointer.mNumberBuffers):
