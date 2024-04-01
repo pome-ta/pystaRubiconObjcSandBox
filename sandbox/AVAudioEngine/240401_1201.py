@@ -128,50 +128,10 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
   format: AVAudioFormat = property()
   sourceNode = property()
   '''
-  sourceNode = property()
   #deltaTime=property()
   #time = property()
-  toneA = property()
-
-
-
-
-  #@Block
-  #@objc_method
-  def renderBlock(self, isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
-                  frameCount: ctypes.c_int32,
-                  outputData: ctypes.c_void_p) -> OSStatus:
-
-    ablPointer = ctypes.cast(outputData, bufferList_pointer).contents
-    #print()
-    #self.audioEngine
-    #self.time += self.deltaTime
-    #print(type(frameCount))
-    #print(type(self.toneA))
-
-    for frame in range(frameCount):
-
-      sampleVal = sin(self.toneA * 2.0 * pi * random())
-      #sampleVal = sin(440.0 * 2.0 * pi * uniform(-1.0, 1.0))
-
-      #sampleVal = uniform(-1.0, 1.0) if frameCount / 2 < frame else 0
-      #sampleVal = uniform(-1.0, 1.0)
-      #sampleVal = random()
-
-      #sampleVal = sin(self.toneA * 2.0 * pi * self.time)
-      #self.time# = self.deltaTime
-      #print(self.time)
-
-      for buffer in range(ablPointer.mNumberBuffers):
-        _mData = ablPointer.mBuffers[buffer].mData
-        _pointer = ctypes.POINTER(ctypes.c_float * frameCount)
-        _buf = ctypes.cast(_mData, _pointer).contents
-        _buf[frame] = sampleVal
-    return 0
-
-    #self.sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(renderBlock)
-
-
+  #toneA = property()
+  
   @objc_method
   def callInitialize(self):
     # todo: rubicon -> python としての変数定義的な
@@ -182,7 +142,53 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
     self.toneA = 440.0
 
     
-    self.sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(self.renderBlock)
+    
+    @Block
+    def renderBlock(isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
+                    frameCount: ctypes.c_int32,
+                    outputData: ctypes.c_void_p) -> OSStatus:
+
+      ablPointer = ctypes.cast(outputData, bufferList_pointer).contents
+      #print(self.time)
+      
+      #self.audioEngine
+      #self.time += self.deltaTime
+      #print(type(frameCount))
+      #print(type(self.toneA))
+      #self.toneA = 440.0
+      _time = self.time
+      _deltaTime = self.deltaTime
+      _toneA = self.toneA
+
+      for frame in range(frameCount):
+
+        #sampleVal = sin(self.toneA * 2.0 * pi * random())
+        
+        #sampleVal = sin(440.0 * 2.0 * pi * uniform(-1.0, 1.0))
+
+        #sampleVal = uniform(-1.0, 1.0) if frameCount / 2 < frame else 0
+        #sampleVal = uniform(-1.0, 1.0)
+        #sampleVal = random()
+
+        sampleVal = sin(_toneA * 2.0 * pi * _time)
+        _time += _deltaTime
+        #self.time# = self.deltaTime
+        #print(self.time)
+
+        for buffer in range(ablPointer.mNumberBuffers):
+          _mData = ablPointer.mBuffers[buffer].mData
+          _pointer = ctypes.POINTER(ctypes.c_float * frameCount)
+          _buf = ctypes.cast(_mData, _pointer).contents
+          _buf[frame] = sampleVal
+      self.time = _time
+      self.deltaTime = _deltaTime
+      self.toneA = _toneA
+      return 0
+
+    self.sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(
+      renderBlock)
+
+    
 
   @objc_method
   def initAudioEngene(self):
