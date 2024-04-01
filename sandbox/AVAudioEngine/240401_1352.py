@@ -127,6 +127,7 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
     self.deltaTime = 0.0
     self.time = 0.0
     self.toneA = 440.0
+    self.add_val = 1.0
 
     @Block
     def renderBlock(isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
@@ -138,8 +139,13 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
       _time = self.time
       _deltaTime = self.deltaTime
       _toneA = self.toneA
+      _add_val = self.add_val
 
       for frame in range(frameCount):
+        _toneA += _add_val
+
+        _add_val = _add_val if 220.0 < _toneA > 880.0 else -_add_val
+
         sampleVal = sin(_toneA * 2.0 * pi * _time)
         _time += _deltaTime
 
@@ -152,6 +158,7 @@ class AudioEngeneWaveGenerator(NSObject, auto_rename=True):
       self.time = _time
       self.deltaTime = _deltaTime
       self.toneA = _toneA
+      self.add_val = _add_val
       return 0
 
     self.sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(
