@@ -84,7 +84,7 @@ class FirstViewController(UIViewController, auto_rename=True):
 
   @objc_method
   def onTap_(self, sender):
-    print(sender)
+    navigationController = self.navigationController
 
   @objc_method
   def viewDidLoad(self):
