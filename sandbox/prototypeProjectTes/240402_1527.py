@@ -75,11 +75,16 @@ UIColor = ObjCClass('UIColor')
 
 UIButtonConfiguration = ObjCClass('UIButtonConfiguration')
 UIButton = ObjCClass('UIButton')
+UIControlEventTouchUpInside = 1 << 6
 
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 
 class FirstViewController(UIViewController, auto_rename=True):
+
+  @objc_method
+  def onTap_(self, sender):
+    print(sender)
 
   @objc_method
   def viewDidLoad(self):
@@ -95,6 +100,8 @@ class FirstViewController(UIViewController, auto_rename=True):
 
     btn = UIButton.new()
     btn.configuration = config
+    btn.addTarget_action_(self, SEL('onTap:'))
+    #btn.addTarget_action_forControlEvents_(self, SEL('onTap:'), UIControlEventTouchUpInside)
 
     self.view.addSubview_(btn)
 
