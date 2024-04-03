@@ -23,6 +23,7 @@ NSObject_instance_methods = [
 def _get_className_methods(rubicon_object):
   objct_class = libobjc.object_getClass(rubicon_object)
   py_className_methods = {}
+  is_flag = False
 
   while objct_class is not None:
     py_methods = []
@@ -43,9 +44,12 @@ def _get_className_methods(rubicon_object):
 
     objct_class = libobjc.class_getSuperclass(objct_class)
 
-    if objct_class.value == NSObject.ptr.value:
-      py_className_methods[str(NSObject)] = NSObject_instance_methods
+    if is_flag:
       break
+    if objct_class.value == NSObject.ptr.value:
+      #py_className_methods[str(NSObject)] = NSObject_instance_methods
+      is_flag =True
+      
   return dict(reversed(list(py_className_methods.items())))
 
 

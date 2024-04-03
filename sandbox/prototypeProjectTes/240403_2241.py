@@ -1,3 +1,4 @@
+#import asyncio
 import ctypes
 
 from pyrubicon.objc.api import ObjCInstance, ObjCClass, ObjCProtocol
@@ -5,6 +6,7 @@ from pyrubicon.objc.api import objc_property, objc_method
 from pyrubicon.objc.api import NSObject
 from pyrubicon.objc.api import Block
 from pyrubicon.objc.runtime import SEL, send_super
+#from pyrubicon.objc.eventloop import EventLoopPolicy, iOSLifecycle
 
 from dispatchSync import dispatch_sync
 
@@ -19,9 +21,6 @@ def present_ViewController(viewController_instance):
 
   while root_vc.presentedViewController:
     root_vc = root_vc.presentedViewController
-
-  #pdbr.state(root_vc)
-  #nv = WrapNavigationController.alloc().initWithRootViewController_(vc)
 
   @Block
   def processing() -> None:
@@ -49,6 +48,7 @@ class WrapNavigationController(UINavigationController,
   def doneButtonTapped_(self, sender):
     visibleViewController = self.visibleViewController
     visibleViewController.dismissViewControllerAnimated_completion_(True, None)
+    #loop.stop()
 
   @objc_method
   def navigationController_willShowViewController_animated_(
@@ -84,25 +84,25 @@ UIControlEventTouchUpInside = 1 << 6
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 
-class FirstViewController(UIViewController, auto_rename=True):
+class FirstViewController(UIViewController,auto_rename=True):
 
   @objc_method
   def onTap_(self, sender):
-    
-    
-    selector = SEL('OnMainThread')
-    
-    self.performSelectorOnMainThread_withObject_waitUntilDone_(selector, None, True)
+    navigationController = self.navigationController
+
+    selector = SEL('pushViewController:animated:')
+    #signature = navigationController.instanceMethodSignatureForSelector_(selector)
+
+    #self.performSelectorOnMainThread_withObject_waitUntilDone_(selector, None, True)
     #pdbr.state(navigationController)
     #print(dir(svc))
+    #svc = SecondViewController.new()
     
-  @objc_method
-  def OnMainThread(self):
-    svc = SecondViewController.new()
-    navigationController = self.navigationController
-    navigationController.pushViewController_animated_(svc, True)
-    
-    
+    #navigationController.pushViewController_animated_(svc, True)
+    #pdbr.state(navigationController)
+    #pdbr.state(navigationController)
+    pdbr.state(NSObject)
+    #print(navigationController.__class__)
 
   @objc_method
   def viewDidLoad(self):
@@ -146,6 +146,7 @@ class SecondViewController(UIViewController, auto_rename=True):
   @objc_method
   def onTap_(self, sender):
     navigationController = self.navigationController
+    pdbr.state(navigationController)
 
   @objc_method
   def viewDidLoad(self):
@@ -181,6 +182,10 @@ class SecondViewController(UIViewController, auto_rename=True):
 
 
 if __name__ == "__main__":
+  #asyncio.set_event_loop_policy(EventLoopPolicy())
+  #loop = asyncio.new_event_loop()
+
   _fvc = FirstViewController.new()
   present_ViewController(_fvc)
+  #loop.run_forever(lifecycle=iOSLifecycle())
 
