@@ -19,17 +19,16 @@ def present_ViewController(viewController_instance):
 
   while root_vc.presentedViewController:
     root_vc = root_vc.presentedViewController
-  
+
   #pdbr.state(root_vc)
   #nv = WrapNavigationController.alloc().initWithRootViewController_(vc)
 
   @Block
   def processing() -> None:
-    
+
     nv = WrapNavigationController.alloc().initWithRootViewController_(vc)
     nv.delegate = nv
     nv.setModalPresentationStyle_(1)
-    
 
     root_vc.presentViewController_animated_completion_(nv, True, None)
 
@@ -89,15 +88,12 @@ class FirstViewController(UIViewController, auto_rename=True):
 
   @objc_method
   def onTap_(self, sender):
-    @Block
-    async  def processing1() -> None:
-      svc = SecondViewController.new()
-      navigationController = self.navigationController
-      navigationController.pushViewController_animated_(svc, True)
-    dispatch_sync(processing1)
-    
-    
-
+    svc = SecondViewController.new()
+    navigationController = self.navigationController
+    navigationController.performSelectorOnMainThread_withObject_waitUntilDone_(
+      SEL('pushViewController:animated:'), svc, False)
+    #pdbr.state(navigationController)
+    #print(dir(svc))
 
   @objc_method
   def viewDidLoad(self):
@@ -114,7 +110,8 @@ class FirstViewController(UIViewController, auto_rename=True):
     btn = UIButton.new()
     btn.configuration = config
     #btn.addTarget_action_(self, SEL('onTap:'))
-    btn.addTarget_action_forControlEvents_(self, SEL('onTap:'), UIControlEventTouchUpInside)
+    btn.addTarget_action_forControlEvents_(self, SEL('onTap:'),
+                                           UIControlEventTouchUpInside)
     #btn.addAction_forControlEvents_(None, UIControlEventTouchUpInside)
     #pdbr.state(btn)
 
@@ -133,7 +130,6 @@ class FirstViewController(UIViewController, auto_rename=True):
   @objc_method
   def viewWillDisappear_(self, animated: bool):
     send_super(__class__, self, 'viewWillDisappear:')
-
 
 
 class SecondViewController(UIViewController, auto_rename=True):
@@ -157,7 +153,7 @@ class SecondViewController(UIViewController, auto_rename=True):
     btn = UIButton.new()
     btn.configuration = config
     btn.addTarget_action_(self, SEL('onTap:'))
-    
+
     self.view.addSubview_(btn)
 
     btn.translatesAutoresizingMaskIntoConstraints = False
@@ -173,9 +169,6 @@ class SecondViewController(UIViewController, auto_rename=True):
   @objc_method
   def viewWillDisappear_(self, animated: bool):
     send_super(__class__, self, 'viewWillDisappear:')
-
-
-
 
 
 if __name__ == "__main__":
