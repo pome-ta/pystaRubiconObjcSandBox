@@ -137,7 +137,7 @@ class ObjCMethod:
         self.method_argtypes = self.imp_argtypes[2:]
 
     def __repr__(self):
-        return f"<{type(self).__qualname__}: {self.name.decode()} {self.encoding.decode()}>"
+        return f"<ObjCMethod: {self.name} {self.encoding}>"
 
     def __call__(self, receiver, *args, convert_args=True, convert_result=True):
         """Call the method on an object with the given arguments.
@@ -243,7 +243,7 @@ class ObjCPartialMethod:
         self.methods = {}  # Initialized in ObjCClass._load_methods
 
     def __repr__(self):
-        return f"{type(self).__qualname__}({self.name_start!r})"
+        return f"{type(self).__module__}.{type(self).__qualname__}({self.name_start!r})"
 
     def __call__(self, receiver, first_arg=_sentinel, **kwargs):
         if first_arg is ObjCPartialMethod._sentinel:
@@ -285,7 +285,7 @@ class ObjCBoundMethod:
             self.receiver = receiver
 
     def __repr__(self):
-        return f"{type(self).__qualname__}({self.method}, {self.receiver})"
+        return f"{type(self).__module__}.{type(self).__qualname__}({self.method}, {self.receiver})"
 
     def __call__(self, *args, **kwargs):
         """Call the method with the given arguments."""
@@ -995,10 +995,10 @@ class ObjCInstance:
 
     def __repr__(self):
         """Get a debugging representation of ``self``, which includes the
-        Objective-C object's class and ``debugDescription``."""
+        Objective-C object's address, class, and ``debugDescription``."""
         return (
-            f"<{type(self).__qualname__}: {self.objc_class.name} at "
-            f"{id(self):#x}: {self.debugDescription}>"
+            f"<{type(self).__module__}.{type(self).__qualname__} {id(self):#x}: "
+            f"{self.objc_class.name} at {self.ptr.value:#x}: {self.debugDescription}>"
         )
 
     def __getattr__(self, name):
@@ -1206,10 +1206,6 @@ class ObjCClass(ObjCInstance, type):
         protocols_ptr = libobjc.class_copyProtocolList(self, byref(out_count))
         return tuple(ObjCProtocol(protocols_ptr[i]) for i in range(out_count.value))
 
-    auto_rename = False
-    """A :any:`bool` value describing whether a defined class should be renamed automatically
-    if a class with the same name already exists in the Objective C runtime."""
-
     @classmethod
     def _new_from_name(cls, name):
         name = ensure_bytes(name)
@@ -1233,20 +1229,11 @@ class ObjCClass(ObjCInstance, type):
         return ptr, name
 
     @classmethod
-    def _new_from_class_statement(cls, name, bases, attrs, *, protocols, auto_rename):
-        basename = name
+    def _new_from_class_statement(cls, name, bases, attrs, *, protocols):
         name = ensure_bytes(name)
 
         if get_class(name).value is not None:
-            if auto_rename or auto_rename is None and cls.auto_rename:
-                suffix = 1
-                while get_class(name).value is not None:
-                    suffix += 1
-                    name = f"{basename}_{suffix}".encode()
-            else:
-                raise RuntimeError(
-                    f"An Objective-C class named {name!r} already exists"
-                )
+            raise RuntimeError(f"An Objective-C class named {name!r} already exists")
 
         try:
             (superclass,) = bases
@@ -1329,15 +1316,7 @@ class ObjCClass(ObjCInstance, type):
 
         return ptr, name, attrs
 
-    def __new__(
-        cls,
-        name_or_ptr,
-        bases=None,
-        attrs=None,
-        *,
-        protocols=(),
-        auto_rename=None,
-    ):
+    def __new__(cls, name_or_ptr, bases=None, attrs=None, *, protocols=()):
         """The constructor accepts either the name of an Objective-C class to
         look up (as :class:`str` or :class:`bytes`), or a pointer to an existing
         class object (in any form accepted by :class:`ObjCInstance`).
@@ -1357,14 +1336,6 @@ class ObjCClass(ObjCInstance, type):
         extended by the new class. An optional ``protocols`` keyword argument is
         also accepted, which must be a sequence of :class:`ObjCProtocol`\\s for
         the new class to adopt.
-
-        If the name of the class has already registered with the Objective C
-        runtime, the ``auto_rename`` option can be used to ensure that the
-        Objective C name for the new class will be unique. A numeric suffix will
-        be appended to the Objective C name to ensure uniqueness (for example,
-        ``MyClass`` will be renamed to ``MyClass_2``, ``MyClass_3`` etc until a
-        unique name is found). By default, classes will *not* be renamed, unless
-        :attr:`ObjCClass.auto_rename` is set at the class level.
         """
 
         if (bases is None) ^ (attrs is None):
@@ -1391,11 +1362,7 @@ class ObjCClass(ObjCInstance, type):
                     return ObjCMetaClass(ptr)
         else:
             ptr, name, attrs = cls._new_from_class_statement(
-                name_or_ptr,
-                bases,
-                attrs,
-                protocols=protocols,
-                auto_rename=auto_rename,
+                name_or_ptr, bases, attrs, protocols=protocols
             )
 
         objc_class_name = name.decode("utf-8")
@@ -1590,7 +1557,7 @@ class ObjCClass(ObjCInstance, type):
         self.objc_class.forced_properties.add(name)
 
     def __repr__(self):
-        return f"<{type(self).__qualname__}: {self.name}>"
+        return f"<{type(self).__module__}.{type(self).__qualname__}: {self.name} at {self.ptr.value:#x}>"
 
     def __str__(self):
         return f"{type(self).__name__}({self.name!r})"
@@ -1885,11 +1852,7 @@ class ObjCProtocol(ObjCInstance):
         protocols_ptr = libobjc.protocol_copyProtocolList(self, byref(out_count))
         return tuple(ObjCProtocol(protocols_ptr[i]) for i in range(out_count.value))
 
-    auto_rename = False
-    """A :class:`bool` value whether a defined protocol should be renamed
-    automatically if a protocol with the same name is already exists."""
-
-    def __new__(cls, name_or_ptr, bases=None, ns=None, auto_rename=None):
+    def __new__(cls, name_or_ptr, bases=None, ns=None):
         """The constructor accepts either the name of an Objective-C protocol
         to look up (as :class:`str` or :class:`bytes`), or a pointer to an
         existing protocol object (in any form accepted by
@@ -1907,15 +1870,6 @@ class ObjCProtocol(ObjCInstance):
         :ref:`custom-classes-and-protocols`). The bases list can contain any
         number of :class:`ObjCProtocol` objects to be extended by the new
         protocol.
-
-        If the name of the protocol has already registered with the Objective C
-        runtime, the ``auto_rename`` option can be used to ensure that the
-        Objective C name for the new protocol will be unique. A numeric suffix
-        will be appended to the Objective C name to ensure uniqueness (for
-        example, ``MyProtocol`` will be renamed to ``MyProtocol_2``,
-        ``MyProtocol_3`` etc until a unique name is found). By default,
-        protocols will *not* be renamed, unless
-        :attr:`ObjCProtocol.auto_rename` is set at the class level.
         """
 
         if (bases is None) ^ (ns is None):
@@ -1938,20 +1892,12 @@ class ObjCProtocol(ObjCInstance):
                         f"Pointer {ptr} ({ptr.value:#x}) does not refer to a protocol"
                     )
         else:
-            basename = name_or_ptr
             name = ensure_bytes(name_or_ptr)
 
-            # Rename the protocol that will be defined if the auto_rename option is True.
             if libobjc.objc_getProtocol(name).value is not None:
-                if auto_rename or auto_rename is None and cls.auto_rename:
-                    suffix = 1
-                    while libobjc.objc_getProtocol(name).value is not None:
-                        suffix += 1
-                        name = f"{basename}_{suffix}".encode()
-                else:
-                    raise RuntimeError(
-                        f"An Objective-C protocol named {name!r} already exists"
-                    )
+                raise RuntimeError(
+                    f"An Objective-C protocol named {name!r} already exists"
+                )
 
             # Check that all bases are protocols.
             for base in bases:
@@ -1981,7 +1927,7 @@ class ObjCProtocol(ObjCInstance):
         return super().__new__(cls, ptr)
 
     def __repr__(self):
-        return f"<{type(self).__qualname__}: {self.name}>"
+        return f"<{type(self).__module__}.{type(self).__qualname__}: {self.name} at {self.ptr.value:#x}>"
 
     def __instancecheck__(self, instance):
         """Check whether the given object conforms to this protocol.
