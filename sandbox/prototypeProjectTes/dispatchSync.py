@@ -1,5 +1,5 @@
 from ctypes import byref, cast, Structure, c_void_p
-import functools
+
 
 from pyrubicon.objc import ObjCInstance
 from pyrubicon.objc.runtime import objc_id, load_library
@@ -26,4 +26,3 @@ def dispatch_get_main_queue():
 
 def dispatch_sync(block_func):
   _dispatch_sync(dispatch_get_main_queue(), block_func)
-
