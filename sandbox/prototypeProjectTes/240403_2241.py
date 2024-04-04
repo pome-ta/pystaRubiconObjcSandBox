@@ -5,7 +5,7 @@ from pyrubicon.objc.api import ObjCInstance, ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import objc_property, objc_method
 from pyrubicon.objc.api import NSObject
 from pyrubicon.objc.api import Block
-from pyrubicon.objc.runtime import SEL, send_super
+from pyrubicon.objc.runtime import SEL, send_super, get_class,objc_id,Class
 #from pyrubicon.objc.eventloop import EventLoopPolicy, iOSLifecycle
 
 from dispatchSync import dispatch_sync
@@ -91,6 +91,15 @@ class FirstViewController(UIViewController,auto_rename=True):
     navigationController = self.navigationController
 
     selector = SEL('pushViewController:animated:')
+    #_ptr = navigationController.ptr
+    #print(_ptr)
+    #_class = Class(navigationController.ptr)
+    #_c = 
+    #pdbr.state(navigationController.__class__)
+    #print(navigationController)
+    #pdbr.state(WrapNavigationController)
+    #pdbr.state(navigationController.zone)
+    #print(navigationController.class)
     #signature = navigationController.instanceMethodSignatureForSelector_(selector)
 
     #self.performSelectorOnMainThread_withObject_waitUntilDone_(selector, None, True)
@@ -101,7 +110,7 @@ class FirstViewController(UIViewController,auto_rename=True):
     #navigationController.pushViewController_animated_(svc, True)
     #pdbr.state(navigationController)
     #pdbr.state(navigationController)
-    pdbr.state(NSObject)
+    #pdbr.state(NSObject)
     #print(navigationController.__class__)
 
   @objc_method
