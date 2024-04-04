@@ -1,4 +1,5 @@
 from ctypes import byref, cast, Structure, c_void_p
+import functools
 
 from pyrubicon.objc import ObjCInstance
 from pyrubicon.objc.runtime import objc_id, load_library
