@@ -13,18 +13,17 @@ ObjCClass.auto_rename = True
 
 
 @onMainThread
-def present_ViewController(viewController_instance):
-  vc = viewController_instance
-  vc.autorelease()
+def present_ViewController(viewController):
   app = ObjCClass('UIApplication').sharedApplication
   window = app.keyWindow if app.keyWindow else app.windows[0]
-  root_vc = window.rootViewController
+  rootViewController = window.rootViewController
 
-  while child_vc := root_vc.presentedViewController:
-    root_vc = child_vc
+  while presentedViewController := rootViewController.presentedViewController:
+    rootViewController = presentedViewController
 
-  vc.setModalPresentationStyle_(1)
-  root_vc.presentViewController_animated_completion_(vc, True, None)
+  viewController.setModalPresentationStyle_(1)
+  rootViewController.presentViewController_animated_completion_(
+    viewController, True, None)
 
 
 UINavigationController = ObjCClass('UINavigationController')
@@ -73,9 +72,6 @@ class RootNavigationController(UINavigationController,
     navigationItem = visibleViewController.navigationItem
     navigationItem.rightBarButtonItem = done_btn
     '''
-
-
-
 
 
 # --- ViewController
@@ -136,7 +132,6 @@ class FirstViewController(UIViewController):
       btn.heightAnchor.constraintEqualToAnchor_multiplier_(
         self.view.heightAnchor, 0.1),
     ])
-  
 
 
 class SecondViewController(UIViewController):
