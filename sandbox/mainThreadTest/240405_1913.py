@@ -15,6 +15,7 @@ ObjCClass.auto_rename = True
 @onMainThread
 def present_ViewController(viewController_instance):
   vc = viewController_instance
+  vc.autorelease()
   app = ObjCClass('UIApplication').sharedApplication
   window = app.keyWindow if app.keyWindow else app.windows[0]
   root_vc = window.rootViewController
@@ -22,10 +23,8 @@ def present_ViewController(viewController_instance):
   while child_vc := root_vc.presentedViewController:
     root_vc = child_vc
 
-  #vc.setModalPresentationStyle_(1)
-
+  vc.setModalPresentationStyle_(1)
   root_vc.presentViewController_animated_completion_(vc, True, None)
-  #pdbr.state(root_vc)
 
 
 UINavigationController = ObjCClass('UINavigationController')
@@ -76,24 +75,7 @@ class RootNavigationController(UINavigationController,
     '''
 
 
-class WrapNavigationController:
 
-  #@onMainThread
-  def _init(self, root_vc: UIViewController):
-    nv = RootNavigationController.alloc()  #.autorelease()
-    selector = SEL('initWithRootViewController:')
-
-    nv.performSelectorOnMainThread_withObject_waitUntilDone_(
-      selector, root_vc, True)
-    #.initWithRootViewController_(root_vc).autorelease()
-    nv.delegate = nv
-    return nv
-
-  @classmethod
-  def initWithRootViewControllerOnMainThread(
-      cls, rootViewController: UIViewController):
-    _cls = cls()
-    return _cls._init(rootViewController)
 
 
 # --- ViewController
@@ -101,7 +83,6 @@ class WrapNavigationController:
 
 class FirstViewController(UIViewController):
 
-  #@onMainThread
   @objc_method
   def onTap_(self, sender):
     navigationController = self.navigationController
@@ -123,17 +104,6 @@ class FirstViewController(UIViewController):
     #print(dir(svc))
     svc = SecondViewController.new()
     svc.autorelease()
-
-    @onMainThread
-    def run():
-
-      navigationController.pushViewController_animated_(svc, True)
-
-    run()
-    #pdbr.state(navigationController)
-    #pdbr.state(navigationController)
-    #pdbr.state(NSObject)
-    #print(navigationController.__class__)
 
   @objc_method
   def viewDidLoad(self):
@@ -166,14 +136,10 @@ class FirstViewController(UIViewController):
       btn.heightAnchor.constraintEqualToAnchor_multiplier_(
         self.view.heightAnchor, 0.1),
     ])
-  '''
-  @objc_method
-  def viewWillDisappear_(self, animated: bool):
-    send_super(__class__, self, 'viewWillDisappear:')
-  '''
+  
 
 
-class SecondViewController(UIViewController, auto_rename=True):
+class SecondViewController(UIViewController):
 
   @objc_method
   def onTap_(self, sender):
@@ -208,18 +174,8 @@ class SecondViewController(UIViewController, auto_rename=True):
         self.view.heightAnchor, 0.3),
     ])
 
-  @objc_method
-  def viewWillDisappear_(self, animated: bool):
-    send_super(__class__, self, 'viewWillDisappear:')
-
 
 if __name__ == "__main__":
-  #asyncio.set_event_loop_policy(EventLoopPolicy())
-  #loop = asyncio.new_event_loop()
-
-  _fvc = FirstViewController.new().autorelease()
-  nv = WrapNavigationController.initWithRootViewControllerOnMainThread(_fvc)
-  #_nv =
-  present_ViewController(nv)
-  #loop.run_forever(lifecycle=iOSLifecycle())
+  _vc = FirstViewController.new()
+  present_ViewController(_vc)
 
