@@ -23,8 +23,8 @@ def present_ViewController(viewController_instance):
     root_vc = child_vc
 
   #nv = WrapNavigationController.alloc().initWithRootViewController_(vc)
-  nv = WrapNavigationController.initWithRootViewControllerOnMainThread_(vc)
-  nv.delegate = nv
+  nv = WrapNavigationController.initWithRootViewControllerOnMainThread(vc)
+  #nv.delegate = nv
   nv.setModalPresentationStyle_(1)
 
   root_vc.presentViewController_animated_completion_(nv, True, None)
@@ -45,30 +45,14 @@ UIControlEventTouchUpInside = 1 << 6
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 
-class WrapNavigationController(UINavigationController,
+class RootNavigationController(UINavigationController,
                                protocols=[UINavigationControllerDelegate]):
-  '''
-  @onMainThread
-  @objc_method
-  def initWithRootViewController_(self, rootViewController:UIViewController):
-    self = send_super(__class__, self, 'initWithRootViewController:')
-    #send_super(__class__, self, 'initWithRootViewController:', rootViewController,argtypes=UIViewController)
-    #self.delegate = self
-    return self
-  '''
-  '''
-  @onMainThread
-  @objc_method
-  def viewDidLoad(self):
-    self.delegate = self
-  '''
 
   @objc_method
   def doneButtonTapped_(self, sender):
     visibleViewController = self.visibleViewController
     visibleViewController.dismissViewControllerAnimated_completion_(True, None)
 
-  #@onMainThread
   @objc_method
   def navigationController_willShowViewController_animated_(
       self, navigationController, viewController, animated):
@@ -91,13 +75,20 @@ class WrapNavigationController(UINavigationController,
     navigationItem = visibleViewController.navigationItem
     navigationItem.rightBarButtonItem = done_btn
 
-  @onMainThread
+
+class WrapNavigationController:
+
+  #@onMainThread
+  def _init(self, root_vc: UIViewController):
+    nv = RootNavigationController.alloc().initWithRootViewController_(root_vc).autorelease()
+    nv.delegate = nv
+    return nv
+
   @classmethod
-  def initWithRootViewControllerOnMainThread_(cls, rootViewController: UIViewController):
-    _cls = cls.alloc().initWithRootViewController_(rootViewController)
-    _cls.delegate = _cls
-    return _cls
-  
+  def initWithRootViewControllerOnMainThread(
+      cls, rootViewController: UIViewController):
+    _cls = cls()
+    return _cls._init(rootViewController)
 
 
 # --- ViewController
@@ -214,6 +205,7 @@ if __name__ == "__main__":
   #loop = asyncio.new_event_loop()
 
   _fvc = FirstViewController.new()
+  #_nv = 
   present_ViewController(_fvc)
   #loop.run_forever(lifecycle=iOSLifecycle())
 
