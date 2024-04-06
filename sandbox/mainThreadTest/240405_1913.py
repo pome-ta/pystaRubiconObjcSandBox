@@ -13,7 +13,7 @@ ObjCClass.auto_rename = True
 
 
 @onMainThread
-def present_ViewController(viewController):
+def present_ViewController(myViewController):
   app = ObjCClass('UIApplication').sharedApplication
   window = app.keyWindow if app.keyWindow else app.windows[0]
   rootViewController = window.rootViewController
@@ -21,9 +21,14 @@ def present_ViewController(viewController):
   while presentedViewController := rootViewController.presentedViewController:
     rootViewController = presentedViewController
 
-  viewController.setModalPresentationStyle_(1)
+  navigationController = RootNavigationController.alloc(
+  ).initWithRootViewController_(myViewController).autorelease()
+  navigationController.delegate = navigationController
+
+  controller = navigationController
+  controller.setModalPresentationStyle_(1)
   rootViewController.presentViewController_animated_completion_(
-    viewController, True, None)
+    controller, True, None)
 
 
 UINavigationController = ObjCClass('UINavigationController')
@@ -52,7 +57,7 @@ class RootNavigationController(UINavigationController,
   @objc_method
   def navigationController_willShowViewController_animated_(
       self, navigationController, viewController, animated):
-    appearance = UINavigationBarAppearance.new().autorelease()
+    appearance = UINavigationBarAppearance.new()
     appearance.configureWithDefaultBackground()
 
     navigationBar = navigationController.navigationBar
@@ -62,7 +67,6 @@ class RootNavigationController(UINavigationController,
     navigationBar.compactScrollEdgeAppearance = appearance
 
     viewController.setEdgesForExtendedLayout_(0)
-    '''
 
     done_btn = UIBarButtonItem.alloc(
     ).initWithBarButtonSystemItem_target_action_(0, navigationController,
@@ -71,7 +75,6 @@ class RootNavigationController(UINavigationController,
 
     navigationItem = visibleViewController.navigationItem
     navigationItem.rightBarButtonItem = done_btn
-    '''
 
 
 # --- ViewController
@@ -81,25 +84,8 @@ class FirstViewController(UIViewController):
 
   @objc_method
   def onTap_(self, sender):
+
     navigationController = self.navigationController
-
-    selector = SEL('pushViewController:animated:')
-    #_ptr = navigationController.ptr
-    #print(_ptr)
-    #_class = Class(navigationController.ptr)
-    #_c =
-    #pdbr.state(navigationController.__class__)
-    #print(navigationController)
-    #pdbr.state(WrapNavigationController)
-    #pdbr.state(navigationController.zone)
-    #print(navigationController.class)
-    #signature = navigationController.instanceMethodSignatureForSelector_(selector)
-
-    #self.performSelectorOnMainThread_withObject_waitUntilDone_(selector, None, True)
-    #pdbr.state(navigationController)
-    #print(dir(svc))
-    svc = SecondViewController.new()
-    svc.autorelease()
 
   @objc_method
   def viewDidLoad(self):
@@ -113,23 +99,25 @@ class FirstViewController(UIViewController):
     config.baseBackgroundColor = UIColor.systemPinkColor()
     config.baseForegroundColor = UIColor.systemGreenColor()
 
-    btn = UIButton.new()
-    btn.configuration = config
+    tapButton = UIButton.new()
+    tapButton.configuration = config
     #btn.addTarget_action_(self, SEL('onTap:'))
-    btn.addTarget_action_forControlEvents_(self, SEL('onTap:'),
-                                           UIControlEventTouchUpInside)
+    tapButton.addTarget_action_forControlEvents_(self, SEL('onTap:'),
+                                                 UIControlEventTouchUpInside)
     #btn.addAction_forControlEvents_(None, UIControlEventTouchUpInside)
     #pdbr.state(btn)
 
-    self.view.addSubview_(btn)
+    self.view.addSubview_(tapButton)
 
-    btn.translatesAutoresizingMaskIntoConstraints = False
+    tapButton.translatesAutoresizingMaskIntoConstraints = False
     NSLayoutConstraint.activateConstraints_([
-      btn.centerXAnchor.constraintEqualToAnchor_(self.view.centerXAnchor),
-      btn.centerYAnchor.constraintEqualToAnchor_(self.view.centerYAnchor),
-      btn.widthAnchor.constraintEqualToAnchor_multiplier_(
+      tapButton.centerXAnchor.constraintEqualToAnchor_(
+        self.view.centerXAnchor),
+      tapButton.centerYAnchor.constraintEqualToAnchor_(
+        self.view.centerYAnchor),
+      tapButton.widthAnchor.constraintEqualToAnchor_multiplier_(
         self.view.widthAnchor, 0.4),
-      btn.heightAnchor.constraintEqualToAnchor_multiplier_(
+      tapButton.heightAnchor.constraintEqualToAnchor_multiplier_(
         self.view.heightAnchor, 0.1),
     ])
 
