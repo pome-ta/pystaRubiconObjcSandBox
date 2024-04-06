@@ -1,14 +1,15 @@
 import ctypes
 
-from pyrubicon.objc.api import ObjCInstance, ObjCClass, ObjCProtocol, objc_property, objc_method
+from pyrubicon.objc.api import at, ObjCInstance, ObjCClass, ObjCProtocol, objc_property, objc_method
 #from pyrubicon.objc.api import NSObject
 from pyrubicon.objc.api import Block
-from pyrubicon.objc.runtime import SEL, send_super, objc_id
+from pyrubicon.objc.runtime import SEL, send_super
 
 from mainThread import onMainThread
 
 import pdbr
 
+NSInvocation = ObjCClass('NSInvocation')
 ObjCClass.auto_rename = True
 
 
@@ -73,8 +74,15 @@ class RootNavigationController(UINavigationController,
     ).initWithBarButtonSystemItem_target_action_(0, navigationController,
                                                  SEL('doneButtonTapped:'))
     visibleViewController = navigationController.visibleViewController
+    topViewController = navigationController.topViewController
+    
+    #pdbr.state(navigationController)
+    #topViewController
 
-    navigationItem = visibleViewController.navigationItem
+    #navigationItem = visibleViewController.navigationItem
+    #navigationItem = navigationController.navigationItem
+    navigationItem = topViewController.navigationItem
+    
     navigationItem.rightBarButtonItem = done_btn
 
 
@@ -86,12 +94,41 @@ class FirstViewController(UIViewController):
   @objc_method
   def onTap_(self, sender):
     navigationController = self.navigationController
-    svc = SecondViewController.new()  #.autorelease()
-    snv = RootNavigationController.alloc().initWithRootViewController_(svc)
-    snv.delegate = snv
-    navigationController.presentModalViewController_animated_(snv, True)
-    #navigationController.presentViewController_animated_completion_(snv, True, None)
-    #pdbr.state(navigationController)
+    svc = SecondViewController.new()#.autorelease()
+    '''
+    @onMainThread
+    def run():
+      
+      selector = SEL('pushViewController:animated:')
+      signature = navigationController.methodSignatureForSelector_(selector)
+  
+      invocation = NSInvocation.invocationWithMethodSignature_(signature)
+      invocation.setSelector_(selector)
+      invocation.setTarget_(navigationController)
+      invocation.setArgument_atIndex_(svc, 2)
+      invocation.setArgument_atIndex_('', 3)
+      invocation.invoke()
+      #pdbr.state(invocation)
+
+    run()
+    '''
+    '''
+    selector = SEL('pushViewController:animated:')
+    signature = navigationController.methodSignatureForSelector_(selector)
+
+    invocation = NSInvocation.invocationWithMethodSignature_(signature)
+    invocation.setSelector_(selector)
+    invocation.setTarget_(navigationController)
+    invocation.setArgument_atIndex_(svc, 2)
+    invocation.setArgument_atIndex_(True, 3)
+    invocation.invoke()
+    #pdbr.state(invocation)
+    #print(invocation)
+    #pdbr.state(invocation)
+    print(at(True))
+    '''
+    navigationController.pushViewController_animated_(svc, True)
+    
 
   @objc_method
   def viewDidLoad(self):
