@@ -15,7 +15,8 @@ ObjCClass.auto_rename = True
 
 
 #@onMainThread
-@on_main_thread
+#@on_main_thread
+@onMainThread
 def present_ViewController(myViewController):
   app = ObjCClass('UIApplication').sharedApplication
   window = app.keyWindow if app.keyWindow else app.windows[0]
@@ -95,10 +96,11 @@ class WrapNavigationController:
       
       navigationItem.rightBarButtonItem = done_btn
 
-  @on_main_thread
+  #@on_main_thread
+  @onMainThread
   def _init(self,vc: UIViewController):
     nv = self.RootNavigationController.alloc().initWithRootViewController_(vc).autorelease()
-    nv.delegate = nv
+    #nv.delegate = nv
     return nv
     
     
@@ -228,6 +230,6 @@ if __name__ == "__main__":
   _vc = FirstViewController.new()
   navigationController = WrapNavigationController.new(_vc)
   #present_ViewController(navigationController)
-  print(navigationController)
+  #print(navigationController)
   #pdbr.state(navigationController)
 
