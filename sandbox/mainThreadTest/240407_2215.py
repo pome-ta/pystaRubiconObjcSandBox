@@ -10,7 +10,6 @@ from objc_util import on_main_thread
 
 import pdbr
 
-
 ObjCClass.auto_rename = True
 
 UINavigationController = ObjCClass('UINavigationController')
@@ -40,13 +39,15 @@ def present_ViewController(myViewController):
     rootViewController = presentedViewController
 
   #navigationController = UINavigationController.new()
+  #navigationController = UINavigationController.alloc().initWithRootViewController_(myViewController)#.autorelease()
+
   navigationController = RootNavigationController.alloc(
   ).initWithRootViewController_(myViewController)#.autorelease()
-  pdbr.state(navigationController)
-  delegate = RootNavigationControllerDelegate.new()
+  #pdbr.state(navigationController)
+  #delegate = RootNavigationControllerDelegate.new()
   #pdbr.state(delegate)
-  navigationController.delegate = delegate
-  
+  #navigationController.setDelegate_(navigationController)
+
   #navigationController = WrapNavigationController.new(myViewController)
 
   controller = navigationController
@@ -56,20 +57,23 @@ def present_ViewController(myViewController):
     controller, True, None)
 
 
-
 #pdbr.state(UINavigationControllerDelegate)
 
 
-class RootNavigationController(UINavigationController):
-  delegate = objc_property()
+class RootNavigationController(UINavigationController,
+                               protocols=[UINavigationControllerDelegate]):
+  #delegate = objc_property()
 
-
-class RootNavigationControllerDelegate(NSObject, protocols=[UINavigationControllerDelegate]):
-  
   
   @objc_method
-  def init(self):
-    return self
+  def viewDidLoad(self):
+    send_super(__class__, self, 'viewDidLoad')
+    self.delegate = self
+    pdbr.state(self)
+  
+  
+  
+  
   @objc_method
   def doneButtonTapped_(self, sender):
     visibleViewController = self.visibleViewController
@@ -93,15 +97,15 @@ class RootNavigationControllerDelegate(NSObject, protocols=[UINavigationControll
     ).initWithBarButtonSystemItem_target_action_(0, navigationController,
                                                  SEL('doneButtonTapped:'))
     visibleViewController = navigationController.visibleViewController
-    topViewController = navigationController.topViewController
-    
+    #topViewController = navigationController.topViewController
+
     #pdbr.state(navigationController)
     #topViewController
 
     navigationItem = visibleViewController.navigationItem
     #navigationItem = navigationController.navigationItem
     #navigationItem = topViewController.navigationItem
-    
+
     navigationItem.rightBarButtonItem = done_btn
 
 
@@ -113,9 +117,8 @@ class FirstViewController(UIViewController):
   @objc_method
   def onTap_(self, sender):
     navigationController = self.navigationController
-    svc = SecondViewController.new()#.autorelease()
+    svc = SecondViewController.new()  #.autorelease()
     navigationController.pushViewController_animated_(svc, True)
-    
 
   @objc_method
   def viewDidLoad(self):
