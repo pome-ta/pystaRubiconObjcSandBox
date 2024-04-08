@@ -9,16 +9,6 @@ __all__ = [
   'state',
 ]
 
-NSObject_instance_methods = [
-  'init',
-  'copy',
-  'mutableCopy',
-  'dealloc',
-  'performSelector_withObject_afterDelay_',
-  'performSelectorOnMainThread_withObject_waitUntilDone_',
-  'performSelectorInBackground_withObject_',
-]
-
 
 def _get_className_methods(rubicon_object):
   objct_class = libobjc.object_getClass(rubicon_object)
@@ -47,9 +37,8 @@ def _get_className_methods(rubicon_object):
     if is_flag:
       break
     if objct_class.value == NSObject.ptr.value:
-      #py_className_methods[str(NSObject)] = NSObject_instance_methods
-      is_flag =True
-      
+      is_flag = True
+
   return dict(reversed(list(py_className_methods.items())))
 
 
@@ -57,5 +46,6 @@ def state(rubicon_obj):
   _dic = _get_className_methods(rubicon_obj)
   data = json.dumps(_dic, indent=2)
   print(data)
+  pprint(list(_dic.keys()))
   pprint(rubicon_obj)
 
