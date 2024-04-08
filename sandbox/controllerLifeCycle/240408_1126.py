@@ -5,4 +5,4 @@ import pdbr
 
 app = ObjCClass('UIApplication').sharedApplication
 
-pdbr.state(app)
+pdbr.state(app.delegate)

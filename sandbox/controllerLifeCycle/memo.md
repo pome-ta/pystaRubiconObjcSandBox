@@ -12,4 +12,9 @@
 
 [アプリ画面のライフサイクル管理をAppDelegateからSceneDelegateへ移行した話 - Studyplus Engineering Blog](https://tech.studyplus.co.jp/entry/2021/07/05/100000)
 
+[SceneDelegateのシングルトンオブジェクトを取得する #Swift - Qiita](https://qiita.com/s2mr/items/43e208d0be48ee2db000)
+
+
+[[Swift]Singleton(シングルトン)とは?メリット、実装方法、使い方 - iOSアプリ開発ならTickleCode](https://ticklecode.com/swiftsingleton/)
+
 
