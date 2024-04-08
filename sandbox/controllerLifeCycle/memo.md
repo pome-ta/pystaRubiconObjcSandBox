@@ -30,4 +30,4 @@
 
 [【Swift】UIApplicationとは?使い方とプロパティやメソッド](https://appdev-room.com/swift-uiapplication)
 
-
+[macOS NSApplication のメインイベントループを60行以下で実装する](https://zenn.dev/codehex/articles/056bd28b7009e2)

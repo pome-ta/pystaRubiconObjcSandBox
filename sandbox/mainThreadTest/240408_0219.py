@@ -3,7 +3,7 @@ import ctypes
 from pyrubicon.objc.api import at, ObjCInstance, ObjCClass, ObjCProtocol, objc_property, objc_method
 from pyrubicon.objc.api import NSObject
 from pyrubicon.objc.api import Block
-from pyrubicon.objc.runtime import SEL, send_super
+from pyrubicon.objc.runtime import SEL, send_super,autoreleasepool
 
 from mainThread import onMainThread
 from objc_util import on_main_thread
@@ -30,6 +30,7 @@ NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 #@onMainThread
 #@on_main_thread
 @onMainThread
+#@autoreleasepool
 def present_ViewController(myViewController):
   app = ObjCClass('UIApplication').sharedApplication
   window = app.keyWindow if app.keyWindow else app.windows[0]
@@ -52,9 +53,9 @@ def present_ViewController(myViewController):
 
   controller = navigationController
   controller.setModalPresentationStyle_(1)
-
-  rootViewController.presentViewController_animated_completion_(
-    controller, True, None)
+  
+  autoreleasepool(rootViewController.presentViewController_animated_completion_(
+    controller, True, None))
 
 
 #pdbr.state(UINavigationControllerDelegate)
