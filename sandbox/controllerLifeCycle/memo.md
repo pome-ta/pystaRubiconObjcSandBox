@@ -17,4 +17,17 @@
 
 [[Swift]Singleton(シングルトン)とは?メリット、実装方法、使い方 - iOSアプリ開発ならTickleCode](https://ticklecode.com/swiftsingleton/)
 
+[Storyboardを使わないiOSアプリ開発](https://zenn.dev/kazumalab/articles/76ca59f82c189cf33d43)
+
+
+[既存iOSプロジェクトをSwiftUI Appへ移行する - アプリ開発者はSwiftUIにおけるAppDelegate/SceneDelegateの扱いをよく理解していない? | Irimasu Densan Planning - いります電算企画](https://irimasu.com/ios-swiftui-app-swiftui-appdelegate-scenedelegate)
+
+
+[@UIApplicationDelegateAdapterについて読み物 - SwiftUIからアプリ始めた人むけ | Irimasu Densan Planning - いります電算企画](https://irimasu.com/about-uiapplicationdelegateadapter)
+
+
+
+
+[【Swift】UIApplicationとは?使い方とプロパティやメソッド](https://appdev-room.com/swift-uiapplication)
+
 
