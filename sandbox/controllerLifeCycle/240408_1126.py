@@ -1,4 +1,4 @@
-from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method
+from pyrubicon.objc.api import at,ObjCClass, ObjCProtocol, objc_method,py_from_ns
 from pyrubicon.objc.runtime import SEL, send_super
 
 from mainThread import onMainThread
@@ -19,6 +19,7 @@ UIViewController = ObjCClass('UIViewController')
 UIColor = ObjCClass('UIColor')
 pageSheet = 1  # xxx: あとでちゃんと定義する
 
+is_print = True
 
 # --- NavigationController
 class RootNavigationController(UINavigationController,
@@ -50,6 +51,7 @@ class RootNavigationController(UINavigationController,
   def navigationController_willShowViewController_animated_(
       self, navigationController, viewController, animated):
     print('--- :willShowViewController:animated:\t -> NavigationController')
+    #print(animated)
     appearance = UINavigationBarAppearance.new()
     appearance.configureWithDefaultBackground()
 
@@ -61,6 +63,19 @@ class RootNavigationController(UINavigationController,
 
     viewController.setEdgesForExtendedLayout_(0)
 
+    done_btn = UIBarButtonItem.alloc(
+    ).initWithBarButtonSystemItem_target_action_(0, navigationController,
+                                                 SEL('doneButtonTapped:'))
+    visibleViewController = navigationController.visibleViewController
+
+    navigationItem = visibleViewController.navigationItem
+    navigationItem.rightBarButtonItem = done_btn
+
+  @objc_method
+  def doneButtonTapped_(self, sender):
+    visibleViewController = self.visibleViewController
+    visibleViewController.dismissViewControllerAnimated_completion_(True, None)
+
 
 # --- ViewController
 class FirstViewController(UIViewController):
@@ -68,26 +83,27 @@ class FirstViewController(UIViewController):
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
-    print('--- ViewController-> viewDidLoad')
+    print('--- viewDidLoad\t -> ViewController')
     self.view.backgroundColor = UIColor.systemBlueColor()
-    self.navigationItem.title = str(__class__)
-    #pdbr.state(self.navigationItem)
+    self.navigationItem.title = 'a'
+    #pdbr.state(self)
+    print(py_from_ns(self.className))
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
     # xxx: 引数不要？
     send_super(__class__, self, 'viewDidAppear:')
-    print('--- ViewController-> viewDidAppear:')
+    print('--- viewDidAppear:\t -> ViewController')
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
     send_super(__class__, self, 'viewWillDisappear:')
-    print('--- ViewController-> viewWillDisappear:')
+    print('--- viewWillDisappear:\t -> ViewController')
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
     send_super(__class__, self, 'viewDidDisappear:')
-    print('--- ViewController-> viewDidDisappear:')
+    print('--- viewDidDisappear:\t -> ViewController')
 
 
 @onMainThread
