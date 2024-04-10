@@ -2,11 +2,11 @@ from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method
 from pyrubicon.objc.runtime import SEL, send_super
 
 from mainThread import onMainThread
-from objc_util import on_main_thread
+#from objc_util import on_main_thread
 import pdbr
 
 ObjCClass.auto_rename = True
-ObjCProtocol.auto_rename = True
+#ObjCProtocol.auto_rename = True
 
 # --- UINavigationController
 UINavigationController = ObjCClass('UINavigationController')
@@ -45,31 +45,11 @@ class RootNavigationController(UINavigationController):
     navigationBar.compactAppearance = appearance
     navigationBar.compactScrollEdgeAppearance = appearance
 
-    #pdbr.state(self)
-    #print(self.navigationItem)
-    #pdbr.state(self.navigationItem)
-    '''
-    
-    doneButton = UIBarButtonItem.alloc(
-    ).initWithBarButtonSystemItem_target_action_(0, self,SEL('doneButtonTapped:'))
-    #self.navigationItem.rightBarButtonItem = doneButton
-    self.navigationItem.setRightBarButtonItem_(doneButton)
-    '''
-
   @objc_method
   def viewDidAppear_(self, animated: bool):
     # xxx: 引数不要?
     send_super(__class__, self, 'viewDidAppear:')
     _dp('--- viewDidAppear:\t -> NavigationController')
-    '''
-    doneButton = UIBarButtonItem.alloc(
-    ).initWithBarButtonSystemItem_target_action_(0, self,
-                                                 SEL('doneButtonTapped:'))
-    #self.navigationItem.rightBarButtonItem = doneButton
-    self.navigationItem.setRightBarButtonItem_(doneButton)
-    '''
-    #pdbr.state(self.visibleViewController)
-    #self.visibleViewController.setEdgesForExtendedLayout_(0)
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
@@ -161,7 +141,6 @@ class SecondViewController(UIViewController):
   def onTap_(self, sender):
     navigationController = self.navigationController
     navigationController.popViewControllerAnimated_(True)
-    #pdbr.state(navigationController)
 
   @objc_method
   def doneButtonTapped_(self, sender):
