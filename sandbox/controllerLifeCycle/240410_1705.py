@@ -2,7 +2,6 @@ from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method
 from pyrubicon.objc.runtime import SEL, send_super
 
 from mainThread import onMainThread
-#from objc_util import on_main_thread
 import pdbr
 
 ObjCClass.auto_rename = True
@@ -25,9 +24,6 @@ NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 pageSheet = 1  # xxx: あとでちゃんと定義する
 
-is_print = True
-_dp = lambda _s: print(_s) if is_print else None
-
 
 # --- NavigationController
 class RootNavigationController(UINavigationController):
@@ -35,7 +31,6 @@ class RootNavigationController(UINavigationController):
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
-    _dp('--- viewDidLoad\t -> NavigationController')
     appearance = UINavigationBarAppearance.new()
     appearance.configureWithDefaultBackground()
 
@@ -46,24 +41,7 @@ class RootNavigationController(UINavigationController):
     navigationBar.compactScrollEdgeAppearance = appearance
 
   @objc_method
-  def viewDidAppear_(self, animated: bool):
-    # xxx: 引数不要?
-    send_super(__class__, self, 'viewDidAppear:')
-    _dp('--- viewDidAppear:\t -> NavigationController')
-
-  @objc_method
-  def viewWillDisappear_(self, animated: bool):
-    send_super(__class__, self, 'viewWillDisappear:')
-    _dp('--- viewWillDisappear:\t -> NavigationController')
-
-  @objc_method
-  def viewDidDisappear_(self, animated: bool):
-    send_super(__class__, self, 'viewDidDisappear:')
-    _dp('--- viewDidDisappear:\t -> NavigationController')
-
-  @objc_method
   def doneButtonTapped_(self, sender):
-    print('nv')
     visibleViewController = self.visibleViewController
     visibleViewController.dismissViewControllerAnimated_completion_(True, None)
 
@@ -73,29 +51,25 @@ class FirstViewController(UIViewController):
 
   @objc_method
   def onTap_(self, sender):
-    navigationController = self.navigationController
     svc = SecondViewController.new()
+    navigationController = self.navigationController
     navigationController.pushViewController_animated_(svc, True)
-
-  @objc_method
-  def doneButtonTapped_(self, sender):
-    print('view')
-    self.dismissViewControllerAnimated_completion_(True, None)
 
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
-    _dp('--- viewDidLoad\t -> ViewController')
 
-    self.view.backgroundColor = UIColor.systemBlueColor()
-    self.setEdgesForExtendedLayout_(0)
+    # --- Navigation
     doneButton = UIBarButtonItem.alloc(
     ).initWithBarButtonSystemItem_target_action_(0, self.navigationController,
                                                  SEL('doneButtonTapped:'))
 
-    self.navigationItem.rightBarButtonItem = doneButton
-    self.navigationItem.title = 'FirstView'
+    navigationItem = self.navigationItem
+    navigationItem.rightBarButtonItem = doneButton
+    navigationItem.title = 'FirstView'
 
+    # --- View
+    self.view.backgroundColor = UIColor.systemBlueColor()
     config = UIButtonConfiguration.tintedButtonConfiguration()
     config.title = 'Tap'
     config.baseBackgroundColor = UIColor.systemPinkColor()
@@ -108,6 +82,8 @@ class FirstViewController(UIViewController):
 
     self.view.addSubview_(tapButton)
 
+    # --- Layout
+    self.setEdgesForExtendedLayout_(0)
     tapButton.translatesAutoresizingMaskIntoConstraints = False
     NSLayoutConstraint.activateConstraints_([
       tapButton.centerXAnchor.constraintEqualToAnchor_(
@@ -120,22 +96,6 @@ class FirstViewController(UIViewController):
         self.view.heightAnchor, 0.1),
     ])
 
-  @objc_method
-  def viewDidAppear_(self, animated: bool):
-    # xxx: 引数不要？
-    send_super(__class__, self, 'viewDidAppear:')
-    _dp('--- viewDidAppear:\t -> ViewController')
-
-  @objc_method
-  def viewWillDisappear_(self, animated: bool):
-    send_super(__class__, self, 'viewWillDisappear:')
-    _dp('--- viewWillDisappear:\t -> ViewController')
-
-  @objc_method
-  def viewDidDisappear_(self, animated: bool):
-    send_super(__class__, self, 'viewDidDisappear:')
-    _dp('--- viewDidDisappear:\t -> ViewController')
-
 
 class SecondViewController(UIViewController):
 
@@ -145,23 +105,20 @@ class SecondViewController(UIViewController):
     navigationController.popViewControllerAnimated_(True)
 
   @objc_method
-  def doneButtonTapped_(self, sender):
-    self.dismissViewControllerAnimated_completion_(True, None)
-
-  @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
-    _dp('--- viewDidLoad\t -> ViewController')
 
-    self.view.backgroundColor = UIColor.systemGreenColor()
-    self.setEdgesForExtendedLayout_(0)
+    # --- Navigation
     doneButton = UIBarButtonItem.alloc(
-    ).initWithBarButtonSystemItem_target_action_(0, self,
+    ).initWithBarButtonSystemItem_target_action_(0, self.navigationController,
                                                  SEL('doneButtonTapped:'))
 
-    self.navigationItem.rightBarButtonItem = doneButton
-    self.navigationItem.title = 'SecondView'
+    navigationItem = self.navigationItem
+    navigationItem.rightBarButtonItem = doneButton
+    navigationItem.title = 'SecondView'
 
+    # --- View
+    self.view.backgroundColor = UIColor.systemGreenColor()
     config = UIButtonConfiguration.tintedButtonConfiguration()
     config.title = 'Tap'
     config.baseBackgroundColor = UIColor.systemPinkColor()
@@ -173,7 +130,8 @@ class SecondViewController(UIViewController):
                                                  touchUpInside)
 
     self.view.addSubview_(tapButton)
-
+    # --- Layout
+    self.setEdgesForExtendedLayout_(0)
     tapButton.translatesAutoresizingMaskIntoConstraints = False
     NSLayoutConstraint.activateConstraints_([
       tapButton.centerXAnchor.constraintEqualToAnchor_(
@@ -185,22 +143,6 @@ class SecondViewController(UIViewController):
       tapButton.heightAnchor.constraintEqualToAnchor_multiplier_(
         self.view.heightAnchor, 0.1),
     ])
-
-  @objc_method
-  def viewDidAppear_(self, animated: bool):
-    # xxx: 引数不要?
-    send_super(__class__, self, 'viewDidAppear:')
-    _dp('--- viewDidAppear:\t -> ViewController')
-
-  @objc_method
-  def viewWillDisappear_(self, animated: bool):
-    send_super(__class__, self, 'viewWillDisappear:')
-    _dp('--- viewWillDisappear:\t -> ViewController')
-
-  @objc_method
-  def viewDidDisappear_(self, animated: bool):
-    send_super(__class__, self, 'viewDidDisappear:')
-    _dp('--- viewDidDisappear:\t -> ViewController')
 
 
 # --- main
@@ -222,7 +164,6 @@ def present_viewController(myVC: UIViewController):
 
 
 if __name__ == "__main__":
-  is_print = False
   vc = FirstViewController.new()
   present_viewController(vc)
 
