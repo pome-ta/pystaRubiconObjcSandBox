@@ -1,4 +1,4 @@
-from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method
+from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method, objc_property
 from pyrubicon.objc.runtime import SEL, send_super
 
 from mainThread import onMainThread
@@ -33,13 +33,29 @@ _dp = lambda _s: print(_s) if is_print else None
 class RootNavigationController(UINavigationController,
                                protocols=[UINavigationControllerDelegate]):
 
+  myDelegate = objc_property(weak=True)
+
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     _dp('--- viewDidLoad\t -> NavigationController')
-    #print(self.delegate)
+    appearance = UINavigationBarAppearance.new()
+    appearance.configureWithDefaultBackground()
+
+    navigationBar = self.navigationBar
+    navigationBar.standardAppearance = appearance
+    navigationBar.scrollEdgeAppearance = appearance
+    navigationBar.compactAppearance = appearance
+    navigationBar.compactScrollEdgeAppearance = appearance
+    
+    print(self.delegate)
+    #self.myDelegate = self
+
     self.delegate = self
+    self.myDelegate = self.delegate
+    print(self.delegate)
     #print(self.delegate)
+    
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -61,6 +77,7 @@ class RootNavigationController(UINavigationController,
   def navigationController_willShowViewController_animated_(
       self, navigationController, viewController, animated):
     _dp('--- :willShowViewController:animated:\t -> NavigationController')
+    '''
 
     appearance = UINavigationBarAppearance.new()
     appearance.configureWithDefaultBackground()
@@ -70,9 +87,10 @@ class RootNavigationController(UINavigationController,
     navigationBar.scrollEdgeAppearance = appearance
     navigationBar.compactAppearance = appearance
     navigationBar.compactScrollEdgeAppearance = appearance
+    '''
 
     viewController.setEdgesForExtendedLayout_(0)
-
+    '''
     doneButton = UIBarButtonItem.alloc(
     ).initWithBarButtonSystemItem_target_action_(0, navigationController,
                                                  SEL('doneButtonTapped:'))
@@ -80,6 +98,7 @@ class RootNavigationController(UINavigationController,
 
     navigationItem = visibleViewController.navigationItem
     navigationItem.rightBarButtonItem = doneButton
+    '''
 
   @objc_method
   def doneButtonTapped_(self, sender):
@@ -211,6 +230,7 @@ def present_viewController(myVC: UIViewController):
     rootVC = _presentedVC
 
   myNC = RootNavigationController.alloc().initWithRootViewController_(myVC)
+  
 
   presentVC = myNC
   presentVC.setModalPresentationStyle_(pageSheet)

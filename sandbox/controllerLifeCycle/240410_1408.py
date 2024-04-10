@@ -30,22 +30,47 @@ _dp = lambda _s: print(_s) if is_print else None
 
 
 # --- NavigationController
-class RootNavigationController(UINavigationController,
-                               protocols=[UINavigationControllerDelegate]):
+class RootNavigationController(UINavigationController):
 
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     _dp('--- viewDidLoad\t -> NavigationController')
-    #print(self.delegate)
-    self.delegate = self
-    #print(self.delegate)
+    appearance = UINavigationBarAppearance.new()
+    appearance.configureWithDefaultBackground()
+
+    navigationBar = self.navigationBar
+    navigationBar.standardAppearance = appearance
+    navigationBar.scrollEdgeAppearance = appearance
+    navigationBar.compactAppearance = appearance
+    navigationBar.compactScrollEdgeAppearance = appearance
+
+    #pdbr.state(self)
+    #print(self.navigationItem)
+    #pdbr.state(self.navigationItem)
+    '''
+    
+    doneButton = UIBarButtonItem.alloc(
+    ).initWithBarButtonSystemItem_target_action_(0, self,SEL('doneButtonTapped:'))
+    #self.navigationItem.rightBarButtonItem = doneButton
+    self.navigationItem.setRightBarButtonItem_(doneButton)
+    '''
+    
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
     # xxx: 引数不要?
     send_super(__class__, self, 'viewDidAppear:')
     _dp('--- viewDidAppear:\t -> NavigationController')
+    '''
+    doneButton = UIBarButtonItem.alloc(
+    ).initWithBarButtonSystemItem_target_action_(0, self,
+                                                 SEL('doneButtonTapped:'))
+    #self.navigationItem.rightBarButtonItem = doneButton
+    self.navigationItem.setRightBarButtonItem_(doneButton)
+    '''
+    #pdbr.state(self.visibleViewController)
+    #self.visibleViewController.setEdgesForExtendedLayout_(0)
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
@@ -56,30 +81,6 @@ class RootNavigationController(UINavigationController,
   def viewDidDisappear_(self, animated: bool):
     send_super(__class__, self, 'viewDidDisappear:')
     _dp('--- viewDidDisappear:\t -> NavigationController')
-
-  @objc_method
-  def navigationController_willShowViewController_animated_(
-      self, navigationController, viewController, animated):
-    _dp('--- :willShowViewController:animated:\t -> NavigationController')
-
-    appearance = UINavigationBarAppearance.new()
-    appearance.configureWithDefaultBackground()
-
-    navigationBar = navigationController.navigationBar
-    navigationBar.standardAppearance = appearance
-    navigationBar.scrollEdgeAppearance = appearance
-    navigationBar.compactAppearance = appearance
-    navigationBar.compactScrollEdgeAppearance = appearance
-
-    viewController.setEdgesForExtendedLayout_(0)
-
-    doneButton = UIBarButtonItem.alloc(
-    ).initWithBarButtonSystemItem_target_action_(0, navigationController,
-                                                 SEL('doneButtonTapped:'))
-    visibleViewController = navigationController.visibleViewController
-
-    navigationItem = visibleViewController.navigationItem
-    navigationItem.rightBarButtonItem = doneButton
 
   @objc_method
   def doneButtonTapped_(self, sender):
@@ -102,6 +103,7 @@ class FirstViewController(UIViewController):
     _dp('--- viewDidLoad\t -> ViewController')
 
     self.view.backgroundColor = UIColor.systemBlueColor()
+    self.setEdgesForExtendedLayout_(0)
     self.navigationItem.title = str(__class__)
 
     config = UIButtonConfiguration.tintedButtonConfiguration()
@@ -219,7 +221,7 @@ def present_viewController(myVC: UIViewController):
 
 
 if __name__ == "__main__":
-  is_print = False
+  is_print = True
   vc = FirstViewController.new()
   present_viewController(vc)
 

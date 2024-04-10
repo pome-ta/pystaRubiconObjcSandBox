@@ -11,6 +11,8 @@ __all__ = [
 
 
 def _get_className_methods(rubicon_object):
+  if rubicon_object == None:
+    return None
   objct_class = libobjc.object_getClass(rubicon_object)
   py_className_methods = {}
   is_flag = False
@@ -44,8 +46,11 @@ def _get_className_methods(rubicon_object):
 
 def state(rubicon_obj):
   _dic = _get_className_methods(rubicon_obj)
-  data = json.dumps(_dic, indent=2)
-  print(data)
-  pprint(list(_dic.keys()))
-  pprint(rubicon_obj)
+  if _dic:
+    data = json.dumps(_dic, indent=2)
+    print(data)
+    pprint(list(_dic.keys()))
+    pprint(rubicon_obj)
+  else:
+    print(rubicon_obj)
 

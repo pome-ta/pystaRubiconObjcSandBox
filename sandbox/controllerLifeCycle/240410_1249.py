@@ -1,4 +1,4 @@
-from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method
+from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method, objc_property
 from pyrubicon.objc.runtime import SEL, send_super
 
 from mainThread import onMainThread
@@ -28,34 +28,10 @@ pageSheet = 1  # xxx: あとでちゃんと定義する
 is_print = True
 _dp = lambda _s: print(_s) if is_print else None
 
-
 # --- NavigationController
-class RootNavigationController(UINavigationController,
-                               protocols=[UINavigationControllerDelegate]):
 
-  @objc_method
-  def viewDidLoad(self):
-    send_super(__class__, self, 'viewDidLoad')
-    _dp('--- viewDidLoad\t -> NavigationController')
-    #print(self.delegate)
-    self.delegate = self
-    #print(self.delegate)
 
-  @objc_method
-  def viewDidAppear_(self, animated: bool):
-    # xxx: 引数不要?
-    send_super(__class__, self, 'viewDidAppear:')
-    _dp('--- viewDidAppear:\t -> NavigationController')
-
-  @objc_method
-  def viewWillDisappear_(self, animated: bool):
-    send_super(__class__, self, 'viewWillDisappear:')
-    _dp('--- viewWillDisappear:\t -> NavigationController')
-
-  @objc_method
-  def viewDidDisappear_(self, animated: bool):
-    send_super(__class__, self, 'viewDidDisappear:')
-    _dp('--- viewDidDisappear:\t -> NavigationController')
+class RootNavigationControllerDelegate(UINavigationControllerDelegate):
 
   @objc_method
   def navigationController_willShowViewController_animated_(
@@ -86,6 +62,37 @@ class RootNavigationController(UINavigationController,
     visibleViewController = self.visibleViewController
     visibleViewController.dismissViewControllerAnimated_completion_(True, None)
 
+#pdbr.state(RootNavigationControllerDelegate)
+print(UINavigationControllerDelegate)
+
+class RootNavigationController(UINavigationController):
+
+  delegate = objc_property()
+
+  @objc_method
+  def viewDidLoad(self):
+    send_super(__class__, self, 'viewDidLoad')
+    _dp('--- viewDidLoad\t -> NavigationController')
+    #print(self.delegate)
+    self.delegate = RootNavigationControllerDelegate
+    #print(self.delegate)
+
+  @objc_method
+  def viewDidAppear_(self, animated: bool):
+    # xxx: 引数不要?
+    send_super(__class__, self, 'viewDidAppear:')
+    _dp('--- viewDidAppear:\t -> NavigationController')
+
+  @objc_method
+  def viewWillDisappear_(self, animated: bool):
+    send_super(__class__, self, 'viewWillDisappear:')
+    _dp('--- viewWillDisappear:\t -> NavigationController')
+
+  @objc_method
+  def viewDidDisappear_(self, animated: bool):
+    send_super(__class__, self, 'viewDidDisappear:')
+    _dp('--- viewDidDisappear:\t -> NavigationController')
+
 
 # --- ViewController
 class FirstViewController(UIViewController):
@@ -99,7 +106,7 @@ class FirstViewController(UIViewController):
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
-    _dp('--- viewDidLoad\t -> ViewController')
+    _dp('--- viewDidLoad\t -> fViewController')
 
     self.view.backgroundColor = UIColor.systemBlueColor()
     self.navigationItem.title = str(__class__)
@@ -132,17 +139,17 @@ class FirstViewController(UIViewController):
   def viewDidAppear_(self, animated: bool):
     # xxx: 引数不要？
     send_super(__class__, self, 'viewDidAppear:')
-    _dp('--- viewDidAppear:\t -> ViewController')
+    _dp('--- viewDidAppear:\t -> fViewController')
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
     send_super(__class__, self, 'viewWillDisappear:')
-    _dp('--- viewWillDisappear:\t -> ViewController')
+    _dp('--- viewWillDisappear:\t -> fViewController')
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
     send_super(__class__, self, 'viewDidDisappear:')
-    _dp('--- viewDidDisappear:\t -> ViewController')
+    _dp('--- viewDidDisappear:\t -> fViewController')
 
 
 class SecondViewController(UIViewController):
@@ -154,7 +161,7 @@ class SecondViewController(UIViewController):
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
-    _dp('--- viewDidLoad\t -> ViewController')
+    _dp('--- viewDidLoad\t -> sViewController')
 
     self.view.backgroundColor = UIColor.systemGreenColor()
     self.navigationItem.title = str(__class__)
@@ -187,17 +194,17 @@ class SecondViewController(UIViewController):
   def viewDidAppear_(self, animated: bool):
     # xxx: 引数不要?
     send_super(__class__, self, 'viewDidAppear:')
-    _dp('--- viewDidAppear:\t -> ViewController')
+    _dp('--- viewDidAppear:\t -> sViewController')
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
     send_super(__class__, self, 'viewWillDisappear:')
-    _dp('--- viewWillDisappear:\t -> ViewController')
+    _dp('--- viewWillDisappear:\t -> sViewController')
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
     send_super(__class__, self, 'viewDidDisappear:')
-    _dp('--- viewDidDisappear:\t -> ViewController')
+    _dp('--- viewDidDisappear:\t -> sViewController')
 
 
 # --- main
