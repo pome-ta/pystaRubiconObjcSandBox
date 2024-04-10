@@ -2,27 +2,20 @@ import ctypes
 import json
 from pprint import pprint
 
-from pyrubicon.objc.api import ObjCInstance, NSObject
+from pyrubicon.objc import ObjCInstance, ObjCClass, NSObject
 from pyrubicon.objc.runtime import libobjc
 
 __all__ = [
   'state',
 ]
 
-NSObject_instance_methods = [
-  'init',
-  'copy',
-  'mutableCopy',
-  'dealloc',
-  'performSelector_withObject_afterDelay_',
-  'performSelectorOnMainThread_withObject_waitUntilDone_',
-  'performSelectorInBackground_withObject_',
-]
 
-
-def _get_className_methods(rubicon_object, is_revers: bool = True):
+def _get_className_methods(rubicon_object):
+  if rubicon_object == None:
+    return None
   objct_class = libobjc.object_getClass(rubicon_object)
   py_className_methods = {}
+  is_flag = False
 
   while objct_class is not None:
     py_methods = []
@@ -43,18 +36,21 @@ def _get_className_methods(rubicon_object, is_revers: bool = True):
 
     objct_class = libobjc.class_getSuperclass(objct_class)
 
-    if objct_class.value == NSObject.ptr.value:
-      py_className_methods[str(NSObject)] = NSObject_instance_methods
+    if is_flag:
       break
+    if objct_class.value == NSObject.ptr.value:
+      is_flag = True
 
-  _items = py_className_methods.items()
-  _list_items = list(reversed(_items) if is_revers else _items)
-  return dict(_list_items)
+  return dict(reversed(list(py_className_methods.items())))
 
 
-def state(rubicon_obj, indent: int = 2, is_reverse: bool = True):
-  _dic = _get_className_methods(rubicon_obj, is_reverse)
-  data = json.dumps(_dic, indent=indent)
-  print(data)
-  pprint(rubicon_obj)
+def state(rubicon_obj):
+  _dic = _get_className_methods(rubicon_obj)
+  if _dic:
+    data = json.dumps(_dic, indent=2)
+    print(data)
+    pprint(list(_dic.keys()))
+    pprint(rubicon_obj)
+  else:
+    print(rubicon_obj)
 
