@@ -5,7 +5,7 @@ from mainThread import onMainThread
 import pdbr
 
 ObjCClass.auto_rename = True
-#ObjCProtocol.auto_rename = True
+ObjCProtocol.auto_rename = True
 
 # --- UINavigationController
 UINavigationController = ObjCClass('UINavigationController')
@@ -26,7 +26,7 @@ pageSheet = 1  # xxx: あとでちゃんと定義する
 
 
 # --- NavigationController
-class RootNavigationController(UINavigationController):
+class RootNavigationController(UINavigationController, protocols=[UINavigationControllerDelegate]):
 
   @objc_method
   def viewDidLoad(self):
@@ -39,12 +39,25 @@ class RootNavigationController(UINavigationController):
     navigationBar.scrollEdgeAppearance = appearance
     navigationBar.compactAppearance = appearance
     navigationBar.compactScrollEdgeAppearance = appearance
+    
+    self.delegate = self
 
   @objc_method
   def doneButtonTapped_(self, sender):
     visibleViewController = self.visibleViewController
     visibleViewController.dismissViewControllerAnimated_completion_(True, None)
 
+  @objc_method
+  def navigationController_willShowViewController_animated_(self, navigationController, viewController, animated:bool):
+    viewController.setEdgesForExtendedLayout_(0)
+    doneButton = UIBarButtonItem.alloc(
+    ).initWithBarButtonSystemItem_target_action_(0, navigationController,
+                                                 SEL('doneButtonTapped:'))
+    visibleViewController = navigationController.visibleViewController
+
+    navigationItem = visibleViewController.navigationItem
+    navigationItem.rightBarButtonItem = doneButton
+        
 
 # --- ViewController
 class FirstViewController(UIViewController):
