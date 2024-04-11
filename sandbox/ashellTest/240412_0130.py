@@ -1,6 +1,3 @@
-print('hoge')
-
-"""
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method
 from pyrubicon.objc.runtime import SEL, send_super
 
@@ -224,5 +221,4 @@ def present_viewController(myVC: UIViewController):
 if __name__ == "__main__":
   vc = FirstViewController.new()
   present_viewController(vc)
-"""
 
