@@ -96,6 +96,8 @@ import ctypes
 from math import sin, pi
 from random import random, uniform
 
+from pyrubicon.objc.api import Block
+
 OSStatus = ctypes.c_int32
 
 AVAudioEngine = ObjCClass('AVAudioEngine')
@@ -124,25 +126,54 @@ class SineWaveGenerator(NSObject):
 
   @objc_method
   def init(self):
-    self.audioEngine = AVAudioEngine.new()
+    self.sampleRate: float
+    self.deltaTime: float
     self.initAudioEngene()
+
+    self.time = 0.0
+    self.toneA = 440.0
+
+    bufferList_pointer = ctypes.POINTER(AudioBufferList)
+
+    @Block
+    def renderBlock(isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
+                    frameCount: ctypes.c_int32,
+                    outputData: ctypes.c_void_p) -> OSStatus:
+      ablPointer = ctypes.cast(outputData, bufferList_pointer).contents
+
+      _dTime = self.deltaTime
+      _time = self.time
+      _toneA = self.toneA
+
+      for frame in range(frameCount):
+        sampleVal = sin(_toneA * 2.0 * pi * _time)
+        _time += _dTime
+
+        for buffer in range(ablPointer.mNumberBuffers):
+          _mData = ablPointer.mBuffers[buffer].mData
+          _pointer = ctypes.POINTER(ctypes.c_float * frameCount)
+          _buf = ctypes.cast(_mData, _pointer).contents
+          _buf[frame] = sampleVal
+
+      self.deltaTime = _dTime
+      self.time = _time
+      self.toneA = _toneA
+      return 0
+
+    self.sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(
+      renderBlock)
+
     return self
 
   @objc_method
   def initAudioEngene(self):
+    self.audioEngine = AVAudioEngine.new()
     mainMixer = self.audioEngine.mainMixerNode
     outputNode = self.audioEngine.outputNode
     format = outputNode.inputFormatForBus_(0)
 
-    sampleRate = format.sampleRate
-    deltaTime = 1 / sampleRate
-    
-    toneA = 440.0
-    time = 0.0
-    
-
-    #pdbr.state(sampleRate)
-    print(deltaTime)
+    self.sampleRate = format.sampleRate
+    self.deltaTime = 1 / self.sampleRate
 
 
 if __name__ == "__main__":
