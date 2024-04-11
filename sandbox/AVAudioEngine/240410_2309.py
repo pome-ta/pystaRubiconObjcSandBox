@@ -85,10 +85,13 @@ class MainViewController(UIViewController):
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     self.navigationItem.title = 'sine wave'
+    self.sine = SineWaveGenerator.new()
+    self.sine.start()
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
     send_super(__class__, self, 'viewWillDisappear:')
+    self.sine.stop()
 
 
 # --- AVAudioEngine
@@ -126,9 +129,13 @@ class SineWaveGenerator(NSObject):
 
   @objc_method
   def init(self):
-    self.sampleRate: float
-    self.deltaTime: float
-    self.initAudioEngene()
+    self.audioEngine = AVAudioEngine.new()
+    self.mainMixer = self.audioEngine.mainMixerNode
+    self.outputNode = self.audioEngine.outputNode
+    self.format = self.outputNode.inputFormatForBus_(0)
+
+    self.sampleRate = self.format.sampleRate
+    self.deltaTime = 1 / self.sampleRate
 
     self.time = 0.0
     self.toneA = 440.0
@@ -166,18 +173,28 @@ class SineWaveGenerator(NSObject):
     return self
 
   @objc_method
-  def initAudioEngene(self):
-    self.audioEngine = AVAudioEngine.new()
-    mainMixer = self.audioEngine.mainMixerNode
-    outputNode = self.audioEngine.outputNode
-    format = outputNode.inputFormatForBus_(0)
+  def start(self):
 
-    self.sampleRate = format.sampleRate
-    self.deltaTime = 1 / self.sampleRate
+    inputFormat = AVAudioFormat.alloc(
+    ).initWithCommonFormat_sampleRate_channels_interleaved_(
+      self.format.commonFormat, self.sampleRate, CHANNEL,
+      self.format.isInterleaved)
+
+    self.audioEngine.attachNode_(self.sourceNode)
+    self.audioEngine.connect_to_format_(self.sourceNode, self.mainMixer,
+                                        inputFormat)
+
+    self.audioEngine.connect_to_format_(self.mainMixer, self.outputNode, None)
+    self.mainMixer.outputVolume = 0.5
+
+    self.audioEngine.startAndReturnError_(None)
+
+  @objc_method
+  def stop(self):
+    self.audioEngine.stop()
 
 
 if __name__ == "__main__":
   vc = MainViewController.new()
-  g = SineWaveGenerator.new()
   present_viewController(vc)
 
