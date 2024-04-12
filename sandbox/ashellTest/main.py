@@ -102,8 +102,9 @@ class RootNavigationController(UINavigationController,
   @objc_method
   def viewDidDisappear_(self, animated: bool):
     send_super(__class__, self, 'viewDidDisappear:')
-    loop.stop()
-    sys.exit()
+    #loop.stop()
+    #loop.shutdown_asyncgens()
+    
     
   @objc_method
   def doneButtonTapped_(self, sender):
@@ -239,5 +240,6 @@ if __name__ == "__main__":
   present_viewController(vc)
   asyncio.set_event_loop_policy(EventLoopPolicy())
   loop = asyncio.new_event_loop()
+  loop.stop()
   loop.run_forever(lifecycle=iOSLifecycle())
 
