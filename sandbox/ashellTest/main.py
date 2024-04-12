@@ -240,6 +240,6 @@ if __name__ == "__main__":
   present_viewController(vc)
   asyncio.set_event_loop_policy(EventLoopPolicy())
   loop = asyncio.new_event_loop()
-  loop.stop()
+  #loop.stop()
   loop.run_forever(lifecycle=iOSLifecycle())
 

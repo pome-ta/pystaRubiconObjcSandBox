@@ -5,10 +5,9 @@ import pdbr
 
 ObjCClass.auto_rename = True
 
+### --- onMainThread --- ###
 from ctypes import byref, cast, Structure
 import functools
-
-### --- onMainThread --- ###
 from pyrubicon.objc.api import Block, ObjCClass, ObjCInstance
 from pyrubicon.objc.runtime import libobjc, objc_block, objc_id
 
