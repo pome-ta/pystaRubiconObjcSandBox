@@ -1,12 +1,3 @@
-import asyncio
-
-from pyrubicon.objc.eventloop import EventLoopPolicy, iOSLifecycle
-
-# Install the event loop policy
-asyncio.set_event_loop_policy(EventLoopPolicy())
-
-# Create an event loop, and run it, using the UIApplication!
-
 from pyrubicon.objc import objc_method, ObjCClass, send_super, ObjCProtocol, SEL
 
 ObjCClass.auto_rename = True
@@ -69,7 +60,6 @@ class RootNavigationController(UINavigationController,
   def doneButtonTapped_(self, sender):
     visibleViewController = self.visibleViewController
     visibleViewController.dismissViewControllerAnimated_completion_(True, None)
-    self.dismissViewControllerAnimated_completion_(True, None)
 
   @objc_method
   def navigationController_willShowViewController_animated_(
@@ -89,12 +79,9 @@ class FirstViewController(UIViewController):
 
   @objc_method
   def onTap_(self, sender):
-    '''
     svc = SecondViewController.new()
     navigationController = self.navigationController
     navigationController.pushViewController_animated_(svc, True)
-    '''
-    self.dismissViewControllerAnimated_completion_(True, None)
 
   @objc_method
   def viewDidLoad(self):
@@ -133,7 +120,6 @@ class SecondViewController(UIViewController):
 
   @objc_method
   def onTap_(self, sender):
-    self.dismissViewControllerAnimated_completion_(True, None)
     navigationController = self.navigationController
     navigationController.popViewControllerAnimated_(True)
 
@@ -169,11 +155,6 @@ class SecondViewController(UIViewController):
         self.view.heightAnchor, 0.1),
     ])
 
-  @objc_method
-  def viewDidDisappear_(self, animated: bool):
-    send_super(__class__, self, 'viewDidDisappear:')
-    loop.stop()
-
 
 class MainOperation(NSOperation):
 
@@ -185,9 +166,10 @@ class MainOperation(NSOperation):
     while childVC := rootVC.presentedViewController:
       rootVC = childVC
     mainVC = FirstViewController.new().autorelease()
-    #mainNV = RootNavigationController.alloc().initWithRootViewController_(mainVC).autorelease()
+    mainNV = RootNavigationController.alloc().initWithRootViewController_(
+      mainVC).autorelease()
 
-    rootVC.presentViewController(mainVC, animated=True, completion=None)
+    rootVC.presentViewController(mainNV, animated=True, completion=None)
 
 
 if __name__ == '__main__':
@@ -195,9 +177,6 @@ if __name__ == '__main__':
   queue = NSOperationQueue.mainQueue
   queue.addOperation(operation)
   queue.waitUntilAllOperationsAreFinished()
-  loop = asyncio.new_event_loop()
-  loop.run_forever(lifecycle=iOSLifecycle())
-
 """
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method
 from pyrubicon.objc.runtime import SEL, send_super
