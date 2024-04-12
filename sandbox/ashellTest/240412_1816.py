@@ -1,6 +1,7 @@
-import sys
 import asyncio
 from pyrubicon.objc.eventloop import EventLoopPolicy, iOSLifecycle
+
+
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method
 from pyrubicon.objc.runtime import SEL, send_super
@@ -98,20 +99,13 @@ class RootNavigationController(UINavigationController,
 
     self.delegate = self
 
-
-  @objc_method
-  def viewDidDisappear_(self, animated: bool):
-    send_super(__class__, self, 'viewDidDisappear:')
-    loop.stop()
-    sys.exit()
-    
   @objc_method
   def doneButtonTapped_(self, sender):
     visibleViewController = self.visibleViewController
-
-    visibleViewController.dismissViewControllerAnimated_completion_(True, None)
     
-    #sys.exit()
+    
+    visibleViewController.dismissViewControllerAnimated_completion_(True, None)
+    loop.stop()
     #loop.close()
     #del loop
 
@@ -240,4 +234,6 @@ if __name__ == "__main__":
   asyncio.set_event_loop_policy(EventLoopPolicy())
   loop = asyncio.new_event_loop()
   loop.run_forever(lifecycle=iOSLifecycle())
+  
+
 
