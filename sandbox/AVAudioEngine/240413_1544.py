@@ -127,8 +127,10 @@ class AudioBufferList(ctypes.Structure):
 
 class SineWaveGenerator(NSObject):
 
-  tone = objc_property(float)
   deltaTime = objc_property(float)
+  #tone = objc_property(float)
+  #topTone = objc_property(float)
+  #bottomTone= objc_property(float)
 
   @objc_method
   def init(self):
@@ -142,6 +144,9 @@ class SineWaveGenerator(NSObject):
 
     self.time = 0.0
     self.tone = 440.0
+    self.topTone = 880.0
+    self.bottomTone = 220.0
+    self.add = 10.0
 
     bufferList_pointer = ctypes.POINTER(AudioBufferList)
 
@@ -152,7 +157,14 @@ class SineWaveGenerator(NSObject):
       ablPointer = ctypes.cast(outputData, bufferList_pointer).contents
 
       _time = self.time
-      _tone = 880.0 if int(_time) % 2 else 440.0
+      if self.tone > self.topTone:
+        _add = -10.0
+      elif self.tone < self.bottomTone:
+        _add = 10.0
+      else:
+        _add = self.add
+
+      _tone = self.tone + _add
 
       for frame in range(frameCount):
         sampleVal = sin(_tone * 2.0 * pi * _time)
@@ -168,6 +180,7 @@ class SineWaveGenerator(NSObject):
 
       self.time = _time
       self.tone = _tone
+      self.add = _add
       return 0
 
     self.sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(
