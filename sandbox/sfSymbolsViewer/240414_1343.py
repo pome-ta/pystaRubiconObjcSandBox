@@ -101,6 +101,7 @@ class MainViewController(UIViewController):
 
 
 # --- SF Symbols
+from pyrubicon.objc.types import CGRectMake
 
 # --- UITableView
 UITableView = ObjCClass('UITableView')
@@ -110,24 +111,28 @@ UITableViewDataSource = ObjCProtocol('UITableViewDataSource')
 UITableViewDelegate = ObjCProtocol('UITableViewDelegate')
 
 UITableViewStylePlain = 0
-UITableViewStyleGrouped =1
+UITableViewStyleGrouped = 1
 UITableViewStyleInsetGrouped = 2
+
 
 # --- TableView
 class SfSymbolsViewController(
     UIViewController, protocols=[UITableViewDataSource, UITableViewDelegate]):
 
-  #tableView: UITableView = objc_property()
+  tableView: UITableView = objc_property()
+  #cell_identifier = objc_property()
 
   @objc_method
   def init(self):
     send_super(__class__, self, 'init')
-    self.tableView = UITableView.new()
-    # xxx: `initWithFrame_style_` readonly ?
-    self.tableView.style = UITableViewStyleGrouped
-    #pdbr.state(self.tableView)
-    
-    
+    self.cell_identifier = 'customCell'
+
+    self.tableView = UITableView.alloc().initWithFrame_style_(
+      CGRectMake(0.0, 0.0, 0.0, 0.0), UITableViewStylePlain)
+    #self.tableView.translatesAutoresizingMaskIntoConstraints = False
+    self.tableView.registerClass_forCellReuseIdentifier_(
+      UITableViewCell, self.cell_identifier)
+
     return self
 
   @objc_method
@@ -138,10 +143,31 @@ class SfSymbolsViewController(
 
     # --- View
     self.view.backgroundColor = UIColor.systemGreenColor()
+    self.setup()
 
   @objc_method
   def setup(self):
-    pass
+    self.tableView.delegate = self
+    self.tableView.dataSource = self
+
+    self.view.addSubview_(self.tableView)
+    pdbr.state(self.tableView)
+    '''
+    NSLayoutConstraint.activateConstraints_([
+      self.tableView.centerXAnchor.constraintEqualToAnchor_(
+        self.view.centerXAnchor),
+      self.tableView.centerYAnchor.constraintEqualToAnchor_(
+        self.view.centerYAnchor),
+      self.tableView.widthAnchor.constraintEqualToAnchor_multiplier_(
+        self.view.widthAnchor, 1.0),
+      self.tableView.heightAnchor.constraintEqualToAnchor_multiplier_(
+        self.view.heightAnchor, 1.0),
+    ])
+    '''
+
+  @objc_method
+  def tableView_numberOfRowsInSection_(self, tableView, section):
+    return 0
 
 
 if __name__ == "__main__":
