@@ -109,6 +109,9 @@ UITableViewCell = ObjCClass('UITableViewCell')
 UITableViewDataSource = ObjCProtocol('UITableViewDataSource')
 UITableViewDelegate = ObjCProtocol('UITableViewDelegate')
 
+UITableViewStylePlain = 0
+UITableViewStyleGrouped =1
+UITableViewStyleInsetGrouped = 2
 
 # --- TableView
 class SfSymbolsViewController(
@@ -119,7 +122,11 @@ class SfSymbolsViewController(
   @objc_method
   def init(self):
     send_super(__class__, self, 'init')
-    pdbr.state(self)
+    self.tableView = UITableView.new()
+    # xxx: `initWithFrame_style_` readonly ?
+    self.tableView.style = UITableViewStyleGrouped
+    #pdbr.state(self.tableView)
+    
     
     return self
 
@@ -138,6 +145,6 @@ class SfSymbolsViewController(
 
 
 if __name__ == "__main__":
-  mainVC = MainViewController.new()
+  mainVC = SfSymbolsViewController.new()
   present_viewController(mainVC)
 
