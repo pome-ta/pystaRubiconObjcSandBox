@@ -1,10 +1,11 @@
-from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method
+from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method, objc_property
 from pyrubicon.objc.runtime import SEL, send_super
 
 from mainThread import onMainThread
 import pdbr
 
 ObjCClass.auto_rename = True
+ObjCProtocol.auto_rename = True
 
 # --- UINavigationController
 UINavigationController = ObjCClass('UINavigationController')
@@ -19,7 +20,6 @@ UIButtonConfiguration = ObjCClass('UIButtonConfiguration')
 UIButton = ObjCClass('UIButton')
 
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
-
 
 edgeNone = 0  # UIRectEdgeNone
 touchUpInside = 1 << 6  # UIControlEventTouchUpInside
@@ -91,10 +91,13 @@ class MainViewController(UIViewController):
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     # --- Navigation
-    self.navigationItem.title = 'main'
+    #self.navigationItem.title = 'main'
 
     # --- View
     self.view.backgroundColor = UIColor.systemBlueColor()
+    self.SfSymbolsVC = SfSymbolsViewController.new()
+    self.SfSymbolsView = self.SfSymbolsVC.view
+    self.view.addSubview_(self.SfSymbolsView)
 
 
 # --- SF Symbols
@@ -103,7 +106,35 @@ class MainViewController(UIViewController):
 UITableView = ObjCClass('UITableView')
 UITableViewCell = ObjCClass('UITableViewCell')
 
+UITableViewDataSource = ObjCProtocol('UITableViewDataSource')
+UITableViewDelegate = ObjCProtocol('UITableViewDelegate')
+
+
 # --- TableView
+class SfSymbolsViewController(
+    UIViewController, protocols=[UITableViewDataSource, UITableViewDelegate]):
+
+  #tableView: UITableView = objc_property()
+
+  @objc_method
+  def init(self):
+    send_super(__class__, self, 'init')
+    pdbr.state(self)
+    
+    return self
+
+  @objc_method
+  def viewDidLoad(self):
+    send_super(__class__, self, 'viewDidLoad')
+    # --- Navigation
+    #self.navigationItem.title = 'main'
+
+    # --- View
+    self.view.backgroundColor = UIColor.systemGreenColor()
+
+  @objc_method
+  def setup(self):
+    pass
 
 
 if __name__ == "__main__":
