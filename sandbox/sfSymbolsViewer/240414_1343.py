@@ -43,7 +43,7 @@ def present_viewController(myVC: UIViewController):
   UIModalPresentationFullScreen = 0
   UIModalPresentationPageSheet = 1
   '''
-  presentVC.setModalPresentationStyle_(1)
+  presentVC.setModalPresentationStyle_(0)
 
   rootVC.presentViewController_animated_completion_(presentVC, True, None)
 
@@ -101,6 +101,7 @@ class MainViewController(UIViewController):
 
 
 # --- SF Symbols
+import ctypes
 from pyrubicon.objc.types import CGRectMake
 
 # --- UITableView
@@ -129,7 +130,7 @@ class SfSymbolsViewController(
 
     self.tableView = UITableView.alloc().initWithFrame_style_(
       CGRectMake(0.0, 0.0, 0.0, 0.0), UITableViewStylePlain)
-    #self.tableView.translatesAutoresizingMaskIntoConstraints = False
+    self.tableView.translatesAutoresizingMaskIntoConstraints = False
     self.tableView.registerClass_forCellReuseIdentifier_(
       UITableViewCell, self.cell_identifier)
 
@@ -151,23 +152,36 @@ class SfSymbolsViewController(
     self.tableView.dataSource = self
 
     self.view.addSubview_(self.tableView)
-    pdbr.state(self.tableView)
-    '''
+
     NSLayoutConstraint.activateConstraints_([
       self.tableView.centerXAnchor.constraintEqualToAnchor_(
         self.view.centerXAnchor),
       self.tableView.centerYAnchor.constraintEqualToAnchor_(
         self.view.centerYAnchor),
       self.tableView.widthAnchor.constraintEqualToAnchor_multiplier_(
-        self.view.widthAnchor, 1.0),
+        self.view.widthAnchor, 0.9),
       self.tableView.heightAnchor.constraintEqualToAnchor_multiplier_(
-        self.view.heightAnchor, 1.0),
+        self.view.heightAnchor, 0.9),
     ])
-    '''
 
   @objc_method
   def tableView_numberOfRowsInSection_(self, tableView, section):
-    return 0
+    #print(tableView)
+    
+    return 1
+
+  @objc_method
+  def tableView_cellForRowAtIndexPath_(self, tableView,
+                                       indexPath) -> None:
+    cell = tableView.dequeueReusableCellWithIdentifier_forIndexPath_(
+      self.cell_identifier, indexPath)
+
+    content = cell.defaultContentConfiguration()
+    content.text = 'hoge'
+    cell.contentConfiguration = content
+    #print(indexPath)
+    #print('t')
+    return cell
 
 
 if __name__ == "__main__":
