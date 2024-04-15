@@ -85,6 +85,20 @@ class RootNavigationController(UINavigationController,
 
 
 # --- ViewController
+class MainViewController(UIViewController):
+
+  @objc_method
+  def viewDidLoad(self):
+    send_super(__class__, self, 'viewDidLoad')
+    # --- Navigation
+    #self.navigationItem.title = 'main'
+
+    # --- View
+    self.view.backgroundColor = UIColor.systemBlueColor()
+    self.SfSymbolsVC = SfSymbolsViewController.new()
+    self.SfSymbolsView = self.SfSymbolsVC.view
+    self.view.addSubview_(self.SfSymbolsView)
+
 
 # --- SF Symbols
 import ctypes
