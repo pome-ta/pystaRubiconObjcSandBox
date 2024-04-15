@@ -102,7 +102,8 @@ class MainViewController(UIViewController):
 
 # --- SF Symbols
 import ctypes
-from pyrubicon.objc.types import CGRectMake
+from pyrubicon.objc.types import NSInteger, CGRectMake
+#from pyrubicon.objc.runtime import objc_id
 
 # --- UITableView
 UITableView = ObjCClass('UITableView')
@@ -115,13 +116,23 @@ UITableViewStylePlain = 0
 UITableViewStyleGrouped = 1
 UITableViewStyleInsetGrouped = 2
 
+avengers = [
+  "ソー",
+  "ドクター・ストレンジ",
+  "アイアンマン",
+  "キャプテン・マーベル",
+  "スパイダーマン",
+  "ハルク",
+  "キャプテン・アメリカ",
+]
+
 
 # --- TableView
 class SfSymbolsViewController(
     UIViewController, protocols=[UITableViewDataSource, UITableViewDelegate]):
 
   tableView: UITableView = objc_property()
-  #cell_identifier = objc_property()
+  cell_identifier = objc_property()
 
   @objc_method
   def init(self):
@@ -129,8 +140,9 @@ class SfSymbolsViewController(
     self.cell_identifier = 'customCell'
 
     self.tableView = UITableView.alloc().initWithFrame_style_(
-      CGRectMake(0.0, 0.0, 0.0, 0.0), UITableViewStylePlain)
+      CGRectMake(0.0, 0.0, 0.0, 0.0), UITableViewStyleGrouped)
     self.tableView.translatesAutoresizingMaskIntoConstraints = False
+
     self.tableView.registerClass_forCellReuseIdentifier_(
       UITableViewCell, self.cell_identifier)
 
@@ -165,23 +177,25 @@ class SfSymbolsViewController(
     ])
 
   @objc_method
-  def tableView_numberOfRowsInSection_(self, tableView, section):
-    #print(tableView)
-    
+  def tableView_numberOfRowsInSection_(self, tableView,
+                                       section: NSInteger) -> NSInteger:
+
+    #return len(avengers)
     return 1
 
   @objc_method
   def tableView_cellForRowAtIndexPath_(self, tableView,
-                                       indexPath) -> None:
+                                       indexPath) -> ctypes.c_void_p:
     cell = tableView.dequeueReusableCellWithIdentifier_forIndexPath_(
       self.cell_identifier, indexPath)
 
+    print(indexPath)
     content = cell.defaultContentConfiguration()
     content.text = 'hoge'
     cell.contentConfiguration = content
     #print(indexPath)
     #print('t')
-    return cell
+    return cell.ptr
 
 
 if __name__ == "__main__":
