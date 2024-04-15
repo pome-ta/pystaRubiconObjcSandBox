@@ -102,9 +102,11 @@ class MainViewController(UIViewController):
 
 # --- SF Symbols
 import ctypes
+from pathlib import Path
+import plistlib
 from pyrubicon.objc.types import NSInteger, CGRectMake
-#from pyrubicon.objc.runtime import objc_id
 
+UIImage = ObjCClass('UIImage')
 # --- UITableView
 UITableView = ObjCClass('UITableView')
 UITableViewCell = ObjCClass('UITableViewCell')
@@ -116,15 +118,15 @@ UITableViewStylePlain = 0
 UITableViewStyleGrouped = 1
 UITableViewStyleInsetGrouped = 2
 
-avengers = [
-  "ソー",
-  "ドクター・ストレンジ",
-  "アイアンマン",
-  "キャプテン・マーベル",
-  "スパイダーマン",
-  "ハルク",
-  "キャプテン・アメリカ",
-]
+
+def get_order_list():
+  CoreGlyphs_path = '/System/Library/CoreServices/CoreGlyphs.bundle/'
+
+  symbol_order_path = 'symbol_order.plist'
+  symbol_order_bundle = Path(CoreGlyphs_path, symbol_order_path)
+
+  order_list = plistlib.loads(symbol_order_bundle.read_bytes())
+  return order_list
 
 
 # --- TableView
@@ -137,10 +139,12 @@ class SfSymbolsViewController(
   @objc_method
   def init(self):
     send_super(__class__, self, 'init')
+
+    self.all_items: list = get_order_list()
     self.cell_identifier = 'customCell'
 
     self.tableView = UITableView.alloc().initWithFrame_style_(
-      CGRectMake(0.0, 0.0, 0.0, 0.0), UITableViewStyleGrouped)
+      CGRectMake(0.0, 0.0, 0.0, 0.0), UITableViewStylePlain)
     self.tableView.translatesAutoresizingMaskIntoConstraints = False
 
     self.tableView.registerClass_forCellReuseIdentifier_(
@@ -152,7 +156,7 @@ class SfSymbolsViewController(
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     # --- Navigation
-    #self.navigationItem.title = 'main'
+    self.navigationItem.title = 'SF Symbols tableList 😤'
 
     # --- View
     self.view.backgroundColor = UIColor.systemGreenColor()
@@ -171,31 +175,37 @@ class SfSymbolsViewController(
       self.tableView.centerYAnchor.constraintEqualToAnchor_(
         self.view.centerYAnchor),
       self.tableView.widthAnchor.constraintEqualToAnchor_multiplier_(
-        self.view.widthAnchor, 0.9),
+        self.view.widthAnchor, 1.0),
       self.tableView.heightAnchor.constraintEqualToAnchor_multiplier_(
-        self.view.heightAnchor, 0.9),
+        self.view.heightAnchor, 1.0),
     ])
 
   @objc_method
   def tableView_numberOfRowsInSection_(self, tableView,
                                        section: NSInteger) -> NSInteger:
 
-    return len(avengers)
+    return len(self.all_items)
 
   @objc_method
   def tableView_cellForRowAtIndexPath_(self, tableView,
                                        indexPath) -> ctypes.c_void_p:
     cell = tableView.dequeueReusableCellWithIdentifier_forIndexPath_(
       self.cell_identifier, indexPath)
+
+    symbol_name = self.all_items[indexPath.row]
+
     content = cell.defaultContentConfiguration()
-    content.text = avengers[indexPath.row]
+    content.text = symbol_name
+    content.image = UIImage.systemImageNamed_(symbol_name)
+    content.textProperties.numberOfLines = 1
+
     cell.contentConfiguration = content
-    #print(indexPath)
-    #print('t')
+
     return cell.ptr
 
 
 if __name__ == "__main__":
   mainVC = SfSymbolsViewController.new()
   present_viewController(mainVC)
+
 
