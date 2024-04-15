@@ -5,7 +5,7 @@ from mainThread import onMainThread
 import pdbr
 
 ObjCClass.auto_rename = True
-ObjCProtocol.auto_rename = True
+#ObjCProtocol.auto_rename = True
 
 # --- UINavigationController
 UINavigationController = ObjCClass('UINavigationController')
@@ -181,17 +181,14 @@ class SfSymbolsViewController(
                                        section: NSInteger) -> NSInteger:
 
     return len(avengers)
-    #return 1
 
   @objc_method
   def tableView_cellForRowAtIndexPath_(self, tableView,
                                        indexPath) -> ctypes.c_void_p:
     cell = tableView.dequeueReusableCellWithIdentifier_forIndexPath_(
       self.cell_identifier, indexPath)
-
-    #print(indexPath)
     content = cell.defaultContentConfiguration()
-    content.text = 'hoge'
+    content.text = avengers[indexPath.row]
     cell.contentConfiguration = content
     #print(indexPath)
     #print('t')
