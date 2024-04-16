@@ -98,20 +98,18 @@ class RootNavigationController(UINavigationController,
 
     self.delegate = self
 
-
   @objc_method
   def viewDidDisappear_(self, animated: bool):
     send_super(__class__, self, 'viewDidDisappear:')
     #loop.stop()
     #loop.shutdown_asyncgens()
-    
-    
+
   @objc_method
   def doneButtonTapped_(self, sender):
     visibleViewController = self.visibleViewController
 
     visibleViewController.dismissViewControllerAnimated_completion_(True, None)
-    
+
     #sys.exit()
     #loop.close()
     #del loop
