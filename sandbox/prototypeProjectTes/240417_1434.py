@@ -1,11 +1,19 @@
-from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method
-from pyrubicon.objc.runtime import SEL, send_super, libc, libobjc,load_library,Foundation
+import ctypes
+
+from pyrubicon.objc.api import ObjCInstance,ObjCClass, ObjCProtocol, objc_method,NSString,NSObject
+from pyrubicon.objc.runtime import SEL, send_super, libc, libobjc,load_library,Foundation,Class,objc_id
 
 from mainThread import onMainThread
 import pdbr
 
 ObjCClass.auto_rename = True
-NSStringFromClass = load_library('NSStringFromClass')
+#NSString = ObjCClass('NSString')
+
+NSStringFromClass = Foundation.NSStringFromClass
+NSStringFromClass.restype = NSObject
+NSStringFromClass.argtypes = [Class]
+
+print(NSStringFromClass)
 
 # --- UINavigationController
 UINavigationController = ObjCClass('UINavigationController')
@@ -106,6 +114,8 @@ class FirstViewController(UIViewController):
     send_super(__class__, self, 'viewDidLoad')
     # --- Navigation
     self.navigationItem.title = 'FirstView'
+    #print(ObjCInstance(NSStringFromClass(__class__)))
+    print(NSStringFromClass(__class__))
 
     # --- View
     self.view.backgroundColor = UIColor.systemBlueColor()
