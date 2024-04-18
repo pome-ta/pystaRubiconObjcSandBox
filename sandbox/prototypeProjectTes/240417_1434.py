@@ -1,7 +1,7 @@
 import ctypes
 
-from pyrubicon.objc.api import ObjCInstance,ObjCClass, ObjCProtocol, objc_method,NSString,NSObject
-from pyrubicon.objc.runtime import SEL, send_super, libc, libobjc,load_library,Foundation,Class,objc_id
+from pyrubicon.objc.api import ObjCInstance, ObjCClass, ObjCProtocol, objc_method, NSString, NSObject
+from pyrubicon.objc.runtime import SEL, send_super, libc, libobjc, load_library, Foundation, Class, objc_id
 
 from mainThread import onMainThread
 import pdbr
@@ -9,11 +9,13 @@ import pdbr
 ObjCClass.auto_rename = True
 #NSString = ObjCClass('NSString')
 
-NSStringFromClass = Foundation.NSStringFromClass
-NSStringFromClass.restype = NSObject
-NSStringFromClass.argtypes = [Class]
 
-print(NSStringFromClass)
+def NSStringFromClass(cls: Class) -> ObjCInstance:
+  _NSStringFromClass = Foundation.NSStringFromClass
+  _NSStringFromClass.restype = ctypes.c_void_p
+  _NSStringFromClass.argtypes = [Class]
+  return ObjCInstance(_NSStringFromClass(cls))
+
 
 # --- UINavigationController
 UINavigationController = ObjCClass('UINavigationController')
@@ -46,6 +48,7 @@ UIBarButtonSystemItemDone
 '''
 done = 0
 
+
 # --- present
 @onMainThread
 def present_viewController(myVC: UIViewController):
@@ -66,7 +69,6 @@ def present_viewController(myVC: UIViewController):
   presentVC.setModalPresentationStyle_(0)
 
   rootVC.presentViewController_animated_completion_(presentVC, True, None)
-
 
 
 # --- NavigationController
@@ -108,21 +110,19 @@ class RootNavigationController(UINavigationController,
 # --- ViewController
 class FirstViewController(UIViewController):
 
-
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     # --- Navigation
-    self.navigationItem.title = 'FirstView'
+    self.navigationItem.title = NSStringFromClass(__class__)
     #print(ObjCInstance(NSStringFromClass(__class__)))
-    print(NSStringFromClass(__class__))
+    #print(NSStringFromClass(__class__))
 
     # --- View
     self.view.backgroundColor = UIColor.systemBlueColor()
-    
+
 
 if __name__ == "__main__":
   vc = FirstViewController.new()
   present_viewController(vc)
-
 
