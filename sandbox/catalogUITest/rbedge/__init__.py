@@ -1,29 +1,44 @@
- __version__ = 0.0
-from pyrubicon.objc.api import ObjCInstance, ObjCClass, ObjCProtocol, objc_method
-from pyrubicon.objc.runtime import SEL, send_super, Foundation, Class
+__version__ = '0.0.0'
+from pyrubicon.objc.api import ObjCClass
 
-from .rootNavigationController import RootNavigationController
+from .enumerations import UIModalPresentationStyle
 from .mainThread import onMainThread
- 
- 
+
+# todo: アノテーション用呼び出し
+UIViewController = ObjCClass('UIViewController')
+
 @onMainThread
-def present_viewController(myVC: UIViewController):
-  app = ObjCClass('UIApplication').sharedApplication
-  window = app.keyWindow if app.keyWindow else app.windows[0]
-  rootVC = window.rootViewController
+def present_viewController(viewController: UIViewController,
+                           modalPresentationStyle: UIModalPresentationStyle
+                           | int = UIModalPresentationStyle.fullScreen,
+                           navigationController_enabled: bool = True):
+  sharedApplication = ObjCClass('UIApplication').sharedApplication
+  keyWindow = sharedApplication.keyWindow if sharedApplication.keyWindow else sharedApplication.windows[
+    0]
+  rootViewController = keyWindow.rootViewController
 
-  while _presentedVC := rootVC.presentedViewController:
-    rootVC = _presentedVC
+  while _presentedViewController := rootViewController.presentedViewController:
+    rootViewController = _presentedViewController
 
-  myNC = RootNavigationController.alloc().initWithRootViewController_(myVC)
+  if navigationController_enabled:
+    from .rootNavigationController import RootNavigationController
 
-  presentVC = myNC
-  '''
-  UIModalPresentationFullScreen = 0
-  UIModalPresentationPageSheet = 1
-  '''
-  presentVC.setModalPresentationStyle_(0)
+    presentViewController = RootNavigationController.alloc(
+    ).initWithRootViewController_(viewController)
+  else:
+    presentViewController = viewController
 
-  rootVC.presentViewController_animated_completion_(presentVC, True, None)
+  # xxx: style 指定を力技で確認
+  automatic = UIModalPresentationStyle.automatic  # -2
+  blurOverFullScreen = UIModalPresentationStyle.blurOverFullScreen  # 8
+  pageSheet = UIModalPresentationStyle.pageSheet  # 1
 
+  style = modalPresentationStyle if isinstance(
+    modalPresentationStyle, int
+  ) and automatic <= modalPresentationStyle <= blurOverFullScreen else pageSheet
+
+  presentViewController.setModalPresentationStyle_(style)
+
+  rootViewController.presentViewController_animated_completion_(
+    presentViewController, True, None)
 

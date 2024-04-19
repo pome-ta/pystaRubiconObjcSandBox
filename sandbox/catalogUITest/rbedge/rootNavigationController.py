@@ -1,6 +1,8 @@
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method
 from pyrubicon.objc.runtime import SEL, send_super
 
+from .enumerations import UIRectEdge, UIBarButtonItem_SystemItem
+
 ObjCClass.auto_rename = True
 
 # --- UINavigationController
@@ -9,16 +11,6 @@ UINavigationControllerDelegate = ObjCProtocol('UINavigationControllerDelegate')
 UINavigationBarAppearance = ObjCClass('UINavigationBarAppearance')
 UIBarButtonItem = ObjCClass('UIBarButtonItem')
 
-# ref: [UIRectEdge | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uirectedge?language=objc)
-'''
-UIRectEdgeNone = 0
-'''
-edgeNone = 0
-# ref: [UIBarButtonSystemItem | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uibarbuttonsystemitem?language=objc)
-'''
-UIBarButtonSystemItemDone
-'''
-done = 0
 
 class RootNavigationController(UINavigationController,
                                protocols=[UINavigationControllerDelegate]):
@@ -45,13 +37,16 @@ class RootNavigationController(UINavigationController,
   @objc_method
   def navigationController_willShowViewController_animated_(
       self, navigationController, viewController, animated: bool):
-    viewController.setEdgesForExtendedLayout_(edgeNone)
+    extendedLayout = UIRectEdge.none
+    viewController.setEdgesForExtendedLayout_(extendedLayout)
+
+    barButtonSystemItem = UIBarButtonItem_SystemItem.done
     doneButton = UIBarButtonItem.alloc(
-    ).initWithBarButtonSystemItem_target_action_(done, navigationController,
+    ).initWithBarButtonSystemItem_target_action_(barButtonSystemItem,
+                                                 navigationController,
                                                  SEL('doneButtonTapped:'))
     visibleViewController = navigationController.visibleViewController
 
     navigationItem = visibleViewController.navigationItem
     navigationItem.rightBarButtonItem = doneButton
-
 

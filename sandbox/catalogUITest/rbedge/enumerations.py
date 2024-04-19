@@ -225,4 +225,3 @@ class UIImageRenderingMode:
   alwaysOriginal = 1
   alwaysTemplate = 2
 
-
