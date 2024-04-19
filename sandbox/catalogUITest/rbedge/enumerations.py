@@ -13,7 +13,7 @@ class UIRectEdge:
 
 
 @dataclass
-class UIViewContentMode:
+class UIView_ContentMode:
   # ref: [UIView.ContentMode | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uiview/contentmode)
   scaleToFill: int = 0
   scaleAspectFit: int = 1
@@ -47,7 +47,7 @@ class UIModalPresentationStyle:
 
 
 @dataclass
-class UITableViewCellAccessoryType:
+class UITableViewCell_AccessoryType:
   # ref: [UITableViewCell.AccessoryType | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uitableviewcell/accessorytype)
   none: int = 0
   disclosureIndicator: int = 1
@@ -224,4 +224,5 @@ class UIImageRenderingMode:
   automatic = 0
   alwaysOriginal = 1
   alwaysTemplate = 2
+
 
