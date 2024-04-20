@@ -217,7 +217,7 @@ def present_viewController(myVC: UIViewController):
   rootVC.presentViewController_animated_completion_(presentVC, True, None)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   vc = FirstViewController.new()
   present_viewController(vc)
 
