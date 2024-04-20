@@ -2,7 +2,7 @@ from pyrubicon.objc.api import ObjCClass, objc_method
 from pyrubicon.objc.runtime import send_super
 
 from rbedge.functions import NSStringFromClass
-from rbedge import present_viewController
+
 
 ObjCClass.auto_rename = True
 
@@ -21,11 +21,11 @@ class MainViewController(UIViewController):
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     # --- Navigation
-    title = str(NSStringFromClass(__class__))
+    title = NSStringFromClass(__class__)
     self.navigationItem.title = title
 
     # --- View
-    backgroundColor = UIColor.systemBlueColor()
+    backgroundColor = UIColor.systemBackgroundColor()
     baseBackgroundColor = UIColor.systemOrangeColor()
     baseForegroundColor = UIColor.systemGreenColor()
 
@@ -55,6 +55,8 @@ class MainViewController(UIViewController):
 
 
 if __name__ == "__main__":
+  from rbedge import present_viewController
+  
   vc = MainViewController.new()
-  present_viewController(vc, 1, False)
+  present_viewController(vc)
 
