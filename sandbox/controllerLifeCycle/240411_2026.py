@@ -193,7 +193,7 @@ class SecondViewController(UIViewController):
     ])
 
 
-# --- main
+# --- present
 @onMainThread
 def present_viewController(myVC: UIViewController):
   app = ObjCClass('UIApplication').sharedApplication

@@ -14,6 +14,8 @@ UILabel = ObjCClass('UILabel')
 UIFont = ObjCClass('UIFont')
 UIColor = ObjCClass('UIColor')
 
+UIView = ObjCClass('UIView')
+
 
 class MainViewController(UIViewController):
 
@@ -32,16 +34,27 @@ class MainViewController(UIViewController):
     self.label.text = 'UIKitCatalog'
     self.label.font = UIFont.systemFontOfSize_(26.0)
     self.label.sizeToFit()
+    
+    uiv = UIView.new()
+    uiv.backgroundColor = UIColor.systemOrangeColor()
+    
 
     self.view.addSubview_(self.label)
+    self.view.addSubview_(uiv)
+    
     # --- Layout
     self.label.translatesAutoresizingMaskIntoConstraints = False
+    uiv.translatesAutoresizingMaskIntoConstraints = False
 
     NSLayoutConstraint.activateConstraints_([
       self.label.centerXAnchor.constraintEqualToAnchor_(
         self.view.centerXAnchor),
       self.label.centerYAnchor.constraintEqualToAnchor_(
         self.view.centerYAnchor),
+      uiv.widthAnchor.constraintEqualToAnchor_multiplier_(
+        self.view.widthAnchor, 0.5),
+      uiv.heightAnchor.constraintEqualToAnchor_multiplier_(
+        self.view.heightAnchor, 0.5),
     ])
 
 
