@@ -54,7 +54,7 @@ class MainViewController(UIViewController):
     ])
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   from rbedge import present_viewController
   
   vc = MainViewController.new()
