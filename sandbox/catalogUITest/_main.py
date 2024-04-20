@@ -2,17 +2,17 @@ from pyrubicon.objc.api import ObjCClass, objc_method
 from pyrubicon.objc.runtime import send_super
 
 from rbedge.functions import NSStringFromClass
-
+import pdbr
 
 ObjCClass.auto_rename = True
 
 # --- UIViewController
 UIViewController = ObjCClass('UIViewController')
-UIColor = ObjCClass('UIColor')
-UIButtonConfiguration = ObjCClass('UIButtonConfiguration')
-UIButton = ObjCClass('UIButton')
-
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
+
+UILabel = ObjCClass('UILabel')
+UIFont = ObjCClass('UIFont')
+UIColor = ObjCClass('UIColor')
 
 
 class MainViewController(UIViewController):
@@ -26,37 +26,28 @@ class MainViewController(UIViewController):
 
     # --- View
     backgroundColor = UIColor.systemBackgroundColor()
-    baseBackgroundColor = UIColor.systemOrangeColor()
-    baseForegroundColor = UIColor.systemGreenColor()
-
     self.view.backgroundColor = backgroundColor
 
-    config = UIButtonConfiguration.tintedButtonConfiguration()
-    config.title = 'Tap'
-    config.baseBackgroundColor = baseBackgroundColor
-    config.baseForegroundColor = baseForegroundColor
+    self.label = UILabel.new()
+    self.label.text = 'UIKitCatalog'
+    self.label.font = UIFont.systemFontOfSize_(26.0)
+    self.label.sizeToFit()
 
-    tapButton = UIButton.new()
-    tapButton.configuration = config
-
-    self.view.addSubview_(tapButton)
+    self.view.addSubview_(self.label)
     # --- Layout
-    tapButton.translatesAutoresizingMaskIntoConstraints = False
+    self.label.translatesAutoresizingMaskIntoConstraints = False
+
     NSLayoutConstraint.activateConstraints_([
-      tapButton.centerXAnchor.constraintEqualToAnchor_(
+      self.label.centerXAnchor.constraintEqualToAnchor_(
         self.view.centerXAnchor),
-      tapButton.centerYAnchor.constraintEqualToAnchor_(
+      self.label.centerYAnchor.constraintEqualToAnchor_(
         self.view.centerYAnchor),
-      tapButton.widthAnchor.constraintEqualToAnchor_multiplier_(
-        self.view.widthAnchor, 0.4),
-      tapButton.heightAnchor.constraintEqualToAnchor_multiplier_(
-        self.view.heightAnchor, 0.1),
     ])
 
 
 if __name__ == '__main__':
   from rbedge import present_viewController
-  
+
   vc = MainViewController.new()
   present_viewController(vc)
 
