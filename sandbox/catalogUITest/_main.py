@@ -37,7 +37,6 @@ class MainViewController(UIViewController):
 
     # --- Layout
     self.label.translatesAutoresizingMaskIntoConstraints = False
-    uiv.translatesAutoresizingMaskIntoConstraints = False
 
     NSLayoutConstraint.activateConstraints_([
       self.label.centerXAnchor.constraintEqualToAnchor_(
