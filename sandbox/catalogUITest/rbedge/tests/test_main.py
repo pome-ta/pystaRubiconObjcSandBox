@@ -1,3 +1,8 @@
+import sys
+import pathlib
+
+parent_level = 3
+sys.path.append(str(pathlib.Path(__file__, '../' * parent_level).resolve()))
 from pyrubicon.objc.api import ObjCClass, objc_method
 from pyrubicon.objc.runtime import send_super
 
@@ -13,6 +18,8 @@ NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 UILabel = ObjCClass('UILabel')
 UIFont = ObjCClass('UIFont')
 UIColor = ObjCClass('UIColor')
+
+UIView = ObjCClass('UIView')
 
 
 class MainViewController(UIViewController):
@@ -33,7 +40,11 @@ class MainViewController(UIViewController):
     self.label.font = UIFont.systemFontOfSize_(26.0)
     self.label.sizeToFit()
 
+    uiv = UIView.new()
+    uiv.backgroundColor = UIColor.systemOrangeColor()
+
     self.view.addSubview_(self.label)
+    self.view.addSubview_(uiv)
 
     # --- Layout
     self.label.translatesAutoresizingMaskIntoConstraints = False
@@ -44,6 +55,10 @@ class MainViewController(UIViewController):
         self.view.centerXAnchor),
       self.label.centerYAnchor.constraintEqualToAnchor_(
         self.view.centerYAnchor),
+      uiv.widthAnchor.constraintEqualToAnchor_multiplier_(
+        self.view.widthAnchor, 0.5),
+      uiv.heightAnchor.constraintEqualToAnchor_multiplier_(
+        self.view.heightAnchor, 0.5),
     ])
 
 
