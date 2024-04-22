@@ -4,7 +4,7 @@ from pyrubicon.objc.api import ObjCClass
 from .enumerations import UIModalPresentationStyle
 from .mainThread import onMainThread
 
-# todo: アノテーション用呼び出し
+# todo: アノテーション呼び出し用
 UIViewController = ObjCClass('UIViewController')
 
 @onMainThread
