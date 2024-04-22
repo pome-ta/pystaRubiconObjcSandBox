@@ -111,6 +111,9 @@ import re
 
 
 class FirstViewController(UIViewController):
+  def __init__(self, *args, **kwargs):
+    #super().__init__(*args, **kwargs)
+    pass
 
   @objc_method
   def onTap_(self, sender):
@@ -167,6 +170,10 @@ class FirstViewController(UIViewController):
 
 
 class TopViewController(FirstViewController):
+
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
@@ -174,7 +181,6 @@ class TopViewController(FirstViewController):
     title = str(NSStringFromClass(__class__))
     self.navigationItem.title = 'title'
 
-  
 
 if __name__ == "__main__":
   vc = TopViewController.new()

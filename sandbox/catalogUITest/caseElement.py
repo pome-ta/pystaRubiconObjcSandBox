@@ -20,7 +20,7 @@ class CaseElement:
   def targetView(cell):
     # xxx: 多分まだ呼び出せない
     # xxx: index 呼び出しがスマートに書けるかも
-    
+
     return cell.contentView().subviews().objectAtIndexedSubscript_(
       0) if cell != None else None
 
