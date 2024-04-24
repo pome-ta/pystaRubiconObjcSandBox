@@ -9,6 +9,7 @@ class ButtonSystemAddContact(UITableViewCell):
   @objc_method
   def initWithStyle_reuseIdentifier_(self, style, reuseIdentifier):
     cell = send_super(__class__, self, 'initWithStyle:reuseIdentifier:')
+    print(cell)
     return cell
 
 
