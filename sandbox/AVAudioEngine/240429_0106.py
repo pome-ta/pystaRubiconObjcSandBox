@@ -129,6 +129,7 @@ class SineWaveGenerator(NSObject):
 
   deltaTime = objc_property(float)
   time = objc_property(float)
+
   #tone = objc_property(float)
   #topTone = objc_property(float)
   #bottomTone= objc_property(float)
@@ -137,8 +138,6 @@ class SineWaveGenerator(NSObject):
     super().__init__(*args, **kwargs)
     self.deltaTime = 0
     self.time = 0.0
-    
-
 
   @objc_method
   def init(self):
@@ -150,7 +149,6 @@ class SineWaveGenerator(NSObject):
     self.sampleRate = self.format.sampleRate
     self.deltaTime = 1 / self.sampleRate
 
-    
     self.tone = 440.0
     self.topTone = 880.0
     self.bottomTone = 220.0
@@ -179,7 +177,6 @@ class SineWaveGenerator(NSObject):
         _time += self.deltaTime
 
         for buffer in range(ablPointer.mNumberBuffers):
-          #print(buffer)
 
           _mData = ablPointer.mBuffers[buffer].mData
           _pointer = ctypes.POINTER(ctypes.c_float * frameCount)
