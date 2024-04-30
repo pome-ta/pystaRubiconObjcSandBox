@@ -169,7 +169,6 @@ class SineWaveGenerator(NSObject):
         _add = 10.0
       else:
         _add = self.add
-
       _tone = self.tone + _add
 
       for frame in range(frameCount):
@@ -177,7 +176,6 @@ class SineWaveGenerator(NSObject):
         _time += self.deltaTime
 
         for buffer in range(ablPointer.mNumberBuffers):
-
           _mData = ablPointer.mBuffers[buffer].mData
           _pointer = ctypes.POINTER(ctypes.c_float * frameCount)
           _buf = ctypes.cast(_mData, _pointer).contents
