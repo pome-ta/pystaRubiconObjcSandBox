@@ -171,7 +171,7 @@ class SineWaveGenerator(NSObject):
       else:
         _add = self.add
 
-      _tone = self.tone# + _add
+      _tone = self.tone + _add
 
       for frame in range(frameCount):
         #_time = self.time
