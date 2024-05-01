@@ -168,7 +168,7 @@ class SineWaveGenerator(NSObject):
       if self.tone > self.topTone:
         _add = -1.0
       elif self.tone < self.bottomTone:
-        _add = 1.0
+        _add = 10.0
       else:
         _add = self.add
 
@@ -176,10 +176,6 @@ class SineWaveGenerator(NSObject):
       
 
       for frame in range(frameCount):
-        #print(frame)
-
-
-
         sampleVal = sin(_tone * 2.0 * pi * _time)
         _time += self.deltaTime# + self.time
 
