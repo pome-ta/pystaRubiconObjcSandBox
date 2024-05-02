@@ -80,18 +80,25 @@ class RootNavigationController(UINavigationController,
 
 # --- ViewController
 class MainViewController(UIViewController):
+  waveGenerator = objc_property()
+
+  def __init__(self, *args, **kwargs):
+    print('init')
+    super().__init__(*args, **kwargs)
+    self.waveGenerator = None
 
   @objc_method
   def viewDidLoad(self):
+    print('view')
     send_super(__class__, self, 'viewDidLoad')
     self.navigationItem.title = 'sine wave'
-    self.sine = SineWaveGenerator.new()
-    self.sine.start()
+    self.waveGenerator=SineWaveGenerator.new()
+    self.waveGenerator.start()
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
     send_super(__class__, self, 'viewWillDisappear:')
-    self.sine.stop()
+    self.waveGenerator.stop()
 
 
 # --- AVAudioEngine
@@ -130,11 +137,8 @@ class SineWaveGenerator(NSObject):
   deltaTime = objc_property(float)
   time = objc_property(float)
 
-  #tone = objc_property(float)
-  #topTone = objc_property(float)
-  #bottomTone= objc_property(float)
-
   def __init__(self, *args, **kwargs):
+    print('s')
     super().__init__(*args, **kwargs)
     self.deltaTime = 0
     self.time = 0.0
@@ -162,9 +166,8 @@ class SineWaveGenerator(NSObject):
                     outputData: ctypes.c_void_p) -> OSStatus:
       ablPointer = ctypes.cast(outputData, bufferList_pointer).contents
 
-
       _time = self.time
-      
+
       if self.tone > self.topTone:
         _add = -1.0
       elif self.tone < self.bottomTone:
@@ -173,11 +176,10 @@ class SineWaveGenerator(NSObject):
         _add = self.add
 
       _tone = self.tone + _add
-      
 
       for frame in range(frameCount):
         sampleVal = sin(_tone * 2.0 * pi * _time)
-        _time += self.deltaTime# + self.time
+        _time += self.deltaTime  # + self.time
 
         for buffer in range(ablPointer.mNumberBuffers):
 
@@ -190,7 +192,6 @@ class SineWaveGenerator(NSObject):
       self.tone = _tone
       self.add = _add
       return 0
-      
 
     self.sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(
       renderBlock)
