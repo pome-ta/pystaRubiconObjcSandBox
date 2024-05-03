@@ -80,27 +80,29 @@ class RootNavigationController(UINavigationController,
 
 # --- ViewController
 class MainViewController(UIViewController):
-  waveGenerator = objc_property()
+  #waveGenerator = objc_property()
 
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     self.navigationItem.title = 'sine wave'
     self.waveGenerator = WaveGenerator.new()
+    self.waveGenerator.prepare()
     self.waveGenerator.start()
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
     send_super(__class__, self, 'viewWillDisappear:')
-    self.waveGenerator.stop()
+    self.waveGenerator.dispose()
 
 
 # --- AVAudioEngine
 import ctypes
 from math import sin, pi
-from random import random, uniform
-
+from pyrubicon.objc.runtime import  load_library
 from pyrubicon.objc.api import Block
+
+AVFoundation = load_library('AVFoundation')
 
 OSStatus = ctypes.c_int32
 
@@ -127,45 +129,29 @@ class AudioBufferList(ctypes.Structure):
 
 
 class WaveGenerator(NSObject):
+  #audioEngine = objc_property()
+  '''
+  sampleRate = objc_property(float)
+  time = objc_property(float)
+  deltaTime = objc_property(float)
+  toneA = objc_property(float)
+
+  sourceNode = objc_property()
+  '''
 
   @objc_method
   def init(self):
     self.audioEngine = AVAudioEngine.new()
-    
-    bufferList_pointer = ctypes.POINTER(AudioBufferList)
+
+    self.sampleRate = 44100.0
+    self.time = 0.0
+    self.deltaTime = 0.0
 
     @Block
     def renderBlock(isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
                     frameCount: ctypes.c_int32,
                     outputData: ctypes.c_void_p) -> OSStatus:
-      ablPointer = ctypes.cast(outputData, bufferList_pointer).contents
-
-      _time = self.time
-
-      if self.tone > self.topTone:
-        _add = -1.0
-      elif self.tone < self.bottomTone:
-        _add = 10.0
-      else:
-        _add = self.add
-
-      _tone = self.tone + _add
-      
-
-      for frame in range(frameCount):
-        sampleVal = sin(_tone * 2.0 * pi * _time)
-        _time += self.deltaTime  # + self.time
-
-        for buffer in range(ablPointer.mNumberBuffers):
-
-          _mData = ablPointer.mBuffers[buffer].mData
-          _pointer = ctypes.POINTER(ctypes.c_float * frameCount)
-          _buf = ctypes.cast(_mData, _pointer).contents
-          _buf[frame] = sampleVal
-
-      self.time = _time
-      self.tone = _tone
-      self.add = _add
+      #print('h')
       return 0
 
     self.sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(
@@ -173,25 +159,38 @@ class WaveGenerator(NSObject):
 
     return self
 
-  
   @objc_method
   def initAudioEngene(self):
-    pass
-    
+    self.mainMixer = self.audioEngine.mainMixerNode
+    self.outputNode = self.audioEngine.outputNode
+    self.format = self.outputNode.inputFormatForBus_(0)
+
+    self.sampleRate = float(self.format.sampleRate)
+    self.deltaTime = 1.0 / self.sampleRate
+
   @objc_method
   def prepare(self):
     self.initAudioEngene()
-  
-  
+
   @objc_method
   def start(self):
+    inputFormat = AVAudioFormat.alloc(
+    ).initWithCommonFormat_sampleRate_channels_interleaved_(
+      self.format.commonFormat, self.sampleRate, 1, self.format.isInterleaved)
+    self.audioEngine.attachNode_(self.sourceNode)
+    self.audioEngine.connect_to_format_(self.sourceNode, self.mainMixer,
+                                        inputFormat)
 
-    self.audioEngine.startAndReturnError_(None)
+    try:
+      self.audioEngine.startAndReturnError_(None)
+
+    except Exception as e:
+      print(f'{e}: エラー')
 
   @objc_method
   def stop(self):
     self.audioEngine.stop()
-    
+
   @objc_method
   def dispose(self):
     self.stop()
