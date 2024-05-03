@@ -86,7 +86,7 @@ class MainViewController(UIViewController):
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     self.navigationItem.title = 'sine wave'
-    self.waveGenerator = SineWaveGenerator.new()
+    self.waveGenerator = WaveGenerator.new()
     self.waveGenerator.start()
 
   @objc_method
@@ -126,32 +126,12 @@ class AudioBufferList(ctypes.Structure):
   ]
 
 
-class SineWaveGenerator(NSObject):
-
-  deltaTime = objc_property(float)
-  time = objc_property(float)
-
-  def __init__(self, *args, **kwargs):
-    print('s')
-    super().__init__(*args, **kwargs)
-    self.deltaTime = 0
-    self.time = 0.0
+class WaveGenerator(NSObject):
 
   @objc_method
   def init(self):
     self.audioEngine = AVAudioEngine.new()
-    self.mainMixer = self.audioEngine.mainMixerNode
-    self.outputNode = self.audioEngine.outputNode
-    self.format = self.outputNode.inputFormatForBus_(0)
-
-    self.sampleRate = self.format.sampleRate
-    self.deltaTime = 1 / self.sampleRate
-
-    self.tone = 440.0
-    self.topTone = 880.0
-    self.bottomTone = 220.0
-    self.add = 10.0
-
+    
     bufferList_pointer = ctypes.POINTER(AudioBufferList)
 
     @Block
@@ -170,6 +150,7 @@ class SineWaveGenerator(NSObject):
         _add = self.add
 
       _tone = self.tone + _add
+      
 
       for frame in range(frameCount):
         sampleVal = sin(_tone * 2.0 * pi * _time)
@@ -192,26 +173,28 @@ class SineWaveGenerator(NSObject):
 
     return self
 
+  
+  @objc_method
+  def initAudioEngene(self):
+    pass
+    
+  @objc_method
+  def prepare(self):
+    self.initAudioEngene()
+  
+  
   @objc_method
   def start(self):
-
-    inputFormat = AVAudioFormat.alloc(
-    ).initWithCommonFormat_sampleRate_channels_interleaved_(
-      self.format.commonFormat, self.sampleRate, CHANNEL,
-      self.format.isInterleaved)
-
-    self.audioEngine.attachNode_(self.sourceNode)
-    self.audioEngine.connect_to_format_(self.sourceNode, self.mainMixer,
-                                        inputFormat)
-
-    self.audioEngine.connect_to_format_(self.mainMixer, self.outputNode, None)
-    self.mainMixer.outputVolume = 0.5
 
     self.audioEngine.startAndReturnError_(None)
 
   @objc_method
   def stop(self):
     self.audioEngine.stop()
+    
+  @objc_method
+  def dispose(self):
+    self.stop()
 
 
 if __name__ == "__main__":
