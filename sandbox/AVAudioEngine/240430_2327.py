@@ -82,21 +82,8 @@ class RootNavigationController(UINavigationController,
 class MainViewController(UIViewController):
   waveGenerator = objc_property()
 
-  def __init__(self, *args, **kwargs):
-    print('init')
-    super().__init__(*args, **kwargs)
-    self.waveGenerator = None
-
-  @objc_method
-  def init(self):
-    a = send_super(__class__, self, 'init')
-    print(a)
-    return self
-
   @objc_method
   def viewDidLoad(self):
-    #print('view')
-    #pdbr.state(self)
     send_super(__class__, self, 'viewDidLoad')
     self.navigationItem.title = 'sine wave'
     self.waveGenerator = SineWaveGenerator.new()
