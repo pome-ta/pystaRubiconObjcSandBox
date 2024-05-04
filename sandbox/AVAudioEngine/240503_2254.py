@@ -154,7 +154,7 @@ class WaveGenerator(NSObject):
     def renderBlock(isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
                     frameCount: ctypes.c_int32,
                     outputData: ctypes.c_void_p) -> OSStatus:
-      print(frameCount)
+      #print(frameCount)
       return 0
 
     self.sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(
@@ -179,7 +179,10 @@ class WaveGenerator(NSObject):
   def start(self):
     inputFormat = AVAudioFormat.alloc(
     ).initWithCommonFormat_sampleRate_channels_interleaved_(
-      self.format.commonFormat, self.sampleRate, 1, self.format.isInterleaved)
+      self.format.commonFormat, self.sampleRate, 1, self.format.isInterleaved())
+    #pdbr.state(inputFormat.isInterleaved)
+    #print(inputFormat.isInterleaved())
+    pdbr.state(self.format.formatDescription)
     self.audioEngine.attachNode_(self.sourceNode)
     self.audioEngine.connect_to_format_(self.sourceNode, self.mainMixer,
                                         inputFormat)
