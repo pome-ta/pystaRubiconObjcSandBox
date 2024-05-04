@@ -1,3 +1,37 @@
+# 📝 2024/05/04
+
+
+`load_library` でframework 取ってくるか？と思っても
+あまり意味なさそう
+
+構造体を自分で作るなのかな？
+
+[Core Audio | Apple Developer Documentation](https://developer.apple.com/documentation/coreaudio?language=objc)
+
+
+`.locatble` ? みたいなのを取ってくるのかな？
+
+
+## 構造体
+
+
+[AudioBuffer | Apple Developer Documentation](https://developer.apple.com/documentation/coreaudiotypes/audiobuffer?language=objc)
+
+
+An audio buffer holds a single buffer of audio data in its mData field. The buffer can represent two types of audio:
+
+- A single, monophonic, noninterleaved channel of audio
+- Interleaved audio with the number of channels set by the mNumberChannels field
+
+オーディオバッファは、mDataフィールドにオーディオデータの単一のバッファを保持します。バッファは2種類のオーディオを表すことができます。
+
+- オーディオの単一、モノフォニック、非インターリーブチャンネル
+- mNumberChannelsフィールドで設定されたチャンネル数のインターリーブオーディオ
+
+
+[Core Audio その1 AudioBufferとAudioBufferList | objective-audio](kVariableLengthArray)
+
+
 # 📝 2024/05/03
 
 [GitHub - TokyoYoshida/CoreAudioExamples](https://github.com/TokyoYoshida/CoreAudioExamples)

@@ -105,7 +105,7 @@ from pyrubicon.objc.api import Block
 
 #Core Audio Types
 
-AVFoundation = load_library('CoreAudio')
+#AVFoundation = load_library('CoreAudio')
 
 OSStatus = ctypes.c_int32
 
@@ -154,7 +154,7 @@ class WaveGenerator(NSObject):
     def renderBlock(isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
                     frameCount: ctypes.c_int32,
                     outputData: ctypes.c_void_p) -> OSStatus:
-      #print('h')
+      print(frameCount)
       return 0
 
     self.sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(
