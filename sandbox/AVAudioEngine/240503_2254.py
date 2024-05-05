@@ -101,6 +101,8 @@ import ctypes
 from math import sin, pi
 
 from pyrubicon.objc.api import Block
+from pyrubicon.objc.api import ObjCInstance
+from pyrubicon.objc.runtime import objc_id
 
 
 OSStatus = ctypes.c_int32
@@ -151,10 +153,11 @@ class WaveGenerator(NSObject):
     def renderBlock(isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
                     frameCount: ctypes.c_int32,
                     outputData:ctypes.c_void_p) -> OSStatus:
-      #print(outputData)
       
-      abl = ctypes.cast(outputData, ctypes.POINTER(AudioBufferList))
-      print(abl)
+      #abl = ctypes.cast(outputData, ctypes.POINTER(AudioBufferList)).value
+      abl = ObjCInstance(objc_id(outputData))
+      #print(abl)
+      pdbr.state(abl)
       
       return 0
 
