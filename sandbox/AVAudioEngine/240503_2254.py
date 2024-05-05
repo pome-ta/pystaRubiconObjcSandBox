@@ -100,14 +100,11 @@ class MainViewController(UIViewController):
 import ctypes
 from math import sin, pi
 
-from pyrubicon.objc.runtime import  load_library
 from pyrubicon.objc.api import Block
 
-#Core Audio Types
-
-#AVFoundation = load_library('CoreAudio')
 
 OSStatus = ctypes.c_int32
+
 
 AVAudioEngine = ObjCClass('AVAudioEngine')
 AVAudioFormat = ObjCClass('AVAudioFormat')
@@ -153,8 +150,12 @@ class WaveGenerator(NSObject):
     @Block
     def renderBlock(isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
                     frameCount: ctypes.c_int32,
-                    outputData: ctypes.c_void_p) -> OSStatus:
-      #print(frameCount)
+                    outputData:ctypes.c_void_p) -> OSStatus:
+      #print(outputData)
+      
+      abl = ctypes.cast(outputData, ctypes.POINTER(AudioBufferList))
+      print(abl)
+      
       return 0
 
     self.sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(
@@ -182,13 +183,16 @@ class WaveGenerator(NSObject):
       self.format.commonFormat, self.sampleRate, 1, self.format.isInterleaved())
     #pdbr.state(inputFormat.isInterleaved)
     #print(inputFormat.isInterleaved())
-    pdbr.state(self.format.formatDescription)
+    #pdbr.state(self.format.formatDescription)
     self.audioEngine.attachNode_(self.sourceNode)
     self.audioEngine.connect_to_format_(self.sourceNode, self.mainMixer,
                                         inputFormat)
-
+    self.audioEngine.connect_to_format_(self.mainMixer, self.outputNode, None)
+    self.mainMixer.outputVolume = 0.5
+    
     try:
       self.audioEngine.startAndReturnError_(None)
+      print(self.audioEngine)
 
     except Exception as e:
       print(f'{e}: エラー')
