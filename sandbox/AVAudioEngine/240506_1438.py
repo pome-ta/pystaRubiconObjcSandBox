@@ -156,14 +156,12 @@ class WaveGenerator(NSObject):
                     outputData:ctypes.c_void_p) -> OSStatus:
       
       abl = ctypes.cast(outputData, ctypes.POINTER(AudioBufferList)).contents
-      #print(dir(abl))
-      #abl = ObjCInstance(objc_id(outputData))
-      #abl = ctypes.cast(outputData, AudioBufferList.po)
-      #print(abl)
-      #pdbr.state(abl)
       #print(abl.mBuffers)
-      #print(dir(abl.mBuffers))
-      #print((abl.mBuffers)
+      
+      for buffer in abl.mBuffers:
+        #print(dir(objc_id(buffer.mData)))
+        print(objc_id(buffer.mData)[0])
+      
       
       
       
@@ -192,10 +190,11 @@ class WaveGenerator(NSObject):
   def start(self):
     inputFormat = AVAudioFormat.alloc(
     ).initWithCommonFormat_sampleRate_channels_interleaved_(
-      self.format.commonFormat, self.sampleRate, 1, self.format.isInterleaved())
+      self.format.commonFormat, self.sampleRate, CHANNEL, self.format.isInterleaved())
     #pdbr.state(inputFormat.isInterleaved)
     #print(inputFormat.isInterleaved())
     #pdbr.state(self.format.formatDescription)
+    print(inputFormat)
     self.audioEngine.attachNode_(self.sourceNode)
     self.audioEngine.connect_to_format_(self.sourceNode, self.mainMixer,
                                         inputFormat)
@@ -204,7 +203,7 @@ class WaveGenerator(NSObject):
     
     try:
       self.audioEngine.startAndReturnError_(None)
-      print(self.audioEngine)
+      #print(self.audioEngine)
 
     except Exception as e:
       print(f'{e}: エラー')

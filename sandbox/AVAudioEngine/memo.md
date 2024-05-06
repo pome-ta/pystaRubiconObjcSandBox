@@ -1,3 +1,24 @@
+# 📝 2024/05/06
+
+```.py
+
+
+ctypes.cast(outputData, ctypes.POINTER(AudioBufferList))
+
+'''
+['__bool__', '__class__', '__ctypes_from_outparam__', '__delattr__', '__delitem__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getitem__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__setitem__', '__setstate__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_b_base_', '_b_needsfree_', '_objects', '_type_', 'contents']
+'''
+
+
+ctypes.cast(outputData, ctypes.POINTER(AudioBufferList)).contents
+
+'''
+['__class__', '__ctypes_from_outparam__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__setstate__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_b_base_', '_b_needsfree_', '_fields_', '_objects', 'mBuffers', 'mNumberBuffers']
+'''
+
+```
+
+
 # 📝 2024/05/04
 
 
