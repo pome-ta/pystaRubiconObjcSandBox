@@ -130,6 +130,7 @@ class AudioBufferList(ctypes.Structure):
   ]
 
 
+
 class WaveGenerator(NSObject):
   #audioEngine = objc_property()
   '''
@@ -154,10 +155,12 @@ class WaveGenerator(NSObject):
                     frameCount: ctypes.c_int32,
                     outputData:ctypes.c_void_p) -> OSStatus:
       
-      #abl = ctypes.cast(outputData, ctypes.POINTER(AudioBufferList)).value
-      abl = ObjCInstance(objc_id(outputData))
+      abl = ctypes.cast(outputData, ctypes.POINTER(AudioBufferList)).contents
+      print(abl)
+      #abl = ObjCInstance(objc_id(outputData))
+      #abl = ctypes.cast(outputData, AudioBufferList.po)
       #print(abl)
-      pdbr.state(abl)
+      #pdbr.state(abl)
       
       return 0
 
