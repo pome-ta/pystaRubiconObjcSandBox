@@ -149,18 +149,27 @@ class WaveGenerator(NSObject):
     self.sampleRate = 44100.0
     self.time = 0.0
     self.deltaTime = 0.0
+    self.toneA = 440.0
 
     @Block
     def renderBlock(isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
                     frameCount: ctypes.c_int32,
                     outputData:ctypes.c_void_p) -> OSStatus:
       
+      
+      
       abl = ctypes.cast(outputData, ctypes.POINTER(AudioBufferList)).contents
       #print(abl.mBuffers)
-      
-      for buffer in abl.mBuffers:
-        #print(dir(objc_id(buffer.mData)))
-        print(objc_id(buffer.mData)[0])
+      #print(frameCount)
+      for frame in range(frameCount):
+        #sampleVal = sin(_tone * 2.0 * pi * _time)
+        print(self.toneA)
+        self.time += self.deltaTime
+        #print(self.time)
+        
+        for buffer in abl.mBuffers:
+          pass
+        
       
       
       
