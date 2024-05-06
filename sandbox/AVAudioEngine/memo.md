@@ -41,6 +41,39 @@ for buffer in abl.mBuffers:
 なかなか、わからんのでメモしながら整理していく
 
 
+```.swift
+lazy var sourceNode = AVAudioSourceNode { [self] (_, _, frameCount, audioBufferList) -> OSStatus in
+    // `AudioBufferList` の、`mBuffers` 配列要素を操作できるような形式になる？
+    let abl = UnsafeMutableAudioBufferListPointer(audioBufferList)
+    // `frameCount` = `1024` とか
+    for frame in 0..<Int(frameCount) {
+        let sampleVal: Float = sin(AudioEngeneWaveGenerator.toneA * 2.0 * Float(Double.pi) * self.time)
+        self.time += self.deltaTime
+        // `frame` 分の時間処理をしてから呼び出しをしている
+        // channel としては`1` なので1回の処理
+        for buffer in abl {
+            // 中身が`Float` となるってこと？形としては配列みたいな？
+            // ここでキャストか
+            let buf: UnsafeMutableBufferPointer<Float> = UnsafeMutableBufferPointer(buffer)
+            buf[frame] = sampleVal
+        }
+    }
+    return noErr
+}
+```
+
+
+
+
+
+
+
+
+[UnsafeMutablePointer | Apple Developer Documentation](https://developer.apple.com/documentation/swift/unsafemutablepointer)
+
+
+
+
 
 # 📝 2024/05/04
 
