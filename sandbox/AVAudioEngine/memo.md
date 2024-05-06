@@ -1,8 +1,11 @@
 # 📝 2024/05/06
 
+
+## `block` 内の処理
+
+ctypes でこねこねするから、メモ
+
 ```.py
-
-
 ctypes.cast(outputData, ctypes.POINTER(AudioBufferList))
 
 '''
@@ -19,8 +22,6 @@ ctypes.cast(outputData, ctypes.POINTER(AudioBufferList)).contents
 ```
 
 
-
-
 ```.py
 
 for buffer in abl.mBuffers:
@@ -34,6 +35,12 @@ for buffer in abl.mBuffers:
 '''
 
 ```
+
+## `UnsafeMutableAudioBufferListPointer` と`UnsafeMutableBufferPointer`
+
+なかなか、わからんのでメモしながら整理していく
+
+
 
 # 📝 2024/05/04
 
