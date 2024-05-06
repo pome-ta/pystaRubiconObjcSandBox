@@ -132,7 +132,7 @@ class WaveGenerator(NSObject):
   #audioEngine = objc_property()
 
   #sampleRate = objc_property(float)
-  #time = objc_property(float)
+  time = objc_property(float)
   deltaTime = objc_property(float)
   toneA = objc_property(float)
 
@@ -148,7 +148,7 @@ class WaveGenerator(NSObject):
     self.toneA = 440.0
 
     def hoge():
-      print(self.time)
+      self.toneA += 0.1
 
     @Block
     def renderBlock(isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
@@ -157,21 +157,18 @@ class WaveGenerator(NSObject):
 
       abl = ctypes.cast(outputData, ctypes.POINTER(AudioBufferList)).contents
       mData_POINTER = ctypes.POINTER(ctypes.c_float * frameCount)
-      '''
-      #print(abl.mBuffers)
-      #print(frameCount)
-      mBuff = abl.mBuffers[0]
-      mData = mBuff.mData
-      #print(dir(mBuff))
-      mCast = ctypes.cast(mData, ctypes.POINTER(ctypes.c_float * frameCount))
-      print(mCast.contents[1023])
-      '''
+      
       _time = self.time
+      hoge()
+      
 
       for frame in range(frameCount):
+        
+        #self.toneA += 0.1
         #sampleVal = sin(self.toneA * 2.0 * pi * _time)
         #sampleVal = sin(440.0 * 2.0 * pi * _time)
         #sampleVal = sin(440.0 * 2.0 * pi * self.time)
+        #sampleVal = sin(self.toneA * 2.0 * pi * _time)
         sampleVal = sin(self.toneA * 2.0 * pi * _time)
         _time += self.deltaTime
         #self.time += self.deltaTime
@@ -181,38 +178,12 @@ class WaveGenerator(NSObject):
         for buffer in abl.mBuffers:
           buf = ctypes.cast(buffer.mData, mData_POINTER).contents
           buf[frame] = sampleVal
+          
 
       self.time = _time
       return 0
 
-    """
-    bufferList_pointer = ctypes.POINTER(AudioBufferList)
-
-    @Block
-    def renderBlock(isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
-                    frameCount: ctypes.c_int32,
-                    outputData: ctypes.c_void_p) -> OSStatus:
-      ablPointer = ctypes.cast(outputData, bufferList_pointer).contents
-
-      _time = self.time
-      
-
-      for frame in range(frameCount):
-        sampleVal = sin(440.0 * 2.0 * pi * _time)
-        _time += self.deltaTime
-
-        for buffer in range(ablPointer.mNumberBuffers):
-
-          _mData = ablPointer.mBuffers[buffer].mData
-          _pointer = ctypes.POINTER(ctypes.c_float * frameCount)
-          _buf = ctypes.cast(_mData, _pointer).contents
-          _buf[frame] = sampleVal
-
-      self.time = _time
-      
-      return 0
-    """
-
+    
     self.sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(
       renderBlock)
 
@@ -237,10 +208,6 @@ class WaveGenerator(NSObject):
     ).initWithCommonFormat_sampleRate_channels_interleaved_(
       self.format.commonFormat, self.sampleRate, CHANNEL,
       self.format.isInterleaved())
-    #pdbr.state(inputFormat.isInterleaved)
-    #print(inputFormat.isInterleaved())
-    #pdbr.state(self.format.formatDescription)
-    #print(inputFormat)
     self.audioEngine.attachNode_(self.sourceNode)
     self.audioEngine.connect_to_format_(self.sourceNode, self.mainMixer,
                                         inputFormat)
@@ -249,7 +216,6 @@ class WaveGenerator(NSObject):
 
     try:
       self.audioEngine.startAndReturnError_(None)
-      #print(self.audioEngine)
 
     except Exception as e:
       print(f'{e}: エラー')
