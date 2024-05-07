@@ -4,12 +4,12 @@ import pathlib
 parent_level = 3
 sys.path.append(str(pathlib.Path(__file__, '../' * parent_level).resolve()))
 
-from pyrubicon.objc.api import ObjCClass, objc_method
+from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_property, objc_method
 
 from pyrubicon.objc.runtime import SEL, send_super
 from storyboard.buttonViewController import prototypes
 
-from mainThread import onMainThread
+from rbedge.mainThread import onMainThread
 import pdbr
 
 ObjCClass.auto_rename = True
