@@ -143,12 +143,9 @@ class WaveGenerator(NSObject):
     self.audioEngine = AVAudioEngine.new()
 
     self.sampleRate = 44100.0
-    self.time = 0.0
+    self.time = ctypes.c_float(0.0)
     self.deltaTime = 0.0
     self.toneA = 440.0
-
-    def hoge():
-      self.toneA += 0.1
 
     @Block
     def renderBlock(isSilence: ctypes.c_void_p, timestamp: ctypes.c_void_p,
@@ -158,8 +155,6 @@ class WaveGenerator(NSObject):
       abl = ctypes.cast(outputData, ctypes.POINTER(AudioBufferList)).contents
       mData_POINTER = ctypes.POINTER(ctypes.c_float * frameCount)
       
-      _time = self.time
-      hoge()
       
 
       for frame in range(frameCount):
@@ -169,9 +164,9 @@ class WaveGenerator(NSObject):
         #sampleVal = sin(440.0 * 2.0 * pi * _time)
         #sampleVal = sin(440.0 * 2.0 * pi * self.time)
         #sampleVal = sin(self.toneA * 2.0 * pi * _time)
-        sampleVal = sin(self.toneA * 2.0 * pi * _time)
+        sampleVal = sin(self.toneA * 2.0 * pi * self.time)
         #sampleVal = sin(self.toneA * 2.0 * pi * frame)
-        _time += self.deltaTime
+        self.time = ctypes.byref(self.time,self.deltaTime)
         #self.time += self.deltaTime
         #print(self.time)
         #print(sampleVal)
