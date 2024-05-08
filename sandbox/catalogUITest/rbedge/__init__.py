@@ -4,8 +4,11 @@ from pyrubicon.objc.api import ObjCClass
 from .enumerations import UIModalPresentationStyle
 from .mainThread import onMainThread
 
+ObjCClass.auto_rename = True
+
 # todo: アノテーション呼び出し用
 UIViewController = ObjCClass('UIViewController')
+
 
 @onMainThread
 def present_viewController(viewController: UIViewController,

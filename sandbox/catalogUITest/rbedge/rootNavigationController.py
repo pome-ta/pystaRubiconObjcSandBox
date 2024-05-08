@@ -3,7 +3,7 @@ from pyrubicon.objc.runtime import SEL, send_super
 
 from .enumerations import UIRectEdge, UIBarButtonItem_SystemItem
 
-ObjCClass.auto_rename = True
+#ObjCClass.auto_rename = True
 
 # --- UINavigationController
 UINavigationController = ObjCClass('UINavigationController')

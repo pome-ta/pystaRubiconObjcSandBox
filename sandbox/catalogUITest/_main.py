@@ -4,7 +4,7 @@ from pyrubicon.objc.runtime import send_super
 from rbedge.functions import NSStringFromClass
 import pdbr
 
-ObjCClass.auto_rename = True
+#ObjCClass.auto_rename = True
 
 # --- UIViewController
 UIViewController = ObjCClass('UIViewController')
