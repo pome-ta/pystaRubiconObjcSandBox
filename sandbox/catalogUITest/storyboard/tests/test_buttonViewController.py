@@ -28,33 +28,15 @@ UIColor = ObjCClass('UIColor')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 UITableViewController = ObjCClass('UITableViewController')
-UITableView = ObjCClass('UITableView')
 UITableViewCell = ObjCClass('UITableViewCell')
-UITableViewDataSource = ObjCProtocol('UITableViewDataSource')
-#UITableViewDelegate = ObjCProtocol('UITableViewDelegate')
 
 
-class TableViewControllerTest(UITableViewController,
-                              protocols=[
-                                UITableViewDataSource,
-                              ]):
-
-  tableView: UITableView = objc_property()
-  
+class TableViewControllerTest(UITableViewController):
 
   @objc_method
   def init(self):
     send_super(__class__, self, 'init')
-
     self.cell_identifier = 'customCell'
-
-    self.tableView = UITableView.alloc().initWithFrame_style_(
-      CGRectMake(0.0, 0.0, 0.0, 0.0), UITableViewStyle.plain)
-    self.tableView.translatesAutoresizingMaskIntoConstraints = False
-
-    self.tableView.registerClass_forCellReuseIdentifier_(
-      UITableViewCell, self.cell_identifier)
-
     return self
 
   @objc_method
@@ -70,28 +52,15 @@ class TableViewControllerTest(UITableViewController,
 
   @objc_method
   def tableSetup(self):
-    #self.tableView.delegate = self
-    self.tableView.dataSource = self
-
-    self.view.addSubview_(self.tableView)
-
-    NSLayoutConstraint.activateConstraints_([
-      self.tableView.centerXAnchor.constraintEqualToAnchor_(
-        self.view.centerXAnchor),
-      self.tableView.centerYAnchor.constraintEqualToAnchor_(
-        self.view.centerYAnchor),
-      self.tableView.widthAnchor.constraintEqualToAnchor_multiplier_(
-        self.view.widthAnchor, 1.0),
-      self.tableView.heightAnchor.constraintEqualToAnchor_multiplier_(
-        self.view.heightAnchor, 1.0),
-    ])
+    self.tableView.registerClass_forCellReuseIdentifier_(
+      UITableViewCell, self.cell_identifier)
 
   # --- UITableViewDataSource
   @objc_method
   def tableView_numberOfRowsInSection_(self, tableView,
                                        section: NSInteger) -> NSInteger:
 
-    return 1
+    return 29
 
   @objc_method
   def tableView_cellForRowAtIndexPath_(self, tableView,

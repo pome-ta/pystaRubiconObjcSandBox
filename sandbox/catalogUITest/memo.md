@@ -1,3 +1,13 @@
+# 📝 2024/05/09
+
+
+[なぜUITableViewControllerを使うなと言われるのか #iOS - Qiita](https://qiita.com/yosshi4486/items/33132718a0fb08273a45)
+
+
+
+
+
+
 # 📝 2024/04/24
 
 改めてstoryboard について考えてみる
