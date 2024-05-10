@@ -54,12 +54,14 @@ class TableViewControllerTest(UITableViewController):
   def tableSetup(self):
     self.tableView.registerClass_forCellReuseIdentifier_(
       prototypes[0], self.cell_identifier)
+      #UITableViewCell, self.cell_identifier)
 
   # --- UITableViewDataSource
   @objc_method
   def tableView_numberOfRowsInSection_(self, tableView,
-                                       section: NSInteger) -> NSInteger:
+                                       section:NSInteger) -> NSInteger:
 
+    print(tableView)
     return 1
 
   @objc_method
@@ -68,6 +70,7 @@ class TableViewControllerTest(UITableViewController):
     cell = tableView.dequeueReusableCellWithIdentifier_forIndexPath_(
       self.cell_identifier, indexPath)
 
+    print(indexPath)
     content = cell.defaultContentConfiguration()
     content.text = 'symbol_name'
     content.textProperties.numberOfLines = 1
