@@ -19,7 +19,7 @@ except Exception as e:
   print(f'{e}: error')
 
 # --- test modules
-#from storyboard.buttonViewController import prototypes
+from storyboard.buttonViewController import prototypes
 
 #ObjCClass.auto_rename = True
 #ObjCProtocol.auto_rename = True # xxx: `__init__.py` にやるかも
@@ -53,14 +53,14 @@ class TableViewControllerTest(UITableViewController):
   @objc_method
   def tableSetup(self):
     self.tableView.registerClass_forCellReuseIdentifier_(
-      UITableViewCell, self.cell_identifier)
+      prototypes[0], self.cell_identifier)
 
   # --- UITableViewDataSource
   @objc_method
   def tableView_numberOfRowsInSection_(self, tableView,
                                        section: NSInteger) -> NSInteger:
 
-    return 29
+    return 1
 
   @objc_method
   def tableView_cellForRowAtIndexPath_(self, tableView,
