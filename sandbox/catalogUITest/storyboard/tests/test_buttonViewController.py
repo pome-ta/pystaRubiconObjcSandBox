@@ -61,7 +61,7 @@ class TableViewControllerTest(UITableViewController):
   def tableView_numberOfRowsInSection_(self, tableView,
                                        section:NSInteger) -> NSInteger:
 
-    print(tableView)
+    #print(tableView)
     return 1
 
   @objc_method
@@ -70,7 +70,11 @@ class TableViewControllerTest(UITableViewController):
     cell = tableView.dequeueReusableCellWithIdentifier_forIndexPath_(
       self.cell_identifier, indexPath)
 
-    print(indexPath)
+    #print(indexPath)
+    #pdbr.state(cell)
+    #print(cell.style)
+    #print(cell.reuseIdentifier)
+    
     content = cell.defaultContentConfiguration()
     content.text = 'symbol_name'
     content.textProperties.numberOfLines = 1

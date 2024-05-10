@@ -12,24 +12,25 @@ UITableViewCell = ObjCClass('UITableViewCell')
 class ButtonSystemAddContact(UITableViewCell):
 
   @objc_method
-  def initWithStyle_reuseIdentifier_(
-      self, style: NSInteger, reuseIdentifier) -> ctypes.c_void_p:
+  def initWithStyle_reuseIdentifier_(self, style,
+                                     reuseIdentifier) -> ctypes.c_void_p:
 
     cell = send_super(__class__,
-               self,
-               'initWithStyle:reuseIdentifier:', [
-                 style,
-                 reuseIdentifier,
-               ],
-               argtypes=[
-                 NSInteger,
-                 ctypes.c_void_p,
-               ])
+                      self,
+                      'initWithStyle:reuseIdentifier:', [
+                        style(),
+                        reuseIdentifier,
+                      ],
+                      argtypes=[
+                        int,
+                        str,
+                      ])
 
     #return self
     #cell = ObjCInstance(_cell)
-    return cell
-    
+    #return ObjCInstance(_cell).ptr
+    return self
+    #return cell
 
 
 prototypes = [
