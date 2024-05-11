@@ -1,6 +1,6 @@
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass, objc_method
+from pyrubicon.objc.api import ObjCClass,ObjCInstance, objc_method
 from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import NSInteger
 
@@ -18,11 +18,23 @@ UIColor = ObjCClass('UIColor')
 
 
 class TableViewControllerTest(UITableViewController):
-
+  '''
   @objc_method
   def init(self):
     send_super(__class__, self, 'init')
     self.cell_identifier = 'customCell'
+    return self
+
+  '''
+
+  @objc_method
+  def initWithStyle_(self, style:ObjCInstance):
+    self==send_super(__class__,
+               self,
+               'initWithStyle:', [style,],
+               argtypes=[ObjCInstance,])
+    self.cell_identifier = 'customCell'
+    #print(style)
     return self
 
   @objc_method
@@ -45,10 +57,6 @@ class TableViewControllerTest(UITableViewController):
   @objc_method
   def tableView_numberOfRowsInSection_(self, tableView,
                                        section: NSInteger) -> NSInteger:
-
-    #print(type(section))
-    #print(section)
-    #print(tableView)
     return 1
 
   @objc_method
@@ -64,6 +72,8 @@ class TableViewControllerTest(UITableViewController):
     content.textProperties.numberOfLines = 1
 
     cell.contentConfiguration = content
+    #pdbr.state(tableView)
+    #print(tableView.style)
     return cell.ptr
 
 
