@@ -7,13 +7,14 @@ from pyrubicon.objc.types import NSInteger
 #ObjCClass.auto_rename = True # xxx: ここ含めて全部呼び出し？
 
 UITableViewCell = ObjCClass('UITableViewCell')
+NSString = ObjCClass('NSString')
 
 
 class ButtonSystemAddContact(UITableViewCell):
 
   @objc_method
   def initWithStyle_reuseIdentifier_(self, style: ctypes.c_void_p,
-                                     reuseIdentifier):
+                                     reuseIdentifier:NSString):
 
     send_super(__class__,
                self,
@@ -23,7 +24,7 @@ class ButtonSystemAddContact(UITableViewCell):
                ],
                argtypes=[
                  ctypes.c_void_p,
-                 str,
+                 NSString,
                ])
 
     #return self
