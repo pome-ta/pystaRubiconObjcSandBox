@@ -1,7 +1,7 @@
 import ctypes
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, objc_method
-from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.runtime import send_super, libobjc
 from pyrubicon.objc.types import NSInteger
 
 from rbedge.enumerations import UITableViewStyle

@@ -1,3 +1,8 @@
+# 📝 2024/05/12
+
+
+http://developer.apple.com/mac/library/documentation/cocoa/conceptual/objectivec/Articles/ocDefiningClasses.html#//apple_ref/doc/uid/TP30001163-CH12-BAJHDGAC
+
 # 📝 2024/05/11
 
 `0.4.9`
