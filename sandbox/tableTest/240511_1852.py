@@ -28,13 +28,8 @@ class TableViewControllerTest(UITableViewController):
   '''
 
   @objc_method
-  def initWithStyle_(self, style:ObjCInstance):
-    self==send_super(__class__,
-               self,
-               'initWithStyle:', [style,],
-               argtypes=[ObjCInstance,])
-    self.cell_identifier = 'customCell'
-    #print(style)
+  def initWithStyle_(self, style:ctypes.c_void_p):
+    self=send_super(__class__,self, 'initWithStyle:')
     return self
 
   @objc_method
