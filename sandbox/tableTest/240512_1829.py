@@ -1,7 +1,7 @@
 import ctypes
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, objc_method
-from pyrubicon.objc.runtime import send_super, libobjc,objc_super
+from pyrubicon.objc.runtime import send_super, libobjc, objc_super
 from pyrubicon.objc.types import NSInteger
 
 from rbedge.enumerations import UITableViewStyle
@@ -18,6 +18,7 @@ UIColor = ObjCClass('UIColor')
 
 #libobjc.class_getSuperclass.restype = ctypes.c_void_p
 #libobjc.class_getSuperclass.argtypes = [ctypes.c_void_p]
+
 
 #print(libobjc.class_getSuperclass)
 class TableViewControllerTest(UITableViewController):
@@ -36,9 +37,12 @@ class TableViewControllerTest(UITableViewController):
     #s = Class(self.objc_class)
     #print(__class__._as_parameter_)
     super_ptr = libobjc.class_getSuperclass(__class__._as_parameter_)
-    super_struct = objc_super(self, super_ptr)
+    #a = self._as_parameter_
+    #print(a)
+
+    super_struct = objc_super(self._as_parameter_, super_ptr)
     print(super_struct)
-    
+
     return self
 
   @objc_method
