@@ -1,7 +1,7 @@
 import ctypes
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, objc_method
-from pyrubicon.objc.runtime import send_super, libobjc, objc_super
+from pyrubicon.objc.runtime import send_super, libobjc, objc_super, SEL
 from pyrubicon.objc.types import NSInteger
 
 from rbedge.enumerations import UITableViewStyle
@@ -16,34 +16,50 @@ UITableView = ObjCClass('UITableView')  # todo: 型ヒント
 
 UIColor = ObjCClass('UIColor')
 
-#libobjc.class_getSuperclass.restype = ctypes.c_void_p
-#libobjc.class_getSuperclass.argtypes = [ctypes.c_void_p]
 
-
-#print(libobjc.class_getSuperclass)
 class TableViewControllerTest(UITableViewController):
 
   @objc_method
   def init(self):
     send_super(__class__, self, 'init')
     self.cell_identifier = 'customCell'
-    #print(dir(libobjc.class_getSuperclass))
-    #print(libobjc.class_getSuperclass.argtypes)
-    #print(dir(self))
-    #print(dir(self.objc_class))
-    #print(self)
-    #print(self.objc_class)
-    #s = libobjc.class_getSuperclass(Class(objc_id(self)))
-    #s = Class(self.objc_class)
-    #print(__class__._as_parameter_)
+    print(self)
+    return self
+
+  '''
+  @objc_method
+  def initWithStyle_(self, style):
+    #send_super(__class__, self, 'init')
+    self.cell_identifier = 'customCell'
+
+    super_sel = SEL('initWithStyle:')
+
     super_ptr = libobjc.class_getSuperclass(__class__._as_parameter_)
-    #a = self._as_parameter_
-    #print(a)
 
     super_struct = objc_super(self._as_parameter_, super_ptr)
-    print(super_struct)
+    send = libobjc.objc_msgSendSuper
+    send.restype = ctypes.c_void_p
+    send.argtypes = [
+      ctypes.c_void_p,
+      ctypes.c_void_p,
+      ctypes.c_void_p,
+    ]
+    _args = [
+      ctypes.byref(super_struct),
+      super_sel,
+      style,
+    ]
+    _this = objc_msgSendSuper(*_args)
+    #print(super_struct)
+    #print(libobjc.objc_msgSendSuper)
+    #print(super_struct)
+    #p = ctypes.byref(super_struct)
+    #print(p)
+    #print(SEL)
 
-    return self
+    #return self
+    return ObjCInstance(_this)
+  '''
 
   @objc_method
   def viewDidLoad(self):
