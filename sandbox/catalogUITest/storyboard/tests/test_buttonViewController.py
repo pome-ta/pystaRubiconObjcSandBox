@@ -50,6 +50,10 @@ class TableViewControllerTest(UITableViewController):
 
   @objc_method
   def tableSetup(self):
+    '''
+    for prototype in prototypes:
+      self.tableView.registerClass_forCellReuseIdentifier_(prototype, self.cell_identifier)
+    '''
     self.tableView.registerClass_forCellReuseIdentifier_(
       prototypes[0], self.cell_identifier)
 
@@ -58,6 +62,7 @@ class TableViewControllerTest(UITableViewController):
   def tableView_numberOfRowsInSection_(self, tableView,
                                        section: NSInteger) -> NSInteger:
 
+    #return len(prototypes)
     return 1
 
   @objc_method

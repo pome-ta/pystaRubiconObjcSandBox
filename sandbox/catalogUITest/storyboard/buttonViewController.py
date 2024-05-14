@@ -58,9 +58,26 @@ class ButtonSystemAddContact(CustomTableViewCell):
         contentView.centerYAnchor),
     ])
     
+class ButtonDetailDisclosure(CustomTableViewCell):
 
+  @objc_method
+  def initCell(self):
+    type = UIButtonType.detailDisclosure
+    button = UIButton.buttonWithType_(type)
+    button.translatesAutoresizingMaskIntoConstraints = False
+    
+    contentView = self.contentView
+    contentView.addSubview_(button)
+
+    NSLayoutConstraint.activateConstraints_([
+      button.centerXAnchor.constraintEqualToAnchor_(
+        contentView.centerXAnchor),
+      button.centerYAnchor.constraintEqualToAnchor_(
+        contentView.centerYAnchor),
+    ])
 
 prototypes = [
   ButtonSystemAddContact,
+  ButtonDetailDisclosure,
 ]
 
