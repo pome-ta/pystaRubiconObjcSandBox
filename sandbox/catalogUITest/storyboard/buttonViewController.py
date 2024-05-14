@@ -47,17 +47,16 @@ class ButtonSystemAddContact(CustomTableViewCell):
     type = UIButtonType.contactAdd
     button = UIButton.buttonWithType_(type)
     button.translatesAutoresizingMaskIntoConstraints = False
-    
+
     contentView = self.contentView
     contentView.addSubview_(button)
 
     NSLayoutConstraint.activateConstraints_([
-      button.centerXAnchor.constraintEqualToAnchor_(
-        contentView.centerXAnchor),
-      button.centerYAnchor.constraintEqualToAnchor_(
-        contentView.centerYAnchor),
+      button.centerXAnchor.constraintEqualToAnchor_(contentView.centerXAnchor),
+      button.centerYAnchor.constraintEqualToAnchor_(contentView.centerYAnchor),
     ])
-    
+
+
 class ButtonDetailDisclosure(CustomTableViewCell):
 
   @objc_method
@@ -65,19 +64,30 @@ class ButtonDetailDisclosure(CustomTableViewCell):
     type = UIButtonType.detailDisclosure
     button = UIButton.buttonWithType_(type)
     button.translatesAutoresizingMaskIntoConstraints = False
-    
+
     contentView = self.contentView
     contentView.addSubview_(button)
 
     NSLayoutConstraint.activateConstraints_([
-      button.centerXAnchor.constraintEqualToAnchor_(
-        contentView.centerXAnchor),
-      button.centerYAnchor.constraintEqualToAnchor_(
-        contentView.centerYAnchor),
+      button.centerXAnchor.constraintEqualToAnchor_(contentView.centerXAnchor),
+      button.centerYAnchor.constraintEqualToAnchor_(contentView.centerYAnchor),
     ])
 
+
+def create_reuse_dict(cellClass: UITableViewCell, identifier: str) -> dict:
+  return {
+    'cellClass': cellClass,
+    'identifier': identifier,
+  }
+
+
+prototypes = [
+  create_reuse_dict(ButtonSystemAddContact, 'buttonSystemAddContact'),
+  create_reuse_dict(ButtonDetailDisclosure, 'buttonDetailDisclosure'),
+]
+'''
 prototypes = [
   ButtonSystemAddContact,
   ButtonDetailDisclosure,
 ]
-
+'''

@@ -50,28 +50,37 @@ class TableViewControllerTest(UITableViewController):
 
   @objc_method
   def tableSetup(self):
-    '''
+
     for prototype in prototypes:
-      self.tableView.registerClass_forCellReuseIdentifier_(prototype, self.cell_identifier)
-    '''
-    self.tableView.registerClass_forCellReuseIdentifier_(
-      prototypes[0], self.cell_identifier)
+      cellClass = prototype['cellClass']
+      identifier = prototype['identifier']
+      self.tableView.registerClass_forCellReuseIdentifier_(
+        cellClass, identifier)
+
+    #self.tableView.registerClass_forCellReuseIdentifier_(prototypes[0]['cellClass'], self.cell_identifier)
 
   # --- UITableViewDataSource
   @objc_method
   def tableView_numberOfRowsInSection_(self, tableView,
                                        section: NSInteger) -> NSInteger:
 
-    #return len(prototypes)
-    return 1
+    return len(prototypes)
+    #return 1
 
   @objc_method
   def tableView_cellForRowAtIndexPath_(self, tableView,
                                        indexPath) -> ctypes.c_void_p:
+
+    identifier = prototypes[indexPath.row]['identifier']
+    #print(indexPath.row)
+
     cell = tableView.dequeueReusableCellWithIdentifier_forIndexPath_(
-      self.cell_identifier, indexPath)
+      identifier, indexPath)
+
+    #cell = tableView.dequeueReusableCellWithIdentifier_forIndexPath_(self.cell_identifier, indexPath)
 
     content = cell.defaultContentConfiguration()
+    #print('h')
     #content.text = 'symbol_name'
     #content.textProperties.numberOfLines = 1
 
