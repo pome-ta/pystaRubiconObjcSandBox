@@ -7,7 +7,7 @@ sys.path.append(str(pathlib.Path(__file__, '../' * parent_level).resolve()))
 try:
   import ctypes
   from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method, objc_property
-  from pyrubicon.objc.runtime import send_super
+  #from pyrubicon.objc.runtime import send_super
   from pyrubicon.objc.types import NSInteger, CGRectMake
 
   from rbedge.functions import NSStringFromClass
@@ -35,13 +35,11 @@ class TableViewControllerTest(UITableViewController):
 
   @objc_method
   def init(self):
-    send_super(__class__, self, 'init')
     self.cell_identifier = 'customCell'
     return self
 
   @objc_method
   def viewDidLoad(self):
-    send_super(__class__, self, 'viewDidLoad')
     # --- Navigation
     title = NSStringFromClass(__class__)
     self.navigationItem.title = title
@@ -54,14 +52,12 @@ class TableViewControllerTest(UITableViewController):
   def tableSetup(self):
     self.tableView.registerClass_forCellReuseIdentifier_(
       prototypes[0], self.cell_identifier)
-      #UITableViewCell, self.cell_identifier)
 
   # --- UITableViewDataSource
   @objc_method
   def tableView_numberOfRowsInSection_(self, tableView,
-                                       section:NSInteger) -> NSInteger:
+                                       section: NSInteger) -> NSInteger:
 
-    #print(tableView)
     return 1
 
   @objc_method
@@ -70,17 +66,11 @@ class TableViewControllerTest(UITableViewController):
     cell = tableView.dequeueReusableCellWithIdentifier_forIndexPath_(
       self.cell_identifier, indexPath)
 
-    #print(indexPath)
-    #pdbr.state(cell)
-    #print(cell.style)
-    #print(cell.reuseIdentifier)
-    
     content = cell.defaultContentConfiguration()
-    content.text = 'symbol_name'
-    content.textProperties.numberOfLines = 1
+    #content.text = 'symbol_name'
+    #content.textProperties.numberOfLines = 1
 
-    cell.contentConfiguration = content
-
+    #cell.contentConfiguration = content
     return cell.ptr
 
 

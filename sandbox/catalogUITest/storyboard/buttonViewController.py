@@ -1,12 +1,18 @@
 import ctypes
+
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, objc_method
 from pyrubicon.objc.runtime import send_super
-
 from pyrubicon.objc.types import NSInteger
+
+from rbedge.enumerations import UIButtonType
+
+from rbedge import pdbr
 
 #ObjCClass.auto_rename = True # xxx: ここ含めて全部呼び出し？
 
 UITableViewCell = ObjCClass('UITableViewCell')
+UIButton = ObjCClass('UIButton')
+NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 
 class CustomTableViewCell(UITableViewCell):
@@ -26,11 +32,32 @@ class CustomTableViewCell(UITableViewCell):
 
     # todo: `self` に再定義しない
     #self = ObjCInstance(self_ptr)
+    self.initCell()
     return ObjCInstance(self_ptr)
+
+  @objc_method
+  def initCell(self):
+    pass
 
 
 class ButtonSystemAddContact(CustomTableViewCell):
-  pass
+
+  @objc_method
+  def initCell(self):
+    type = UIButtonType.contactAdd
+    button = UIButton.buttonWithType_(type)
+    button.translatesAutoresizingMaskIntoConstraints = False
+    
+    contentView = self.contentView
+    contentView.addSubview_(button)
+
+    NSLayoutConstraint.activateConstraints_([
+      button.centerXAnchor.constraintEqualToAnchor_(
+        contentView.centerXAnchor),
+      button.centerYAnchor.constraintEqualToAnchor_(
+        contentView.centerYAnchor),
+    ])
+    
 
 
 prototypes = [

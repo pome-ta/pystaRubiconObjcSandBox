@@ -1,3 +1,19 @@
+# 📝 2024/05/14
+
+`0.4.9`
+
+## storyboard
+
+`ButtonViewController.storyboard`
+
+
+`reuseIdentifier` をどう捌くか？
+
+
+サイズはよしなにやってもらう？
+
+
+
 # 📝 2024/05/09
 
 

@@ -94,16 +94,17 @@ class NSTextAlignment:
   natural = 4
 
 
+# ref: [UIButtonType | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uibuttontype?language=objc)
 @dataclass
-class UIButton_ButtonType:
-  custom = 0
-  system = 1
-  detailDisclosure = 2
-  infoLight = 3
-  infoDark = 4
-  contactAdd = 5
-  plain = 6
-  close = 7
+class UIButtonType:
+  custom: int = 0
+  system: int = 1
+  detailDisclosure: int = 2
+  infoLight: int = 3
+  infoDark: int = 4
+  contactAdd: int = 5
+  plain: int = 6
+  close: int = 7
 
 
 @dataclass
