@@ -25,6 +25,7 @@ class TableViewControllerTest(UITableViewController):
     self.cell_identifier = 'customCell'
 
     super_sel = SEL('initWithStyle:')
+    '''
 
     super_ptr = libobjc.class_getSuperclass(__class__._as_parameter_)
 
@@ -44,6 +45,13 @@ class TableViewControllerTest(UITableViewController):
     ]
     _this = send(*_args)
     return ObjCInstance(_this)
+    '''
+    self_ptr = send_super(__class__,
+                          self,
+                          'initWithStyle:',
+                          style,
+                          argtypes=[NSInteger])
+    return ObjCInstance(self_ptr)
 
   @objc_method
   def viewDidLoad(self):
