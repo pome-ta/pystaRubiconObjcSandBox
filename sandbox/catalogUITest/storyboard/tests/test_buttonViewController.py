@@ -33,10 +33,12 @@ UITableViewCell = ObjCClass('UITableViewCell')
 
 class TableViewControllerTest(UITableViewController):
 
+  '''
   @objc_method
   def init(self):
     self.cell_identifier = 'customCell'
     return self
+  '''
 
   @objc_method
   def viewDidLoad(self):
