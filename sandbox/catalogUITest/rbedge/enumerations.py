@@ -242,3 +242,10 @@ class UICollectionLayoutListAppearance:
   sidebar: int = 3
   sidebarPlain: int = 4
 
+'''
+none
+supplementary
+firstItemInSection
+
+'''
+

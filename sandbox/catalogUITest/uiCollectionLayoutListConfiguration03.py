@@ -77,7 +77,7 @@ if __name__ == '__main__':
   from rbedge import pdbr
 
   listConfiguration = UICollectionLayoutListConfiguration.alloc(
-  ).initWithAppearance_(4)
+  ).initWithAppearance_(2)
   listConfiguration.headerMode = 2
   #pdbr.state(listConfiguration)
   layout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
