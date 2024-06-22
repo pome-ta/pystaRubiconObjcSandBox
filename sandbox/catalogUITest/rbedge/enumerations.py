@@ -242,10 +242,12 @@ class UICollectionLayoutListAppearance:
   sidebar: int = 3
   sidebarPlain: int = 4
 
-'''
-none
-supplementary
-firstItemInSection
 
-'''
+# ref: [UICollectionLayoutListHeaderMode | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uicollectionlayoutlistheadermode)
+@dataclass
+class UICollectionLayoutListHeaderMode:
+  # xxx: 独自調査 a.k.a: 勘
+  none: int = 0
+  supplementary: int = 1
+  firstItemInSection: int = 2
 

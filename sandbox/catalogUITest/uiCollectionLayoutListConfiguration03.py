@@ -1,26 +1,28 @@
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass, objc_method
+from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
-from pyrubicon.objc.types import NSInteger
+from pyrubicon.objc.types import NSInteger, NSZeroPoint
 
-from rbedge.enumerations import UISplitViewControllerStyle, UISplitViewControllerColumn, UICollectionLayoutListAppearance
+from rbedge.enumerations import UICollectionLayoutListAppearance, UICollectionLayoutListHeaderMode
 from rbedge.functions import NSStringFromClass
 
 #ObjCClass.auto_rename = True
 
-UICollectionViewController = ObjCClass('UICollectionViewController')
-#UICollectionViewLayout = ObjCClass('UICollectionViewLayout')
-UICollectionViewCell = ObjCClass('UICollectionViewCell')
-UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
+UIViewController = ObjCClass('UIViewController')
+UIColor = ObjCClass('UIColor')
+NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
+# --- UICollectionView
+UICollectionView = ObjCClass('UICollectionView')
+UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
 UICollectionViewCompositionalLayout = ObjCClass(
   'UICollectionViewCompositionalLayout')
 UICollectionLayoutListConfiguration = ObjCClass(
   'UICollectionLayoutListConfiguration')
 
-UIColor = ObjCClass('UIColor')
-NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
+UICollectionViewDataSource = ObjCProtocol('UICollectionViewDataSource')
+#UICollectionViewLayout = ObjCClass('UICollectionViewLayout')
 
 # [UICollectionLayoutListConfigurationのheaderMode=.firstItemInSection観測隊](https://zenn.dev/samekard_dev/articles/2cbb0788915f01)
 prefectures = [
@@ -38,37 +40,25 @@ prefectures = [
 ]
 
 
-class CollectionViewController(UICollectionViewController):
+class ViewController(UIViewController,
+                     protocols=[
+                       UICollectionViewDataSource,
+                     ]):
+  collectionView = objc_property()
 
   @objc_method
-  def viewDidLoad(self):
-    send_super(__class__, self, 'viewDidLoad')  # xxx: 不要?
-    title = NSStringFromClass(__class__)
-    self.navigationItem.title = title
-    self.identifier_str = 'customCell'
-    self.collectionView.registerClass_forCellWithReuseIdentifier_(
-      UICollectionViewListCell, self.identifier_str)
+  def init(self):
+    send_super(__class__, self, 'init')
+    listConfiguration = UICollectionLayoutListConfiguration.alloc(
+    ).initWithAppearance_(UICollectionLayoutListAppearance.plain)
+    listConfiguration.headerMode = UICollectionLayoutListHeaderMode.firstItemInSection
 
-  @objc_method
-  def numberOfSectionsInCollectionView_(self, collectionView) -> NSInteger:
-    return len(prefectures)
+    simpleLayout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
+      listConfiguration)
 
-  @objc_method
-  def collectionView_numberOfItemsInSection_(self, collectionView,
-                                             section: NSInteger) -> NSInteger:
-
-    return len(prefectures[section])
-
-  @objc_method
-  def collectionView_cellForItemAtIndexPath_(self, collectionView,
-                                             indexPath) -> ctypes.c_void_p:
-    cell = collectionView.dequeueReusableCellWithReuseIdentifier_forIndexPath_(
-      self.identifier_str, indexPath)
-
-    cellConfiguration = cell.defaultContentConfiguration()
-    cellConfiguration.text = prefectures[indexPath.section][indexPath.row]
-    cell.contentConfiguration = cellConfiguration
-    return cell.ptr
+    #pdbr.state(UICollectionView.alloc())
+    #self.collectionView = UICollectionView.alloc().initWithFrame_collectionViewLayout_(NSZeroPoint, simpleLayout)
+    return self
 
 
 if __name__ == '__main__':
@@ -76,15 +66,7 @@ if __name__ == '__main__':
   from rbedge import present_viewController
   from rbedge import pdbr
 
-  listConfiguration = UICollectionLayoutListConfiguration.alloc(
-  ).initWithAppearance_(2)
-  listConfiguration.headerMode = 2
-  #pdbr.state(listConfiguration)
-  layout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
-    listConfiguration)
-
-  main_vc = CollectionViewController.alloc().initWithCollectionViewLayout_(
-    layout)
+  main_vc = ViewController.new()
 
   present_viewController(main_vc)
 
