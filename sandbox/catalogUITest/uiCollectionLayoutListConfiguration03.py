@@ -1,7 +1,7 @@
 import ctypes
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method, objc_property, objc_const
-from pyrubicon.objc.runtime import send_super, objc_id,load_library
+from pyrubicon.objc.runtime import send_super, objc_id, load_library
 from pyrubicon.objc.types import NSInteger, NSZeroPoint
 
 from rbedge.enumerations import UICollectionLayoutListAppearance, UICollectionLayoutListHeaderMode
@@ -57,8 +57,10 @@ class ViewController(UIViewController,
       listConfiguration)
 
     #pdbr.state(UICollectionView.alloc())
-    #self.collectionView = 
-    z=objc_const(load_library('CGGeometry'), 'CGRectZero')
+    #self.collectionView =
+    #z = objc_const(load_library('CoreGraphics'), 'CGRectZero')
+    core = load_library('CGGeometry')
+    print(core)
     #UICollectionView.alloc().initWithFrame_collectionViewLayout_(NSZeroPoint, simpleLayout)
     return self
 
