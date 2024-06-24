@@ -2,7 +2,7 @@ import ctypes
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method, objc_property, objc_const
 from pyrubicon.objc.runtime import send_super, objc_id, load_library
-from pyrubicon.objc.types import NSInteger, NSZeroPoint
+from pyrubicon.objc.types import NSInteger, CGRect
 
 from rbedge.enumerations import UICollectionLayoutListAppearance, UICollectionLayoutListHeaderMode
 from rbedge.functions import NSStringFromClass
@@ -23,6 +23,9 @@ UICollectionLayoutListConfiguration = ObjCClass(
 
 UICollectionViewDataSource = ObjCProtocol('UICollectionViewDataSource')
 #UICollectionViewLayout = ObjCClass('UICollectionViewLayout')
+
+CoreGraphics = load_library('CoreGraphics')
+
 
 # [UICollectionLayoutListConfigurationのheaderMode=.firstItemInSection観測隊](https://zenn.dev/samekard_dev/articles/2cbb0788915f01)
 prefectures = [
@@ -59,9 +62,10 @@ class ViewController(UIViewController,
     #pdbr.state(UICollectionView.alloc())
     #self.collectionView =
     #z = objc_const(load_library('CoreGraphics'), 'CGRectZero')
-    core = load_library('CoreGraphics')
-    z = objc_const(core, )
-    print(core)
+    #print(ctypes.c_double.in_dll)
+    print(CGRect)
+    print(dir(CGRect))
+    print(CGRect.in_dll)
     #UICollectionView.alloc().initWithFrame_collectionViewLayout_(NSZeroPoint, simpleLayout)
     return self
 
