@@ -1,7 +1,7 @@
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method, objc_property, objc_const
-from pyrubicon.objc.runtime import send_super, objc_id, load_library
+from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method, objc_property
+from pyrubicon.objc.runtime import send_super, load_library
 from pyrubicon.objc.types import NSInteger, CGRect
 
 from rbedge.enumerations import UICollectionLayoutListAppearance, UICollectionLayoutListHeaderMode
@@ -22,10 +22,10 @@ UICollectionLayoutListConfiguration = ObjCClass(
   'UICollectionLayoutListConfiguration')
 
 UICollectionViewDataSource = ObjCProtocol('UICollectionViewDataSource')
-#UICollectionViewLayout = ObjCClass('UICollectionViewLayout')
+UICollectionViewDelegate = ObjCProtocol('UICollectionViewDelegate')
 
 CoreGraphics = load_library('CoreGraphics')
-
+CGRectZero = CGRect.in_dll(CoreGraphics, 'CGRectZero')
 
 # [UICollectionLayoutListConfigurationのheaderMode=.firstItemInSection観測隊](https://zenn.dev/samekard_dev/articles/2cbb0788915f01)
 prefectures = [
@@ -46,12 +46,17 @@ prefectures = [
 class ViewController(UIViewController,
                      protocols=[
                        UICollectionViewDataSource,
+                       UICollectionViewDelegate,
                      ]):
   collectionView = objc_property()
+  cellId = objc_property()
 
   @objc_method
   def init(self):
     send_super(__class__, self, 'init')
+
+    self.cellId = 'Cell'
+
     listConfiguration = UICollectionLayoutListConfiguration.alloc(
     ).initWithAppearance_(UICollectionLayoutListAppearance.plain)
     listConfiguration.headerMode = UICollectionLayoutListHeaderMode.firstItemInSection
@@ -59,15 +64,65 @@ class ViewController(UIViewController,
     simpleLayout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
       listConfiguration)
 
-    #pdbr.state(UICollectionView.alloc())
-    #self.collectionView =
-    #z = objc_const(load_library('CoreGraphics'), 'CGRectZero')
-    #print(ctypes.c_double.in_dll)
-    print(CGRect)
-    print(dir(CGRect))
-    print(CGRect.in_dll)
-    #UICollectionView.alloc().initWithFrame_collectionViewLayout_(NSZeroPoint, simpleLayout)
+    self.collectionView = UICollectionView.alloc(
+    ).initWithFrame_collectionViewLayout_(CGRectZero, simpleLayout)
+
     return self
+
+  @objc_method
+  def viewDidLoad(self):
+    send_super(__class__, self, 'viewDidLoad')  # xxx: 不要?
+    title = NSStringFromClass(__class__)
+    self.navigationItem.title = title
+    self.view.backgroundColor = UIColor.systemBlueColor()
+
+    self.collectionView.registerClass_forCellWithReuseIdentifier_(
+      UICollectionViewListCell, self.cellId)
+
+    self.collectionView.dataSource = self
+    self.collectionView.delegate = self
+
+    self.view.addSubview_(self.collectionView)
+
+    self.collectionView.translatesAutoresizingMaskIntoConstraints = False
+    NSLayoutConstraint.activateConstraints_([
+      self.collectionView.topAnchor.constraintEqualToAnchor_(
+        self.view.safeAreaLayoutGuide.topAnchor),
+      self.collectionView.bottomAnchor.constraintEqualToAnchor_(
+        self.view.safeAreaLayoutGuide.bottomAnchor),
+      self.collectionView.leadingAnchor.constraintEqualToAnchor_(
+        self.view.safeAreaLayoutGuide.leadingAnchor),
+      self.collectionView.trailingAnchor.constraintEqualToAnchor_(
+        self.view.safeAreaLayoutGuide.trailingAnchor),
+    ])
+
+  # --- UICollectionViewDataSource
+  @objc_method
+  def numberOfSectionsInCollectionView_(self, collectionView) -> NSInteger:
+    return len(prefectures)
+
+  @objc_method
+  def collectionView_numberOfItemsInSection_(self, collectionView,
+                                             section: NSInteger) -> NSInteger:
+
+    return len(prefectures[section])
+
+  @objc_method
+  def collectionView_cellForItemAtIndexPath_(self, collectionView,
+                                             indexPath) -> ctypes.c_void_p:
+    cell = collectionView.dequeueReusableCellWithReuseIdentifier_forIndexPath_(
+      self.cellId, indexPath)
+
+    cellConfiguration = cell.defaultContentConfiguration()
+    cellConfiguration.text = prefectures[indexPath.section][indexPath.row]
+    cell.contentConfiguration = cellConfiguration
+    return cell.ptr
+
+  # --- UICollectionViewDelegate
+  @objc_method
+  def collectionView_didSelectItemAtIndexPath_(self, collectionView,
+                                               indexPath):
+    print(f'didSelect: {prefectures[indexPath.section][indexPath.row]}')
 
 
 if __name__ == '__main__':
