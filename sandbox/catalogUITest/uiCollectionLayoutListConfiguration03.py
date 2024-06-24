@@ -59,7 +59,8 @@ class ViewController(UIViewController,
     #pdbr.state(UICollectionView.alloc())
     #self.collectionView =
     #z = objc_const(load_library('CoreGraphics'), 'CGRectZero')
-    core = load_library('CGGeometry')
+    core = load_library('CoreGraphics')
+    z = objc_const(core, )
     print(core)
     #UICollectionView.alloc().initWithFrame_collectionViewLayout_(NSZeroPoint, simpleLayout)
     return self
