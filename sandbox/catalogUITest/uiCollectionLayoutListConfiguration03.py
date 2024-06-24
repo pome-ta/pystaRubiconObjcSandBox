@@ -74,7 +74,8 @@ class ViewController(UIViewController,
     send_super(__class__, self, 'viewDidLoad')  # xxx: 不要?
     title = NSStringFromClass(__class__)
     self.navigationItem.title = title
-    self.view.backgroundColor = UIColor.systemBlueColor()
+
+    self.view.backgroundColor = UIColor.systemDarkRedColor()
 
     self.collectionView.registerClass_forCellWithReuseIdentifier_(
       UICollectionViewListCell, self.cellId)
