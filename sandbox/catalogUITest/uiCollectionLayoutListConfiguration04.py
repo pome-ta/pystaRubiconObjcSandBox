@@ -4,7 +4,11 @@ from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method, objc_proper
 from pyrubicon.objc.runtime import send_super, load_library
 from pyrubicon.objc.types import NSInteger, CGRect
 
-from rbedge.enumerations import UICollectionLayoutListAppearance, UICollectionLayoutListHeaderMode
+from rbedge.enumerations import (
+  UICollectionLayoutListAppearance,
+  UICollectionLayoutListHeaderMode,
+  UIViewAutoresizing,
+)
 from rbedge.functions import NSStringFromClass
 
 #ObjCClass.auto_rename = True
@@ -16,6 +20,7 @@ NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 # --- UICollectionView
 UICollectionView = ObjCClass('UICollectionView')
 UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
+UICollectionViewLayout = ObjCClass('UICollectionViewLayout')  # todo: 型呼び出し
 UICollectionViewCompositionalLayout = ObjCClass(
   'UICollectionViewCompositionalLayout')
 UICollectionLayoutListConfiguration = ObjCClass(
@@ -43,11 +48,21 @@ prefectures = [
 ]
 
 
-class ViewController(UIViewController,
-                     protocols=[
-                       UICollectionViewDataSource,
-                       UICollectionViewDelegate,
-                     ]):
+class OutlineItem:
+
+  def __init__(self, title: str, subitems: list, storyboardName: str,
+               imageName: str):
+    self.title = title
+    self.subitems = subitems
+    self.storyboardName = storyboardName
+    self.imageName = imageName
+
+
+class OutlineViewController(UIViewController,
+                            protocols=[
+                              UICollectionViewDataSource,
+                              UICollectionViewDelegate,
+                            ]):
   collectionView = objc_property()
   cellId = objc_property()
 
@@ -56,6 +71,7 @@ class ViewController(UIViewController,
     send_super(__class__, self, 'init')
 
     self.cellId = 'Cell'
+    '''
 
     listConfiguration = UICollectionLayoutListConfiguration.alloc(
     ).initWithAppearance_(UICollectionLayoutListAppearance.plain)
@@ -64,8 +80,10 @@ class ViewController(UIViewController,
     simpleLayout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
       listConfiguration)
 
+    
     self.collectionView = UICollectionView.alloc(
     ).initWithFrame_collectionViewLayout_(CGRectZero, simpleLayout)
+    '''
 
     return self
 
@@ -77,6 +95,16 @@ class ViewController(UIViewController,
 
     self.view.backgroundColor = UIColor.systemDarkRedColor()
 
+    listConfiguration = UICollectionLayoutListConfiguration.alloc(
+    ).initWithAppearance_(UICollectionLayoutListAppearance.plain)
+    listConfiguration.headerMode = UICollectionLayoutListHeaderMode.firstItemInSection
+
+    simpleLayout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
+      listConfiguration)
+
+    self.collectionView = UICollectionView.alloc(
+    ).initWithFrame_collectionViewLayout_(self.view.bounds, simpleLayout)
+
     self.collectionView.registerClass_forCellWithReuseIdentifier_(
       UICollectionViewListCell, self.cellId)
 
@@ -84,7 +112,10 @@ class ViewController(UIViewController,
     self.collectionView.delegate = self
 
     self.view.addSubview_(self.collectionView)
+    autoresizingMask = UIViewAutoresizing.flexibleHeight | UIViewAutoresizing.flexibleWidth
 
+    self.collectionView.autoresizingMask = autoresizingMask
+    '''
     self.collectionView.translatesAutoresizingMaskIntoConstraints = False
     NSLayoutConstraint.activateConstraints_([
       self.collectionView.topAnchor.constraintEqualToAnchor_(
@@ -96,6 +127,23 @@ class ViewController(UIViewController,
       self.collectionView.trailingAnchor.constraintEqualToAnchor_(
         self.view.safeAreaLayoutGuide.trailingAnchor),
     ])
+    '''
+
+  @objc_method
+  def configureCollectionView(self):
+    pass
+
+  @objc_method
+  def configureDataSource(self):
+    pass
+
+  @objc_method
+  def generateLayout(self):
+    listConfiguration = UICollectionLayoutListConfiguration.alloc(
+    ).initWithAppearance_(UICollectionLayoutListAppearance.sidebar)
+    layout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
+      listConfiguration)
+    return layout
 
   # --- UICollectionViewDataSource
   @objc_method
@@ -131,7 +179,7 @@ if __name__ == '__main__':
   from rbedge import present_viewController
   from rbedge import pdbr
 
-  main_vc = ViewController.new()
+  main_vc = OutlineViewController.new()
 
   present_viewController(main_vc)
 
