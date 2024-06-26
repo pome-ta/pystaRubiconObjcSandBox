@@ -87,9 +87,10 @@ class OutlineViewController(UIViewController,
 
     containerCellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
       UICollectionViewListCell, configurationHandler)
-    pdbr.state(UICollectionViewCellRegistration)
+    #pdbr.state(UICollectionViewCellRegistration)
     #registrationWithCellClass_configurationHandler_
-    #pdbr.state(UICollectionViewDiffableDataSource.alloc())
+    #initWithCollectionView_cellProvider_
+    pdbr.state(UICollectionViewDiffableDataSource.alloc())
     #initWithCollectionView_sectionControllers_rendererIdentifierProvider_
     #pdbr.state(UICollectionView.alloc())
 
