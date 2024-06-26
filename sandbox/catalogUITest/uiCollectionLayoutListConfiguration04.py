@@ -24,6 +24,8 @@ UICollectionViewDiffableDataSource = ObjCClass(
 NSCollectionLayoutSize = ObjCClass('NSCollectionLayoutSize')
 NSCollectionLayoutDimension = ObjCClass('NSCollectionLayoutDimension')
 NSCollectionLayoutItem = ObjCClass('NSCollectionLayoutItem')
+NSCollectionLayoutGroup = ObjCClass('NSCollectionLayoutGroup')
+NSCollectionLayoutSection = ObjCClass('NSCollectionLayoutSection')
 
 # ---
 
@@ -64,13 +66,19 @@ class ViewController(UIViewController):
       NSCollectionLayoutDimension.fractionalHeightDimension_(1.0))
 
     item = NSCollectionLayoutItem.itemWithLayoutSize_(itemSize)
-    pdbr.state(item)
 
-    #fractionalHeightDimension_
-    #widthDimension = NSCollectionLayoutDimension.fractionalWidthDimension_(1.0)
-    #heightDimension = NSCollectionLayoutDimension.fractionalHeightDimension_(1.0)
-    #itemSize = NSCollectionLayoutDimension.sizeWithWidthDimension_heightDimension_()
-    #print(NSCollectionLayoutDimension.fractionalHeightDimension_(1.0))
+    groupSize = NSCollectionLayoutSize.sizeWithWidthDimension_heightDimension_(
+      NSCollectionLayoutDimension.fractionalWidthDimension_(1.0),
+      NSCollectionLayoutDimension.absoluteDimension_(44))
+
+    group = NSCollectionLayoutGroup.horizontalGroupWithLayoutSize_subitems_(
+      groupSize, [
+        item,
+      ])
+
+    section = NSCollectionLayoutSection.sectionWithGroup_(group)
+    section.interGroupSpacing=0
+    pdbr.state(section)
 
   # --- extension
   @objc_method
