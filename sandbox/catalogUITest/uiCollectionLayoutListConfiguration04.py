@@ -19,9 +19,17 @@ NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 # --- UICollectionView
 UICollectionView = ObjCClass('UICollectionView')
+UICollectionViewDiffableDataSource = ObjCClass(
+  'UICollectionViewDiffableDataSource')
+NSCollectionLayoutSize = ObjCClass('NSCollectionLayoutSize')
+NSCollectionLayoutDimension = ObjCClass('NSCollectionLayoutDimension')
+NSCollectionLayoutItem = ObjCClass('NSCollectionLayoutItem')
+
+# ---
+
 UICollectionViewCellRegistration = ObjCClass(
   'UICollectionViewCellRegistration')
-UICollectionViewDiffableDataSource = ObjCClass('UICollectionViewDiffableDataSource')
+
 UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
 #UICollectionViewLayout = ObjCClass('UICollectionViewLayout')  # todo: 型呼び出し
 UICollectionViewCompositionalLayout = ObjCClass(
@@ -32,75 +40,44 @@ UICollectionLayoutListConfiguration = ObjCClass(
 UICollectionViewDataSource = ObjCProtocol('UICollectionViewDataSource')
 UICollectionViewDelegate = ObjCProtocol('UICollectionViewDelegate')
 
+# [モダンなUICollectionViewでシンプルなリストレイアウト その1 〜 概要](https://zenn.dev/samekard_dev/articles/43991e9321b6c9)
 
-class OutlineItem:
-
-  def __init__(self, title: str, subitems: list, storyboardName: str,
-               imageName: str):
-    self.title = title
-    self.subitems = subitems
-    self.storyboardName = storyboardName
-    self.imageName = imageName
+prefectures = ['福岡', '佐賀', '長崎', '大分', '熊本', '宮崎', '鹿児島']
 
 
-class OutlineViewController(UIViewController,
-                            protocols=[
-                              UICollectionViewDataSource,
-                              UICollectionViewDelegate,
-                            ]):
-  outlineCollectionView = objc_property()
+class ViewController(UIViewController):
+  dataSource: UICollectionViewDiffableDataSource = objc_property()
+  collectionView: UICollectionView = objc_property()
 
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')  # xxx: 不要?
     title = NSStringFromClass(__class__)
     self.navigationItem.title = title
-
     self.view.backgroundColor = UIColor.systemDarkRedColor()
 
-    self.configureCollectionView()
-    self.configureDataSource()
+    #pdbr.state(NSCollectionLayoutDimension)
+    #pdbr.state(NSCollectionLayoutSize)
 
-  # MARK: - UICollectionViewDiffableDataSource
-  # --- extension OutlineViewController
+    itemSize = NSCollectionLayoutSize.sizeWithWidthDimension_heightDimension_(
+      NSCollectionLayoutDimension.fractionalWidthDimension_(1.0),
+      NSCollectionLayoutDimension.fractionalHeightDimension_(1.0))
+
+    item = NSCollectionLayoutItem.itemWithLayoutSize_(itemSize)
+    pdbr.state(item)
+
+    #fractionalHeightDimension_
+    #widthDimension = NSCollectionLayoutDimension.fractionalWidthDimension_(1.0)
+    #heightDimension = NSCollectionLayoutDimension.fractionalHeightDimension_(1.0)
+    #itemSize = NSCollectionLayoutDimension.sizeWithWidthDimension_heightDimension_()
+    #print(NSCollectionLayoutDimension.fractionalHeightDimension_(1.0))
+
+  # --- extension
   @objc_method
-  def configureCollectionView(self):
-    collectionView = UICollectionView.alloc(
-    ).initWithFrame_collectionViewLayout_(self.view.bounds,
-                                          self.generateLayout())
+  def createLayout(self):
+    #sizeWithWidthDimension_heightDimension_
 
-    collectionView.backgroundColor = UIColor.systemDarkPurpleColor()
-
-    self.view.addSubview_(collectionView)
-
-    autoresizingMask = UIViewAutoresizing.flexibleHeight | UIViewAutoresizing.flexibleWidth
-    collectionView.autoresizingMask = autoresizingMask
-    self.outlineCollectionView = collectionView
-
-  @objc_method
-  def configureDataSource(self):
-
-    @Block
-    def configurationHandler(cell: objc_id, indexPath: objc_id,
-                             menuItem: objc_id) -> None:
-      print('h')
-
-    containerCellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
-      UICollectionViewListCell, configurationHandler)
-    #pdbr.state(UICollectionViewCellRegistration)
-    #registrationWithCellClass_configurationHandler_
-    #initWithCollectionView_cellProvider_
-    pdbr.state(UICollectionViewDiffableDataSource.alloc())
-    #initWithCollectionView_sectionControllers_rendererIdentifierProvider_
-    #pdbr.state(UICollectionView.alloc())
-
-  @objc_method
-  def generateLayout(self):
-    listConfiguration = UICollectionLayoutListConfiguration.alloc(
-    ).initWithAppearance_(UICollectionLayoutListAppearance.sidebar)
-    layout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
-      listConfiguration)
-    return layout
+    return None
 
 
 if __name__ == '__main__':
@@ -108,7 +85,7 @@ if __name__ == '__main__':
   from rbedge import present_viewController
   from rbedge import pdbr
 
-  main_vc = OutlineViewController.new()
+  main_vc = ViewController.new()
 
   present_viewController(main_vc)
 

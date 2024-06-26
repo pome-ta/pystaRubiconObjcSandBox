@@ -48,8 +48,8 @@ class ViewController(UIViewController,
                        UICollectionViewDataSource,
                        UICollectionViewDelegate,
                      ]):
-  collectionView = objc_property()
-  cellId = objc_property()
+  collectionView: UICollectionView = objc_property()
+  cellId: str = objc_property()
 
   @objc_method
   def init(self):
