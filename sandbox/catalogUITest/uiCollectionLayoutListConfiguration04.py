@@ -1,6 +1,6 @@
 import ctypes
 
-from pyrubicon.objc.api import Block, ObjCClass, ObjCProtocol, objc_method, objc_property
+from pyrubicon.objc.api import Block, ObjCClass, ObjCInstance, ObjCProtocol, objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import NSInteger
 
@@ -29,28 +29,31 @@ NSCollectionLayoutGroup = ObjCClass('NSCollectionLayoutGroup')
 NSCollectionLayoutSection = ObjCClass('NSCollectionLayoutSection')
 UICollectionViewCompositionalLayout = ObjCClass(
   'UICollectionViewCompositionalLayout')
-
-# ---
-
 UICollectionViewCellRegistration = ObjCClass(
   'UICollectionViewCellRegistration')
-
 UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
+
+
+UICollectionViewDelegate = ObjCProtocol('UICollectionViewDelegate')
+# ---
+
+
 #UICollectionViewLayout = ObjCClass('UICollectionViewLayout')  # todo: 型呼び出し
 
 UICollectionLayoutListConfiguration = ObjCClass(
   'UICollectionLayoutListConfiguration')
 
 UICollectionViewDataSource = ObjCProtocol('UICollectionViewDataSource')
-UICollectionViewDelegate = ObjCProtocol('UICollectionViewDelegate')
 
 # [モダンなUICollectionViewでシンプルなリストレイアウト その1 〜 概要](https://zenn.dev/samekard_dev/articles/43991e9321b6c9)
 
 prefectures = ['福岡', '佐賀', '長崎', '大分', '熊本', '宮崎', '鹿児島']
 
 
-class ViewController(UIViewController):
-  dataSource: UICollectionViewDiffableDataSource = objc_property()
+class ViewController(UIViewController, protocols=[
+    UICollectionViewDelegate,
+]):
+  #dataSource: UICollectionViewDiffableDataSource = objc_property()
   collectionView: UICollectionView = objc_property()
 
   @objc_method
@@ -61,12 +64,11 @@ class ViewController(UIViewController):
     self.view.backgroundColor = UIColor.systemDarkRedColor()
 
     self.configureHierarchy()
-    #self.createLayout()
-    
+    self.configureDataSource()
 
   # --- extension
   @objc_method
-  def createLayout(self)->ctypes.c_void_p:
+  def createLayout(self):
     itemSize = NSCollectionLayoutSize.sizeWithWidthDimension_heightDimension_(
       NSCollectionLayoutDimension.fractionalWidthDimension_(1.0),
       NSCollectionLayoutDimension.fractionalHeightDimension_(1.0))
@@ -85,30 +87,39 @@ class ViewController(UIViewController):
     section = NSCollectionLayoutSection.sectionWithGroup_(group)
     section.interGroupSpacing = 0
     section.contentInsets = NSDirectionalEdgeInsetsMake(10.0, 10.0, 10.0, 10.0)
-    
-    
 
     layout = UICollectionViewCompositionalLayout.alloc().initWithSection_(
       section)
 
-    #return layout
-    #pdbr.state(layout)
-    return layout
+    # xxx: `return` で落ちるので、こっちに押し込む
+    self.collectionView = UICollectionView.alloc(
+    ).initWithFrame_collectionViewLayout_(self.view.bounds, layout)
 
   @objc_method
   def configureHierarchy(self):
-    self.collectionView = UICollectionView.alloc(
-    )  #.initWithFrame_collectionViewLayout_(self.view.bounds, self.createLayout())
-    print(self.createLayout())
+    self.createLayout()
+    self.collectionView.backgroundColor = UIColor.systemDarkPurpleColor()
 
-    #initWithFrame_collectionViewLayout_
+    autoresizingMask = UIViewAutoresizing.flexibleHeight | UIViewAutoresizing.flexibleWidth
+    self.collectionView.autoresizingMask = autoresizingMask
+    self.view.addSubview_(self.collectionView)
+    self.collectionView.delegate = self
 
-    #pdbr.state(self.collectionView)
-    #print(self.view.bounds)
-    #print(self.createLayout())
-    #autoresizingMask = UIViewAutoresizing.flexibleHeight | UIViewAutoresizing.flexibleWidth
-    #self.collectionView.autoresizingMask = autoresizingMask
-    #self.view.addSubview_(self.collectionView)
+  @objc_method
+  def configureDataSource(self):
+    @Block
+    def configurationHandler(cell:ctypes.c_void_p, indexPath:ctypes.c_void_p, identifier:ctypes.c_void_p)->None:
+      pass
+    
+    cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(UICollectionViewListCell, configurationHandler)
+    
+    dataSource = UICollectionViewDiffableDataSource
+    pdbr.state(dataSource)
+
+  @objc_method
+  def collectionView_didSelectItemAtIndexPath_(self, collectionView,
+                                               indexPath):
+    pdbr.state(collectionView)
 
 
 if __name__ == '__main__':
