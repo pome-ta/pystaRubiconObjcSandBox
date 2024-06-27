@@ -49,7 +49,7 @@ class OutlineViewController(UIViewController,
                               UICollectionViewDataSource,
                               UICollectionViewDelegate,
                             ]):
-  outlineCollectionView = objc_property()
+  outlineCollectionView: UICollectionView = objc_property()
 
   @objc_method
   def viewDidLoad(self):
@@ -91,7 +91,7 @@ class OutlineViewController(UIViewController,
     #pdbr.state(UICollectionViewCellRegistration)
     #registrationWithCellClass_configurationHandler_
     #initWithCollectionView_cellProvider_
-    pdbr.state(UICollectionViewDiffableDataSource.alloc())
+    #pdbr.state(UICollectionViewDiffableDataSource.alloc())
     #initWithCollectionView_sectionControllers_rendererIdentifierProvider_
     #pdbr.state(UICollectionView.alloc())
 
@@ -101,6 +101,7 @@ class OutlineViewController(UIViewController,
     ).initWithAppearance_(UICollectionLayoutListAppearance.sidebar)
     layout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
       listConfiguration)
+    pdbr.state(layout)
     return layout
 
 

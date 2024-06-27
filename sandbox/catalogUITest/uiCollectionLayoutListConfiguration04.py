@@ -10,6 +10,7 @@ from rbedge.enumerations import (
   UIViewAutoresizing,
 )
 from rbedge.functions import NSStringFromClass
+from rbedge.types import NSDirectionalEdgeInsetsMake
 
 #ObjCClass.auto_rename = True
 
@@ -26,6 +27,8 @@ NSCollectionLayoutDimension = ObjCClass('NSCollectionLayoutDimension')
 NSCollectionLayoutItem = ObjCClass('NSCollectionLayoutItem')
 NSCollectionLayoutGroup = ObjCClass('NSCollectionLayoutGroup')
 NSCollectionLayoutSection = ObjCClass('NSCollectionLayoutSection')
+UICollectionViewCompositionalLayout = ObjCClass(
+  'UICollectionViewCompositionalLayout')
 
 # ---
 
@@ -34,8 +37,7 @@ UICollectionViewCellRegistration = ObjCClass(
 
 UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
 #UICollectionViewLayout = ObjCClass('UICollectionViewLayout')  # todo: 型呼び出し
-UICollectionViewCompositionalLayout = ObjCClass(
-  'UICollectionViewCompositionalLayout')
+
 UICollectionLayoutListConfiguration = ObjCClass(
   'UICollectionLayoutListConfiguration')
 
@@ -58,9 +60,13 @@ class ViewController(UIViewController):
     self.navigationItem.title = title
     self.view.backgroundColor = UIColor.systemDarkRedColor()
 
-    #pdbr.state(NSCollectionLayoutDimension)
-    #pdbr.state(NSCollectionLayoutSize)
+    self.configureHierarchy()
+    #self.createLayout()
+    
 
+  # --- extension
+  @objc_method
+  def createLayout(self)->ctypes.c_void_p:
     itemSize = NSCollectionLayoutSize.sizeWithWidthDimension_heightDimension_(
       NSCollectionLayoutDimension.fractionalWidthDimension_(1.0),
       NSCollectionLayoutDimension.fractionalHeightDimension_(1.0))
@@ -77,15 +83,32 @@ class ViewController(UIViewController):
       ])
 
     section = NSCollectionLayoutSection.sectionWithGroup_(group)
-    section.interGroupSpacing=0
-    pdbr.state(section)
+    section.interGroupSpacing = 0
+    section.contentInsets = NSDirectionalEdgeInsetsMake(10.0, 10.0, 10.0, 10.0)
+    
+    
 
-  # --- extension
+    layout = UICollectionViewCompositionalLayout.alloc().initWithSection_(
+      section)
+
+    #return layout
+    #pdbr.state(layout)
+    return layout
+
   @objc_method
-  def createLayout(self):
-    #sizeWithWidthDimension_heightDimension_
+  def configureHierarchy(self):
+    self.collectionView = UICollectionView.alloc(
+    )  #.initWithFrame_collectionViewLayout_(self.view.bounds, self.createLayout())
+    print(self.createLayout())
 
-    return None
+    #initWithFrame_collectionViewLayout_
+
+    #pdbr.state(self.collectionView)
+    #print(self.view.bounds)
+    #print(self.createLayout())
+    #autoresizingMask = UIViewAutoresizing.flexibleHeight | UIViewAutoresizing.flexibleWidth
+    #self.collectionView.autoresizingMask = autoresizingMask
+    #self.view.addSubview_(self.collectionView)
 
 
 if __name__ == '__main__':
