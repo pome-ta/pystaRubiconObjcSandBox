@@ -33,10 +33,8 @@ UICollectionViewCellRegistration = ObjCClass(
   'UICollectionViewCellRegistration')
 UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
 
-
 UICollectionViewDelegate = ObjCProtocol('UICollectionViewDelegate')
 # ---
-
 
 #UICollectionViewLayout = ObjCClass('UICollectionViewLayout')  # todo: 型呼び出し
 
@@ -107,14 +105,25 @@ class ViewController(UIViewController, protocols=[
 
   @objc_method
   def configureDataSource(self):
+
     @Block
-    def configurationHandler(cell:ctypes.c_void_p, indexPath:ctypes.c_void_p, identifier:ctypes.c_void_p)->None:
+    def configurationHandler(_cell: ctypes.c_void_p, _indexPath: ctypes.c_void_p,
+                             _identifier: ctypes.c_void_p) -> None:
+      cell = ObjCInstance(_cell)
+      
+
+    cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
+      UICollectionViewListCell, configurationHandler)
+
+    @Block
+    def cellProvider(_collectionView: ctypes.c_void_p,
+                     _indexPath: ctypes.c_void_p,
+                     _identifier: ctypes.c_void_p) -> ctypes.c_void_p:
       pass
-    
-    cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(UICollectionViewListCell, configurationHandler)
-    
-    dataSource = UICollectionViewDiffableDataSource
-    pdbr.state(dataSource)
+
+    dataSource = UICollectionViewDiffableDataSource.alloc(
+    ).initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
+    #pdbr.state(UICollectionViewDiffableDataSource.alloc())
 
   @objc_method
   def collectionView_didSelectItemAtIndexPath_(self, collectionView,
