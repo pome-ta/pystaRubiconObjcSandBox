@@ -32,6 +32,7 @@ UICollectionViewCompositionalLayout = ObjCClass(
 UICollectionViewCellRegistration = ObjCClass(
   'UICollectionViewCellRegistration')
 UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
+NSDiffableDataSourceSnapshot = ObjCClass('NSDiffableDataSourceSnapshot')
 
 UICollectionViewDelegate = ObjCProtocol('UICollectionViewDelegate')
 # ---
@@ -51,7 +52,7 @@ prefectures = ['福岡', '佐賀', '長崎', '大分', '熊本', '宮崎', '鹿�
 class ViewController(UIViewController, protocols=[
     UICollectionViewDelegate,
 ]):
-  #dataSource: UICollectionViewDiffableDataSource = objc_property()
+  dataSource: UICollectionViewDiffableDataSource = objc_property()
   collectionView: UICollectionView = objc_property()
 
   @objc_method
@@ -107,23 +108,28 @@ class ViewController(UIViewController, protocols=[
   def configureDataSource(self):
 
     @Block
-    def configurationHandler(_cell: ctypes.c_void_p, _indexPath: ctypes.c_void_p,
-                             _identifier: ctypes.c_void_p) -> None:
+    def configurationHandler(_cell: objc_id, _indexPath: objc_id,
+                             _identifier: objc_id) -> None:
       cell = ObjCInstance(_cell)
-      
+      cell.label.text = str(ObjCInstance(_identifier))
 
     cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
       UICollectionViewListCell, configurationHandler)
 
     @Block
-    def cellProvider(_collectionView: ctypes.c_void_p,
-                     _indexPath: ctypes.c_void_p,
-                     _identifier: ctypes.c_void_p) -> ctypes.c_void_p:
-      pass
+    def cellProvider(_collectionView: objc_id, _indexPath: objc_id,
+                     _identifier: objc_id) -> ctypes.c_void_p:
+      collectionView = ObjCInstance(collectionView)
+      return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
+        cellRegistration, _indexPath, _identifier).ptr
 
-    dataSource = UICollectionViewDiffableDataSource.alloc(
+    self.dataSource = UICollectionViewDiffableDataSource.alloc(
     ).initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
     #pdbr.state(UICollectionViewDiffableDataSource.alloc())
+    
+    snapshot = NSDiffableDataSourceSnapshot.alloc().init()
+    snapshot.appendSectionsWithIdentifiers_([0])
+    pdbr.state(snapshot)
 
   @objc_method
   def collectionView_didSelectItemAtIndexPath_(self, collectionView,
