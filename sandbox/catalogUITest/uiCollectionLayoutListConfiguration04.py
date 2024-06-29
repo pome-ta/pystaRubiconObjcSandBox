@@ -34,6 +34,7 @@ UICollectionViewCellRegistration = ObjCClass(
 UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
 NSDiffableDataSourceSnapshot = ObjCClass('NSDiffableDataSourceSnapshot')
 
+
 UICollectionViewDelegate = ObjCProtocol('UICollectionViewDelegate')
 # ---
 
@@ -97,7 +98,9 @@ class ViewController(UIViewController, protocols=[
     def configurationHandler(cell: objc_id, indexPath: objc_id,
                              identifier: objc_id) -> None:
 
-      cell.label.text = str(ObjCInstance(identifier))
+      contentConfiguration = cell.defaultContentConfiguration()
+      contentConfiguration.text = str(identifier)
+      cell.contentConfiguration = contentConfiguration
 
     cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
       UICollectionViewListCell, configurationHandler)
@@ -109,19 +112,20 @@ class ViewController(UIViewController, protocols=[
       return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
         cellRegistration, indexPath, identifier)
 
+    
+    
     self.dataSource = UICollectionViewDiffableDataSource.alloc(
     ).initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
     #pdbr.state(UICollectionViewDiffableDataSource.alloc())
 
-    pdbr.state(NSDiffableDataSourceSnapshot.alloc())
+    #pdbr.state(NSDiffableDataSourceSnapshot.alloc())
     snapshot = NSDiffableDataSourceSnapshot.alloc().init()
-    snapshot.appendSectionsWithIdentifiers_([0])
-    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(
-      prefectures, 0)
+    #snapshot.appendSectionsWithIdentifiers_([0])
+    #snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(prefectures, 0)
     #
     #pdbr.state(snapshot)
-    #self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
-    #pdbr.state(self.dataSource)
+    self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+    pdbr.state(self.dataSource)
 
     #self.configureHierarchy()
     #self.configureDataSource()
