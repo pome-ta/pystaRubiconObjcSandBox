@@ -1,7 +1,7 @@
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method, objc_property
-from pyrubicon.objc.runtime import send_super, load_library
+from pyrubicon.objc.api import ObjCClass, ObjCInstance, ObjCProtocol, objc_method, objc_property
+from pyrubicon.objc.runtime import send_super, load_library, objc_id
 from pyrubicon.objc.types import NSInteger, CGRect
 
 from rbedge.enumerations import UICollectionLayoutListAppearance, UICollectionLayoutListHeaderMode
@@ -109,10 +109,12 @@ class ViewController(UIViewController,
     return len(prefectures[section])
 
   @objc_method
-  def collectionView_cellForItemAtIndexPath_(self, collectionView,
-                                             indexPath) -> ctypes.c_void_p:
+  def collectionView_cellForItemAtIndexPath_(
+      self, collectionView, _indexPath: objc_id) -> ctypes.c_void_p:
+    print(_indexPath)
+    indexPath = ObjCInstance(_indexPath)
     cell = collectionView.dequeueReusableCellWithReuseIdentifier_forIndexPath_(
-      self.cellId, indexPath)
+      self.cellId, _indexPath)
 
     cellConfiguration = cell.defaultContentConfiguration()
     cellConfiguration.text = prefectures[indexPath.section][indexPath.row]

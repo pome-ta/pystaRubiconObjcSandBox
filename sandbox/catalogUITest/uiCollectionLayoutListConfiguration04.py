@@ -118,18 +118,23 @@ class ViewController(UIViewController, protocols=[
 
     @Block
     def cellProvider(_collectionView: objc_id, _indexPath: objc_id,
-                     _identifier: objc_id) -> ctypes.c_void_p:
-      collectionView = ObjCInstance(collectionView)
+                     _identifier: objc_id) -> objc_id:
+      collectionView = ObjCInstance(_collectionView)
       return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
-        cellRegistration, _indexPath, _identifier).ptr
+        cellRegistration, _indexPath, _identifier)
 
     self.dataSource = UICollectionViewDiffableDataSource.alloc(
     ).initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
     #pdbr.state(UICollectionViewDiffableDataSource.alloc())
-    
+
     snapshot = NSDiffableDataSourceSnapshot.alloc().init()
     snapshot.appendSectionsWithIdentifiers_([0])
+    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(
+      prefectures, 0)
+    #
     pdbr.state(snapshot)
+    #self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+    #pdbr.state(self.dataSource)
 
   @objc_method
   def collectionView_didSelectItemAtIndexPath_(self, collectionView,
