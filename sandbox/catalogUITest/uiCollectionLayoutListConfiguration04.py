@@ -62,9 +62,71 @@ class ViewController(UIViewController, protocols=[
     self.navigationItem.title = title
     self.view.backgroundColor = UIColor.systemDarkRedColor()
 
-    self.configureHierarchy()
-    self.configureDataSource()
+    itemSize = NSCollectionLayoutSize.sizeWithWidthDimension_heightDimension_(
+      NSCollectionLayoutDimension.fractionalWidthDimension_(1.0),
+      NSCollectionLayoutDimension.fractionalHeightDimension_(1.0))
 
+    item = NSCollectionLayoutItem.itemWithLayoutSize_(itemSize)
+
+    groupSize = NSCollectionLayoutSize.sizeWithWidthDimension_heightDimension_(
+      NSCollectionLayoutDimension.fractionalWidthDimension_(1.0),
+      NSCollectionLayoutDimension.absoluteDimension_(44))
+
+    group = NSCollectionLayoutGroup.horizontalGroupWithLayoutSize_subitems_(
+      groupSize, [
+        item,
+      ])
+
+    section = NSCollectionLayoutSection.sectionWithGroup_(group)
+    section.interGroupSpacing = 0
+    section.contentInsets = NSDirectionalEdgeInsetsMake(10.0, 10.0, 10.0, 10.0)
+
+    layout = UICollectionViewCompositionalLayout.alloc().initWithSection_(
+      section)
+
+    # xxx: `return` で落ちるので、こっちに押し込む
+    self.collectionView = UICollectionView.alloc(
+    ).initWithFrame_collectionViewLayout_(self.view.bounds, layout)
+    self.collectionView.backgroundColor = UIColor.systemDarkPurpleColor()
+
+    autoresizingMask = UIViewAutoresizing.flexibleHeight | UIViewAutoresizing.flexibleWidth
+    self.collectionView.autoresizingMask = autoresizingMask
+    self.view.addSubview_(self.collectionView)
+    self.collectionView.delegate = self
+
+    @Block
+    def configurationHandler(cell: objc_id, indexPath: objc_id,
+                             identifier: objc_id) -> None:
+
+      cell.label.text = str(ObjCInstance(identifier))
+
+    cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
+      UICollectionViewListCell, configurationHandler)
+
+    @Block
+    def cellProvider(collectionView: objc_id, indexPath: objc_id,
+                     identifier: objc_id) -> objc_id:
+
+      return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
+        cellRegistration, indexPath, identifier)
+
+    self.dataSource = UICollectionViewDiffableDataSource.alloc(
+    ).initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
+    #pdbr.state(UICollectionViewDiffableDataSource.alloc())
+
+    snapshot = NSDiffableDataSourceSnapshot.alloc().init()
+    snapshot.appendSectionsWithIdentifiers_([0])
+    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(
+      prefectures, 0)
+    #
+    #pdbr.state(snapshot)
+    self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+    #pdbr.state(self.dataSource)
+
+    #self.configureHierarchy()
+    #self.configureDataSource()
+
+  '''
   # --- extension
   @objc_method
   def createLayout(self):
@@ -135,6 +197,7 @@ class ViewController(UIViewController, protocols=[
     pdbr.state(snapshot)
     #self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
     #pdbr.state(self.dataSource)
+  '''
 
   @objc_method
   def collectionView_didSelectItemAtIndexPath_(self, collectionView,
