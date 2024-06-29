@@ -84,7 +84,6 @@ class ViewController(UIViewController, protocols=[
     layout = UICollectionViewCompositionalLayout.alloc().initWithSection_(
       section)
 
-    # xxx: `return` で落ちるので、こっちに押し込む
     self.collectionView = UICollectionView.alloc(
     ).initWithFrame_collectionViewLayout_(self.view.bounds, layout)
     self.collectionView.backgroundColor = UIColor.systemDarkPurpleColor()
@@ -114,13 +113,14 @@ class ViewController(UIViewController, protocols=[
     ).initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
     #pdbr.state(UICollectionViewDiffableDataSource.alloc())
 
+    pdbr.state(NSDiffableDataSourceSnapshot.alloc())
     snapshot = NSDiffableDataSourceSnapshot.alloc().init()
     snapshot.appendSectionsWithIdentifiers_([0])
     snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(
       prefectures, 0)
     #
     #pdbr.state(snapshot)
-    self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+    #self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
     #pdbr.state(self.dataSource)
 
     #self.configureHierarchy()
