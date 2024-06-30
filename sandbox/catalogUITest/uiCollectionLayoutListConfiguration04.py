@@ -1,6 +1,6 @@
 import ctypes
 
-from pyrubicon.objc.api import Block, ObjCClass, ObjCInstance, ObjCProtocol, objc_method, objc_property
+from pyrubicon.objc.api import Block, ObjCClass, ObjCInstance, ObjCProtocol, objc_method, objc_property,NSString
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import NSInteger
 
@@ -34,6 +34,7 @@ UICollectionViewCellRegistration = ObjCClass(
 UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
 NSDiffableDataSourceSnapshot = ObjCClass('NSDiffableDataSourceSnapshot')
 
+NSIndexPath = ObjCClass('NSIndexPath')
 
 UICollectionViewDelegate = ObjCProtocol('UICollectionViewDelegate')
 # ---
@@ -106,25 +107,23 @@ class ViewController(UIViewController, protocols=[
       UICollectionViewListCell, configurationHandler)
 
     @Block
-    def cellProvider(collectionView: objc_id, indexPath: objc_id,
-                     identifier: objc_id) -> objc_id:
+    def cellProvider(collectionView:objc_id, indexPath:objc_id, identifier:objc_id) -> ctypes.c_void_p:
 
       return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
-        cellRegistration, indexPath, identifier)
+        cellRegistration.ptr, indexPath, identifier).ptr
 
-    
-    
     self.dataSource = UICollectionViewDiffableDataSource.alloc(
     ).initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
     #pdbr.state(UICollectionViewDiffableDataSource.alloc())
 
     #pdbr.state(NSDiffableDataSourceSnapshot.alloc())
     snapshot = NSDiffableDataSourceSnapshot.alloc().init()
-    #snapshot.appendSectionsWithIdentifiers_([0])
-    #snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(prefectures, 0)
+    snapshot.appendSectionsWithIdentifiers_([0])
+    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(
+      prefectures, 0)
     #
     #pdbr.state(snapshot)
-    self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+    #self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
     pdbr.state(self.dataSource)
 
     #self.configureHierarchy()
