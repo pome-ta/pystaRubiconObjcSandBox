@@ -119,12 +119,12 @@ class ViewController(UIViewController, protocols=[
     #pdbr.state(NSDiffableDataSourceSnapshot.alloc())
     snapshot = NSDiffableDataSourceSnapshot.alloc().init()
     snapshot.appendSectionsWithIdentifiers_([0])
-    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(
-      prefectures, 0)
+    #snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(prefectures, 0)
+    snapshot.appendItemsWithIdentifiers_(prefectures)
     #
-    #pdbr.state(snapshot)
-    #self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
-    pdbr.state(self.dataSource)
+    pdbr.state(snapshot)
+    self.dataSource.applySnapshot_animatingDifferences_(snapshot, True)
+    #pdbr.state(self.dataSource)
 
     #self.configureHierarchy()
     #self.configureDataSource()
