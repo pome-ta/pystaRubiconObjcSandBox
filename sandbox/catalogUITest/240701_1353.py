@@ -102,6 +102,8 @@ class ViewController(UIViewController, protocols=[
     
     
     snapshot = NSDiffableDataSourceSnapshot.alloc().init()
+    snapshot.appendSectionsWithIdentifiers_(['a'])
+    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(prefectures, 'a')
     pdbr.state(snapshot.impl)
     #print(dir(snapshot))
     #print(snapshot)
