@@ -103,14 +103,15 @@ class ViewController(UIViewController, protocols=[
       contentConfiguration.text = str(identifier)
       cell.contentConfiguration = contentConfiguration
 
-    cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
+    self.cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
       UICollectionViewListCell, configurationHandler)
 
     @Block
     def cellProvider(collectionView:objc_id, indexPath:objc_id, identifier:objc_id) -> ctypes.c_void_p:
+      #ind = NSIndexPath.indexPathForItem_inSection_(0,0)
 
-      return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
-        cellRegistration.ptr, indexPath, identifier).ptr
+      return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(self.cellRegistration.ptr, indexPath, identifier).ptr
+      
 
     self.dataSource = UICollectionViewDiffableDataSource.alloc(
     ).initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
@@ -119,11 +120,11 @@ class ViewController(UIViewController, protocols=[
     #pdbr.state(NSDiffableDataSourceSnapshot.alloc())
     snapshot = NSDiffableDataSourceSnapshot.alloc().init()
     snapshot.appendSectionsWithIdentifiers_([0])
-    #snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(prefectures, 0)
-    snapshot.appendItemsWithIdentifiers_(prefectures)
-    #
-    pdbr.state(snapshot)
-    self.dataSource.applySnapshot_animatingDifferences_(snapshot, True)
+    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(prefectures, 0)
+    #snapshot.appendItemsWithIdentifiers_(prefectures)
+    #pdbr.state(snapshot)
+    #pdbr.state(NSIndexPath)
+    self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
     #pdbr.state(self.dataSource)
 
     #self.configureHierarchy()
