@@ -102,7 +102,7 @@ class ViewController(UIViewController, protocols=[
     
     
     snapshot = NSDiffableDataSourceSnapshot.alloc().init()
-    pdbr.state(snapshot)
+    pdbr.state(snapshot.impl)
     #print(dir(snapshot))
     #print(snapshot)
     
