@@ -1,5 +1,5 @@
 import ctypes
-from enum import Enum
+from enum import Enum, auto
 
 from pyrubicon.objc.api import Block, ObjCClass, ObjCInstance, ObjCProtocol, objc_method, objc_property, NSString
 from pyrubicon.objc.runtime import send_super, objc_id
@@ -49,12 +49,18 @@ UICollectionViewDataSource = ObjCProtocol('UICollectionViewDataSource')
 
 # [モダンなUICollectionViewでシンプルなリストレイアウト その1 〜 概要](https://zenn.dev/samekard_dev/articles/43991e9321b6c9)
 
+
+class Section(Enum):
+  main = auto()
+
+
 prefectures = ['福岡', '佐賀', '長崎', '大分', '熊本', '宮崎', '鹿児島']
 
 
 class ViewController(UIViewController, protocols=[
     UICollectionViewDelegate,
 ]):
+
   dataSource: UICollectionViewDiffableDataSource = objc_property()
   collectionView: UICollectionView = objc_property()
 
@@ -95,19 +101,18 @@ class ViewController(UIViewController, protocols=[
     self.collectionView.autoresizingMask = autoresizingMask
     self.view.addSubview_(self.collectionView)
     self.collectionView.delegate = self
-    
-    
-    cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(UICollectionViewListCell, None)
-    
-    
-    
-    snapshot = NSDiffableDataSourceSnapshot.alloc().init()
-    snapshot.appendSectionsWithIdentifiers_(['a'])
-    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(prefectures, 'a')
-    pdbr.state(snapshot.impl)
+
+    cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
+      UICollectionViewListCell, None)
+
+    #snapshot = NSDiffableDataSourceSnapshot.alloc().init()
+    snapshot = NSDiffableDataSourceSnapshot.new()
+    snapshot.appendSectionsWithIdentifiers_([Section.main])
+    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(
+      prefectures, Section.main)
+    pdbr.state(snapshot)
     #print(dir(snapshot))
     #print(snapshot)
-    
 
   @objc_method
   def collectionView_didSelectItemAtIndexPath_(self, collectionView,

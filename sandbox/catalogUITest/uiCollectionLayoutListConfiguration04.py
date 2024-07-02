@@ -118,7 +118,8 @@ class ViewController(UIViewController, protocols=[
     #pdbr.state(UICollectionViewDiffableDataSource.alloc())
 
     #pdbr.state(NSDiffableDataSourceSnapshot.alloc())
-    snapshot = NSDiffableDataSourceSnapshot.alloc().init()
+    #snapshot = NSDiffableDataSourceSnapshot.alloc().init()
+    snapshot = NSDiffableDataSourceSnapshot.new()
     snapshot.appendSectionsWithIdentifiers_([id(0)])
     snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(prefectures, id(0))
     #snapshot.appendItemsWithIdentifiers_(prefectures)
