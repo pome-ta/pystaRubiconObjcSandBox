@@ -60,9 +60,9 @@ class ViewController(UIViewController, protocols=[
   
   @objc_method
   def init(self):
-    this = send_super(__class__, self, 'init')
-    print(this)
-    return self
+    this = ObjCInstance(send_super(__class__, self, 'init'))
+    this.dataSource = UICollectionViewDiffableDataSource.alloc()
+    return this
     
   @objc_method
   def viewDidLoad(self):
@@ -120,8 +120,7 @@ class ViewController(UIViewController, protocols=[
       return self.collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
         cellRegistration, indexPath, identifier).ptr
 
-    self.dataSource = UICollectionViewDiffableDataSource.alloc(
-    ).initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
+    self.dataSource.initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
     
     snapshot = NSDiffableDataSourceSnapshot.alloc().init()
     #snapshot = self.dataSource.snapshot()
@@ -129,7 +128,7 @@ class ViewController(UIViewController, protocols=[
     snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(
       prefectures, Section.main)
     
-    #self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+    self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
     #pdbr.state(self.dataSource.snapshot())
 
   @objc_method
