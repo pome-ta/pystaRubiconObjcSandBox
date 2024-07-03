@@ -35,17 +35,8 @@ UICollectionViewCellRegistration = ObjCClass(
 UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
 NSDiffableDataSourceSnapshot = ObjCClass('NSDiffableDataSourceSnapshot')
 
-NSIndexPath = ObjCClass('NSIndexPath')
-
 UICollectionViewDelegate = ObjCProtocol('UICollectionViewDelegate')
 # ---
-
-#UICollectionViewLayout = ObjCClass('UICollectionViewLayout')  # todo: 型呼び出し
-
-UICollectionLayoutListConfiguration = ObjCClass(
-  'UICollectionLayoutListConfiguration')
-
-UICollectionViewDataSource = ObjCProtocol('UICollectionViewDataSource')
 
 # [モダンなUICollectionViewでシンプルなリストレイアウト その1 〜 概要](https://zenn.dev/samekard_dev/articles/43991e9321b6c9)
 
@@ -61,8 +52,9 @@ class ViewController(UIViewController, protocols=[
     UICollectionViewDelegate,
 ]):
 
-  #dataSource: UICollectionViewDiffableDataSource = objc_property()
+  
   collectionView: UICollectionView = objc_property()
+  sdataSource: UICollectionViewDiffableDataSource = objc_property()
 
   @objc_method
   def viewDidLoad(self):
@@ -102,33 +94,47 @@ class ViewController(UIViewController, protocols=[
     self.view.addSubview_(self.collectionView)
     self.collectionView.delegate = self
 
+    @Block
+    def configurationHandler(cell: objc_id, indexPath: objc_id,
+                             identifier: objc_id) -> None:
+      print('j')
+      contentConfiguration = cell.defaultContentConfiguration()
+      contentConfiguration.text = str(identifier)
+      cell.contentConfiguration = contentConfiguration
+
     cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
-      UICollectionViewListCell, None)
+      UICollectionViewListCell, configurationHandler)
 
     @Block
-    def cellProvider(collectionView: objc_id, indexPath:objc_id, identifier:objc_id)->objc_id:
+    def cellProvider(collectionView: objc_id, indexPath: objc_id,
+                     identifier: objc_id) -> objc_id:
       print('h')
-      return collectionView
-    
-    
-    self.dataSource = UICollectionViewDiffableDataSource.alloc().initWithCollectionView_cellProvider_(self.collectionView,cellProvider)
-    
+      return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
+        cellRegistration, indexPath, identifier).ptr
+
+    self.sdataSource = UICollectionViewDiffableDataSource.alloc().initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
+    #self.collectionView.dataSource = UICollectionViewDiffableDataSource.alloc().initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
+
     #dataSource = UICollectionViewDiffableDataSource.new()
     #pdbr.state(dataSource)
-    print(self.dataSource)
-    
-    
-    #snapshot = NSDiffableDataSourceSnapshot.alloc().init()
-    snapshot = NSDiffableDataSourceSnapshot.new()
+    #print(dataSource)
+
+    snapshot = NSDiffableDataSourceSnapshot.alloc().init()
+    #snapshot = NSDiffableDataSourceSnapshot.new()
     snapshot.appendSectionsWithIdentifiers_([Section.main])
-    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(
-      prefectures, Section.main)
+    #snapshot.appendSectionsWithIdentifiers_([0])
+    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(prefectures, Section.main)
+    #snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(prefectures, 0)
     #pdbr.state(snapshot)
     #print(dir(snapshot))
     #print(snapshot)
     #print(snapshot.impl)
-    self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
-    print(self.dataSource)
+    #self.collectionView.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+    self.sdataSource.applySnapshot_animatingDifferences_(snapshot, False)
+    #self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+    #print(dataSource)
+    #pdbr.state(self.collectionView)
+    pdbr.state(self)
 
   @objc_method
   def collectionView_didSelectItemAtIndexPath_(self, collectionView,
