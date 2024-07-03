@@ -61,7 +61,7 @@ class ViewController(UIViewController, protocols=[
     UICollectionViewDelegate,
 ]):
 
-  dataSource: UICollectionViewDiffableDataSource = objc_property(weak=True)
+  #dataSource: UICollectionViewDiffableDataSource = objc_property()
   collectionView: UICollectionView = objc_property()
 
   @objc_method
