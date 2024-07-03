@@ -49,21 +49,15 @@ class Section(Enum):
 prefectures = ['福岡', '佐賀', '長崎', '大分', '熊本', '宮崎', '鹿児島']
 
 
-class ViewController(UIViewController, protocols=[
-    UICollectionViewDelegate,UICollectionViewDataSource,
-]):
+class ViewController(UIViewController,
+                     protocols=[
+                       UICollectionViewDelegate,
+                       UICollectionViewDataSource,
+                     ]):
 
   dataSource: UICollectionViewDiffableDataSource = objc_property()
   collectionView: UICollectionView = objc_property()
 
-  
-  
-  @objc_method
-  def init(self):
-    this = ObjCInstance(send_super(__class__, self, 'init'))
-    this.dataSource = UICollectionViewDiffableDataSource.alloc()
-    return this
-    
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')  # xxx: 不要?
@@ -95,6 +89,9 @@ class ViewController(UIViewController, protocols=[
 
     self.collectionView = UICollectionView.alloc(
     ).initWithFrame_collectionViewLayout_(self.view.bounds, layout)
+
+    #pdbr.state(self.collectionView)
+
     self.collectionView.backgroundColor = UIColor.systemDarkPurpleColor()
 
     autoresizingMask = UIViewAutoresizing.flexibleHeight | UIViewAutoresizing.flexibleWidth
@@ -117,17 +114,18 @@ class ViewController(UIViewController, protocols=[
     def cellProvider(collectionView: objc_id, indexPath: objc_id,
                      identifier: objc_id) -> objc_id:
       print('h')
+      
       return self.collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
         cellRegistration, indexPath, identifier).ptr
 
-    self.dataSource.initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
-    
+    self.dataSource = UICollectionViewDiffableDataSource.alloc(
+    ).initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
+
     snapshot = NSDiffableDataSourceSnapshot.alloc().init()
-    #snapshot = self.dataSource.snapshot()
     snapshot.appendSectionsWithIdentifiers_([Section.main])
     snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(
       prefectures, Section.main)
-    
+
     self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
     #pdbr.state(self.dataSource.snapshot())
 
