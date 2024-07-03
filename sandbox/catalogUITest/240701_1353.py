@@ -61,7 +61,7 @@ class ViewController(UIViewController, protocols=[
     UICollectionViewDelegate,
 ]):
 
-  dataSource: UICollectionViewDiffableDataSource = objc_property()
+  dataSource: UICollectionViewDiffableDataSource = objc_property(weak=True)
   collectionView: UICollectionView = objc_property()
 
   @objc_method
@@ -105,14 +105,30 @@ class ViewController(UIViewController, protocols=[
     cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
       UICollectionViewListCell, None)
 
+    @Block
+    def cellProvider(collectionView: objc_id, indexPath:objc_id, identifier:objc_id)->objc_id:
+      print('h')
+      return collectionView
+    
+    
+    self.dataSource = UICollectionViewDiffableDataSource.alloc().initWithCollectionView_cellProvider_(self.collectionView,cellProvider)
+    
+    #dataSource = UICollectionViewDiffableDataSource.new()
+    #pdbr.state(dataSource)
+    print(self.dataSource)
+    
+    
     #snapshot = NSDiffableDataSourceSnapshot.alloc().init()
     snapshot = NSDiffableDataSourceSnapshot.new()
     snapshot.appendSectionsWithIdentifiers_([Section.main])
     snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(
       prefectures, Section.main)
-    pdbr.state(snapshot)
+    #pdbr.state(snapshot)
     #print(dir(snapshot))
     #print(snapshot)
+    #print(snapshot.impl)
+    self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+    print(self.dataSource)
 
   @objc_method
   def collectionView_didSelectItemAtIndexPath_(self, collectionView,
