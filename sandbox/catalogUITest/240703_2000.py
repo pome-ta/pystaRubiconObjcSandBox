@@ -79,12 +79,13 @@ class ViewController(UIViewController):
       groupSize, at([item]))
 
     section = NSCollectionLayoutSection.sectionWithGroup_(group)
-    section.interGroupSpacing = 0.0
-    section.contentInsets = NSDirectionalEdgeInsetsMake(10.0, 10.0, 10.0, 10.0)
+    #section.interGroupSpacing = 0.0
+    #section.contentInsets = NSDirectionalEdgeInsetsMake(10.0, 10.0, 10.0, 10.0)
 
-    layout = UICollectionViewCompositionalLayout.alloc().initWithSection_(
-      section)
+    #layout = UICollectionViewCompositionalLayout.alloc().initWithSection_(section)
+    layout = UICollectionViewCompositionalLayout.alloc().initWithLayoutSection_(section)
 
+    #initWithLayoutSection
     listConfiguration = UICollectionLayoutListConfiguration.alloc(
     ).initWithAppearance_(UICollectionLayoutListAppearance.plain)
     listConfiguration.headerMode = UICollectionLayoutListHeaderMode.firstItemInSection
@@ -93,10 +94,13 @@ class ViewController(UIViewController):
       listConfiguration)
 
     #pdbr.state(simpleLayout)
-    pdbr.state(at([item]))
+    #pdbr.state(at([item]))
+    
+    #pdbr.state(layout)
+    #pdbr.state(UICollectionViewCompositionalLayout)
 
-    return simpleLayout
-    #return layout
+    #return simpleLayout
+    return layout
 
   @objc_method
   def configureHierarchy(self):
