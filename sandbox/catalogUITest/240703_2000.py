@@ -1,7 +1,7 @@
 import ctypes
 from enum import Enum, auto
 
-from pyrubicon.objc.api import Block, ObjCClass, ObjCInstance, ObjCProtocol, objc_method, objc_property, NSString
+from pyrubicon.objc.api import Block, ObjCClass, ObjCInstance, ObjCProtocol, objc_method, objc_property, at
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import NSInteger
 
@@ -20,11 +20,13 @@ NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 UICollectionView = ObjCClass('UICollectionView')
 NSCollectionLayoutSize = ObjCClass('NSCollectionLayoutSize')
 NSCollectionLayoutDimension = ObjCClass('NSCollectionLayoutDimension')
+NSCollectionLayoutItem = ObjCClass('NSCollectionLayoutItem')
+NSCollectionLayoutGroup = ObjCClass('NSCollectionLayoutGroup')
+NSCollectionLayoutSection = ObjCClass('NSCollectionLayoutSection')
+UICollectionViewCompositionalLayout = ObjCClass(
+  'UICollectionViewCompositionalLayout')
 
 # ---
-from pyrubicon.objc.runtime import load_library
-from pyrubicon.objc.types import CGRect
-
 from rbedge.enumerations import (
   UICollectionLayoutListAppearance,
   UICollectionLayoutListHeaderMode,
@@ -36,9 +38,6 @@ UICollectionViewCompositionalLayout = ObjCClass(
   'UICollectionViewCompositionalLayout')
 UICollectionLayoutListConfiguration = ObjCClass(
   'UICollectionLayoutListConfiguration')
-
-CoreGraphics = load_library('CoreGraphics')
-CGRectZero = CGRect.in_dll(CoreGraphics, 'CGRectZero')
 
 # [モダンなUICollectionViewでシンプルなリストレイアウト その1 〜 概要](https://zenn.dev/samekard_dev/articles/43991e9321b6c9)
 
@@ -67,12 +66,37 @@ class ViewController(UIViewController):
   def createLayout(self) -> ObjCInstance:  # -> UICollectionViewLayout
     dimension = NSCollectionLayoutDimension
 
+    itemSize = NSCollectionLayoutSize.sizeWithWidthDimension_heightDimension_(
+      dimension.fractionalWidthDimension_(1.0),
+      dimension.fractionalHeightDimension_(1.0))
+    item = NSCollectionLayoutItem.itemWithLayoutSize_(itemSize)
+
+    groupSize = NSCollectionLayoutSize.sizeWithWidthDimension_heightDimension_(
+      dimension.fractionalWidthDimension_(1.0),
+      dimension.absoluteDimension_(44.0))
+
+    group = NSCollectionLayoutGroup.horizontalGroupWithLayoutSize_subitems_(
+      groupSize, at([item]))
+
+    section = NSCollectionLayoutSection.sectionWithGroup_(group)
+    section.interGroupSpacing = 0.0
+    section.contentInsets = NSDirectionalEdgeInsetsMake(10.0, 10.0, 10.0, 10.0)
+
+    layout = UICollectionViewCompositionalLayout.alloc().initWithSection_(
+      section)
+
     listConfiguration = UICollectionLayoutListConfiguration.alloc(
     ).initWithAppearance_(UICollectionLayoutListAppearance.plain)
     listConfiguration.headerMode = UICollectionLayoutListHeaderMode.firstItemInSection
 
-    return UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
+    simpleLayout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
       listConfiguration)
+
+    #pdbr.state(simpleLayout)
+    pdbr.state(at([item]))
+
+    return simpleLayout
+    #return layout
 
   @objc_method
   def configureHierarchy(self):
