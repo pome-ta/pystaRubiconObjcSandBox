@@ -275,3 +275,14 @@ class UIViewAutoresizing:
   flexibleHeight: int = 1 << 4
   flexibleBottomMargin: int = 1 << 5
 
+
+@dataclass
+class NSURLRequestCachePolicy:
+  useProtocolCachePolicy: int = 0
+  reloadIgnoringLocalCacheData: int = 1
+  reloadIgnoringLocalAndRemoteCacheData: int = 4
+  reloadIgnoringCacheData: int = reloadIgnoringLocalCacheData
+  returnCacheDataElseLoad: int = 2
+  returnCacheDataDontLoad: int = 3
+  reloadRevalidatingCacheData: int = 5
+
