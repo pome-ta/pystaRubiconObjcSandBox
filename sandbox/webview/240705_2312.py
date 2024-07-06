@@ -35,7 +35,7 @@ class WebView(UIViewController, protocols=[WKUIDelegate]):
     self.webView = WKWebView.alloc().initWithFrame_configuration_(
       CGRectZero, webConfiguration)
     self.webView.uiDelegate = self
-    self.view = self.webView
+    #self.view = self.webView
 
   @objc_method
   def viewDidLoad(self):
