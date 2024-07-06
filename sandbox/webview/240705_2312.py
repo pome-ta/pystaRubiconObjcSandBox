@@ -25,7 +25,11 @@ WKUIDelegate = ObjCProtocol('WKUIDelegate')
 WKNavigationDelegate = ObjCProtocol('WKNavigationDelegate')
 
 
-class WebView(UIViewController, protocols=[WKUIDelegate]):
+class WebView(UIViewController,
+              protocols=[
+                WKUIDelegate,
+                WKNavigationDelegate,
+              ]):
 
   webView: WKWebView = objc_property()
 
@@ -35,7 +39,8 @@ class WebView(UIViewController, protocols=[WKUIDelegate]):
     self.webView = WKWebView.alloc().initWithFrame_configuration_(
       CGRectZero, webConfiguration)
     self.webView.uiDelegate = self
-    #self.view = self.webView
+    self.webView.navigationDelegate = self
+    self.view = self.webView
 
   @objc_method
   def viewDidLoad(self):
@@ -48,6 +53,13 @@ class WebView(UIViewController, protocols=[WKUIDelegate]):
     myURL = NSURL.URLWithString_('https://www.apple.com')
     myRequest = NSURLRequest.requestWithURL_(myURL)
     self.webView.loadRequest_(myRequest)
+
+  @objc_method
+  def webView_didFinishNavigation_(self, webView, navigation):
+    title = webView.title
+    #pdbr.state(webView.title)
+    #print(webView.title)
+    self.navigationItem.title = str(title)
 
 
 if __name__ == '__main__':
