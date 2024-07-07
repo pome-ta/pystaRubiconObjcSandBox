@@ -1,10 +1,11 @@
+from pathlib import Path
+
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, ObjCProtocol, objc_method, objc_property
-from pyrubicon.objc.runtime import send_super, objc_id, load_library
+from pyrubicon.objc.runtime import send_super, load_library
 from pyrubicon.objc.types import NSInteger, CGRect
 
 from rbedge.enumerations import (
-  NSURLRequestCachePolicy,
-)
+  NSURLRequestCachePolicy, )
 from rbedge.functions import NSStringFromClass
 
 UIViewController = ObjCClass('UIViewController')
@@ -15,6 +16,7 @@ CGRectZero = CGRect.in_dll(CoreGraphics, 'CGRectZero')
 
 NSURL = ObjCClass('NSURL')
 NSURLRequest = ObjCClass('NSURLRequest')
+
 # --- WKWebView
 WKWebView = ObjCClass('WKWebView')
 WKWebViewConfiguration = ObjCClass('WKWebViewConfiguration')
@@ -48,24 +50,21 @@ class WebView(UIViewController,
 
     self.view.backgroundColor = UIColor.systemDarkRedColor()
 
-    myURL = NSURL.URLWithString_('https://www.apple.com')
-    
-    
-    cachePolicy=NSURLRequestCachePolicy.reloadIgnoringLocalCacheData
+    file_path = str(Path('./src/index.html'))
+
+    myURL = NSURL.fileURLWithPath_(file_path)
+
+    cachePolicy = NSURLRequestCachePolicy.reloadIgnoringLocalCacheData
     timeoutInterval = 10
-    
-    
-    
-    myRequest = NSURLRequest.requestWithURL_cachePolicy_timeoutInterval_(myURL, cachePolicy,timeoutInterval)
-      
-    
+
+    myRequest = NSURLRequest.requestWithURL_cachePolicy_timeoutInterval_(
+      myURL, cachePolicy, timeoutInterval)
+
     self.webView.loadRequest_(myRequest)
 
   @objc_method
   def webView_didFinishNavigation_(self, webView, navigation):
     title = webView.title
-    #pdbr.state(webView.title)
-    #print(webView.title)
     self.navigationItem.title = str(title)
 
 
