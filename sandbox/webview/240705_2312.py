@@ -55,12 +55,14 @@ class WebView(UIViewController,
     myURL = NSURL.fileURLWithPath_(file_path)
 
     cachePolicy = NSURLRequestCachePolicy.reloadIgnoringLocalCacheData
-    timeoutInterval = 10
+    timeoutInterval = 100
 
     myRequest = NSURLRequest.requestWithURL_cachePolicy_timeoutInterval_(
       myURL, cachePolicy, timeoutInterval)
 
     self.webView.loadRequest_(myRequest)
+    #self.webView.reload()
+    #pdbr.state(self.webView)
 
   @objc_method
   def webView_didFinishNavigation_(self, webView, navigation):
