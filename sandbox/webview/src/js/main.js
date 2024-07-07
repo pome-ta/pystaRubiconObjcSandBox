@@ -1,3 +1,6 @@
+// import eruda from "https://esm.sh/eruda@3.0.1"
+// eruda.init()
+
 console.log(1);
 
 function addElement() {
