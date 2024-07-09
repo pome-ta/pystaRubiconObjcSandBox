@@ -7,6 +7,9 @@
 [WKWebViewでLocalStorageやJavascriptが使えない場合 | 株式会社ブリッツゲート](https://blitzgate.co.jp/blog/482/)
 
 
+[iOS のプラットフォーム API | owasp-mastg-ja](https://coky-t.gitbook.io/owasp-mastg-ja/ios-tesutogaido/0x06h-testing-platform-interaction)
+
+
 
 # 📝 2024/07/05
 
