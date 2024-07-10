@@ -1,3 +1,14 @@
+# 📝 2024/07/10
+
+
+```.py
+webConfiguration = WKWebViewConfiguration.new()
+webConfiguration.preferences.setValue_forKey_(True, 'allowFileAccessFromFileURLs')
+```
+
+
+`allowFileAccessFromFileURLs` この子で`.js` 呼べた
+
 # 📝 2024/07/09
 
 ## ローカルの`.js` が読み込まれない
