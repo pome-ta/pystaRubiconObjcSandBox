@@ -295,3 +295,13 @@ class WKNavigationActionPolicy:
   allow: int = 1
   download: int = 2
 
+
+# ref: [NSSearchPathDomainMask | Apple Developer Documentation](https://developer.apple.com/documentation/foundation/nssearchpathdomainmask?language=objc)
+@dataclass
+class NSSearchPathDomainMask:
+  userDomainMask: int = 1
+  localDomainMask: int = 2
+  networkDomainMask: int = 4
+  systemDomainMask: int = 8
+  allDomainsMask: int = 0x0ffff
+
