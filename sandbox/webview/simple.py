@@ -30,15 +30,17 @@ class WebView(UIViewController,
 
   @objc_method
   def loadView(self):
+    print('l')
     webConfiguration = WKWebViewConfiguration.new()
     self.webView = WKWebView.alloc().initWithFrame_configuration_(
       CGRectZero, webConfiguration)
-    self.webView.uiDelegate = self
-    self.webView.navigationDelegate = self
+    #self.webView.uiDelegate = self
+    #self.webView.navigationDelegate = self
     self.view = self.webView
 
   @objc_method
   def viewDidLoad(self):
+    print('d')
     send_super(__class__, self, 'viewDidLoad')  # xxx: 不要?
     title = NSStringFromClass(__class__)
     self.navigationItem.title = title
@@ -49,10 +51,12 @@ class WebView(UIViewController,
     myRequest = NSURLRequest.requestWithURL_(myURL)
     self.webView.loadRequest_(myRequest)
 
+  '''
   @objc_method
   def webView_didFinishNavigation_(self, webView, navigation):
     title = webView.title
     self.navigationItem.title = str(title)
+  '''
 
 
 if __name__ == '__main__':
