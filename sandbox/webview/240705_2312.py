@@ -40,7 +40,9 @@ class WebView(UIViewController,
       CGRectZero, webConfiguration)
     self.webView.uiDelegate = self
     self.webView.navigationDelegate = self
+
     self.view = self.webView
+    #print(self.view)
 
   @objc_method
   def viewDidLoad(self):
@@ -67,7 +69,7 @@ class WebView(UIViewController,
   @objc_method
   def webView_didFinishNavigation_(self, webView, navigation):
     title = webView.title
-    self.navigationItem.title = str(title)
+    #self.navigationItem.title = str(title)
 
 
 if __name__ == '__main__':
@@ -76,6 +78,7 @@ if __name__ == '__main__':
   from rbedge import pdbr
 
   main_vc = WebView.new()
+  #print(main_vc)
 
   present_viewController(main_vc)
 
