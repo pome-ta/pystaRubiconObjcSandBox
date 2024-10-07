@@ -69,7 +69,7 @@ class WebView(UIViewController,
   @objc_method
   def webView_didFinishNavigation_(self, webView, navigation):
     title = webView.title
-    #self.navigationItem.title = str(title)
+    self.navigationItem.title = str(title)
 
 
 if __name__ == '__main__':

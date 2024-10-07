@@ -3,6 +3,8 @@
 
 console.log(1);
 
+document.title = 'hoge';
+
 function addElement() {
   // 新しい div 要素を作成します
   const newDiv = document.createElement('div');
