@@ -80,7 +80,7 @@ class ViewController(UIViewController, protocols=[
 
     section = NSCollectionLayoutSection.sectionWithGroup_(group)
     section.interGroupSpacing = 0
-    section.contentInsets = NSDirectionalEdgeInsetsMake(10.0, 10.0, 10.0, 10.0)
+    #section.contentInsets = NSDirectionalEdgeInsetsMake(10.0, 10.0, 10.0, 10.0)
 
     layout = UICollectionViewCompositionalLayout.alloc().initWithSection_(
       section)
