@@ -1,3 +1,14 @@
+# 📝 2024/10/14
+
+## ドキュメントの機械翻訳
+
+[Rubicon Objective-C](https://rubicon-objc.readthedocs.io/en/stable/)
+
+[Tutorial](https://rubicon-objc.readthedocs.io/en/stable/tutorial/index.html) と[How-to guides](https://rubicon-objc.readthedocs.io/en/stable/how-to/index.html) をやっていく
+
+
+
+
 # 📝 2024/03/24
 
 ## objc のclass のプリントデバッグ用スクリプト
