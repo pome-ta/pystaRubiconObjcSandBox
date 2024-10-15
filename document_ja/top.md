@@ -15,7 +15,7 @@ Rubicon Objective-Cは、Objective-CとPythonの間の架け橋です。こ�
 
 ## 目次: Table of contents
 
-### [チュートリアル: Tutorial](/Tutorial/index.md)
+### [チュートリアル: Tutorial](./Tutorials/index.md)
 
 初心者向けの実践的な紹介から始めましょう
 
