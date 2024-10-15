@@ -6,8 +6,13 @@
 
 [Tutorial](https://rubicon-objc.readthedocs.io/en/stable/tutorial/index.html) と[How-to guides](https://rubicon-objc.readthedocs.io/en/stable/how-to/index.html) をやっていく
 
+### 書き方ルール
 
+定義しとかんと、バラバラになりそうやな
 
+- `()` は半角
+- なるべく基に沿って、補足的に日本語にする？
+- ヘッダーは`翻訳: 原語` と、二つ並べる
 
 # 📝 2024/03/24
 
