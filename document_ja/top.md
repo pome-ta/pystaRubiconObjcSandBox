@@ -2,16 +2,13 @@
 
 > [Rubicon 0.4.9](https://rubicon-objc.readthedocs.io/en/stable/index.html)
 
-Rubicon Objective-Cは、Objective-CとPythonの間の架け橋です。これにより、次のことが可能になります:
+Rubicon Objective-C は、Objective-C と Python の間の架け橋です。これにより、次のことが可能になります:
 
 - Python を使用して、Objective-C で定義されたオブジェクトをインスタンス化します
 - Python を使用して、Objective-C で定義されたオブジェクトのメソッドを呼び出し、および
 - Python で Objective-C クラスをサブクラス化して拡張します
 
-
 また、Foundation framework からのいくつかの重要なデータタイプのラッパーも含まれています(例:`NSString`)。
-
-
 
 ## 目次: Table of contents
 
@@ -39,6 +36,4 @@ Rubicon は[BeeWare suite](https://beeware.org/) の一部です。コミュ�
 - [Discord](https://beeware.org/bee/chat/)
 - The Rubicon-ObjC [Github Discussions forum](https://github.com/beeware/rubicon-objc/discussions)
 
-
 Next [チュートリアル: Tutorials](./Tutorials/index.md) >
-
