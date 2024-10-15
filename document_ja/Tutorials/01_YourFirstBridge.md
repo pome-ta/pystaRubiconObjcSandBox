@@ -36,3 +36,25 @@ base = NSURL.URLWithString("https://beeware.org/")
 ```python
 full = NSURL.URLWithString("contributing/", relativeToURL=base)
 ```
+
+
+2番目の引数(`relativeToURL`) は、キーワード引数としてアクセスされます。この引数はタイプ`NSURL *` であると宣言されます。`base` は`NSURL` のインスタンスであるため、Rubicon はこのインスタンスを通過できます。
+
+時々、Objective-C メソッド定義は同じキーワード引数名を2回使用します(たとえば、`NSLayoutConstraint` には`+constraintWithItem:attribute:relatedBy:toItem:attribute:multiplier:constant:` selector があり、属性キーワードを2回使用します)。これはObjective-C では合法ですが、メソッド呼び出しでキーワード引数を繰り返すことができないため、Pythonでは合法ではありません。この場合、あいまいなキーワード引数に`__` 接尾辞を使用して一意にすることができます。Objective-C 呼び出しを行うと、`__` 以降のコンテンツが削除されます。
+
+
+```python
+constraint = NSLayoutConstraint.constraintWithItem(
+  first_item,
+  attribute__1=first_attribute,
+  relatedBy=relation,
+  toItem=second_item,
+  attribute__2=second_attribute,
+  multiplier=2.0,
+  constant=1.0
+)
+```
+
+## インスタンスメソッド: Instance methods
+
+
