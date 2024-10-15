@@ -1,6 +1,6 @@
 # Rubicon Objective-C
 
-[Rubicon Objective-C](https://rubicon-objc.readthedocs.io/en/stable/)
+> [Rubicon Objective-C](https://rubicon-objc.readthedocs.io/en/stable/)
 
 Rubicon Objective-Cは、Objective-CとPythonの間の架け橋です。これにより、次のことが可能になります:
 
