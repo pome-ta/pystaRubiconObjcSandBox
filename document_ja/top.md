@@ -40,5 +40,5 @@ Rubicon は[BeeWare suite](https://beeware.org/) の一部です。コミュ�
 - The Rubicon-ObjC [Github Discussions forum](https://github.com/beeware/rubicon-objc/discussions)
 
 
-Next [Tutorials](https://rubicon-objc.readthedocs.io/en/stable/tutorial/index.html) >
+Next [チュートリアル: Tutorials](./Tutorials/index.md) >
 
