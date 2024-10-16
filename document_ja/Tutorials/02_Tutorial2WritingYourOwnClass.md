@@ -74,3 +74,50 @@ class PureHandler(NSObject):
 ```
 
 これは、属性へのアクセスまたは変更方法に何も変更しません。Objective-C コードが属性も表示できることを意味します。
+
+
+## クラスの命名: Class naming
+
+この改訂された例では、別のクラス名である`PureHandler` も使用したことに注意してください。Objective-C には名前空間の概念がないため、これは意図的なものです。その結果、プロセス内の任意の名前のクラスを1つだけ定義できるため、同じPython シェルで2番目のハンドラークラスを定義することはできません。試すと、エラーが表示されます。
+
+
+```python
+class Handler(NSObject):
+    pass
+# > Traceback (most recent call last)
+#   RuntimeError: An Objective-C class named b'Handler' already exists
+#   RuntimeError: b'Handler'という名前のObjective-Cクラスがすでに存在します
+```
+
+クラス名を選ぶときは、注意する必要があります(そして時には、痛みを伴うほど冗長です)。
+
+クラス名の再利用を許可するには、クラス変数 [`auto_rename`](https://rubicon-objc.readthedocs.io/en/stable/reference/rubicon-objc-api.html#rubicon.objc.api.ObjCClass.auto_rename) を `True` に設定できます。このオプションは、命名の衝突が検出された場合、Objective C クラスの自動名前の変更を可能にします:
+
+```python
+ObjCClass.auto_rename = True
+```
+
+このオプションは、クラス宣言の [`auto_rename`](https://rubicon-objc.readthedocs.io/en/stable/reference/rubicon-objc-api.html#rubicon.objc.api.ObjCClass.auto_rename) 引数を使用して、クラスごとに有効にすることもできます:
+
+```python
+class Handler(NSObject, auto_rename=True):
+    pass
+```
+
+
+このオプションを使用すると、Objective C クラス名には数値接尾辞(例:`Handler_2`)があります。Python クラス名は変更されません。
+
+
+## `__init__()` は無い？: What, no __init__()?
+
+また、サンプルコードには、通常 Python コードに期待するような `__init__()` メソッドがないことに気付くでしょう。Objective-C クラスを定義するときは、Objective-C オブジェクトのライフサイクルに従う必要があります。つまり、Objective-C ランタイムに表示される初期化メソッドを定義し、そのブリッジを介して呼び出すことを意味します。
+
+
+## 次のステップ: Next steps
+
+???
+
+< Previous [あなたの最初の橋: Your first bridge](./01_YourFirstBridge.md)
+
+Next [ハウツーガイド: How-to Guides](../HowToGuides/index.md) >
+
