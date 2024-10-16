@@ -21,7 +21,7 @@ NSURL = ObjCClass("NSURL")
 これにより、Objective-C ランタイムの`NSURL` クラスに透過的にブリッジされたPythonの`NSURL` クラスが得られます。[`NSURL` に関するAppleのドキュメント](https://developer.apple.com/documentation/foundation/nsurl?language=objc) に記載されているすべての方法またはプロパティは、このブリッジを介してアクセスできます。
 
 
-`NSURL` オブジェクトのインスタンスを作成しましょう。`NSURL` ドキュメントでは、静的コンストラクタ `+URLWithString:` が記述されています。このコンストラクタは次のように呼び出すことができます:
+`NSURL` オブジェクトのインスタンスを作成しましょう。`NSURL` ドキュメントでは、静的コンストラクタ(static constructor) `+URLWithString:` が記述されています。このコンストラクタは次のように呼び出すことができます:
 
 ```python
 base = NSURL.URLWithString("https://beeware.org/")
@@ -57,4 +57,63 @@ constraint = NSLayoutConstraint.constraintWithItem(
 
 ## インスタンスメソッド: Instance methods
 
+
+
+これまで、'`+URLWithString:` 静的コンストラクタ(g: static constructor) を使用してきました。ただし、`NSUR` Lは初期化メソッド`-initWithString:` も提供します。この方法を使用するには、まずObjective-C ランタイムにインスタンスのメモリを割り当てるように指示し、次に初期化子を呼び出す必要があります:
+
+```python
+base = NSURL.alloc().initWithString("https://beeware.org/")
+```
+
+`NSURL` のインスタンスがあるので、操作する必要があります。`NSURL` は `absoluteURL` プロパティを記述します。このプロパティは Python 属性としてアクセスできます。
+
+
+```python
+absolute = full.absoluteURL
+```
+
+インスタンスでメソッドを呼び出すこともできます:
+
+```python
+longer = absolute.URLByAppendingPathComponent('how/first-time/')
+```
+
+
+コンソールでオブジェクトを出力する場合は、Objective-C プロパティの説明を使用するか、デバッグ出力には`debugDescription` を使用できます:
+
+
+```python
+longer.description
+# > 'https://beeware.org/contributing/how/first-time/'
+
+longer.debugDescription
+# > 'https://beeware.org/contributing/how/first-time/'
+```
+
+内部的には、`description` と`debugDescription` は、それぞれPythonの同等の`__str__()` と`__repr__()` に接続されています。
+
+
+```python
+str(absolute)
+# > 'https://beeware.org/contributing/'
+
+repr(absolute)
+# > '<ObjCInstance: NSURL at 0x1114a3cf8: https://beeware.org/contributing/>'
+
+print(absolute)
+# > https://beeware.org/contributing/
+```
+
+## 世界を乗っ取る時が来た！: Time to take over the world!
+
+これで、どのクラスでも、どのライブラリでも、macOSまたはiOSエコシステム全体で、あらゆる方法にアクセスできます!Objective-C で何かを呼び出すことができれば、Python で呼び出すことができます。必要なのは:
+
+> - ctypesでライブラリをロード
+> - 使用したいクラスを登録、そして
+> - これらのクラスをPythonで書かれたかのように使用してください。
+
+
+## 次のステップ: Next steps
+
+次のステップは、独自のクラスを作成し、それらをObjective-C ランタイムに公開することです。それが次のチュートリアルの主題です。
 
