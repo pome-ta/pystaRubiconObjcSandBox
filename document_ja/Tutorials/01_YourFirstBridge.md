@@ -115,5 +115,10 @@ print(absolute)
 
 ## 次のステップ: Next steps
 
-次のステップは、独自のクラスを作成し、それらをObjective-C ランタイムに公開することです。それが次のチュートリアルの主題です。
+次のステップは、独自のクラスを作成し、それらをObjective-C ランタイムに公開することです。それが[次のチュートリアル](./02_Tutorial2WritingYourOwnClass.md) の主題です。
+
+
+< Previous [Tutorials](./index.md)
+
+Next [チュートリアル2 - あなた自身のクラスを書く: Tutorial 2 - Writing your own class](./02_Tutorial2WritingYourOwnClass.md) >
 
