@@ -76,6 +76,8 @@ class TodoRepository:
 
 
 class TodoListViewController(UIViewController):
+  collectionView = objc_property(weak=True)
+  dataSource = objc_property()
 
   @objc_method
   def viewDidLoad(self):
@@ -107,7 +109,7 @@ class TodoListViewController(UIViewController):
       print('Block: sectionProvider')
       # xxx: `sectionIndex`, 'NSInteger' ? `objc_id` ? `int` ?
       layoutEnvironment = ObjCInstance(_layoutEnvironment)
-      
+
       #print(layoutEnvironment.container.effectiveContentSize.width)
       #pdbr.state(layoutEnvironment)
       #print(sectionIndex)
@@ -121,7 +123,8 @@ class TodoListViewController(UIViewController):
       #pdbr.state(layoutSection)
       return layoutSection
 
-    layout = UICollectionViewCompositionalLayout.alloc().initWithSectionProvider_(sectionProvider)
+    layout = UICollectionViewCompositionalLayout.alloc(
+    ).initWithSectionProvider_(sectionProvider)
     #pdbr.state(layout)
     #layout = UICollectionViewCompositionalLayout.alloc().initWithSection_(ObjCInstance(sectionProvider))
 
@@ -181,9 +184,11 @@ class TodoListViewController(UIViewController):
     todoCellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
       UICollectionViewListCell, configurationHandler)
 
+    print('d')
+    
     self.dataSource = UICollectionViewDiffableDataSource.alloc(
-    ).initWithCollectionView_cellProvider_(self.collectionView,
-                                           cellProvider)
+    ).initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
+    print(self.dataSource)
 
   @objc_method
   def applySnapshot(self):
@@ -213,5 +218,4 @@ if __name__ == '__main__':
   style = UIModalPresentationStyle.fullScreen
   present_viewController(todo_vc, style)
   #print(CGRectZero)
-
 
