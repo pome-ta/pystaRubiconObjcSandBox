@@ -12,3 +12,8 @@ pip install rubicon-objc
 ```
 
 これで、Rubicon を使用する準備が整いました!次のステップは、最初のステップを段階的に説明し、慣れる必要がある重要な概念を紹介する [チュートリアル: Tutorial](./Tutorials/index.md) に取り組むことです。
+
+
+< Previous [ハウツーガイド: How-to Guides](../HowToGuides/index.md)
+
+Next [あなたは私のタイプではありません:PythonでObjective-Cタイプを使用する: You’re just not my type: Using Objective-C types in Python](./02_typeMapping.md) >
