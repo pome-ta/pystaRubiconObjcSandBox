@@ -7,3 +7,7 @@
 
 - [Rubicon を使い始める: Getting Started with Rubicon](./01_GettingStartedWithRubicon.md)
 
+
+< Previous [チュートリアル2 - あなた自身のクラスを書く: Tutorial 2 - Writing your own class](./02_Tutorial2WritingYourOwnClass.md)
+
+Next [Rubicon を使い始める: Getting Started with Rubicon](./01_GettingStartedWithRubicon.md) >
