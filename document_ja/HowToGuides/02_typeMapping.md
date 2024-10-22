@@ -18,7 +18,7 @@ Objective-Cオブジェクトの渡しと返すには、追加の作業は
 
 
 
-他のすべてのパラメータと戻り値タイプ(プリミティブ、ポインタ、構造体)は、Rubicon とObjective-C にどのタイプを期待するかを伝えるために注釈付けする必要があります。これらのアノテーションは、[NSInteger](https://rubicon-objc.readthedocs.io/en/stable/reference/rubicon-objc-types.html#rubicon.objc.types.NSInteger) や[NSRange](https://rubicon-objc.readthedocs.io/en/stable/reference/rubicon-objc-types.html#rubicon.objc.types.NSRange) などのRubiconによって定義された型と、c_byteやc_doubleなどの[ctypes](https://docs.python.org/ja/3.10/library/ctypes.html#module-ctypes) モジュールの標準C型を使用できます。
+他のすべてのパラメータと戻り値タイプ(プリミティブ、ポインタ、構造体)は、Rubicon とObjective-C にどのタイプを期待するかを伝えるために注釈付けする必要があります。これらのアノテーションは、[`NSInteger`](https://rubicon-objc.readthedocs.io/en/stable/reference/rubicon-objc-types.html#rubicon.objc.types.NSInteger) や[`NSRange`](https://rubicon-objc.readthedocs.io/en/stable/reference/rubicon-objc-types.html#rubicon.objc.types.NSRange) などのRubiconによって定義された型と、[`c_byte`](https://docs.python.org/ja/3.10/library/ctypes.html#ctypes.c_byte) や[`c_double`](https://docs.python.org/ja/3.10/library/ctypes.html#ctypes.c_double) などの[`ctypes`](https://docs.python.org/ja/3.10/library/ctypes.html#module-ctypes) モジュールの標準C型を使用できます。
 
 たとえば、C `double` を取り、`NSInteger` を返すメソッドは、次のように定義され、注釈付けされます。
 
@@ -29,5 +29,6 @@ def roundToZero_(self, value: c_double) -> NSInteger:
     return int(value)
 ```
 
-また、Rubicon は特定のPythonタイプをメソッドシグネチャで使用でき、それらを一致するプリミティブ`ctypes` タイプに変換します。たとえば、Python `int` は `c_int` として扱われ、`float` は `c_double` として扱われます。
+また、Rubicon は特定のPythonタイプをメソッドシグネチャで使用でき、それらを一致するプリミティブ`ctypes` タイプに変換します。たとえば、Python `int` は [`c_int`](https://docs.python.org/ja/3.10/library/ctypes.html#ctypes.c_int) として扱われ、`float` は [`c_double`](https://docs.python.org/ja/3.10/library/ctypes.html#ctypes.c_double) として扱われます。
+
 
