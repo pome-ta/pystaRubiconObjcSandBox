@@ -29,6 +29,6 @@ def roundToZero_(self, value: c_double) -> NSInteger:
     return int(value)
 ```
 
-また、Rubicon は特定のPythonタイプをメソッドシグネチャで使用でき、それらを一致するプリミティブ`ctypes` タイプに変換します。たとえば、Python `int` は [`c_int`](https://docs.python.org/ja/3.10/library/ctypes.html#ctypes.c_int) として扱われ、`float` は [`c_double`](https://docs.python.org/ja/3.10/library/ctypes.html#ctypes.c_double) として扱われます。
+また、Rubicon は特定のPythonタイプをメソッドシグネチャで使用でき、それらを一致するプリミティブ`ctypes` タイプに変換します。たとえば、Python [`int`](https://docs.python.org/ja/3.10/library/functions.html#int) は [`c_int`](https://docs.python.org/ja/3.10/library/ctypes.html#ctypes.c_int) として扱われ、[`float`](https://docs.python.org/ja/3.10/library/functions.html#float) は [`c_double`](https://docs.python.org/ja/3.10/library/ctypes.html#ctypes.c_double) として扱われます。
 
 
