@@ -36,4 +36,21 @@ def roundToZero_(self, value: c_double) -> NSInteger:
 > [rubicon.objc.types](https://rubicon-objc.readthedocs.io/en/stable/reference/rubicon-objc-types.html#module-rubicon.objc.types) 参照ドキュメントには、Rubiconが提供するすべてのC型定義が一覧表示され、Rubiconが型をどのように変換するかに関する追加情報が記載されています。
 
 
+## タイプ変換: Type conversions
+
+既存のObjective-Cメソッドを呼び出すと、Rubiconは各引数に必要な型と返されるものをすでに知っています。この型情報に基づいて、Rubiconは渡された引数を適切なObjective-C型に自動的に変換し、戻り値を適切なPython型に変換します。これにより、多くの場合、Python と Objective-C タイプ間の明示的なタイプ変換が不要になります。
+
+
+### 引数変換: Argument conversion
+
+Objective-CメソッドがCプリミティブ引数を期待する場合、代わりに同等のPython値を渡すことができます。たとえば、Pythonの`int`値は任意の整数引数(`int`、`NSInteger`、`uint8_t`、...)に渡され、Python `float`値は任意の浮動小数点引数(`double`、`CGFloat`、...)に渡すことができます。
+
+
+C構造を引数として渡すには、通常、構造インスタンスを名前で構築する必要があります。これは、特にネストされた構造(例:`NSRect(NSPoint(1.2, 3.4), NSSize(5.6, 7.8))`)。略語として、ルビコンは構造オブジェクトの代わりにタプルを渡すことができます(例:`((1.2, 3.4), (5.6, 7.8))`)およびそれらを必要な構造タイプに自動的に変換します。
+
+パラメータがObjective-Cオブジェクトを期待している場合、特定のPythonオブジェクトを渡すこともできます。これは自動的にObjective-Cオブジェクトに変換されます。たとえば、Python `str` は `NSString` に変換され、`bytes` は `NSData` などに変換されます。コレクションもサポートされています。リストと辞書は`NSArray`と`NSDictionary`に変換され、それらの要素は再帰的に変換されます。
+
+
+> [!NOTE]
+> これらの変換はすべて手動で実行することもできます。詳細については、手動変換を参照してください。
 
