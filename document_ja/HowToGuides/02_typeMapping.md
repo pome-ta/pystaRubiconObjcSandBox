@@ -51,3 +51,10 @@ C 構造を引数として渡すには、通常、構造インスタンスを名
 メソッドから返されたプリミティブ値は、通常の`ctypes` 変換を使用して変換されます。C 整数は Python `int` に変換され、浮動小数点値は Python `float` に変換されます。
 
 
+
+Objective-Cオブジェクトは自動的に[`ObjCInstance`](https://rubicon-objc.readthedocs.io/en/stable/reference/rubicon-objc-api.html#rubicon.objc.api.ObjCInstance)オブジェクトとして返されるため、メソッドを呼び出してプロパティにアクセスできます。場合によっては、RubiconはObjective-Cオブジェクトに追加のPythonメソッドも提供します。詳細については、PythonスタイルのAPIとObjective-Cオブジェクトのメソッドを参照してください。
+
+## Objective-Cメソッドの呼び出し: Invoking Objective-C methods
+
+Objective-Cクラスがラップされると、そのクラス(またはそのクラスのインスタンス)のセレクターは、Pythonクラスのメソッドであるかのように呼び出すことができます。各Objective-Cセレクターは、セレクターのコロンをアンダースコアに置き換えることで、Pythonメソッド名に変換されます。
+
