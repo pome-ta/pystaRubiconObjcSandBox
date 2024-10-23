@@ -32,3 +32,8 @@ def roundToZero_(self, value: c_double) -> NSInteger:
 また、Rubicon は特定のPythonタイプをメソッドシグネチャで使用でき、それらを一致するプリミティブ`ctypes` タイプに変換します。たとえば、Python [`int`](https://docs.python.org/ja/3.10/library/functions.html#int) は [`c_int`](https://docs.python.org/ja/3.10/library/ctypes.html#ctypes.c_int) として扱われ、[`float`](https://docs.python.org/ja/3.10/library/functions.html#float) は [`c_double`](https://docs.python.org/ja/3.10/library/ctypes.html#ctypes.c_double) として扱われます。
 
 
+> [!NOTE]
+> [rubicon.objc.types](https://rubicon-objc.readthedocs.io/en/stable/reference/rubicon-objc-types.html#module-rubicon.objc.types) 参照ドキュメントには、Rubiconが提供するすべてのC型定義が一覧表示され、Rubiconが型をどのように変換するかに関する追加情報が記載されています。
+
+
+
