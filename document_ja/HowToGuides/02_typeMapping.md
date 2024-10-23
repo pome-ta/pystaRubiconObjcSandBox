@@ -26,7 +26,8 @@ def roundToZero_(self, value: c_double) -> NSInteger:
 
 また、Rubicon は特定の Python タイプをメソッドシグネチャで使用でき、それらを一致するプリミティブ`ctypes` タイプに変換します。たとえば、Python [`int`](https://docs.python.org/ja/3.10/library/functions.html#int) は [`c_int`](https://docs.python.org/ja/3.10/library/ctypes.html#ctypes.c_int) として扱われ、[`float`](https://docs.python.org/ja/3.10/library/functions.html#float) は [`c_double`](https://docs.python.org/ja/3.10/library/ctypes.html#ctypes.c_double) として扱われます。
 
-> [!NOTE] > [rubicon.objc.types](https://rubicon-objc.readthedocs.io/en/stable/reference/rubicon-objc-types.html#module-rubicon.objc.types) 参照ドキュメントには、Rubicon が提供するすべての C 型定義が一覧表示され、Rubicon が型をどのように変換するかに関する追加情報が記載されています。
+> [!NOTE]
+> [rubicon.objc.types](https://rubicon-objc.readthedocs.io/en/stable/reference/rubicon-objc-types.html#module-rubicon.objc.types) 参照ドキュメントには、Rubicon が提供するすべての C 型定義が一覧表示され、Rubicon が型をどのように変換するかに関する追加情報が記載されています。
 
 ## タイプ変換: Type conversions
 
@@ -42,3 +43,11 @@ C 構造を引数として渡すには、通常、構造インスタンスを名
 
 > [!NOTE]
 > これらの変換はすべて手動で実行することもできます。詳細については、手動変換を参照してください。
+
+
+
+### 戻り値の変換とラッピング: Return value conversion and wrapping
+
+メソッドから返されたプリミティブ値は、通常の`ctypes` 変換を使用して変換されます。C 整数は Python `int` に変換され、浮動小数点値は Python `float` に変換されます。
+
+
