@@ -2,17 +2,15 @@
 note: 迷走中
 ref: [モダンなUICollectionViewでシンプルなリストレイアウト その1 〜 概要](https://zenn.dev/samekard_dev/articles/43991e9321b6c9)
   - Diffable DataSource
-
-
 """
 import ctypes
+
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
 from pyrubicon.objc.api import objc_method, objc_property, at
 from pyrubicon.objc.runtime import send_super, objc_id
 
 #from rbedge.types import NSDirectionalEdgeInsetsMake
-from rbedge.enumerations import UICollectionLayoutListAppearance, UIViewAutoresizing
-
+from rbedge.enumerations import UIViewAutoresizing
 from rbedge.functions import NSStringFromClass
 
 UIViewController = ObjCClass('UIViewController')
@@ -39,6 +37,8 @@ UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
 
 NSDiffableDataSourceSnapshot = ObjCClass('NSDiffableDataSourceSnapshot')
 
+NSUUID = ObjCClass('NSUUID')
+
 prefectures = [
   '福岡',
   '佐賀',
@@ -52,16 +52,15 @@ prefectures = [
 
 class ViewController(UIViewController):
 
-  #dataSource: UICollectionViewDiffableDataSource = objc_property(weak=True)
-  #dataSource: UICollectionViewDiffableDataSource = objc_property()
-  #collectionView: UICollectionView = objc_property(weak=True)
-
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')  # xxx: 不要?
     # --- Navigation
     title = NSStringFromClass(__class__)
     self.navigationItem.title = title
+
+    # xxx: 先に宣言してみる
+    #self.collectionView = UICollectionView.alloc()
 
     self.configureHierarchy()
     self.configureDataSource()
@@ -70,7 +69,9 @@ class ViewController(UIViewController):
   def viewDidAppear_(self, animated: bool):
     # xxx: 引数不要?
     send_super(__class__, self, 'viewDidAppear:')
-    #print('viewDidAppear')
+    print('viewDidAppear')
+    pdbr.state(self.collectionView)
+    
 
   @objc_method
   def createLayout(self) -> ctypes.py_object:
@@ -100,8 +101,8 @@ class ViewController(UIViewController):
   def configureHierarchy(self):
     view = self.view
 
-    self.collectionView = UICollectionView.alloc(
-    ).initWithFrame_collectionViewLayout_(view.bounds, self.createLayout())
+    #self.collectionView.initWithFrame_collectionViewLayout_(view.bounds, self.createLayout())
+    self.collectionView = UICollectionView.alloc().initWithFrame_collectionViewLayout_(view.bounds, self.createLayout())
 
     #self.collectionView.autoresizingMask = UIViewAutoresizing.flexibleHeight | UIViewAutoresizing.flexibleWidth
 
@@ -115,46 +116,53 @@ class ViewController(UIViewController):
     print('configureDataSource')
 
     @Block
-    def configurationHandler(cell: objc_id, _indexPath: objc_id,
-                             item: objc_id) -> None:
+    def configurationHandler(_cell: objc_id, _indexPath: objc_id,
+                             _item: objc_id) -> None:
       print('Block: configurationHandler')
-      '''
-      #cell = ObjCInstance(_cell)
+
+      cell = ObjCInstance(_cell)
       indexPath = ObjCInstance(_indexPath)
-      #item = ObjCInstance(_item)
+      item = ObjCInstance(_item)
       # wip: 後ほど独自拡張
       configuration = cell.defaultContentConfiguration()
-      configuration.setText_(item)
-      #cell.setContentConfiguration_(configuration)
-      '''
+      configuration.setText_('hoge')
+      cell.setContentConfiguration_(configuration)
 
-    @Block
-    def cellProvider(collectionView: objc_id, _indexPath: objc_id,
-                     item: objc_id) -> ctypes.py_object:
-      print('Block: cellProvider')
-      #collectionView = ObjCInstance(_collectionView)
-      indexPath = ObjCInstance(_indexPath)
-      #item = ObjCInstance(_item)
-
-      return self.collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
-        cellRegistration, _indexPath, item)
 
     cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
       UICollectionViewListCell, configurationHandler)
 
-    self.dataSource = UICollectionViewDiffableDataSource.alloc(
+
+    @Block
+    def cellProvider(_collectionView: objc_id, _indexPath: objc_id,
+                     _item: objc_id) -> ctypes.py_object:
+      print('Block: cellProvider')
+      collectionView = ObjCInstance(_collectionView)
+      indexPath = ObjCInstance(_indexPath)
+      item = ObjCInstance(_item)
+
+      return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
+        cellRegistration, indexPath, item)
+
+    
+
+    dataSource = UICollectionViewDiffableDataSource.alloc(
     ).initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
-    #pdbr.state(dataSource)
-    #pdbr.state(self.collectionView)
+    
+    
 
     snapshot = NSDiffableDataSourceSnapshot.alloc().init()
     snapshot.appendSectionsWithIdentifiers_(at([0]))
-    #snapshot.appendItemsWithIdentifiers_(at([]))
-    #snapshot.appendItemsWithIdentifiers_(at([prefectures]))
-    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(at([]), 0)
-    #snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(at(prefectures), 0)
-
-    self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(
+      at([
+        NSUUID.UUID(),
+        NSUUID.UUID(),
+        #prefectures
+      ]), 0)
+    dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+    #self.collectionView.setDataSource_(dataSource)
+    #pdbr.state(snapshot)
+    #pdbr.state(dataSource)
 
 
 if __name__ == '__main__':

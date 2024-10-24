@@ -89,7 +89,7 @@ class TableViewControllerTest(UITableViewController):
     content.textProperties.numberOfLines = 1
 
     cell.contentConfiguration = content
-    pdbr.state(tableView)
+    pdbr.state(indexPath)
     #print(tableView.style)
     return cell
 
