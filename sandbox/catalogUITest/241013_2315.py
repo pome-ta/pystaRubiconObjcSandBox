@@ -76,8 +76,8 @@ class TodoRepository:
 
 
 class TodoListViewController(UIViewController):
-  collectionView = objc_property(weak=True)
-  dataSource = objc_property()
+  #collectionView = objc_property(weak=True)
+  #dataSource = objc_property()
 
   @objc_method
   def viewDidLoad(self):
@@ -105,7 +105,7 @@ class TodoListViewController(UIViewController):
 
     @Block
     def sectionProvider(sectionIndex: NSInteger,
-                        _layoutEnvironment: objc_id) -> objc_id:
+                        _layoutEnvironment: objc_id) -> ctypes.c_void_p:
       print('Block: sectionProvider')
       # xxx: `sectionIndex`, 'NSInteger' ? `objc_id` ? `int` ?
       layoutEnvironment = ObjCInstance(_layoutEnvironment)
@@ -170,7 +170,7 @@ class TodoListViewController(UIViewController):
 
     @Block
     def cellProvider(_collectionView: objc_id, _indexPath: objc_id,
-                     _itemIdentifier: objc_id) -> objc_id:
+                     _itemIdentifier: objc_id) -> ctypes.py_object:
       print('Block: cellProvider')
       collectionView = ObjCInstance(_collectionView)
       indexPath = ObjCInstance(_indexPath)
@@ -203,7 +203,7 @@ class TodoListViewController(UIViewController):
     #snapshot.appendItemsWithIdentifiers_(self.repository.todoIDs)
     #snapshot.appendItemsWithIdentifiers_([])
     #pdbr.state(snapshot)
-    self.dataSource.applySnapshot_animatingDifferences_(snapshot, True)
+    self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
     print('h')
     #pdbr.state(self.dataSource)
     #pdbr.state(self.collectionView)

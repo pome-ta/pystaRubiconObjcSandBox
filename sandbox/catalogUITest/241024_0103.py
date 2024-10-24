@@ -43,6 +43,7 @@ NSDiffableDataSourceSnapshot = ObjCClass('NSDiffableDataSourceSnapshot')
 class ViewController(UIViewController):
 
   #dataSource: UICollectionViewDiffableDataSource = objc_property(weak=True)
+  #dataSource: UICollectionViewDiffableDataSource = objc_property()
   collectionView: UICollectionView = objc_property(weak=True)
 
   @objc_method
@@ -139,7 +140,7 @@ class ViewController(UIViewController):
     #snapshot.appendItemsWithIdentifiers_(at(['f',]))
     snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(
       at([
-        'f',
+        'f','h',
       ]), 0)
 
     dataSource.applySnapshot_animatingDifferences_(snapshot, True)
