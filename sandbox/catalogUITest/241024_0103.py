@@ -5,6 +5,7 @@ ref: [モダンなUICollectionViewでシンプルなリストレイア�
 
 
 """
+import ctypes
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
 from pyrubicon.objc.api import objc_method, objc_property, at
 from pyrubicon.objc.runtime import send_super, objc_id
@@ -16,6 +17,7 @@ from rbedge.functions import NSStringFromClass
 
 UIViewController = ObjCClass('UIViewController')
 UICollectionView = ObjCClass('UICollectionView')
+
 UICollectionViewDiffableDataSource = ObjCClass(
   'UICollectionViewDiffableDataSource')
 
@@ -25,10 +27,22 @@ NSCollectionLayoutItem = ObjCClass('NSCollectionLayoutItem')
 NSCollectionLayoutGroup = ObjCClass('NSCollectionLayoutGroup')
 NSCollectionLayoutSection = ObjCClass('NSCollectionLayoutSection')
 
+UICollectionViewLayout = ObjCClass('UICollectionViewLayout')
+UICollectionViewCompositionalLayout = ObjCClass(
+  'UICollectionViewCompositionalLayout')
+
+UICollectionViewCellRegistration = ObjCClass(
+  'UICollectionViewCellRegistration')
+
+# wip: 後ほど独自拡張
+UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
+
+NSDiffableDataSourceSnapshot = ObjCClass('NSDiffableDataSourceSnapshot')
+
 
 class ViewController(UIViewController):
 
-  dataSource: UICollectionViewDiffableDataSource = objc_property(weak=True)
+  #dataSource: UICollectionViewDiffableDataSource = objc_property(weak=True)
   collectionView: UICollectionView = objc_property(weak=True)
 
   @objc_method
@@ -39,6 +53,7 @@ class ViewController(UIViewController):
     self.navigationItem.title = title
 
     self.configureHierarchy()
+    self.configureDataSource()
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -47,7 +62,7 @@ class ViewController(UIViewController):
     #print('viewDidAppear')
 
   @objc_method
-  def createLayout(self):
+  def createLayout(self) -> ctypes.py_object:
     itemSize = NSCollectionLayoutSize.sizeWithWidthDimension_heightDimension_(
       NSCollectionLayoutDimension.fractionalWidthDimension_(1.0),
       NSCollectionLayoutDimension.fractionalHeightDimension_(1.0))
@@ -61,16 +76,73 @@ class ViewController(UIViewController):
       ]))
     section = NSCollectionLayoutSection.sectionWithGroup_(group)
     section.setInterGroupSpacing_(0)
-    
+
+    # wip: `NSDirectionalEdgeInsetsMake`
     #section.setContentInsets_()
     #m = NSDirectionalEdgeInsetsMake(10.0, 10.0, 10.0, 10.0)
-    
-    pdbr.state(m)
+
+    layout = UICollectionViewCompositionalLayout.alloc().initWithSection_(
+      section)
+    return layout
 
   @objc_method
   def configureHierarchy(self):
-    #print('configureHierarchy')
-    self.createLayout()
+    view = self.view
+
+    self.collectionView = UICollectionView.alloc(
+    ).initWithFrame_collectionViewLayout_(view.bounds, self.createLayout())
+
+    #self.collectionView.autoresizingMask = UIViewAutoresizing.flexibleHeight | UIViewAutoresizing.flexibleWidth
+
+    self.collectionView.setAutoresizingMask_(
+      UIViewAutoresizing.flexibleHeight | UIViewAutoresizing.flexibleWidth)
+    view.addSubview_(self.collectionView)
+    # wip: `collectionView.delegate = self //タップ操作へ対応するため`
+
+  @objc_method
+  def configureDataSource(self):
+    print('configureDataSource')
+
+    @Block
+    def configurationHandler(_cell: objc_id, _indexPath: objc_id,
+                             _item: objc_id) -> None:
+      print('Block: configurationHandler')
+      cell = ObjCInstance(_cell)
+      indexPath = ObjCInstance(_indexPath)
+      item = ObjCInstance(_item)
+      # wip: 後ほど独自拡張
+      configuration = cell.defaultContentConfiguration()
+      configuration.setText_(at('hoge'))
+      cell.setContentConfiguration_(configuration)
+
+    @Block
+    def cellProvider(_collectionView: objc_id, _indexPath: objc_id,
+                     _item: objc_id) -> ctypes.py_object:
+      print('Block: cellProvider')
+      collectionView = ObjCInstance(_collectionView)
+      indexPath = ObjCInstance(_indexPath)
+      item = ObjCInstance(_item)
+
+      return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
+        cellRegistration, indexPath, item)
+
+    cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
+      UICollectionViewListCell, configurationHandler)
+
+    dataSource = UICollectionViewDiffableDataSource.alloc(
+    ).initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
+    #pdbr.state(dataSource)
+    #pdbr.state(self.collectionView)
+
+    snapshot = NSDiffableDataSourceSnapshot.alloc().init()
+    snapshot.appendSectionsWithIdentifiers_(at([0]))
+    #snapshot.appendItemsWithIdentifiers_(at(['f',]))
+    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(
+      at([
+        'f',
+      ]), 0)
+
+    dataSource.applySnapshot_animatingDifferences_(snapshot, True)
 
 
 if __name__ == '__main__':

@@ -243,46 +243,14 @@ class UICollectionLayoutListAppearance:
   sidebarPlain: int = 4
 
 
-# ref: [UICollectionLayoutListHeaderMode | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uicollectionlayoutlistheadermode)
-@dataclass
-class UICollectionLayoutListHeaderMode:
-  # xxx: 独自調査 a.k.a: 勘
-  none: int = 0
-  supplementary: int = 1
-  firstItemInSection: int = 2
-
-
-# ref: [UIUserInterfaceIdiom | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uiuserinterfaceidiom?language=objc)
-@dataclass
-class UIUserInterfaceIdiom:
-  unspecified: int = -1
-  phone: int = 0
-  pad: int = 1
-  tv: int = 2
-  carPlay: int = 3
-  mac: int = 5
-  vision: int = 6
-
-
 # ref: [UIViewAutoresizing | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uiviewautoresizing?language=objc)
 @dataclass
 class UIViewAutoresizing:
-  none: int = 0  # xxx: objc のみ確認
+  none: int = 0  # ref: [UIViewAutoresizingNone | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uiviewautoresizing/uiviewautoresizingnone?language=objc)
   flexibleLeftMargin: int = 1 << 0
   flexibleWidth: int = 1 << 1
   flexibleRightMargin: int = 1 << 2
   flexibleTopMargin: int = 1 << 3
   flexibleHeight: int = 1 << 4
   flexibleBottomMargin: int = 1 << 5
-
-
-@dataclass
-class NSURLRequestCachePolicy:
-  useProtocolCachePolicy: int = 0
-  reloadIgnoringLocalCacheData: int = 1
-  reloadIgnoringLocalAndRemoteCacheData: int = 4
-  reloadIgnoringCacheData: int = reloadIgnoringLocalCacheData
-  returnCacheDataElseLoad: int = 2
-  returnCacheDataDontLoad: int = 3
-  reloadRevalidatingCacheData: int = 5
 
