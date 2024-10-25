@@ -52,6 +52,9 @@ prefectures = [
 
 class ViewController(UIViewController):
 
+  collectionView: UICollectionView = objc_property()
+  dataSource: UICollectionViewDiffableDataSource = objc_property()
+
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')  # xxx: 不要?
@@ -70,8 +73,8 @@ class ViewController(UIViewController):
     # xxx: 引数不要?
     send_super(__class__, self, 'viewDidAppear:')
     print('viewDidAppear')
-    pdbr.state(self.collectionView)
-    
+    #pdbr.state(self.collectionView)
+    print(self.collectionView)
 
   @objc_method
   def createLayout(self) -> ctypes.py_object:
@@ -102,7 +105,8 @@ class ViewController(UIViewController):
     view = self.view
 
     #self.collectionView.initWithFrame_collectionViewLayout_(view.bounds, self.createLayout())
-    self.collectionView = UICollectionView.alloc().initWithFrame_collectionViewLayout_(view.bounds, self.createLayout())
+    self.collectionView = UICollectionView.alloc(
+    ).initWithFrame_collectionViewLayout_(view.bounds, self.createLayout())
 
     #self.collectionView.autoresizingMask = UIViewAutoresizing.flexibleHeight | UIViewAutoresizing.flexibleWidth
 
@@ -128,11 +132,6 @@ class ViewController(UIViewController):
       configuration.setText_('hoge')
       cell.setContentConfiguration_(configuration)
 
-
-    cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
-      UICollectionViewListCell, configurationHandler)
-
-
     @Block
     def cellProvider(_collectionView: objc_id, _indexPath: objc_id,
                      _item: objc_id) -> ctypes.py_object:
@@ -144,12 +143,13 @@ class ViewController(UIViewController):
       return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
         cellRegistration, indexPath, item)
 
-    
+    cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
+      UICollectionViewListCell, configurationHandler)
+
+    pdbr.state(cellRegistration)
 
     dataSource = UICollectionViewDiffableDataSource.alloc(
     ).initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
-    
-    
 
     snapshot = NSDiffableDataSourceSnapshot.alloc().init()
     snapshot.appendSectionsWithIdentifiers_(at([0]))
@@ -158,8 +158,15 @@ class ViewController(UIViewController):
         NSUUID.UUID(),
         NSUUID.UUID(),
         #prefectures
-      ]), 0)
-    dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+      ]),
+      0)
+
+    #snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(prefectures, 0)
+    self.dataSource = dataSource
+    #self.dataSource.applySnapshot_animatingDifferences_(snapshot, True)
+
+    #print(self.dataSource)
+    #print(dataSource)
     #self.collectionView.setDataSource_(dataSource)
     #pdbr.state(snapshot)
     #pdbr.state(dataSource)
