@@ -13,8 +13,8 @@ UIViewController = ObjCClass('UIViewController')  # todo: アノテーション�
 
 @onMainThread
 def present_viewController(viewController: UIViewController,
-                           modalPresentationStyle: UIModalPresentationStyle
-                           | int = UIModalPresentationStyle.fullScreen,
+                           modalPresentationStyle:
+                            int = UIModalPresentationStyle.fullScreen,
                            navigationController_enabled: bool = True):
   sharedApplication = ObjCClass('UIApplication').sharedApplication
   keyWindow = sharedApplication.keyWindow if sharedApplication.keyWindow else sharedApplication.windows[
