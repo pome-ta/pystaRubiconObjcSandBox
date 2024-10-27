@@ -13,7 +13,7 @@ class MyViewController(UIViewController):
     @objc_method
     def viewDidLoad(self):
         send_super(__class__, self, "viewDidLoad")
-        self.view.backgroundColor = UIColor.blueColor
+        #self.view.backgroundColor = UIColor.blueColor
         print("Viewが読み込まれました")
 
 class MainOperation(NSOperation):
@@ -31,5 +31,7 @@ class MainOperation(NSOperation):
 if __name__ == "__main__":
     operation = MainOperation.new()
     queue = NSOperationQueue.mainQueue
-    queue.addOperation(operation)
-    queue.waitUntilAllOperationsAreFinished()
+    #queue.addOperation(operation)
+    #queue.waitUntilAllOperationsAreFinished()
+    queue.addOperations_waitUntilFinished_([operation], True)
+    print('h')
