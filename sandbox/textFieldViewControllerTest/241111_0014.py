@@ -1,4 +1,4 @@
-from pyrubicon.objc.api import ObjCClass, objc_method
+from pyrubicon.objc.api import ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import SEL, send_super, objc_id
 from pyrubicon.objc.types import CGRectMake
@@ -8,9 +8,11 @@ from rbedge import pdbr
 
 UIViewController = ObjCClass('UIViewController')
 UITextField = ObjCClass('UITextField')
+UITextFieldDelegate = ObjCProtocol('UITextFieldDelegate')
 
-
-class ViewController(UIViewController):
+class ViewController(UIViewController,protocols=[
+                                UITextFieldDelegate,
+                              ]):
 
   @objc_method
   def viewDidLoad(self):
@@ -24,7 +26,9 @@ class ViewController(UIViewController):
     textField.backgroundColor = ObjCClass('UIColor').systemRedColor()
 
     self.view.addSubview_(textField)
-    pdbr.state(textField,1)
+    #pdbr.state(textField, 1)
+    pdbr.state(textField)
+    #print(textField.autocorrectionType)
 
 
 if __name__ == '__main__':
