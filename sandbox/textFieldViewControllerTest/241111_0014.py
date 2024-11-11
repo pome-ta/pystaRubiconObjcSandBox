@@ -26,8 +26,8 @@ class ViewController(UIViewController,protocols=[
     textField.backgroundColor = ObjCClass('UIColor').systemRedColor()
 
     self.view.addSubview_(textField)
-    #pdbr.state(textField, 1)
-    pdbr.state(textField)
+    pdbr.state(textField, 1)
+    #pdbr.state(textField)
     #print(textField.autocorrectionType)
 
 
