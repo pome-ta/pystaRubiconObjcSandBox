@@ -1,6 +1,6 @@
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import SEL, send_super, objc_id
+from pyrubicon.objc.runtime import SEL, send_super, objc_id,send_message
 from pyrubicon.objc.types import CGRectMake
 
 from rbedge.functions import NSStringFromClass
@@ -26,9 +26,20 @@ class ViewController(UIViewController,protocols=[
     textField.backgroundColor = ObjCClass('UIColor').systemRedColor()
 
     self.view.addSubview_(textField)
-    pdbr.state(textField, 1)
-    #pdbr.state(textField)
+    #pdbr.state(textField, 1)
+    textField.textInputTraits().keyboardType = 4
+    
+    pdbr.state(textField.textInputTraits())
     #print(textField.autocorrectionType)
+    #print(textField.debugDescription)
+    #print(textField.__repr__)
+    #print(send_message(textField,'keyboardType'))
+    
+    #textInputTraits = textField.forwardingTargetForSelector_(SEL('keyboardType'))
+    #print(type(UITextInputTraits))
+    #keyboardType
+    #textInputTraits.keyboardType = 4
+    #pdbr.state(textInputTraits)
 
 
 if __name__ == '__main__':
