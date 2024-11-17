@@ -143,11 +143,7 @@ class SplitViewController(UISplitViewController):
 
 
 @onMainThread
-def present_splitViewController(
-    viewController: UIViewController,
-    modalPresentationStyle: UIModalPresentationStyle
-  | int = UIModalPresentationStyle.fullScreen,
-    use_navigationControllerClass=RootNavigationController):
+def present_splitViewController():
   sharedApplication = ObjCClass('UIApplication').sharedApplication
   keyWindow = sharedApplication.keyWindow if sharedApplication.keyWindow else sharedApplication.windows[
     0]
@@ -156,21 +152,22 @@ def present_splitViewController(
   while _presentedViewController := rootViewController.presentedViewController:
     rootViewController = _presentedViewController
 
-  if use_navigationControllerClass:
+  p_vc = PrimaryViewController.new()
+  s_vc = SecondaryViewController.new()
+  nav_vc = NavigationController.alloc().initWithRootViewController_(p_vc)
 
-    presentViewController = use_navigationControllerClass.alloc(
-    ).initWithRootViewController_(viewController)
-  else:
-    presentViewController = viewController
+  splt_vc = SplitViewController.alloc().initWithStyle_(
+    UISplitViewControllerStyle.doubleColumn)
 
-  # xxx: style 指定を力技で確認
-  automatic = UIModalPresentationStyle.automatic  # -2
-  blurOverFullScreen = UIModalPresentationStyle.blurOverFullScreen  # 8
-  pageSheet = UIModalPresentationStyle.pageSheet  # 1
+  splt_vc.viewControllers = [
+    nav_vc,
+    s_vc,
+  ]
+  #pdbr.state(splt_vc)
+  presentViewController = splt_vc
 
-  style = modalPresentationStyle if isinstance(
-    modalPresentationStyle, int
-  ) and automatic <= modalPresentationStyle <= blurOverFullScreen else pageSheet
+  style = UIModalPresentationStyle.fullScreen
+  style = UIModalPresentationStyle.pageSheet
 
   presentViewController.setModalPresentationStyle_(style)
 
@@ -179,6 +176,7 @@ def present_splitViewController(
 
 
 if __name__ == '__main__':
+  '''
   splt_vc = SplitViewController.alloc().initWithStyle_(
     UISplitViewControllerStyle.doubleColumn)
   p_vc = PrimaryViewController.new()
@@ -186,4 +184,6 @@ if __name__ == '__main__':
   style = UIModalPresentationStyle.fullScreen
   style = UIModalPresentationStyle.pageSheet
   present_splitViewController(p_vc, style, NavigationController)
+  '''
+  present_splitViewController()
 
