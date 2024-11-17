@@ -80,7 +80,7 @@ class PrimaryViewController(UIViewController):
     self.navigationItem.title = title
 
     # --- View
-    self.view.backgroundColor = UIColor.systemOrangeColor()
+    self.view.backgroundColor = UIColor.systemDarkTealColor()
 
     self.label = UILabel.new()
     self.label.text = 'Primary'
@@ -109,7 +109,7 @@ class SecondaryViewController(UIViewController):
     self.navigationItem.title = title
 
     # --- View
-    self.view.backgroundColor = UIColor.systemOrangeColor()
+    self.view.backgroundColor = UIColor.systemDarkRedColor()
 
     self.label = UILabel.new()
     self.label.text = 'Secondary'
@@ -160,10 +160,11 @@ def present_splitViewController():
     UISplitViewControllerStyle.doubleColumn)
 
   splt_vc.viewControllers = [
-    nav_vc,
+    #nav_vc,
+    p_vc,
     s_vc,
   ]
-  #pdbr.state(splt_vc)
+
   presentViewController = splt_vc
 
   style = UIModalPresentationStyle.fullScreen
