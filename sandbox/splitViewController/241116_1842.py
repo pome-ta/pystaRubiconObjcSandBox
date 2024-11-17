@@ -2,10 +2,12 @@ from pyrubicon.objc.api import ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import objc_method
 from pyrubicon.objc.runtime import send_super, SEL
 
+from rbedge.objcMainThread import onMainThread
 from rbedge.enumerations import (
   UIRectEdge,
   UIBarButtonSystemItem,
   UISplitViewControllerStyle,
+  UIModalPresentationStyle,
 )
 from rbedge.functions import NSStringFromClass
 from rbedge import pdbr
@@ -134,7 +136,8 @@ class SplitViewController(UISplitViewController):
     #pdbr.state(self.viewControllers)
 
 
-if __name__ == '__main__':
+@onMainThread
+def present():
   from rbedge.enumerations import UIModalPresentationStyle
   from rbedge import present_viewController
 
@@ -142,10 +145,12 @@ if __name__ == '__main__':
   splt_vc = SplitViewController.alloc().initWithStyle_(
     UISplitViewControllerStyle.doubleColumn)
 
-  
-  nvc = 
   style = UIModalPresentationStyle.fullScreen
   style = UIModalPresentationStyle.pageSheet
 
   present_viewController(splt_vc, style, False)
+
+
+if __name__ == '__main__':
+  present()
 
