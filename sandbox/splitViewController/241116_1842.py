@@ -1,7 +1,13 @@
+'''
+  note:
+    [How to create UISplitViewController programmatically | by Anurag Ajwani | Medium](https://anuragajwani.medium.com/how-to-create-uisplitviewcontroller-programmatically-b07b15c01ae6)
+'''
+
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import objc_method
 from pyrubicon.objc.runtime import send_super, SEL
 
+from rbedge.rootNavigationController import RootNavigationController
 from rbedge.objcMainThread import onMainThread
 from rbedge.enumerations import (
   UIRectEdge,
@@ -137,20 +143,47 @@ class SplitViewController(UISplitViewController):
 
 
 @onMainThread
-def present():
-  from rbedge.enumerations import UIModalPresentationStyle
-  from rbedge import present_viewController
+def present_splitViewController(
+    viewController: UIViewController,
+    modalPresentationStyle: UIModalPresentationStyle
+  | int = UIModalPresentationStyle.fullScreen,
+    use_navigationControllerClass=RootNavigationController):
+  sharedApplication = ObjCClass('UIApplication').sharedApplication
+  keyWindow = sharedApplication.keyWindow if sharedApplication.keyWindow else sharedApplication.windows[
+    0]
+  rootViewController = keyWindow.rootViewController
 
-  #vc = MainViewController.new()
-  splt_vc = SplitViewController.alloc().initWithStyle_(
-    UISplitViewControllerStyle.doubleColumn)
+  while _presentedViewController := rootViewController.presentedViewController:
+    rootViewController = _presentedViewController
 
-  style = UIModalPresentationStyle.fullScreen
-  style = UIModalPresentationStyle.pageSheet
+  if use_navigationControllerClass:
 
-  present_viewController(splt_vc, style, False)
+    presentViewController = use_navigationControllerClass.alloc(
+    ).initWithRootViewController_(viewController)
+  else:
+    presentViewController = viewController
+
+  # xxx: style 指定を力技で確認
+  automatic = UIModalPresentationStyle.automatic  # -2
+  blurOverFullScreen = UIModalPresentationStyle.blurOverFullScreen  # 8
+  pageSheet = UIModalPresentationStyle.pageSheet  # 1
+
+  style = modalPresentationStyle if isinstance(
+    modalPresentationStyle, int
+  ) and automatic <= modalPresentationStyle <= blurOverFullScreen else pageSheet
+
+  presentViewController.setModalPresentationStyle_(style)
+
+  rootViewController.presentViewController_animated_completion_(
+    presentViewController, True, None)
 
 
 if __name__ == '__main__':
-  present()
+  splt_vc = SplitViewController.alloc().initWithStyle_(
+    UISplitViewControllerStyle.doubleColumn)
+  p_vc = PrimaryViewController.new()
+
+  style = UIModalPresentationStyle.fullScreen
+  style = UIModalPresentationStyle.pageSheet
+  present_splitViewController(p_vc, style, NavigationController)
 
