@@ -1,6 +1,7 @@
 '''
   note:
     [How to create UISplitViewController programmatically | by Anurag Ajwani | Medium](https://anuragajwani.medium.com/how-to-create-uisplitviewcontroller-programmatically-b07b15c01ae6)
+    - Navigation の取り回し
 '''
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol
@@ -83,6 +84,7 @@ class PrimaryViewController(UIViewController):
     # --- Navigation
     title = NSStringFromClass(__class__)
     self.navigationItem.title = title
+    
 
     # --- View
     self.view.backgroundColor = UIColor.systemDarkTealColor()
@@ -122,6 +124,7 @@ class SecondaryViewController(UIViewController):
     self.label.sizeToFit()
 
     self.view.addSubview_(self.label)
+    pdbr.state(self)
 
     # --- Layout
     self.label.translatesAutoresizingMaskIntoConstraints = False
@@ -153,7 +156,8 @@ class SplitViewController(UISplitViewController,
   @objc_method
   def splitViewController_topColumnForCollapsingToProposedTopColumn_(
       self, svc, proposedTopColumn: int):
-    print('topColumnForCollapsingToProposedTopColumn')
+    #print('topColumnForCollapsingToProposedTopColumn')
+    #pdbr.state(svc.viewControllers[0])
     return UISplitViewControllerColumn.secondary
 
   @objc_method
@@ -163,10 +167,10 @@ class SplitViewController(UISplitViewController,
     if (navController :=
         svc.viewControllers[0]).isMemberOfClass_(UINavigationController):
       #pdbr.state(navController)
-      print('t')
-    else:
-      print('f')
-    print('displayModeForExpandingToProposedDisplayMode')
+      #print('t')
+      pass
+
+    #print('displayModeForExpandingToProposedDisplayMode')
     return UISplitViewControllerDisplayMode.automatic
 
 
@@ -188,13 +192,14 @@ def present_splitViewController():
     UISplitViewControllerStyle.doubleColumn)
 
   splt_vc.viewControllers = [
-    nav_vc,
-    #p_vc,
+    #nav_vc,
+    p_vc,
     s_vc,
   ]
 
   #pdbr.state(splt_vc)
   presentViewController = splt_vc
+  #presentViewController = NavigationController.alloc().initWithRootViewController_(splt_vc)
 
   style = UIModalPresentationStyle.fullScreen
   style = UIModalPresentationStyle.pageSheet
