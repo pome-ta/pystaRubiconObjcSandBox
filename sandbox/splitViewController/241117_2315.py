@@ -2,6 +2,7 @@
   note:
     [How to create UISplitViewController programmatically | by Anurag Ajwani | Medium](https://anuragajwani.medium.com/how-to-create-uisplitviewcontroller-programmatically-b07b15c01ae6)
     - Navigation の取り回し
+    - `back` ではなく、title
 '''
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol
@@ -84,6 +85,8 @@ class PrimaryViewController(UIViewController):
     # --- Navigation
     title = NSStringFromClass(__class__)
     self.navigationItem.title = title
+    #self.navigationItem.title = 'title'
+    #self.title = 'p'
     
 
     # --- View
@@ -124,7 +127,7 @@ class SecondaryViewController(UIViewController):
     self.label.sizeToFit()
 
     self.view.addSubview_(self.label)
-    pdbr.state(self)
+    #pdbr.state(self,1)
 
     # --- Layout
     self.label.translatesAutoresizingMaskIntoConstraints = False
