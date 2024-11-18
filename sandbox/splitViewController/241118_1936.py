@@ -3,6 +3,7 @@
     [How to create UISplitViewController programmatically | by Anurag Ajwani | Medium](https://anuragajwani.medium.com/how-to-create-uisplitviewcontroller-programmatically-b07b15c01ae6)
     - Navigation の取り回し
     - `back` ではなく、title
+      - 生成後、設定
 '''
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol
@@ -116,7 +117,7 @@ class SecondaryViewController(UIViewController):
   def viewDidLoad(self):
     # --- Navigation
     title = NSStringFromClass(__class__)
-    #self.navigationItem.title = title
+    self.navigationItem.title = title
 
     # --- View
     self.view.backgroundColor = UIColor.systemDarkRedColor()
