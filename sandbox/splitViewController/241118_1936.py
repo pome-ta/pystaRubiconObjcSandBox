@@ -162,7 +162,7 @@ class SplitViewController(UISplitViewController,
       self, svc, proposedTopColumn: int):
     #print('topColumnForCollapsingToProposedTopColumn')
     #pdbr.state(svc.viewControllers[0])
-    pdbr.state(svc.navigationItem)
+    #pdbr.state(svc.navigationItem)
     return UISplitViewControllerColumn.secondary
 
   @objc_method
@@ -177,6 +177,16 @@ class SplitViewController(UISplitViewController,
 
     #print('displayModeForExpandingToProposedDisplayMode')
     return UISplitViewControllerDisplayMode.automatic
+    
+  @objc_method
+  def splitViewController_willHideColumn_(self,svc,column:int):
+    print('willHideColumn')
+    print(column)
+    
+  @objc_method
+  def splitViewController_willShowColumn_(self,svc,column:int):
+    print('willShowColumn')
+    print(column)
 
 
 @onMainThread
@@ -198,8 +208,8 @@ def present_splitViewController():
     UISplitViewControllerStyle.doubleColumn)
 
   splt_vc.viewControllers = [
-    nav_vc,
-    #p_vc,
+    #nav_vc,
+    p_vc,
     s_vc,
   ]
 
@@ -208,7 +218,7 @@ def present_splitViewController():
   #presentViewController = NavigationController.alloc().initWithRootViewController_(splt_vc)
 
   style = UIModalPresentationStyle.fullScreen
-  #style = UIModalPresentationStyle.pageSheet
+  style = UIModalPresentationStyle.pageSheet
 
   presentViewController.setModalPresentationStyle_(style)
 
