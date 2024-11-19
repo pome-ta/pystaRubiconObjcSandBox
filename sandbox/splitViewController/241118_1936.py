@@ -88,7 +88,6 @@ class PrimaryViewController(UIViewController):
     #self.navigationItem.title = title
     #self.navigationItem.title = 'title'
     #self.title = 'p'
-    
 
     # --- View
     self.view.backgroundColor = UIColor.systemDarkTealColor()
@@ -171,22 +170,9 @@ class SplitViewController(UISplitViewController,
 
     if (navController :=
         svc.viewControllers[0]).isMemberOfClass_(UINavigationController):
-      #pdbr.state(navController)
-      #print('t')
-      pass
+      navController.popToRootViewControllerAnimated_(False)
 
-    #print('displayModeForExpandingToProposedDisplayMode')
     return UISplitViewControllerDisplayMode.automatic
-    
-  @objc_method
-  def splitViewController_willHideColumn_(self,svc,column:int):
-    print('willHideColumn')
-    print(column)
-    
-  @objc_method
-  def splitViewController_willShowColumn_(self,svc,column:int):
-    print('willShowColumn')
-    print(column)
 
 
 @onMainThread
@@ -213,7 +199,6 @@ def present_splitViewController():
     s_vc,
   ]
 
-  #pdbr.state(splt_vc)
   presentViewController = splt_vc
   #presentViewController = NavigationController.alloc().initWithRootViewController_(splt_vc)
 
