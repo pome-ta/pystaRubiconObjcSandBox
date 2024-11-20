@@ -1,18 +1,14 @@
 '''
   note:
-    [Split View Controllers Done Right in iOS 14 - BiTE Interactive](https://www.biteinteractive.com/split-view-controllers-done-right-in-ios-14/)
+    `UISplitViewControllerDelegate` 確認
 '''
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import objc_method
-from pyrubicon.objc.runtime import send_super, SEL
+from pyrubicon.objc.runtime import send_super
 
-from rbedge.rootNavigationController import RootNavigationController
-from rbedge.objcMainThread import onMainThread
 from rbedge.enumerations import (
   UIViewAutoresizing,
-  UIRectEdge,
-  UIBarButtonSystemItem,
   UISplitViewControllerStyle,
   UISplitViewControllerColumn,
   UISplitViewControllerDisplayMode,
@@ -30,11 +26,7 @@ UIColor = ObjCClass('UIColor')
 UILabel = ObjCClass('UILabel')
 UIFont = ObjCClass('UIFont')
 
-# --- UINavigationController
-UINavigationController = ObjCClass('UINavigationController')
-UINavigationControllerDelegate = ObjCProtocol('UINavigationControllerDelegate')
-UINavigationBarAppearance = ObjCClass('UINavigationBarAppearance')
-UIBarButtonItem = ObjCClass('UIBarButtonItem')
+UINavigationController = ObjCClass('UINavigationController')  # todo: 型確認用
 
 
 class PrimaryViewController(UIViewController):
@@ -45,7 +37,6 @@ class PrimaryViewController(UIViewController):
     title = NSStringFromClass(__class__)
     self.navigationItem.title = title
     #self.navigationItem.title = 'title'
-    #self.title = 'p'
 
     # --- View
     self.view.backgroundColor = UIColor.systemDarkTealColor()
@@ -85,7 +76,6 @@ class SecondaryViewController(UIViewController):
     self.label.sizeToFit()
 
     self.view.addSubview_(self.label)
-    #pdbr.state(self,1)
 
     # --- Layout
     self.label.translatesAutoresizingMaskIntoConstraints = False
@@ -96,6 +86,32 @@ class SecondaryViewController(UIViewController):
       self.label.centerYAnchor.constraintEqualToAnchor_(
         self.view.centerYAnchor),
     ])
+
+
+class SplitViewController(UISplitViewController,
+                          protocols=[
+                            UISplitViewControllerDelegate,
+                          ]):
+
+  @objc_method
+  def viewDidLoad(self):
+    send_super(__class__, self, 'viewDidLoad')
+    self.delegate = self
+  
+  @objc_method
+  def splitViewController_topColumnForCollapsingToProposedTopColumn_(
+      self, svc, proposedTopColumn: int):
+    return UISplitViewControllerColumn.secondary
+
+  @objc_method
+  def splitViewController_displayModeForExpandingToProposedDisplayMode_(
+      self, svc, proposedDisplayMode: int):
+
+    if (navController :=
+        svc.viewControllers[0]).isMemberOfClass_(UINavigationController):
+      navController.popToRootViewControllerAnimated_(False)
+
+    return UISplitViewControllerDisplayMode.automatic
 
 
 class ViewController(UIViewController):
@@ -109,7 +125,7 @@ class ViewController(UIViewController):
     self.navigationItem.title = title
 
     # --- View
-    split = UISplitViewController.alloc().initWithStyle_(
+    split = SplitViewController.alloc().initWithStyle_(
       UISplitViewControllerStyle.doubleColumn)
 
     self.addChildViewController_(split)
@@ -120,29 +136,18 @@ class ViewController(UIViewController):
 
     split.didMoveToParentViewController_(self)
 
-    primary = PrimaryViewController.new()
-    #print(dir(primary))
-    #print(primary.__class__)
-    #pdbr.state(primary,1)
-    #print(primary.CalClassName)
-    #primary.title = f'{primary.class}'
-    primary.title = 'hPrimaryViewController'
-    secondary = SecondaryViewController.new()
-    '''
+    primary_vc = PrimaryViewController.new()
+    primary_vc.title = primary_vc.className()
 
-    split.setViewController_forColumn_(primary,
-                                       UISplitViewControllerColumn.primary)
+    secondary_vc = SecondaryViewController.new()
 
-    
-    split.setViewController_forColumn_(secondary,
-                                       UISplitViewControllerColumn.secondary)
-    '''
-    split.viewControllers = [
-      primary,
-      secondary,
-    ]
+    primary = UISplitViewControllerColumn.primary
+    secondary = UISplitViewControllerColumn.secondary
 
-    #pdbr.state(split)
+    split.setViewController_forColumn_(primary_vc, primary)
+    split.setViewController_forColumn_(secondary_vc, secondary)
+
+    #split.viewControllers = [primary, secondary,]
 
 
 if __name__ == '__main__':

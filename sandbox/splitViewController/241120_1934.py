@@ -126,7 +126,7 @@ class ViewController(UIViewController):
     #pdbr.state(primary,1)
     #print(primary.CalClassName)
     #primary.title = f'{primary.class}'
-    primary.title = 'hPrimaryViewController'
+    primary.title = primary.className()
     secondary = SecondaryViewController.new()
     '''
 
