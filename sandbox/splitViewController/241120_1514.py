@@ -43,7 +43,7 @@ class PrimaryViewController(UIViewController):
   def viewDidLoad(self):
     # --- Navigation
     title = NSStringFromClass(__class__)
-    #self.navigationItem.title = title
+    self.navigationItem.title = title
     #self.navigationItem.title = 'title'
     #self.title = 'p'
 
@@ -74,7 +74,7 @@ class SecondaryViewController(UIViewController):
   def viewDidLoad(self):
     # --- Navigation
     title = NSStringFromClass(__class__)
-    self.navigationItem.title = title
+    #self.navigationItem.title = title
 
     # --- View
     self.view.backgroundColor = UIColor.systemDarkRedColor()
@@ -105,6 +105,7 @@ class ViewController(UIViewController):
     send_super(__class__, self, 'viewDidLoad')
     # --- Navigation
     title = NSStringFromClass(__class__)
+
     self.navigationItem.title = title
 
     # --- View
@@ -113,11 +114,28 @@ class ViewController(UIViewController):
 
     self.addChildViewController_(split)
     self.view.addSubview_(split.view)
-    
+
     split.view.frame = self.view.bounds
     split.view.autoresizingMask = UIViewAutoresizing.flexibleHeight | UIViewAutoresizing.flexibleWidth
-    
+
     split.didMoveToParentViewController_(self)
+
+    primary = PrimaryViewController.new()
+    #print(dir(primary))
+    #print(primary.__class__)
+    #pdbr.state(primary,1)
+    #print(primary.CalClassName)
+    #primary.title = f'{primary.class}'
+    primary.title = 'hPrimaryViewController'
+
+    split.setViewController_forColumn_(primary,
+                                       UISplitViewControllerColumn.primary)
+
+    secondary = SecondaryViewController.new()
+    split.setViewController_forColumn_(secondary,
+                                       UISplitViewControllerColumn.secondary)
+
+    #pdbr.state(split)
 
 
 if __name__ == '__main__':
@@ -126,6 +144,6 @@ if __name__ == '__main__':
   vc = ViewController.new()
 
   style = UIModalPresentationStyle.fullScreen
-  style = UIModalPresentationStyle.pageSheet
+  #style = UIModalPresentationStyle.pageSheet
   present_viewController(vc, style)
 
