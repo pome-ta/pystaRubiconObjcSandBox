@@ -155,6 +155,11 @@ class SplitViewController(UISplitViewController,
 
     # --- View
     self.view.backgroundColor = UIColor.systemIndigoColor()
+    barButtonSystemItem = UIBarButtonSystemItem.done
+    doneButton = UIBarButtonItem.alloc(
+    ).initWithBarButtonSystemItem_target_action_(barButtonSystemItem, self,
+                                                 SEL('doneButtonTapped:'))
+    self.navigationItemrightBarButtonItem = doneButton
 
   @objc_method
   def doneButtonTapped_(self, sender):
@@ -164,12 +169,8 @@ class SplitViewController(UISplitViewController,
   @objc_method
   def splitViewController_topColumnForCollapsingToProposedTopColumn_(
       self, svc, proposedTopColumn: int):
-    pdbr.state(svc, 1)
-    barButtonSystemItem = UIBarButtonSystemItem.done
-    doneButton = UIBarButtonItem.alloc(
-    ).initWithBarButtonSystemItem_target_action_(barButtonSystemItem, svc,
-                                                 SEL('doneButtonTapped:'))
-    svc.navigationItemrightBarButtonItem = doneButton
+    #pdbr.state(svc, 1)
+
     return UISplitViewControllerColumn.secondary
 
   @objc_method
