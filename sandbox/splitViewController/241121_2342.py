@@ -16,6 +16,7 @@ from rbedge.enumerations import (
   UIModalPresentationStyle,
   UICollectionLayoutListAppearance,
 )
+from rbedge.objcMainThread import onMainThread
 from rbedge.functions import NSStringFromClass
 from rbedge import pdbr
 
@@ -69,9 +70,7 @@ class ViewController(UIViewController):
 
     #self.dataSource = self.configureCellRegistration_(collectionView)
     self.configureCellRegistration_(collectionView)
-    #self.initData()
-
-    #pdbr.state(self.dataSource)
+    
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -98,30 +97,36 @@ class ViewController(UIViewController):
 
     @Block
     def cellRegistrationHandler(_cell: objc_id, _indexPath: objc_id,
-                                _item: objc_id) -> ctypes.c_void_p:
+                                _item: objc_id) -> None:
+      '''
       cell = ObjCInstance(_cell)
       indexPath = ObjCInstance(_indexPath)
       item = ObjCInstance(_item)
-      content = cell.defaultContentConfiguration()
-      content.text = item
-      cell.contentConfiguration = content
+      content = _cell.defaultContentConfiguration()
+      content.text = _item
+      cell.contentConfiguration = _content
+      '''
+      pass
 
     cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
       UICollectionViewListCell, cellRegistrationHandler)
 
+    '''
     @Block
     def cellProvider(_collectionView: objc_id, _indexPath: objc_id,
-                     _item: objc_id) -> objc_id:
-      collectionView = ObjCInstance(_collectionView)
-      indexPath = ObjCInstance(_indexPath)
-      item = ObjCInstance(_item)
+                     _item: int) -> ctypes.py_object:
+      #collectionView = ObjCInstance(_collectionView)
+      #indexPath = ObjCInstance(_indexPath)
+      #item = ObjCInstance(_item)
+      print('h')
 
       return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
-        cellRegistration, indexPath, item)
-
+        _cellRegistration, _indexPath, _item)
+    '''
+    
     #return UICollectionViewDiffableDataSource.alloc().initWithCollectionView_cellProvider_(collectionView, cellProvider)
-    self.dataSource = UICollectionViewDiffableDataSource.alloc(
-    ).initWithCollectionView_cellProvider_(collectionView, cellProvider)
+    #self.dataSource = UICollectionViewDiffableDataSource.alloc().initWithCollectionView_cellProvider_(collectionView, cellProvider)
+    self.dataSource = UICollectionViewDiffableDataSource.alloc().initWithCollectionView_cellProvider_(collectionView, Block(collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_, ctypes.py_object, objc_id, objc_id,objc_id))
 
   @objc_method
   def initData(self):
@@ -136,9 +141,12 @@ class ViewController(UIViewController):
       '🍋',
     ])
     '''
-    snapshot.appendItemsWithIdentifiers_([''])
+    snapshot.appendItemsWithIdentifiers_(['hoge'])
+    #snapshot.appendItemsWithIdentifiers_([])
     self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
-    #pdbr.state(self.dataSource)
+    #pdbr.state(self.dataSource.collectionView())
+    #print(self.dataSource.collectionView)
+    #pdbr.state(self.dataSource.snapshot())
 
 
 if __name__ == '__main__':
