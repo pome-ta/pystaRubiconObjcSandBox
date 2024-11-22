@@ -26,3 +26,12 @@
 - [Swift – UITableViewの基礎を学ぼう (セルのスタイルの種類について) |](https://weblabo.oscasierra.net/swift-uitableview-2/)
 - [Table View の使い方 (Swift) - iOS アプリの開発 - iOS 開発入門](https://softmoco.com/basics/how-to-use-table-view.php)
 - [Getting started with UITableViewController in iOS | en.proft.me ](https://en.proft.me/2019/08/30/getting-started-uitableviewcontroller-ios/)
+
+
+
+## `UISplitViewController` と、`UITableView` での組み合わせ
+
+- [How to create UISplitViewController programmatically | by Anurag Ajwani | Medium](https://anuragajwani.medium.com/how-to-create-uisplitviewcontroller-programmatically-b07b15c01ae6)
+
+- [UISplitViewController Tutorial: Getting Started | Kodeco](https://www.kodeco.com/4613809-uisplitviewcontroller-tutorial-getting-started)
+
