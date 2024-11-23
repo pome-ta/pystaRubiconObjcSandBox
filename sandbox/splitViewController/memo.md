@@ -34,4 +34,5 @@
 - [How to create UISplitViewController programmatically | by Anurag Ajwani | Medium](https://anuragajwani.medium.com/how-to-create-uisplitviewcontroller-programmatically-b07b15c01ae6)
 
 - [UISplitViewController Tutorial: Getting Started | Kodeco](https://www.kodeco.com/4613809-uisplitviewcontroller-tutorial-getting-started)
+- [Master側の選択に応じてDetail側のViewControllerを切り替える - 開発メモ](showDetailViewController)
 
