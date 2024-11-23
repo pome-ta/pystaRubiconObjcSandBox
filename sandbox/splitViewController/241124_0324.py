@@ -13,6 +13,7 @@ from rbedge.enumerations import (
   UISplitViewControllerStyle,
   UISplitViewControllerColumn,
   UITableViewStyle,
+  UIUserInterfaceSizeClass,
 )
 from rbedge.functions import NSStringFromClass
 from rbedge import pdbr
@@ -200,24 +201,26 @@ class PrimaryTableViewController(UIViewController,
   # --- UITableViewDelegate
   @objc_method
   def tableView_didSelectRowAtIndexPath_(self, tableView, indexPath):
-    #tableView.deselectRowAtIndexPath_animated_(indexPath, True)
-    #pdbr.state(self,1)
-    #pdbr.state(self.navigationController)
-    #splitViewController = self.splitViewController
-
-    #pdbr.state(splitViewController.traitCollection)
-
-    #showViewController_sender_
-
     vc = self.all_items[indexPath.row][1].new()
-    nvc = UINavigationController.alloc().initWithRootViewController_(vc)
-    #navigationController = self.navigationController
-    #navigationController.pushViewController_animated_(vc, True)
-    #self.showDetailViewController_sender_(vc, vc)
-    #self.showViewController_sender_(vc, vc)
-    self.splitViewController.showDetailViewController_sender_(nvc, nvc)
-    #splitViewController.showViewController_sender_(vc, None)
-    #self.navigationController.showViewController_sender_(vc, self)
+    tableView.deselectRowAtIndexPath_animated_(indexPath, True)
+    self.pushOrPresentViewController_(vc)
+
+  # --- private
+  @objc_method
+  def splitViewWantsToShowDetail(self) -> bool:
+    return self.splitViewController.traitCollection.horizontalSizeClass == UIUserInterfaceSizeClass.regular
+
+  # --- private
+  @objc_method
+  def pushOrPresentViewController_(self, viewController):
+    if self.splitViewWantsToShowDetail():
+      navVC = UINavigationController.alloc().initWithRootViewController_(
+        viewController)
+
+      self.splitViewController.showDetailViewController_sender_(navVC, navVC)
+    else:
+      self.navigationController.pushViewController_animated_(
+        viewController, True)
 
 
 class SecondaryViewController(UIViewController):

@@ -452,3 +452,11 @@ class UISplitViewControllerDisplayMode:
   twoOverSecondary: int = 5
   twoDisplaceSecondary: int = 6
 
+
+# ref: [UIUserInterfaceSizeClass | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uiuserinterfacesizeclass?language=objc)
+@dataclass
+class UIUserInterfaceSizeClass:
+  unspecified: int = 0
+  compact: int = 1
+  regular: int = 2
+
