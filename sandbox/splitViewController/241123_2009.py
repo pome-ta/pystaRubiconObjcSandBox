@@ -56,12 +56,13 @@ class hogeViewController(UIViewController):
 
     # --- Layout
     self.label.translatesAutoresizingMaskIntoConstraints = False
+    safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
 
     NSLayoutConstraint.activateConstraints_([
       self.label.centerXAnchor.constraintEqualToAnchor_(
-        self.view.centerXAnchor),
+        safeAreaLayoutGuide.centerXAnchor),
       self.label.centerYAnchor.constraintEqualToAnchor_(
-        self.view.centerYAnchor),
+        safeAreaLayoutGuide.centerYAnchor),
     ])
 
 
