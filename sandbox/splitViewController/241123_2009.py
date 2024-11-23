@@ -18,6 +18,7 @@ from rbedge.functions import NSStringFromClass
 from rbedge import pdbr
 
 UIViewController = ObjCClass('UIViewController')
+UINavigationController = ObjCClass('UINavigationController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 # --- SplitView
@@ -35,7 +36,6 @@ UIColor = ObjCClass('UIColor')
 UILabel = ObjCClass('UILabel')
 UIFont = ObjCClass('UIFont')
 UIImage = ObjCClass('UIImage')
-
 
 
 class hogeViewController(UIViewController):
@@ -127,7 +127,6 @@ tbl_list = [
 ]
 
 
-
 class PrimaryTableViewController(UIViewController,
                                  protocols=[
                                    UITableViewDataSource,
@@ -202,9 +201,23 @@ class PrimaryTableViewController(UIViewController,
   @objc_method
   def tableView_didSelectRowAtIndexPath_(self, tableView, indexPath):
     #tableView.deselectRowAtIndexPath_animated_(indexPath, True)
+    #pdbr.state(self,1)
+    #pdbr.state(self.navigationController)
+    splitViewController = self.splitViewController
+
+    #pdbr.state(splitViewController.traitCollection)
+
+    #showViewController_sender_
+
     vc = self.all_items[indexPath.row][1].new()
-    #self.showDetailViewController_sender_(vc, self)
-    self.showViewController_sender_(vc, self)
+    nvc = UINavigationController.alloc().initWithRootViewController_(vc)
+    navigationController = self.navigationController
+    #navigationController.pushViewController_animated_(vc, True)
+    #self.showDetailViewController_sender_(vc, vc)
+    #self.showViewController_sender_(vc, vc)
+    splitViewController.showDetailViewController_sender_(nvc, nvc)
+    #splitViewController.showViewController_sender_(vc, None)
+    #self.navigationController.showViewController_sender_(vc, self)
 
 
 class SecondaryViewController(UIViewController):
@@ -258,8 +271,8 @@ class SplitViewController(UISplitViewController,
   @objc_method
   def splitViewController_topColumnForCollapsingToProposedTopColumn_(
       self, svc, proposedTopColumn: int) -> int:
-    return UISplitViewControllerColumn.secondary
-    #return UISplitViewControllerColumn.primary
+    #return UISplitViewControllerColumn.secondary
+    return UISplitViewControllerColumn.primary
 
 
 class ViewController(UIViewController):
