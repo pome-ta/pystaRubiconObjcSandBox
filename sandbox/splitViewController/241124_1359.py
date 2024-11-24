@@ -10,10 +10,11 @@ from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGRectMake
 
 from rbedge.enumerations import (
+  UIUserInterfaceSizeClass,
   UISplitViewControllerStyle,
   UISplitViewControllerColumn,
+  UISplitViewControllerDisplayMode,
   UITableViewStyle,
-  UIUserInterfaceSizeClass,
 )
 from rbedge.functions import NSStringFromClass
 from rbedge import pdbr
@@ -282,11 +283,7 @@ class SplitViewController(UISplitViewController,
 
     if (navController :=
         svc.viewControllers[0]).isMemberOfClass_(UINavigationController):
-      try:
-        navController.popToRootViewControllerAnimated_(False)
-      except:
-        pass  # xxx: 一旦回避
-
+      navController.popToRootViewControllerAnimated_(False)
     return UISplitViewControllerDisplayMode.automatic
 
 
