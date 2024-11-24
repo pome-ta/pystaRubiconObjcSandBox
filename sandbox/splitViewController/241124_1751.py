@@ -1,10 +1,11 @@
 '''
   note:
     `UISplitViewController` と、`UITableView`
+      - `UICollectionView` でやってみる？
 '''
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass, ObjCProtocol
+from pyrubicon.objc.api import ObjCClass, ObjCProtocol, ObjCInstance
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGRectMake
@@ -15,6 +16,7 @@ from rbedge.enumerations import (
   UISplitViewControllerDisplayMode,
   UIUserInterfaceSizeClass,
   UITableViewStyle,
+  UICollectionLayoutListAppearance,
 )
 from rbedge.functions import NSStringFromClass
 from rbedge import pdbr
@@ -32,6 +34,15 @@ UITableViewCell = ObjCClass('UITableViewCell')
 UITableView = ObjCClass('UITableView')
 UITableViewDataSource = ObjCProtocol('UITableViewDataSource')
 UITableViewDelegate = ObjCProtocol('UITableViewDelegate')
+
+# --- CollectionView
+UICollectionView = ObjCClass('UICollectionView')
+UICollectionViewDelegate = ObjCProtocol('UICollectionViewDelegate')
+UICollectionViewDataSource = ObjCProtocol('UICollectionViewDataSource')
+UICollectionLayoutListConfiguration = ObjCClass(
+  'UICollectionLayoutListConfiguration')
+UICollectionViewCompositionalLayout = ObjCClass(
+  'UICollectionViewCompositionalLayout')
 
 # --- others
 UIColor = ObjCClass('UIColor')
@@ -142,6 +153,36 @@ tbl_list = [
 ]
 
 
+class PrimaryCollectionViewController(UIViewController,
+                                      protocols=[
+                                        UICollectionViewDelegate,
+                                        UICollectionViewDataSource,
+                                      ]):
+
+  collectionView: UICollectionView = objc_property()
+
+  @objc_method
+  def init(self):
+    send_super(__class__, self, 'init')
+    self.collectionView = UICollectionView.alloc(
+    ).initWithFrame_collectionViewLayout_(CGRectMake(0.0, 0.0, 0.0, 0.0),
+                                          self.generateLayout())
+    #pdbr.state(self.generateLayout())
+    self.collectionView.delegate = self
+    self.collectionView.dataSource = self
+    return self
+
+  # --- private
+  @objc_method
+  def generateLayout(self) -> ObjCInstance:
+    _appearance = UICollectionLayoutListAppearance.sidebar
+    listConfiguration = UICollectionLayoutListConfiguration.alloc(
+    ).initWithAppearance_(_appearance)
+    layout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
+      listConfiguration)
+    return layout
+
+
 class PrimaryTableViewController(UIViewController,
                                  protocols=[
                                    UITableViewDataSource,
@@ -161,6 +202,9 @@ class PrimaryTableViewController(UIViewController,
     self.cell_identifier = 'customCell'
     self.tableView.registerClass_forCellReuseIdentifier_(
       UITableViewCell, self.cell_identifier)
+    # --- Table set
+    self.tableView.delegate = self
+    self.tableView.dataSource = self
 
     return self
 
@@ -171,10 +215,6 @@ class PrimaryTableViewController(UIViewController,
     # --- View
     self.view.backgroundColor = UIColor.systemDarkGreenColor()  # todo: 確認用
     self.view.addSubview_(self.tableView)
-
-    # --- Table set
-    self.tableView.delegate = self
-    self.tableView.dataSource = self
 
     # --- Layout
     self.tableView.translatesAutoresizingMaskIntoConstraints = False
@@ -271,6 +311,8 @@ class SplitViewController(UISplitViewController,
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     self.delegate = self
+
+    c = PrimaryCollectionViewController.new()
 
     primary_vc = PrimaryTableViewController.new()
     primary_vc.title = primary_vc.className()
