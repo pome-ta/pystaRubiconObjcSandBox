@@ -10,10 +10,10 @@ from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGRectMake
 
 from rbedge.enumerations import (
-  UIUserInterfaceSizeClass,
   UISplitViewControllerStyle,
   UISplitViewControllerColumn,
   UISplitViewControllerDisplayMode,
+  UIUserInterfaceSizeClass,
   UITableViewStyle,
 )
 from rbedge.functions import NSStringFromClass
@@ -259,7 +259,6 @@ class SplitViewController(UISplitViewController,
     send_super(__class__, self, 'viewDidLoad')
     self.delegate = self
 
-    #primary_vc = PrimaryViewController.new()
     primary_vc = PrimaryTableViewController.new()
     primary_vc.title = primary_vc.className()
 
@@ -321,7 +320,6 @@ if __name__ == '__main__':
   from rbedge.enumerations import UIModalPresentationStyle
 
   vc = ViewController.new()
-  #vc = PrimaryTableViewController.new()
 
   style = UIModalPresentationStyle.fullScreen
   #style = UIModalPresentationStyle.pageSheet
