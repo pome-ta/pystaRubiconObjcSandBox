@@ -43,6 +43,7 @@ UICollectionLayoutListConfiguration = ObjCClass(
   'UICollectionLayoutListConfiguration')
 UICollectionViewCompositionalLayout = ObjCClass(
   'UICollectionViewCompositionalLayout')
+UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
 
 # --- others
 UIColor = ObjCClass('UIColor')
@@ -152,6 +153,20 @@ tbl_list = [
   ['piyo', piyoViewController],
 ]
 
+prefectures = [
+  ['北海道', '北海道'],
+  ['東北', '青森', '岩手', '秋田', '宮城', '山形', '福島'],
+  ['関東', '茨城', '栃木', '群馬', '埼玉', '千葉', '東京', '神奈川'],
+  ['甲信越', '新潟', '長野', '山梨'],
+  ['北陸', '富山', '石川', '福井'],
+  ['東海', '岐阜', '静岡', '愛知', '三重'],
+  ['近畿', '滋賀', '京都', '奈良', '大阪', '和歌山', '兵庫'],
+  ['中国', '鳥取', '島根', '岡山', '広島', '山口'],
+  ['四国', '香川', '徳島', '愛媛', '高知'],
+  ['九州', '福岡', '佐賀', '長崎', '大分', '熊本', '宮崎', '鹿児島'],
+  ['沖縄', '沖縄'],
+]
+
 
 class PrimaryCollectionViewController(UIViewController,
                                       protocols=[
@@ -167,10 +182,58 @@ class PrimaryCollectionViewController(UIViewController,
     self.collectionView = UICollectionView.alloc(
     ).initWithFrame_collectionViewLayout_(CGRectMake(0.0, 0.0, 0.0, 0.0),
                                           self.generateLayout())
-    #pdbr.state(self.generateLayout())
+
     self.collectionView.delegate = self
     self.collectionView.dataSource = self
+
+    self.identifier_str = 'customCells'
+    self.collectionView.registerClass_forCellWithReuseIdentifier_(
+      UICollectionViewListCell, self.identifier_str)
+
     return self
+
+  @objc_method
+  def viewDidLoad(self):
+    send_super(__class__, self, 'viewDidLoad')
+
+    # --- View
+    self.view.backgroundColor = UIColor.systemBrownColor()  # todo: 確認用
+    self.view.addSubview_(self.collectionView)
+
+    # --- Layout
+    self.collectionView.translatesAutoresizingMaskIntoConstraints = False
+    safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
+    NSLayoutConstraint.activateConstraints_([
+      self.collectionView.centerXAnchor.constraintEqualToAnchor_(
+        safeAreaLayoutGuide.centerXAnchor),
+      self.collectionView.centerYAnchor.constraintEqualToAnchor_(
+        safeAreaLayoutGuide.centerYAnchor),
+      self.collectionView.widthAnchor.constraintEqualToAnchor_multiplier_(
+        safeAreaLayoutGuide.widthAnchor, 1.0),
+      self.collectionView.heightAnchor.constraintEqualToAnchor_multiplier_(
+        safeAreaLayoutGuide.heightAnchor, 1.0),
+    ])
+
+  @objc_method
+  def numberOfSectionsInCollectionView_(self, collectionView) -> int:
+    return len(prefectures)
+
+  @objc_method
+  def collectionView_numberOfItemsInSection_(self, collectionView,
+                                             section: int) -> int:
+
+    return len(prefectures[section])
+
+  @objc_method
+  def collectionView_cellForItemAtIndexPath_(self, collectionView,
+                                             indexPath) -> objc_id:
+    cell = collectionView.dequeueReusableCellWithReuseIdentifier_forIndexPath_(
+      self.identifier_str, indexPath)
+
+    cellConfiguration = cell.defaultContentConfiguration()
+    cellConfiguration.text = prefectures[indexPath.section][indexPath.row]
+    cell.contentConfiguration = cellConfiguration
+    return cell
 
   # --- private
   @objc_method
@@ -312,9 +375,8 @@ class SplitViewController(UISplitViewController,
     send_super(__class__, self, 'viewDidLoad')
     self.delegate = self
 
-    c = PrimaryCollectionViewController.new()
-
-    primary_vc = PrimaryTableViewController.new()
+    primary_vc = PrimaryCollectionViewController.new()
+    #primary_vc = PrimaryTableViewController.new()
     primary_vc.title = primary_vc.className()
 
     secondary_vc = SecondaryViewController.new()
@@ -329,7 +391,8 @@ class SplitViewController(UISplitViewController,
   @objc_method
   def splitViewController_topColumnForCollapsingToProposedTopColumn_(
       self, svc, proposedTopColumn: int) -> int:
-    return UISplitViewControllerColumn.secondary
+    #return UISplitViewControllerColumn.secondary
+    return UISplitViewControllerColumn.primary
 
   @objc_method
   def splitViewController_displayModeForExpandingToProposedDisplayMode_(
