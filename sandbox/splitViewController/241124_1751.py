@@ -17,6 +17,7 @@ from rbedge.enumerations import (
   UIUserInterfaceSizeClass,
   UITableViewStyle,
   UICollectionLayoutListAppearance,
+  UICollectionLayoutListHeaderMode,
 )
 from rbedge.functions import NSStringFromClass
 from rbedge import pdbr
@@ -239,8 +240,12 @@ class PrimaryCollectionViewController(UIViewController,
   @objc_method
   def generateLayout(self) -> ObjCInstance:
     _appearance = UICollectionLayoutListAppearance.sidebar
+    #_appearance = UICollectionLayoutListAppearance.plain
     listConfiguration = UICollectionLayoutListConfiguration.alloc(
     ).initWithAppearance_(_appearance)
+    _headerMode = UICollectionLayoutListHeaderMode.firstItemInSection
+    listConfiguration.headerMode = _headerMode
+    #pdbr.state()
     layout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
       listConfiguration)
     return layout

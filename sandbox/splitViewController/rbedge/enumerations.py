@@ -258,6 +258,16 @@ class UICollectionLayoutListAppearance:
   sidebarPlain: int = 4
 
 
+# ref: [UICollectionLayoutListHeaderMode | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uicollectionlayoutlistheadermode)
+@dataclass
+class UICollectionLayoutListHeaderMode:
+  # xxx: 独自調査 a.k.a: 勘
+  # ref: [UICollectionLayoutList.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UICollectionLayoutList.rs.html)
+  none: int = 0
+  supplementary: int = 1
+  firstItemInSection: int = 2
+
+
 # ref: [UIViewAutoresizing | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uiviewautoresizing?language=objc)
 @dataclass
 class UIViewAutoresizing:
