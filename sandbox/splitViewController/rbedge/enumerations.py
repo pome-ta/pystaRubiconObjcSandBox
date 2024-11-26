@@ -470,3 +470,8 @@ class UIUserInterfaceSizeClass:
   compact: int = 1
   regular: int = 2
 
+# ref: [UICellAccessoryOutlineDisclosureStyle | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uicellaccessoryoutlinedisclosurestyle?language=objc)
+@dataclass
+class UICellAccessoryOutlineDisclosureStyle:
+  pass
+  
