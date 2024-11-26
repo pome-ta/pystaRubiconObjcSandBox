@@ -244,7 +244,7 @@ class PrimaryCollectionViewController(UIViewController,
     listConfiguration = UICollectionLayoutListConfiguration.alloc(
     ).initWithAppearance_(_appearance)
     _headerMode = UICollectionLayoutListHeaderMode.firstItemInSection
-    listConfiguration.headerMode = _headerMode
+    #listConfiguration.headerMode = _headerMode
     #pdbr.state()
     layout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
       listConfiguration)
