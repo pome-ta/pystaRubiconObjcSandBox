@@ -6,8 +6,8 @@
 import ctypes
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol, ObjCInstance
-from pyrubicon.objc.api import objc_method, objc_property,objc_const
-from pyrubicon.objc.runtime import send_super, objc_id,load_library
+from pyrubicon.objc.api import objc_method, objc_property, objc_const
+from pyrubicon.objc.runtime import send_super, objc_id, load_library
 from pyrubicon.objc.types import CGRectMake
 
 from rbedge.enumerations import (
@@ -21,9 +21,6 @@ from rbedge.enumerations import (
 )
 from rbedge.functions import NSStringFromClass
 from rbedge import pdbr
-
-
-
 
 UIKit = load_library('UIKit')  # todo: `objc_const` 用
 UIViewController = ObjCClass('UIViewController')
@@ -50,7 +47,8 @@ UICollectionViewCompositionalLayout = ObjCClass(
   'UICollectionViewCompositionalLayout')
 UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
 #UIListContentTextProperties = ObjCClass('UIListContentTextProperties')
-UICellAccessoryOutlineDisclosure = ObjCClass('UICellAccessoryOutlineDisclosure')
+UICellAccessoryOutlineDisclosure = ObjCClass(
+  'UICellAccessoryOutlineDisclosure')
 
 # --- others
 UIColor = ObjCClass('UIColor')
@@ -59,6 +57,7 @@ UIFont = ObjCClass('UIFont')
 UIImage = ObjCClass('UIImage')
 
 #pdbr.state(UIFont)
+
 
 class OutlineItem:
 
@@ -241,7 +240,8 @@ class PrimaryCollectionViewController(UIViewController,
     cellConfiguration = cell.defaultContentConfiguration()
     cellConfiguration.text = prefectures[indexPath.section][indexPath.row]
     #str(objc_const(UIKit, 'UIFontTextStyleBody')
-    cellConfiguration.textProperties.font = UIFont.preferredFontForTextStyle_(str(objc_const(UIKit, 'UIFontTextStyleHeadline')))
+    cellConfiguration.textProperties.font = UIFont.preferredFontForTextStyle_(
+      str(objc_const(UIKit, 'UIFontTextStyleHeadline')))
     #pdbr.state(cellConfiguration)
     cell.contentConfiguration = cellConfiguration
     return cell
