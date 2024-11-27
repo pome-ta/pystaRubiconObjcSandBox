@@ -164,7 +164,7 @@ class PrimaryCollectionViewController(UIViewController,
       ]
       #[UICellAccessoryOutlineDisclosure.alloc().setStyle_()]
     #pdbr.state(cellConfiguration)
-    background=UIBackgroundConfiguration.clearConfiguration()
+    background = UIBackgroundConfiguration.clearConfiguration()
     cell.backgroundConfiguration = background
     cell.contentConfiguration = cellConfiguration
     return cell
