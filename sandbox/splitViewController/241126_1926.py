@@ -6,8 +6,8 @@
 import ctypes
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol, ObjCInstance
-from pyrubicon.objc.api import objc_method, objc_property,objc_const
-from pyrubicon.objc.runtime import send_super, objc_id,load_library
+from pyrubicon.objc.api import objc_method, objc_property, objc_const
+from pyrubicon.objc.runtime import send_super, objc_id, load_library
 from pyrubicon.objc.types import CGRectMake
 
 from rbedge.enumerations import (
@@ -22,9 +22,6 @@ from rbedge.enumerations import (
 from rbedge.functions import NSStringFromClass
 from rbedge import pdbr
 
-
-
-
 UIKit = load_library('UIKit')  # todo: `objc_const` 用
 UIViewController = ObjCClass('UIViewController')
 UINavigationController = ObjCClass('UINavigationController')
@@ -34,8 +31,6 @@ NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 UISplitViewController = ObjCClass('UISplitViewController')
 UISplitViewControllerDelegate = ObjCProtocol('UISplitViewControllerDelegate')
 UITableViewCell = ObjCClass('UITableViewCell')
-
-
 
 # --- CollectionView
 UICollectionView = ObjCClass('UICollectionView')
@@ -48,24 +43,19 @@ UICollectionViewCompositionalLayout = ObjCClass(
 UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
 #UIListContentTextProperties = ObjCClass('UIListContentTextProperties')
 UICellAccessory = ObjCClass('UICellAccessory')
-UICellAccessoryOutlineDisclosure = ObjCClass('UICellAccessoryOutlineDisclosure')
-
-
+UICellAccessoryOutlineDisclosure = ObjCClass(
+  'UICellAccessoryOutlineDisclosure')
+UIBackgroundConfiguration = ObjCClass('UIBackgroundConfiguration')
 #pdbr.state(UICellAccessory.alloc())
 #pdbr.state()
 #print(UICellAccessoryOutlineDisclosure.alloc().style)
-a = UICellAccessoryOutlineDisclosure.alloc().init()
-
-a.setStyle_(1)
-pdbr.state(a)
-
+#a = UICellAccessoryOutlineDisclosure.alloc().init()
 
 # --- others
 UIColor = ObjCClass('UIColor')
 UILabel = ObjCClass('UILabel')
 UIFont = ObjCClass('UIFont')
 UIImage = ObjCClass('UIImage')
-
 
 
 class OutlineItem:
@@ -79,8 +69,6 @@ class OutlineItem:
     self.subitems = subitems
     self.storyboardName = storyboardName
     self.imageName = imageName
-
-
 
 
 prefectures = [
@@ -162,14 +150,22 @@ class PrimaryCollectionViewController(UIViewController,
 
     cellConfiguration = cell.defaultContentConfiguration()
     cellConfiguration.text = prefectures[indexPath.section][indexPath.row]
-    
+
     if indexPath.row:
       pass
     else:
-      cellConfiguration.textProperties.font = UIFont.preferredFontForTextStyle_(str(objc_const(UIKit, 'UIFontTextStyleHeadline')))
+      cellConfiguration.textProperties.font = UIFont.preferredFontForTextStyle_(
+        str(objc_const(UIKit, 'UIFontTextStyleHeadline')))
       disclosureOptions = UICellAccessoryOutlineDisclosureStyle.header
+      _outlineDisclosure = UICellAccessoryOutlineDisclosure.new()
+      _outlineDisclosure.setStyle_(disclosureOptions)
+      cell.accessories = [
+        _outlineDisclosure,
+      ]
       #[UICellAccessoryOutlineDisclosure.alloc().setStyle_()]
     #pdbr.state(cellConfiguration)
+    background=UIBackgroundConfiguration.clearConfiguration()
+    cell.backgroundConfiguration = background
     cell.contentConfiguration = cellConfiguration
     return cell
 
@@ -186,7 +182,6 @@ class PrimaryCollectionViewController(UIViewController,
     layout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
       listConfiguration)
     return layout
-
 
 
 class SecondaryViewController(UIViewController):
