@@ -49,7 +49,7 @@ NSDiffableDataSourceSnapshot = ObjCClass('NSDiffableDataSourceSnapshot')
 
 
 class ViewController(UIViewController):
-  dataSource: UICollectionViewDiffableDataSource = objc_property(weak=True)
+  #dataSource: UICollectionViewDiffableDataSource = objc_property(weak=True)
 
   @objc_method
   def init(self):
@@ -150,7 +150,7 @@ class ViewController(UIViewController):
       '🍋',
     ])
     '''
-    snapshot.appendItemsWithIdentifiers_([])
+    #snapshot.appendItemsWithIdentifiers_([])
     #snapshot.appendItemsWithIdentifiers_([])
     self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
     #pdbr.state(self.dataSource.collectionView())

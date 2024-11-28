@@ -2,6 +2,7 @@
   note:
     `UISplitViewController` と、`UITableView`
       - `UICollectionView` でやってみる？
+      - 愚直に開閉する
 '''
 import ctypes
 
