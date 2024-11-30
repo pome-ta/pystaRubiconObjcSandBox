@@ -141,8 +141,8 @@ class PrimaryCollectionViewController(UIViewController,
   def collectionView_numberOfItemsInSection_(self, collectionView,
                                              section: int) -> int:
 
-    #return len(prefectures[section])
-    return 1
+    return len(prefectures[section])
+    #return 1
 
   @objc_method
   def collectionView_cellForItemAtIndexPath_(self, collectionView,

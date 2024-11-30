@@ -5,7 +5,7 @@
 '''
 import ctypes
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol, ObjCInstance, Block
-from pyrubicon.objc.api import objc_method,objc_property
+from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
 
 from rbedge.enumerations import (
@@ -50,14 +50,13 @@ NSDiffableDataSourceSnapshot = ObjCClass('NSDiffableDataSourceSnapshot')
 
 class ViewController(UIViewController):
   #dataSource: UICollectionViewDiffableDataSource = objc_property(weak=True)
+  dataSource: UICollectionViewDiffableDataSource = objc_property()
 
   @objc_method
   def init(self):
     send_super(__class__, self, 'init')
-    print('i')
     return self
-    
-  
+
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
@@ -78,7 +77,6 @@ class ViewController(UIViewController):
 
     self.dataSource = self.configureCellRegistration_(collectionView)
     #self.configureCellRegistration_(collectionView)
-    
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -89,7 +87,7 @@ class ViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #print(self.dataSource)
+    print(self.dataSource)
     #self.initData()
 
   @objc_method
@@ -107,33 +105,30 @@ class ViewController(UIViewController):
     @Block
     def cellRegistrationHandler(_cell: objc_id, _indexPath: objc_id,
                                 _item: objc_id) -> None:
-      
+
       cell = ObjCInstance(_cell)
       indexPath = ObjCInstance(_indexPath)
       item = ObjCInstance(_item)
       content = _cell.defaultContentConfiguration()
       content.text = _item
       cell.contentConfiguration = _content
-      
-      
 
     cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
       UICollectionViewListCell, cellRegistrationHandler)
 
-    
     @Block
     def cellProvider(_collectionView: objc_id, _indexPath: objc_id,
                      _item: int) -> ctypes.py_object:
       #collectionView = ObjCInstance(_collectionView)
       #indexPath = ObjCInstance(_indexPath)
       #item = ObjCInstance(_item)
-      print('h')
+      #print('h')
 
       return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
         _cellRegistration, ObjCInstance(_indexPath), _item)
-    
-    
-    return UICollectionViewDiffableDataSource.alloc().initWithCollectionView_cellProvider_(collectionView, cellProvider)
+
+    return UICollectionViewDiffableDataSource.alloc(
+    ).initWithCollectionView_cellProvider_(collectionView, cellProvider)
     #self.dataSource = UICollectionViewDiffableDataSource.alloc().initWithCollectionView_cellProvider_(collectionView, cellProvider)
     #self.dataSource = UICollectionViewDiffableDataSource.alloc().initWithCollectionView_cellProvider_(collectionView, Block(collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_, ctypes.py_object, objc_id, objc_id,objc_id))
 
@@ -166,4 +161,5 @@ if __name__ == '__main__':
   style = UIModalPresentationStyle.fullScreen
   #style = UIModalPresentationStyle.pageSheet
   present_viewController(vc, style)
+e)
   
