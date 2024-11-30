@@ -161,7 +161,7 @@ class PrimaryCollectionViewController(UIViewController,
       disclosureOptions = UICellAccessoryOutlineDisclosureStyle.header
       _outlineDisclosure = UICellAccessoryOutlineDisclosure.new()
       _outlineDisclosure.setStyle_(disclosureOptions)
-      pdbr.state(_outlineDisclosure)
+      #pdbr.state(_outlineDisclosure)
       cell.accessories = [
         _outlineDisclosure,
       ]
@@ -180,11 +180,11 @@ class PrimaryCollectionViewController(UIViewController,
     listConfiguration = UICollectionLayoutListConfiguration.alloc(
     ).initWithAppearance_(_appearance)
     _headerMode = UICollectionLayoutListHeaderMode.firstItemInSection
-    #listConfiguration.headerMode = _headerMode
+    listConfiguration.headerMode = _headerMode
     layout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
       listConfiguration)
     #pdbr.state(listConfiguration.appearance)
-    print(listConfiguration.appearance)
+    #print(listConfiguration.appearance)
     return layout
 
 
