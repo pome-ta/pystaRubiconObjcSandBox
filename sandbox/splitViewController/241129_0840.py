@@ -150,6 +150,9 @@ class PrimaryCollectionViewController(UIViewController,
     cell = collectionView.dequeueReusableCellWithReuseIdentifier_forIndexPath_(
       self.identifier_str, indexPath)
 
+    #pdbr.state(indexPath.item)
+    print(indexPath.item)
+    
     cellConfiguration = cell.defaultContentConfiguration()
     cellConfiguration.text = prefectures[indexPath.section][indexPath.row]
 

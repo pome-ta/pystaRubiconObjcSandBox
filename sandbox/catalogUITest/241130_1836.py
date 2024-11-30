@@ -28,15 +28,19 @@ UICollectionViewCompositionalLayout = ObjCClass(
   'UICollectionViewCompositionalLayout')
 UICollectionViewDiffableDataSource = ObjCClass(
   'UICollectionViewDiffableDataSource')
+UICollectionViewCellRegistration = ObjCClass(
+  'UICollectionViewCellRegistration')
+UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
 
-'''
+
 class CollectionViewController(UIViewController,
                                protocols=[
                                  UICollectionViewDataSource,
                                ]):
-'''
-class CollectionViewController(UIViewController):
+
+  #class CollectionViewController(UIViewController):
   collectionView: UICollectionView = objc_property()
+  cellreg: UICollectionViewCellRegistration = objc_property()
 
   @objc_method
   def init(self):
@@ -44,7 +48,7 @@ class CollectionViewController(UIViewController):
     cg_zero = CGRectMake(0.0, 0.0, 0.0, 0.0)
     self.collectionView = UICollectionView.alloc(
     ).initWithFrame_collectionViewLayout_(cg_zero, self.generateLayout())
-    #self.collectionView.dataSource = self
+    self.collectionView.dataSource = self
     return self
 
   @objc_method
@@ -71,9 +75,29 @@ class CollectionViewController(UIViewController):
         safeAreaLayoutGuide.heightAnchor, 1.0),
     ])
 
-    #def cellProvider()
+    @Block
+    def cellProvider(_cell: objc_id, _indexPath: objc_id,
+                     _item: objc_id) -> None:
+      #pdbr.state(_cell)
+      cell = ObjCInstance(_cell)
+      indexPath = ObjCInstance(_indexPath)
+      item = ObjCInstance(_item)
+      pdbr.state(ObjCInstance(_indexPath))
+      config = cell.defaultContentConfiguration()
+      config.setText_(item)
+      cell.setContentConfiguration_(config)
+
     #pdbr.state(UICollectionViewDiffableDataSource.alloc())
     #initWithCollectionView_cellProvider_
+
+    self.cellreg = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
+      UICollectionViewListCell, cellProvider)
+
+    self.pep = ["manny", "moe", "jack"]
+    #self.datasource = UICollectionViewDiffableDataSource.alloc( ).initWithCollectionView_cellProvider_(self.collectionView, cellreg)
+    #snapshot = self.datasource.snapshot()
+    #pdbr.state(self.datasource)
+    #pdbr.state(cellreg)
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -84,7 +108,21 @@ class CollectionViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    pdbr.state(self.collectionView)
+    #pdbr.state(self.collectionView)
+    #pdbr.state(self.cellreg)
+    #print(self.pep)
+
+  @objc_method
+  def collectionView_numberOfItemsInSection_(self, collectionView,
+                                             section: int) -> int:
+
+    return 3
+
+  @objc_method
+  def collectionView_cellForItemAtIndexPath_(self, collectionView,
+                                             indexPath) -> objc_id:
+    return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
+      self.cellreg, indexPath, self.pep[indexPath.item])
 
   # --- private
   @objc_method
