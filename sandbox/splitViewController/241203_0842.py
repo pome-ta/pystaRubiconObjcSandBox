@@ -184,7 +184,11 @@ class PrimaryCollectionViewController(UIViewController,
   def numberOfSectionsInCollectionView_(self, collectionView) -> int:
     return len(prefectures)
   '''
+  @objc_method
+  def collectionView_numberOfItemsInSection_(self, collectionView,
+                                             section: int) -> int:
 
+    return len(prefectures[section])
   @objc_method
   def collectionView_numberOfItemsInSection_(self, collectionView,
                                              section: int) -> int:
