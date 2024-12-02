@@ -45,7 +45,7 @@ class CollectionViewController(UIViewController,
 
   #class CollectionViewController(UIViewController):
   collectionView: UICollectionView = objc_property()
-  datasource:UICollectionViewDiffableDataSource=objc_property()
+  datasource: UICollectionViewDiffableDataSource = objc_property()
   cellreg: UICollectionViewCellRegistration = objc_property()
 
   @objc_method
@@ -121,7 +121,7 @@ class CollectionViewController(UIViewController,
     #pdbr.state(cellreg)
     self.datasource.applySnapshot_animatingDifferences_(snap, False)
     #self.datasource.applySnapshot_animatingDifferences_(self.datasource.snapshot(), False)
-    
+
     #pdbr.state(self.datasource.snapshot())
     #pdbr.state(self.datasource)
     #pdbr.state(snap)
