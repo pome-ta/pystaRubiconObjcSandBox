@@ -152,7 +152,7 @@ class PrimaryCollectionViewController(UIViewController,
 
     #pdbr.state(indexPath.item)
     print(indexPath.item)
-    
+
     cellConfiguration = cell.defaultContentConfiguration()
     cellConfiguration.text = prefectures[indexPath.section][indexPath.row]
 
