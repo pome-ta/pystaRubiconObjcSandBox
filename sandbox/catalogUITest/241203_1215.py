@@ -4,7 +4,7 @@
 import ctypes
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, ObjCProtocol, Block
-from pyrubicon.objc.api import objc_method, objc_property
+from pyrubicon.objc.api import objc_method, objc_property, at
 from pyrubicon.objc.runtime import send_super, objc_id
 
 from rbedge.functions import NSStringFromClass
@@ -29,6 +29,8 @@ UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
 UICollectionViewDiffableDataSource = ObjCClass(
   'UICollectionViewDiffableDataSource')
 NSDiffableDataSourceSnapshot = ObjCClass('NSDiffableDataSourceSnapshot')
+NSDiffableDataSourceSectionSnapshot = ObjCClass(
+  'NSDiffableDataSourceSectionSnapshot')
 # --- others
 UIColor = ObjCClass('UIColor')
 '''
@@ -41,6 +43,7 @@ class ViewController(UIViewController, protocols=[
 class ViewController(UIViewController):
   collectionView: UICollectionView = objc_property()
   dataSource: UICollectionViewDiffableDataSource = objc_property()
+  #snapshot:NSDiffableDataSourceSectionSnapshot=objc_property()
 
   @objc_method
   def viewDidLoad(self):
@@ -64,7 +67,7 @@ class ViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    print(self.collectionView)
+    #print(self.collectionView)
     #pdbr.state(self)
 
   @objc_method  # private
@@ -116,14 +119,10 @@ class ViewController(UIViewController):
     self.dataSource = UICollectionViewDiffableDataSource.alloc(
     ).initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
 
-    self.pep = ['manny', 'moe', 'jack']
-
-    snapshot = NSDiffableDataSourceSnapshot.alloc().init()
-    snapshot.appendSectionsWithIdentifiers_(['pepboys'])
-    #snapshot.appendItemsWithIdentifiers_(self.pep)
-    snapshot.appendItemsWithIdentifiers_([])
-    self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
-    #pdbr.state(dataSource)
+    #snapshot = self.initialSnapshot()
+    #self.snapshot = self.initialSnapshot()
+    self.initialSnapshot()
+    #pdbr.state(snapshot)
 
   @objc_method  # private
   def generateLayout(self) -> ObjCInstance:
@@ -133,6 +132,20 @@ class ViewController(UIViewController):
     layout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
       listConfiguration)
     return layout
+
+  @objc_method  # private
+  def initialSnapshot(self) -> ObjCInstance:
+    snapshot = NSDiffableDataSourceSectionSnapshot.alloc().init()
+    _parent = 'pepboys'
+    #snapshot.appendItems_([_parent])
+    #snapshot.appendItems_intoParentItem_([_parent], None)
+    #snapshot.appendItems_intoParentItem_(['manny', 'moe', 'jack'], _parent)
+    snapshot.appendItems_intoParentItem_(['manny', 'moe', 'jack'], None)
+    #pdbr.state(snapshot)
+    #pdbr.state(self.dataSource)
+    #self.dataSource.applySnapshot_toSection_animatingDifferences_(snapshot, 0, False)
+    self.dataSource.applySnapshot_animatingDifferences_(snapshot,False)
+    #return snapshot
 
 
 if __name__ == '__main__':
