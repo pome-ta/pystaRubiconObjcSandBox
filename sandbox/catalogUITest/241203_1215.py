@@ -1,10 +1,11 @@
 '''
   note: シンプルに`UICollectionViewDiffableDataSource` のやつやる
 '''
+import ctypes
 
-from pyrubicon.objc.api import ObjCClass, ObjCInstance
-from pyrubicon.objc.api import objc_method
-from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.api import ObjCClass, ObjCInstance, ObjCProtocol, Block
+from pyrubicon.objc.api import objc_method, objc_property
+from pyrubicon.objc.runtime import send_super, objc_id
 
 from rbedge.functions import NSStringFromClass
 from rbedge import pdbr
@@ -17,16 +18,29 @@ NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 # --- CollectionView
 UICollectionView = ObjCClass('UICollectionView')
+#UICollectionViewDelegate = ObjCProtocol('UICollectionViewDelegate')
 UICollectionLayoutListConfiguration = ObjCClass(
   'UICollectionLayoutListConfiguration')
 UICollectionViewCompositionalLayout = ObjCClass(
   'UICollectionViewCompositionalLayout')
-
+UICollectionViewCellRegistration = ObjCClass(
+  'UICollectionViewCellRegistration')
+UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
+UICollectionViewDiffableDataSource = ObjCClass(
+  'UICollectionViewDiffableDataSource')
+NSDiffableDataSourceSnapshot = ObjCClass('NSDiffableDataSourceSnapshot')
 # --- others
 UIColor = ObjCClass('UIColor')
+'''
+class ViewController(UIViewController, protocols=[
+    UICollectionViewDelegate,
+]):
+'''
 
 
 class ViewController(UIViewController):
+  collectionView: UICollectionView = objc_property()
+  dataSource: UICollectionViewDiffableDataSource = objc_property()
 
   @objc_method
   def viewDidLoad(self):
@@ -38,9 +52,20 @@ class ViewController(UIViewController):
     # --- View
     self.view.backgroundColor = UIColor.systemDarkRedColor()  # todo: 確認用
 
-    #pdbr.state(self.generateLayout())
     self.configureCollectionView()
+    self.configureDataSource()
+
+  @objc_method
+  def viewDidAppear_(self, animated: bool):
+    send_super(__class__,
+               self,
+               'viewDidAppear:',
+               animated,
+               argtypes=[
+                 ctypes.c_bool,
+               ])
     print(self.collectionView)
+    #pdbr.state(self)
 
   @objc_method  # private
   def configureCollectionView(self):
@@ -63,10 +88,44 @@ class ViewController(UIViewController):
       collectionView.heightAnchor.constraintEqualToAnchor_multiplier_(
         safeAreaLayoutGuide.heightAnchor, 1.0),
     ])
+    #collectionView.delegate = self
     self.collectionView = collectionView
 
-  # private
-  @objc_method
+  @objc_method  # private
+  def configureDataSource(self):
+
+    @Block
+    def configurationHandler(_cell: objc_id, _indexPath: objc_id,
+                             _item: objc_id) -> None:
+      cell = ObjCInstance(_cell)
+      indexPath = ObjCInstance(_indexPath)
+      item = ObjCInstance(_item)
+
+    cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
+      UICollectionViewListCell, configurationHandler)
+
+    @Block
+    def cellProvider(_collectionView: objc_id, _indexPath: objc_id,
+                     _item: objc_id) -> objc_id:
+      collectionView = ObjCInstance(_collectionView)
+      indexPath = ObjCInstance(_indexPath)
+      item = ObjCInstance(_item)
+      return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
+        cellRegistration, indexPath, item)
+
+    self.dataSource = UICollectionViewDiffableDataSource.alloc(
+    ).initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
+
+    self.pep = ['manny', 'moe', 'jack']
+
+    snapshot = NSDiffableDataSourceSnapshot.alloc().init()
+    snapshot.appendSectionsWithIdentifiers_(['pepboys'])
+    #snapshot.appendItemsWithIdentifiers_(self.pep)
+    snapshot.appendItemsWithIdentifiers_([])
+    self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+    #pdbr.state(dataSource)
+
+  @objc_method  # private
   def generateLayout(self) -> ObjCInstance:
     _appearance = UICollectionLayoutListAppearance.sidebar
     listConfiguration = UICollectionLayoutListConfiguration.alloc(
