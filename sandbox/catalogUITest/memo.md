@@ -1,3 +1,8 @@
+# 📝 2024/12/03
+
+- [【Swift】UICollectionViewの更新処理には段階がある #iOS - Qiita](https://qiita.com/juginon/items/5526e7b79edadd2362b5)
+
+
 # 📝 2024/11/30
 
 
