@@ -34,16 +34,18 @@ NSDiffableDataSourceSectionSnapshot = ObjCClass(
   'NSDiffableDataSourceSectionSnapshot')
 # --- others
 UIColor = ObjCClass('UIColor')
-
 '''
 class ViewController(UIViewController, protocols=[
     UICollectionViewDelegate,
 ]):
 '''
+
+
 class ViewController(UIViewController):
-  collectionView: UICollectionView = objc_property()
-  dataSource: UICollectionViewDiffableDataSource = objc_property()
-  snapshot: NSDiffableDataSourceSectionSnapshot = objc_property()
+  #collectionView: UICollectionView = objc_property()
+  #dataSource: UICollectionViewDiffableDataSource = objc_property()
+  #snapshot: NSDiffableDataSourceSectionSnapshot = objc_property()
+  #cellRegistration=objc_property()
 
   @objc_method
   def viewDidLoad(self):
@@ -69,8 +71,9 @@ class ViewController(UIViewController):
                ])
     #print(self.collectionView)
     #pdbr.state(self)
-    self.initialSnapshot()
+    #self.upDateSnapshot()
     #print(self.collectionView)
+    #pdbr.state(self.collectionView.dataSource)
 
   @objc_method  # private
   def configureCollectionView(self):
@@ -117,15 +120,17 @@ class ViewController(UIViewController):
     def cellProvider(_collectionView: objc_id, _indexPath: objc_id,
                      _item: objc_id) -> objc_id:
       collectionView = ObjCInstance(_collectionView)
+      
       indexPath = ObjCInstance(_indexPath)
       item = ObjCInstance(_item)
       return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
-        cellRegistration, indexPath, item)
+        cellRegistration, _indexPath, item)
 
     self.dataSource = UICollectionViewDiffableDataSource.alloc(
     ).initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
 
     #pdbr.state(UICollectionViewDiffableDataSource.new())
+    self.initialSnapshot()
 
   @objc_method  # private
   def generateLayout(self) -> ObjCInstance:
@@ -139,27 +144,36 @@ class ViewController(UIViewController):
   @objc_method  # private
   def initialSnapshot(self) -> ObjCInstance:
     #snapshot = NSDiffableDataSourceSectionSnapshot.alloc().init()
-    self.snapshot = NSDiffableDataSourceSnapshot.alloc().init()
-    self.snapshot.appendSectionsWithIdentifiers_([0])
-    self.snapshot.appendItemsWithIdentifiers_([])
-    self.snapshot.reloadItemsWithIdentifiers_([])
-
-    self.dataSource.applySnapshot_animatingDifferences_(self.snapshot, True)
-
-    pdbr.state(self.snapshot)
-    '''
-    _parent = 'pepboys'
-    snapshot.appendItems_([_parent])
-    #snapshot.appendItems_intoParentItem_([_parent], None)
-    #snapshot.appendItems_intoParentItem_(['manny', 'moe', 'jack'], _parent)
-    snapshot.appendItems_intoParentItem_([], _parent)
+    snapshot = NSDiffableDataSourceSnapshot.alloc().init()
+    #self.snapshot = self.collectionView.dataSource.snapshot()
+    snapshot.appendSectionsWithIdentifiers_([0])
+    #snapshot.reloadSectionsWithIdentifiers_([0])
+    #snapshot.appendItemsWithIdentifiers_(['a'])
+    #snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(['a'], 0)
+    #self.snapshot.reloadItemsWithIdentifiers_([''])
+    #pdbr.state(self.collectionView.dataSource.snapshot())
+    #pdbr.state(self.snapshot)
+    #self.collectionView.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+    self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+    #print(snapshot)
+    #print(self.collectionView.dataSource.snapshot())
     #pdbr.state(snapshot)
-    #pdbr.state(self.dataSource)
-    #
-    self.dataSource.applySnapshot_toSection_animatingDifferences_(snapshot, _parent, False)
-    #self.dataSource.applySnapshot_animatingDifferences_(snapshot,False)
-    #return snapshot
-    '''
+    #print(snapshot)
+    pdbr.state(self.collectionView)
+
+  @objc_method  # private
+  def upDateSnapshot(self) -> ObjCInstance:
+    #snapshot = NSDiffableDataSourceSectionSnapshot.alloc().init()
+    #snapshot = NSDiffableDataSourceSnapshot.alloc().init()
+    snapshot = self.collectionView.dataSource.snapshot()
+    snapshot.appendSectionsWithIdentifiers_([1])
+    #snapshot.reloadSectionsWithIdentifiers_([0])
+    #snapshot.appendItemsWithIdentifiers_([])
+    #self.snapshot.reloadItemsWithIdentifiers_([''])
+    #pdbr.state(self.collectionView.dataSource.snapshot())
+    #pdbr.state(self.snapshot)
+    #self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+    #print(snapshot)
 
 
 if __name__ == '__main__':
