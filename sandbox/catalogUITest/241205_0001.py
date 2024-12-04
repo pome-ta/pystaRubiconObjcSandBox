@@ -59,6 +59,7 @@ class ViewController(UIViewController):
 
     self.configureCollectionView()
     self.configureDataSource()
+    self.collectionView.reloadData()
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -124,10 +125,11 @@ class ViewController(UIViewController):
       indexPath = ObjCInstance(_indexPath)
       item = ObjCInstance(_item)
       return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
-        cellRegistration, _indexPath, item)
+        cellRegistration, indexPath, item)
 
     self.dataSource = UICollectionViewDiffableDataSource.alloc(
     ).initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
+    
     #pdbr.state(self.dataSource)
     #print(self.dataSource.validateIdentifiers())
 
@@ -159,7 +161,7 @@ class ViewController(UIViewController):
     #pdbr.state(self.collectionView.dataSource.snapshot())
     #pdbr.state(self.snapshot)
     #self.collectionView.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
-    self.dataSource.applySnapshotUsingReloadData_(snapshot)
+    self.dataSource.applySnapshotUsingReloadData_(snapshot())
     #self.dataSource.applySnapshot_toSection_animatingDifferences_(snapshot, None, False)
     #self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
     #pdbr.state(self.dataSource)
@@ -168,6 +170,7 @@ class ViewController(UIViewController):
     #pdbr.state(snapshot)
     #print(snapshot)
     #pdbr.state(self.collectionView)
+    #pdbr.state(self.dataSource)
 
   @objc_method  # private
   def upDateSnapshot(self) -> ObjCInstance:
