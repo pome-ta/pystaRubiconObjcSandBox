@@ -137,14 +137,15 @@ class ViewController(UIViewController):
   def initialSnapshot(self) -> ObjCInstance:
     snapshot = NSDiffableDataSourceSectionSnapshot.alloc().init()
     _parent = 'pepboys'
-    #snapshot.appendItems_([_parent])
+    snapshot.appendItems_([_parent])
     #snapshot.appendItems_intoParentItem_([_parent], None)
     #snapshot.appendItems_intoParentItem_(['manny', 'moe', 'jack'], _parent)
-    snapshot.appendItems_intoParentItem_(['manny', 'moe', 'jack'], None)
+    snapshot.appendItems_intoParentItem_([], _parent)
     #pdbr.state(snapshot)
     #pdbr.state(self.dataSource)
-    #self.dataSource.applySnapshot_toSection_animatingDifferences_(snapshot, 0, False)
-    self.dataSource.applySnapshot_animatingDifferences_(snapshot,False)
+    #
+    self.dataSource.applySnapshot_toSection_animatingDifferences_(snapshot, _parent, False)
+    #self.dataSource.applySnapshot_animatingDifferences_(snapshot,False)
     #return snapshot
 
 
