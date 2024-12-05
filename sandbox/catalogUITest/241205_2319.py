@@ -54,10 +54,7 @@ def dispatch_get_main_queue():
 libobjc.dispatch_async.restype = None
 libobjc.dispatch_async.argtypes = (objc_id, objc_block)
 
-
-pdbr.state(UICollectionViewListCell)
-
-
+#pdbr.state(UICollectionViewListCell.className())
 '''
 class ViewController(UIViewController, protocols=[
     UICollectionViewDelegate,
@@ -83,8 +80,20 @@ class ViewController(UIViewController):
 
     self.configureCollectionView()
     self.configureDataSource()
-    self.collectionView.reloadData()
+    #self.collectionView.reloadData()
 
+  @objc_method
+  def viewWillAppear_(self, animated: bool):
+    send_super(__class__,
+               self,
+               'viewWillAppear:',
+               animated,
+               argtypes=[
+                 ctypes.c_bool,
+               ])
+    self.initialSnapshot()
+    print('viewWillAppear')
+  
   @objc_method
   def viewDidAppear_(self, animated: bool):
     send_super(__class__,
@@ -99,7 +108,13 @@ class ViewController(UIViewController):
     #self.upDateSnapshot()
     #print(self.collectionView)
     #pdbr.state(self.collectionView.dataSource)
-    #self.initialSnapshot()
+    
+    print('viewDidAppear')
+    
+  @objc_method
+  def didReceiveMemoryWarning(self):
+    send_super(__class__, self, 'didReceiveMemoryWarning')
+    print('didReceiveMemoryWarning')
 
   @objc_method  # private
   def configureCollectionView(self):
@@ -190,13 +205,13 @@ class ViewController(UIViewController):
     #self.collectionView.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
     #self.dataSource.applySnapshotUsingReloadData_(snapshot)
     #self.dataSource.applySnapshot_toSection_animatingDifferences_(snapshot, None, False)
-    '''
+
     block = Block(
       functools.partial(self.dataSource.applySnapshot_animatingDifferences_,
                         snapshot, False), None)
     libobjc.dispatch_async(dispatch_get_main_queue(), block)
-    '''
-    self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+
+    #self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
     #pdbr.state(self.dataSource)
     #print(snapshot)
     #print(self.collectionView.dataSource.snapshot())
