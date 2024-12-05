@@ -1,3 +1,9 @@
+# 📝 2024/12/05
+
+- [UITableViewDiffableDataSource: example in Objective-C | Apple Developer Forums](https://forums.developer.apple.com/forums/thread/652551)
+
+
+
 # 📝 2024/12/03
 
 - [【Swift】UICollectionViewの更新処理には段階がある #iOS - Qiita](https://qiita.com/juginon/items/5526e7b79edadd2362b5)
