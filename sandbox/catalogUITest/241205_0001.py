@@ -134,11 +134,13 @@ class ViewController(UIViewController):
     #print(self.dataSource.validateIdentifiers())
 
     #pdbr.state(UICollectionViewDiffableDataSource.new())
-    self.initialSnapshot()
+    #self.initialSnapshot()
+    pdbr.state(self.collectionView)
 
   @objc_method  # private
   def generateLayout(self) -> ObjCInstance:
-    _appearance = UICollectionLayoutListAppearance.sidebar
+    #_appearance = UICollectionLayoutListAppearance.sidebar
+    _appearance = UICollectionLayoutListAppearance.plain
     listConfiguration = UICollectionLayoutListConfiguration.alloc(
     ).initWithAppearance_(_appearance)
     layout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
