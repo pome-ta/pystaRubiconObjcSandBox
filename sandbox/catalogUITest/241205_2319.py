@@ -55,17 +55,20 @@ libobjc.dispatch_async.restype = None
 libobjc.dispatch_async.argtypes = (objc_id, objc_block)
 
 #pdbr.state(UICollectionViewListCell.className())
+
+
+
+
+
 '''
 class ViewController(UIViewController, protocols=[
     UICollectionViewDelegate,
 ]):
 '''
-
-
 class ViewController(UIViewController):
   #collectionView: UICollectionView = objc_property()
   #dataSource: UICollectionViewDiffableDataSource = objc_property()
-  #snapshot: NSDiffableDataSourceSectionSnapshot = objc_property()
+  snapshot: NSDiffableDataSourceSectionSnapshot = objc_property()
   #cellRegistration=objc_property()
 
   @objc_method
@@ -151,7 +154,7 @@ class ViewController(UIViewController):
       item = ObjCInstance(_item)
 
       config = cell.defaultContentConfiguration()
-      config.setText_('hoge')
+      config.setText_(item)
       cell.setContentConfiguration_(config)
 
     cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
@@ -190,10 +193,10 @@ class ViewController(UIViewController):
   @objc_method  # private
   def initialSnapshot(self) -> ObjCInstance:
     #snapshot = NSDiffableDataSourceSectionSnapshot.alloc().init()
-    snapshot = NSDiffableDataSourceSnapshot.alloc().init()
+    self.snapshot = NSDiffableDataSourceSnapshot.alloc().init()
     #self.snapshot = self.collectionView.dataSource.snapshot()
-    snapshot.appendSectionsWithIdentifiers_([0])
-    snapshot.appendItemsWithIdentifiers_([NSUUID.UUID(), NSUUID.UUID()])
+    self.snapshot.appendSectionsWithIdentifiers_([0])
+    self.snapshot.appendItemsWithIdentifiers_([NSUUID.UUID(), NSUUID.UUID()])
     #pdbr.state(snapshot.sectionIdentifiers.objectAtIndex_(0))
     #pdbr.state(snapshot.validateIdentifiers())
     #snapshot.reloadSectionsWithIdentifiers_([0])
@@ -205,11 +208,13 @@ class ViewController(UIViewController):
     #self.collectionView.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
     #self.dataSource.applySnapshotUsingReloadData_(snapshot)
     #self.dataSource.applySnapshot_toSection_animatingDifferences_(snapshot, None, False)
+    
 
     block = Block(
       functools.partial(self.dataSource.applySnapshot_animatingDifferences_,
-                        snapshot, False), None)
+                        self.snapshot, False), None)
     libobjc.dispatch_async(dispatch_get_main_queue(), block)
+    
 
     #self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
     #pdbr.state(self.dataSource)
