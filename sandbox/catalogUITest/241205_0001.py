@@ -111,7 +111,7 @@ class ViewController(UIViewController):
       item = ObjCInstance(_item)
 
       config = cell.defaultContentConfiguration()
-      config.setText_(item)
+      config.setText_('hoge')
       cell.setContentConfiguration_(config)
 
     cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
@@ -161,7 +161,7 @@ class ViewController(UIViewController):
     #pdbr.state(self.collectionView.dataSource.snapshot())
     #pdbr.state(self.snapshot)
     #self.collectionView.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
-    self.dataSource.applySnapshotUsingReloadData_(snapshot())
+    self.dataSource.applySnapshotUsingReloadData_(snapshot)
     #self.dataSource.applySnapshot_toSection_animatingDifferences_(snapshot, None, False)
     #self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
     #pdbr.state(self.dataSource)
