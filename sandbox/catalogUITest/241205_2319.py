@@ -167,7 +167,7 @@ class ViewController(UIViewController):
 
       indexPath = ObjCInstance(_indexPath)
       item = ObjCInstance(_item)
-      return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
+      return _collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
         cellRegistration, indexPath, item)
 
     self.dataSource = UICollectionViewDiffableDataSource.alloc(
@@ -191,7 +191,7 @@ class ViewController(UIViewController):
     return layout
 
   @objc_method  # private
-  def initialSnapshot(self) -> ObjCInstance:
+  def initialSnapshot(self):
     #snapshot = NSDiffableDataSourceSectionSnapshot.alloc().init()
     self.snapshot = NSDiffableDataSourceSnapshot.alloc().init()
     #self.snapshot = self.collectionView.dataSource.snapshot()
