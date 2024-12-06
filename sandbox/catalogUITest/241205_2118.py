@@ -3,7 +3,7 @@
     - [UICollectionViewでUITableViewのようなUIを実現する。ただし#available(iOS 14.0, *) #Swift - Qiita](https://qiita.com/sohichiro/items/9a3394551b8d76d2a346)
 '''
 import ctypes
-
+import objc_util
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, ObjCProtocol, Block
 from pyrubicon.objc.api import objc_method, objc_property, at,NSString
 from pyrubicon.objc.runtime import send_super, objc_id
@@ -166,7 +166,7 @@ class ViewController(UIViewController):
     #self.collectionView.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
     #self.dataSource.applySnapshotUsingReloadData_(snapshot)
     #self.dataSource.applySnapshot_toSection_animatingDifferences_(snapshot, None, False)
-    self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+    #self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
     #pdbr.state(self.dataSource)
     #print(snapshot)
     #print(self.collectionView.dataSource.snapshot())
@@ -174,6 +174,10 @@ class ViewController(UIViewController):
     #print(snapshot)
     #pdbr.state(self.collectionView)
     #pdbr.state(self.dataSource)
+    @objc_util.on_main_thread
+    def b():
+      self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+    b()
 
   @objc_method  # private
   def upDateSnapshot(self) -> ObjCInstance:
