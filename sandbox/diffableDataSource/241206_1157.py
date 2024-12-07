@@ -34,6 +34,7 @@ UICollectionViewCell = ObjCClass('UICollectionViewCell')
 
 UICollectionViewDiffableDataSource = ObjCClass(
   'UICollectionViewDiffableDataSource')
+NSDiffableDataSourceSnapshot = ObjCClass('NSDiffableDataSourceSnapshot')
 
 NSCollectionLayoutSize = ObjCClass('NSCollectionLayoutSize')
 NSCollectionLayoutDimension = ObjCClass('NSCollectionLayoutDimension')
@@ -41,6 +42,7 @@ NSCollectionLayoutItem = ObjCClass('NSCollectionLayoutItem')
 NSCollectionLayoutGroup = ObjCClass('NSCollectionLayoutGroup')
 NSCollectionLayoutSection = ObjCClass('NSCollectionLayoutSection')
 
+NSUUID = ObjCClass('NSUUID')
 
 class ViewController(UIViewController):
 
@@ -62,7 +64,7 @@ class ViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print('viewDidAppear_')
-    pdbr.state(self.collectionView)
+    #pdbr.state(self.collectionView)
 
   @objc_method
   def configureHierarchy(self):
@@ -133,6 +135,13 @@ class ViewController(UIViewController):
     ).initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
 
     #pdbr.state(self.collectionView)
+    snapshot = NSDiffableDataSourceSnapshot.alloc().init()
+    snapshot.appendSectionsWithIdentifiers_([0])
+    
+    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_([NSUUID.UUID(),NSUUID.UUID()], 0)
+    #snapshot.appendItemsWithIdentifiers_([NSUUID.UUID(),NSUUID.UUID()])
+    self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+    pdbr.state(snapshot)
 
 
 class MainOperation(NSOperation):
