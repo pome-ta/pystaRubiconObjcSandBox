@@ -6,8 +6,11 @@
 
 import ctypes
 
-from pyrubicon.objc import ObjCClass, ObjCInstance
-from pyrubicon.objc import objc_method, send_super
+from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
+from pyrubicon.objc.api import objc_method, objc_property
+from pyrubicon.objc.runtime import send_super, objc_id
+
+from rbedge.types import NSDirectionalEdgeInsetsMake
 
 from rbedge import pdbr
 
@@ -19,6 +22,25 @@ UIApplication = ObjCClass('UIApplication')
 UIColor = ObjCClass('UIColor')
 UIViewController = ObjCClass('UIViewController')
 
+NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
+
+UICollectionView = ObjCClass('UICollectionView')
+UICollectionViewCompositionalLayout = ObjCClass(
+  'UICollectionViewCompositionalLayout')
+UICollectionViewCellRegistration = ObjCClass(
+  'UICollectionViewCellRegistration')
+UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
+UICollectionViewCell = ObjCClass('UICollectionViewCell')
+
+UICollectionViewDiffableDataSource = ObjCClass(
+  'UICollectionViewDiffableDataSource')
+
+NSCollectionLayoutSize = ObjCClass('NSCollectionLayoutSize')
+NSCollectionLayoutDimension = ObjCClass('NSCollectionLayoutDimension')
+NSCollectionLayoutItem = ObjCClass('NSCollectionLayoutItem')
+NSCollectionLayoutGroup = ObjCClass('NSCollectionLayoutGroup')
+NSCollectionLayoutSection = ObjCClass('NSCollectionLayoutSection')
+
 
 class ViewController(UIViewController):
 
@@ -26,6 +48,8 @@ class ViewController(UIViewController):
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     self.view.backgroundColor = UIColor.blueColor
+    self.configureHierarchy()
+    self.configureDataSource()
     #print('Viewが読み込まれました')
 
   @objc_method
@@ -38,18 +62,77 @@ class ViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print('viewDidAppear_')
-
-  @objc_method
-  def createLayout(self) -> ObjCInstance:
-    pass
+    pdbr.state(self.collectionView)
 
   @objc_method
   def configureHierarchy(self):
-    pass
+    itemSize = NSCollectionLayoutSize.sizeWithWidthDimension_heightDimension_(
+      NSCollectionLayoutDimension.fractionalWidthDimension_(1.0),
+      NSCollectionLayoutDimension.fractionalHeightDimension_(1.0))
+    item = NSCollectionLayoutItem.itemWithLayoutSize_(itemSize)
+
+    groupSize = NSCollectionLayoutSize.sizeWithWidthDimension_heightDimension_(
+      NSCollectionLayoutDimension.fractionalWidthDimension_(1.0),
+      NSCollectionLayoutDimension.absoluteDimension_(44))
+
+    group = NSCollectionLayoutGroup.horizontalGroupWithLayoutSize_subitems_(
+      groupSize, [
+        item,
+      ])
+    section = NSCollectionLayoutSection.sectionWithGroup_(group)
+    section.interGroupSpacing = 0
+    #section.contentInsets = NSDirectionalEdgeInsetsMake(10.0, 10.0, 10.0, 10.0)
+
+    layout = UICollectionViewCompositionalLayout.alloc().initWithSection_(
+      section)
+
+    collectionView = UICollectionView.alloc(
+    ).initWithFrame_collectionViewLayout_(self.view.bounds, layout)
+    self.view.addSubview_(collectionView)
+
+    # --- Layout
+    collectionView.translatesAutoresizingMaskIntoConstraints = False
+    safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
+    NSLayoutConstraint.activateConstraints_([
+      collectionView.centerXAnchor.constraintEqualToAnchor_(
+        safeAreaLayoutGuide.centerXAnchor),
+      collectionView.centerYAnchor.constraintEqualToAnchor_(
+        safeAreaLayoutGuide.centerYAnchor),
+      collectionView.widthAnchor.constraintEqualToAnchor_multiplier_(
+        safeAreaLayoutGuide.widthAnchor, 1.0),
+      collectionView.heightAnchor.constraintEqualToAnchor_multiplier_(
+        safeAreaLayoutGuide.heightAnchor, 1.0),
+    ])
+    #collectionView.delegate = self
+    self.collectionView = collectionView
+
+    #pdbr.state(collectionView)
 
   @objc_method
   def configureDataSource(self):
-    pass
+
+    @Block
+    def configurationHandler(_cell: objc_id, _indexPath: objc_id,
+                             _item: objc_id) -> None:
+      cell = ObjCInstance(_cell)
+
+    cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
+      UICollectionViewCell, configurationHandler)
+
+    @Block
+    def cellProvider(_collectionView: objc_id, _indexPath: objc_id,
+                     _item: objc_id) -> objc_id:
+      collectionView = ObjCInstance(_collectionView)
+
+      indexPath = ObjCInstance(_indexPath)
+      item = ObjCInstance(_item)
+      return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
+        cellRegistration, indexPath, item)
+
+    self.dataSource = UICollectionViewDiffableDataSource.alloc(
+    ).initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
+
+    #pdbr.state(self.collectionView)
 
 
 class MainOperation(NSOperation):
