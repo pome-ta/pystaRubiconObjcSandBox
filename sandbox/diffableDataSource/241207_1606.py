@@ -6,10 +6,9 @@
 
 import ctypes
 
-
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
 from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super, objc_id,objc_block
+from pyrubicon.objc.runtime import send_super, objc_id, objc_block
 
 from rbedge import pdbr
 
@@ -42,6 +41,7 @@ NSCollectionLayoutGroup = ObjCClass('NSCollectionLayoutGroup')
 NSCollectionLayoutSection = ObjCClass('NSCollectionLayoutSection')
 
 NSUUID = ObjCClass('NSUUID')
+
 
 class ViewController(UIViewController):
 
@@ -131,18 +131,21 @@ class ViewController(UIViewController):
         cellRegistration, indexPath, item)
 
     self.dataSource = UICollectionViewDiffableDataSource.alloc(
-    ).initWithCollectionView_cellProvider_(self.collectionView, Block(cellProvider, objc_id, objc_id, objc_id, objc_id))
+    ).initWithCollectionView_cellProvider_(
+      self.collectionView,
+      Block(cellProvider, objc_id, objc_id, objc_id, objc_id))
 
     #pdbr.state(self.collectionView)
     snapshot = NSDiffableDataSourceSnapshot.alloc().init()
     snapshot.appendSectionsWithIdentifiers_([0])
 
-    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_([NSUUID.UUID(), NSUUID.UUID()], 0)
+    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(
+      [NSUUID.UUID(), NSUUID.UUID()], 0)
     #snapshot.appendItemsWithIdentifiers_([NSUUID.UUID(),NSUUID.UUID()])
     self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
     #self.dataSource.snapshot = snapshot()
     #self.dataSource.snapshot().reloadedSectionIdentifiers
-    
+
     #pdbr.state(self.dataSource)
 
 

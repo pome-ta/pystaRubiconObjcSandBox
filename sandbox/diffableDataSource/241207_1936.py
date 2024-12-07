@@ -10,7 +10,7 @@ import objc_util
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
 from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super, objc_id,objc_block
+from pyrubicon.objc.runtime import send_super, objc_id, objc_block
 
 from rbedge.types import NSDirectionalEdgeInsetsMake
 
@@ -45,6 +45,7 @@ NSCollectionLayoutGroup = ObjCClass('NSCollectionLayoutGroup')
 NSCollectionLayoutSection = ObjCClass('NSCollectionLayoutSection')
 
 NSUUID = ObjCClass('NSUUID')
+
 
 class ViewController(UIViewController):
 
@@ -137,10 +138,8 @@ class ViewController(UIViewController):
     self.dataSource = UICollectionViewDiffableDataSource.alloc(
     ).initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
 
-
   @objc_method
   def initDataSource(self):
-    
 
     #pdbr.state(self.collectionView)
     snapshot = NSDiffableDataSourceSnapshot.alloc().init()
@@ -150,7 +149,7 @@ class ViewController(UIViewController):
       [NSUUID.UUID(), NSUUID.UUID()], 0)
     #snapshot.appendItemsWithIdentifiers_([NSUUID.UUID(),NSUUID.UUID()])
     #self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
-    
+
     #pdbr.state(snapshot)
     #pdbr.state()
     pdbr.state(self.dataSource)
@@ -158,6 +157,7 @@ class ViewController(UIViewController):
     @objc_util.on_main_thread
     def thread():
       self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+
     #thread()
 
 
@@ -179,5 +179,4 @@ if __name__ == "__main__":
   queue = NSOperationQueue.mainQueue
   queue.addOperation(operation)
   queue.waitUntilAllOperationsAreFinished()
-
 
