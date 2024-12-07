@@ -9,7 +9,7 @@ import ctypes
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
 from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super, objc_id
+from pyrubicon.objc.runtime import send_super, objc_id,objc_block
 
 from rbedge import pdbr
 
@@ -120,9 +120,9 @@ class ViewController(UIViewController):
     cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
       UICollectionViewCell, configurationHandler)
 
-    @Block
+    #@Block
     def cellProvider(_collectionView: objc_id, _indexPath: objc_id,
-                     _item: objc_id) -> objc_id:
+                     _item: objc_id) -> objc_block:
       collectionView = ObjCInstance(_collectionView)
 
       indexPath = ObjCInstance(_indexPath)
@@ -131,20 +131,19 @@ class ViewController(UIViewController):
         cellRegistration, indexPath, item)
 
     self.dataSource = UICollectionViewDiffableDataSource.alloc(
-    ).initWithCollectionView_cellProvider_(self.collectionView, cellProvider)
+    ).initWithCollectionView_cellProvider_(self.collectionView, Block(cellProvider, objc_id, objc_id, objc_id, objc_id))
 
     #pdbr.state(self.collectionView)
     snapshot = NSDiffableDataSourceSnapshot.alloc().init()
     snapshot.appendSectionsWithIdentifiers_([0])
 
-    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_(
-      [NSUUID.UUID(), NSUUID.UUID()], 0)
+    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_([NSUUID.UUID(), NSUUID.UUID()], 0)
     #snapshot.appendItemsWithIdentifiers_([NSUUID.UUID(),NSUUID.UUID()])
-    #self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+    self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
     #self.dataSource.snapshot = snapshot()
     #self.dataSource.snapshot().reloadedSectionIdentifiers
     
-    pdbr.state(self.dataSource)
+    #pdbr.state(self.dataSource)
 
 
 class MainOperation(NSOperation):
