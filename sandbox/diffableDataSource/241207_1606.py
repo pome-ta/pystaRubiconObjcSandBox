@@ -6,13 +6,10 @@
 
 import ctypes
 
-import objc_util
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
-
-from rbedge.types import NSDirectionalEdgeInsetsMake
 
 from rbedge import pdbr
 
@@ -144,13 +141,10 @@ class ViewController(UIViewController):
       [NSUUID.UUID(), NSUUID.UUID()], 0)
     #snapshot.appendItemsWithIdentifiers_([NSUUID.UUID(),NSUUID.UUID()])
     #self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
+    #self.dataSource.snapshot = snapshot()
+    #self.dataSource.snapshot().reloadedSectionIdentifiers
     
-    #pdbr.state(snapshot)
-    #pdbr.state()
-    @objc_util.on_main_thread
-    def thread():
-      self.dataSource.applySnapshot_animatingDifferences_(snapshot, False)
-    #thread()
+    pdbr.state(self.dataSource)
 
 
 class MainOperation(NSOperation):
