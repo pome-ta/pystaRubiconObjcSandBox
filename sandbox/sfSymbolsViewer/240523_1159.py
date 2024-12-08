@@ -169,6 +169,7 @@ class SfSymbolsViewController(
   def tableView_numberOfRowsInSection_(self, tableView,
                                        section: NSInteger) -> NSInteger:
 
+    print(section)
     return len(self.all_items)
 
   @objc_method

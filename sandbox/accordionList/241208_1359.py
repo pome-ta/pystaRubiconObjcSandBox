@@ -1,6 +1,7 @@
 '''
   note: 
     - [【Swift】世界一わかりやすいTableViewのアコーディオンの実装方法 #Xode - Qiita](https://qiita.com/tosh_3/items/c254429f4f68c7eab39d)
+    - 配列内配列でいい感じに取得
 '''
 
 import ctypes
@@ -104,8 +105,9 @@ class ViewController(UIViewController):
 
     #pdbr.state(section)
     #print('numberOfRowsInSection')
-    print(section)
-    return len(prefectures[section])
+    #print(section)
+
+    return len(prefectures[section]) - 1
 
   @objc_method
   def tableView_cellForRowAtIndexPath_(self, tableView, indexPath):
@@ -114,7 +116,7 @@ class ViewController(UIViewController):
       self.cell_identifier, indexPath)
 
     content = cell.defaultContentConfiguration()
-    content.text = prefectures[indexPath.section][indexPath.row]
+    content.text = prefectures[indexPath.section][indexPath.row + 1]
     #print(indexPath)
 
     cell.contentConfiguration = content
@@ -126,15 +128,13 @@ class ViewController(UIViewController):
     #print(tableView)
     #pdbr.state(self)
     #print('numberOfSectionsInTableView')
+    #print(len(prefectures))
     return len(prefectures)
 
-  
   @objc_method
   def tableView_titleForHeaderInSection_(self, tableView, section: NSInteger):
-    
+
     return prefectures[section][0]
-
-
 
 
 if __name__ == '__main__':

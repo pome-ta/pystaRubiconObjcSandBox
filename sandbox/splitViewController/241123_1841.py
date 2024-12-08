@@ -177,6 +177,7 @@ class PrimaryTableViewController(UIViewController,
   @objc_method
   def tableView_numberOfRowsInSection_(self, tableView, section) -> int:
 
+    print(section)
     return len(self.all_items)
 
   @objc_method
