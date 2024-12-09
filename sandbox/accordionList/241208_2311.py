@@ -36,6 +36,7 @@ NSIndexSet = ObjCClass('NSIndexSet')
 UICollectionView = ObjCClass('UICollectionView')
 UICollectionLayoutListConfiguration = ObjCClass('UICollectionLayoutListConfiguration')
 UICollectionViewCompositionalLayout = ObjCClass('UICollectionViewCompositionalLayout')
+UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
 
 # --- others
 UIColor = ObjCClass('UIColor')
@@ -67,6 +68,8 @@ courseArray = [
 ]
 
 
+items = ['hoge',]
+
 class ViewController(UIViewController):
 
   tableView: UITableView = objc_property()
@@ -83,91 +86,55 @@ class ViewController(UIViewController):
     self.view.backgroundColor = UIColor.systemBrownColor()  # todo: 確認用
 
     # --- collection set
+    self.listCell_identifier = 'customListCell'
     collectionView = UICollectionView.alloc(
     ).initWithFrame_collectionViewLayout_(self.view.bounds, self.generateLayout())
-
-    # --- Table set
-    self.cell_identifier = 'customCell'
-    self.headerFooterView_identifier = 'customHeaderFooterView'
-
-    tableView = UITableView.alloc().initWithFrame_style_(
-      self.view.bounds, UITableViewStyle.plain)
-    tableView.registerClass_forCellReuseIdentifier_(UITableViewCell,
-                                                    self.cell_identifier)
-
-    tableView.registerClass_forHeaderFooterViewReuseIdentifier_(
-      UITableViewHeaderFooterView, self.headerFooterView_identifier)
-
-    tableView.delegate = self
-    tableView.dataSource = self
+    collectionView.registerClass_forCellWithReuseIdentifier_(UICollectionViewListCell, self.listCell_identifier)
+    
+    #collectionView.delegate = self
+    collectionView.dataSource = self
 
     # --- Layout
-    self.view.addSubview_(tableView)
-    tableView.translatesAutoresizingMaskIntoConstraints = False
+    self.view.addSubview_(collectionView)
+    collectionView.translatesAutoresizingMaskIntoConstraints = False
     safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
     NSLayoutConstraint.activateConstraints_([
-      tableView.centerXAnchor.constraintEqualToAnchor_(
+      collectionView.centerXAnchor.constraintEqualToAnchor_(
         safeAreaLayoutGuide.centerXAnchor),
-      tableView.centerYAnchor.constraintEqualToAnchor_(
+      collectionView.centerYAnchor.constraintEqualToAnchor_(
         safeAreaLayoutGuide.centerYAnchor),
-      tableView.widthAnchor.constraintEqualToAnchor_multiplier_(
+      collectionView.widthAnchor.constraintEqualToAnchor_multiplier_(
         safeAreaLayoutGuide.widthAnchor, 1.0),
-      tableView.heightAnchor.constraintEqualToAnchor_multiplier_(
+      collectionView.heightAnchor.constraintEqualToAnchor_multiplier_(
         safeAreaLayoutGuide.heightAnchor, 1.0),
     ])
-    self.tableView = tableView
+    self.collectionView = collectionView
+    
 
-  # --- UITableViewDataSource
+  # --- UICollectionViewDataSource
   @objc_method
-  def tableView_numberOfRowsInSection_(self, tableView, section: int) -> int:
-    return len(rail.stationArray) if (rail :=
-                                      courseArray[section]).isShown else 0
+  def numberOfSectionsInCollectionView_(self, collectionView) -> int:
+    return 1
 
   @objc_method
-  def tableView_cellForRowAtIndexPath_(self, tableView, indexPath):
-    cell = tableView.dequeueReusableCellWithIdentifier_forIndexPath_(
-      self.cell_identifier, indexPath)
+  def collectionView_numberOfItemsInSection_(self, collectionView,
+                                             section: int) -> int:
 
-    content = cell.defaultContentConfiguration()
-    content.text = courseArray[indexPath.section].stationArray[indexPath.row]
+    return len(items)
 
-    cell.contentConfiguration = content
+  @objc_method
+  def collectionView_cellForItemAtIndexPath_(self, collectionView,
+                                             indexPath) -> objc_id:
+    cell = collectionView.dequeueReusableCellWithReuseIdentifier_forIndexPath_(
+      self.listCell_identifier, indexPath)
 
+    cellConfiguration = cell.defaultContentConfiguration()
+    cellConfiguration.text = str(indexPath)
+    cell.contentConfiguration = cellConfiguration
     return cell
 
-  @objc_method
-  def numberOfSectionsInTableView_(self, tableView) -> int:
-    return len(courseArray)
 
-  @objc_method
-  def tableView_titleForHeaderInSection_(self, tableView, section: int):
 
-    return courseArray[section].railName
-
-  # --- UITableViewDelegate
-  @objc_method
-  def tableView_viewForHeaderInSection_(self, tableView, section: int):
-    headerView = tableView.dequeueReusableHeaderFooterViewWithIdentifier_(
-      self.headerFooterView_identifier)
-
-    gesture = UITapGestureRecognizer.alloc().initWithTarget_action_(
-      self, SEL('headertapped:'))
-    headerView.addGestureRecognizer_(gesture)
-    headerView.tag = section
-    return headerView
-
-  @objc_method
-  def headertapped_(self, sender):
-
-    if (section := sender.view.tag) is None:
-      return
-    courseArray[section].isShown = not courseArray[section].isShown
-
-    self.tableView.beginUpdates()
-    self.tableView.reloadSections_withRowAnimation_(
-      NSIndexSet.indexSetWithIndex_(section),
-      UITableViewRowAnimation.automatic)
-    self.tableView.endUpdates()
 
   # --- private
   @objc_method
@@ -178,8 +145,6 @@ class ViewController(UIViewController):
 
     layout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
       listConfiguration)
-    #pdbr.state(listConfiguration.appearance)
-    #print(listConfiguration.appearance)
     return layout
 
 if __name__ == '__main__':
