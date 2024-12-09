@@ -72,9 +72,16 @@ courseArray = [
   ])
 ]
 
+#courseArray[1].isShown = False
+
 items = [
   'hoge',
 ]
+
+
+class OutlineItem:
+  def __init__(self):
+    pass
 
 
 class ViewController(UIViewController):
@@ -139,6 +146,7 @@ class ViewController(UIViewController):
     cell = collectionView.dequeueReusableCellWithReuseIdentifier_forIndexPath_(
       self.listCell_identifier, indexPath)
 
+    print(indexPath)
     cellConfiguration = cell.defaultContentConfiguration()
     cellConfiguration.text = courseArray[indexPath.section].stationArray[
       indexPath.row]
