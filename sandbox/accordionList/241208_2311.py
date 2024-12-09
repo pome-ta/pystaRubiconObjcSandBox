@@ -13,6 +13,7 @@ from pyrubicon.objc.types import NSInteger
 
 from rbedge.enumerations import (
   UICollectionLayoutListAppearance,
+  UICollectionLayoutListHeaderMode,
   UITableViewStyle,
   UITableViewRowAnimation,
 )
@@ -34,8 +35,10 @@ NSIndexSet = ObjCClass('NSIndexSet')
 
 # --- UICollectionView
 UICollectionView = ObjCClass('UICollectionView')
-UICollectionLayoutListConfiguration = ObjCClass('UICollectionLayoutListConfiguration')
-UICollectionViewCompositionalLayout = ObjCClass('UICollectionViewCompositionalLayout')
+UICollectionLayoutListConfiguration = ObjCClass(
+  'UICollectionLayoutListConfiguration')
+UICollectionViewCompositionalLayout = ObjCClass(
+  'UICollectionViewCompositionalLayout')
 UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
 
 # --- others
@@ -67,8 +70,10 @@ courseArray = [
   ])
 ]
 
+items = [
+  'hoge',
+]
 
-items = ['hoge',]
 
 class ViewController(UIViewController):
 
@@ -88,9 +93,11 @@ class ViewController(UIViewController):
     # --- collection set
     self.listCell_identifier = 'customListCell'
     collectionView = UICollectionView.alloc(
-    ).initWithFrame_collectionViewLayout_(self.view.bounds, self.generateLayout())
-    collectionView.registerClass_forCellWithReuseIdentifier_(UICollectionViewListCell, self.listCell_identifier)
-    
+    ).initWithFrame_collectionViewLayout_(self.view.bounds,
+                                          self.generateLayout())
+    collectionView.registerClass_forCellWithReuseIdentifier_(
+      UICollectionViewListCell, self.listCell_identifier)
+
     #collectionView.delegate = self
     collectionView.dataSource = self
 
@@ -109,18 +116,19 @@ class ViewController(UIViewController):
         safeAreaLayoutGuide.heightAnchor, 1.0),
     ])
     self.collectionView = collectionView
-    
 
   # --- UICollectionViewDataSource
   @objc_method
   def numberOfSectionsInCollectionView_(self, collectionView) -> int:
-    return 1
+    return len(courseArray)
 
   @objc_method
   def collectionView_numberOfItemsInSection_(self, collectionView,
                                              section: int) -> int:
 
-    return len(items)
+    #return len(courseArray)
+    return len(rail.stationArray) if (rail :=
+                                      courseArray[section]).isShown else 0
 
   @objc_method
   def collectionView_cellForItemAtIndexPath_(self, collectionView,
@@ -129,23 +137,25 @@ class ViewController(UIViewController):
       self.listCell_identifier, indexPath)
 
     cellConfiguration = cell.defaultContentConfiguration()
-    cellConfiguration.text = str(indexPath)
+    cellConfiguration.text = courseArray[indexPath.section].stationArray[
+      indexPath.row]
     cell.contentConfiguration = cellConfiguration
     return cell
-
-
-
 
   # --- private
   @objc_method
   def generateLayout(self) -> ObjCInstance:
-    _appearance = UICollectionLayoutListAppearance.plain
+    #_appearance = UICollectionLayoutListAppearance.plain
+    _appearance = UICollectionLayoutListAppearance.sidebar
     listConfiguration = UICollectionLayoutListConfiguration.alloc(
     ).initWithAppearance_(_appearance)
+    _headerMode = UICollectionLayoutListHeaderMode.firstItemInSection
+    listConfiguration.headerMode = _headerMode
 
     layout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
       listConfiguration)
     return layout
+
 
 if __name__ == '__main__':
   from rbedge import present_viewController
