@@ -8,8 +8,8 @@
 import ctypes
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol, ObjCInstance
-from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super, objc_id, SEL
+from pyrubicon.objc.api import objc_method, objc_property, objc_const
+from pyrubicon.objc.runtime import send_super, objc_id, load_library, SEL
 from pyrubicon.objc.types import NSInteger
 
 from rbedge.enumerations import (
@@ -21,6 +21,7 @@ from rbedge.enumerations import (
 from rbedge.functions import NSStringFromClass
 from rbedge import pdbr
 
+UIKit = load_library('UIKit')  # todo: `objc_const` 用
 UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
@@ -42,9 +43,12 @@ UICollectionViewCompositionalLayout = ObjCClass(
   'UICollectionViewCompositionalLayout')
 UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
 
+UICellAccessoryDisclosureIndicator = ObjCClass('UICellAccessoryDisclosureIndicator')
+UICellAccessoryOutlineDisclosure  = ObjCClass('UICellAccessoryOutlineDisclosure')
 
 # --- others
 UIColor = ObjCClass('UIColor')
+UIFont = ObjCClass('UIFont')
 
 
 class Rail:
@@ -80,6 +84,7 @@ items = [
 
 
 class OutlineItem:
+
   def __init__(self):
     pass
 
@@ -101,14 +106,13 @@ class ViewController(UIViewController):
 
     # --- collection set
     self.listCell_identifier = 'customListCell'
-    
+
     collectionView = UICollectionView.alloc(
     ).initWithFrame_collectionViewLayout_(self.view.bounds,
                                           self.generateLayout())
     collectionView.registerClass_forCellWithReuseIdentifier_(
       UICollectionViewListCell, self.listCell_identifier)
 
-    
     #collectionView.delegate = self
     collectionView.dataSource = self
 
@@ -146,14 +150,22 @@ class ViewController(UIViewController):
     cell = collectionView.dequeueReusableCellWithReuseIdentifier_forIndexPath_(
       self.listCell_identifier, indexPath)
 
-    print(indexPath)
-    cellConfiguration = cell.defaultContentConfiguration()
-    cellConfiguration.text = courseArray[indexPath.section].stationArray[
+    #print(indexPath)
+    contentConfiguration = cell.defaultContentConfiguration()
+    contentConfiguration.text = courseArray[indexPath.section].stationArray[
       indexPath.row]
-    cell.contentConfiguration = cellConfiguration
+    # containerCellRegistration
+    if indexPath.row==0:
+      contentConfiguration.textProperties.font = UIFont.preferredFontForTextStyle_(str(objc_const(UIKit, 'UIFontTextStyleHeadline')))
+      pdbr.state(cell.accessories)
+    else:
+      #contentConfiguration.textProperties.font = UIFont.preferredFontForTextStyle_(str(objc_const(UIKit, 'UIFontTextStyleHeadline')))
+      pass
+
+    
+    
+    cell.contentConfiguration = contentConfiguration
     return cell
-
-
 
   # --- private
   @objc_method
