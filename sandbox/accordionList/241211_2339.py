@@ -2,7 +2,7 @@
   note: 
     - [【Swift】世界一わかりやすいTableViewのアコーディオンの実装方法 #Xode - Qiita](https://qiita.com/tosh_3/items/c254429f4f68c7eab39d)
     - `UICollectionView` 形式にもっていく
-      - 
+      - 階層をつける
 '''
 
 import ctypes
@@ -53,6 +53,13 @@ UICellAccessoryOutlineDisclosure = ObjCClass(
 # --- others
 UIColor = ObjCClass('UIColor')
 UIFont = ObjCClass('UIFont')
+
+# --- Global Variable
+UICollectionElementKindSectionHeader = objc_const(
+  UIKit, 'UICollectionElementKindSectionHeader')
+UIFontTextStyleHeadline = objc_const(UIKit, 'UIFontTextStyleHeadline')
+
+#print(objc_const(UIKit,'UICollectionElementKindSectionHeader'))
 
 
 class Rail:
@@ -110,12 +117,17 @@ class ViewController(UIViewController):
 
     # --- collection set
     self.listCell_identifier = 'customListCell'
+    self.header_identifier = 'customHeader'
 
     collectionView = UICollectionView.alloc(
     ).initWithFrame_collectionViewLayout_(self.view.bounds,
                                           self.generateLayout())
     collectionView.registerClass_forCellWithReuseIdentifier_(
       UICollectionViewListCell, self.listCell_identifier)
+
+    collectionView.registerClass_forSupplementaryViewOfKind_withReuseIdentifier_(
+      UICollectionViewListCell, UICollectionElementKindSectionHeader,
+      self.header_identifier)
 
     #collectionView.delegate = self
     collectionView.dataSource = self
@@ -159,31 +171,31 @@ class ViewController(UIViewController):
     contentConfiguration.text = courseArray[indexPath.section].stationArray[
       indexPath.row]
     # containerCellRegistration
-    if indexPath.row == 1:
+    if indexPath.row == 0:
       contentConfiguration.textProperties.font = UIFont.preferredFontForTextStyle_(
-        str(objc_const(UIKit, 'UIFontTextStyleHeadline')))
+        UIFontTextStyleHeadline)
       #pdbr.state(cell.accessories)
       disclosureOptions = UICellAccessoryOutlineDisclosureStyle.header
-      
+
       #outlineDisclosure = UICellAccessoryOutlineDisclosure.alloc().init()
       outlineDisclosure = UICellAccessoryOutlineDisclosure.new()
       #outlineDisclosure.style = disclosureOptions
-      
+
       #outlineDisclosure.setStyle_(disclosureOptions)
       #outlineDisclosure.setStyle_(1)
       #outlineDisclosure.setStyle_(2)
-      
+
       #pdbr.state(outlineDisclosure)
       #outlineDisclosure.rotationAngle = math.pi
       #print()
-      
+
       #pdbr.state(outlineDisclosure)
       #print(outlineDisclosure.style)
       #print(outlineDisclosure.rotationAngle)
       cell.accessories = [
         outlineDisclosure,
       ]
-      
+
     else:
       disclosureIndicator = UICellAccessoryDisclosureIndicator.alloc().init()
       cell.accessories = [
@@ -192,11 +204,27 @@ class ViewController(UIViewController):
 
     cell.contentConfiguration = contentConfiguration
     return cell
-    
-    
+
   @objc_method
-  def collectionView_viewForSupplementaryElementOfKind_atIndexPath_(self, collectionView, kind, indexPath):
-    pass
+  def collectionView_viewForSupplementaryElementOfKind_atIndexPath_(
+      self, collectionView, kind, indexPath):
+    #dequeueReusableSupplementaryViewOfKind:withReuseIdentifier:forIndexPath:
+    headerView = collectionView.dequeueReusableSupplementaryViewOfKind_withReuseIdentifier_forIndexPath_(
+      UICollectionElementKindSectionHeader, self.header_identifier, indexPath)
+
+    contentConfiguration = headerView.defaultContentConfiguration()
+    contentConfiguration.text = courseArray[indexPath.section].railName
+    #print(kind)
+    #print(indexPath)
+    #pdbr.state(headerView)
+    disclosureOptions = UICellAccessoryOutlineDisclosureStyle.header
+    outlineDisclosure = UICellAccessoryOutlineDisclosure.new()
+    headerView.accessories = [
+      outlineDisclosure,
+    ]
+
+    headerView.contentConfiguration = contentConfiguration
+    return headerView
 
   # --- private
   @objc_method
@@ -205,9 +233,9 @@ class ViewController(UIViewController):
     _appearance = UICollectionLayoutListAppearance.sidebar
     listConfiguration = UICollectionLayoutListConfiguration.alloc(
     ).initWithAppearance_(_appearance)
-    _headerMode = UICollectionLayoutListHeaderMode.firstItemInSection
-    #_headerMode = UICollectionLayoutListHeaderMode.supplementary
-    #listConfiguration.headerMode = _headerMode
+    #_headerMode = UICollectionLayoutListHeaderMode.firstItemInSection
+    _headerMode = UICollectionLayoutListHeaderMode.supplementary
+    listConfiguration.headerMode = _headerMode
 
     layout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
       listConfiguration)
