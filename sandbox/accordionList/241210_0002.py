@@ -43,8 +43,10 @@ UICollectionViewCompositionalLayout = ObjCClass(
   'UICollectionViewCompositionalLayout')
 UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
 
-UICellAccessoryDisclosureIndicator = ObjCClass('UICellAccessoryDisclosureIndicator')
-UICellAccessoryOutlineDisclosure  = ObjCClass('UICellAccessoryOutlineDisclosure')
+UICellAccessoryDisclosureIndicator = ObjCClass(
+  'UICellAccessoryDisclosureIndicator')
+UICellAccessoryOutlineDisclosure = ObjCClass(
+  'UICellAccessoryOutlineDisclosure')
 
 # --- others
 UIColor = ObjCClass('UIColor')
@@ -155,15 +157,17 @@ class ViewController(UIViewController):
     contentConfiguration.text = courseArray[indexPath.section].stationArray[
       indexPath.row]
     # containerCellRegistration
-    if indexPath.row==0:
-      contentConfiguration.textProperties.font = UIFont.preferredFontForTextStyle_(str(objc_const(UIKit, 'UIFontTextStyleHeadline')))
+    if indexPath.row == 0:
+      contentConfiguration.textProperties.font = UIFont.preferredFontForTextStyle_(
+        str(objc_const(UIKit, 'UIFontTextStyleHeadline')))
       pdbr.state(cell.accessories)
     else:
+      disclosureIndicator = UICellAccessoryDisclosureIndicator.alloc().init()
       #contentConfiguration.textProperties.font = UIFont.preferredFontForTextStyle_(str(objc_const(UIKit, 'UIFontTextStyleHeadline')))
-      pass
+      cell.accessories = [
+        disclosureIndicator,
+      ]
 
-    
-    
     cell.contentConfiguration = contentConfiguration
     return cell
 
