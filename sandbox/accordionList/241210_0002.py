@@ -6,6 +6,7 @@
 '''
 
 import ctypes
+import math
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol, ObjCInstance
 from pyrubicon.objc.api import objc_method, objc_property, objc_const
@@ -15,6 +16,7 @@ from pyrubicon.objc.types import NSInteger
 from rbedge.enumerations import (
   UICollectionLayoutListAppearance,
   UICollectionLayoutListHeaderMode,
+  UICellAccessoryOutlineDisclosureStyle,
   UITableViewStyle,
   UITableViewRowAnimation,
 )
@@ -160,10 +162,30 @@ class ViewController(UIViewController):
     if indexPath.row == 0:
       contentConfiguration.textProperties.font = UIFont.preferredFontForTextStyle_(
         str(objc_const(UIKit, 'UIFontTextStyleHeadline')))
-      pdbr.state(cell.accessories)
+      #pdbr.state(cell.accessories)
+      disclosureOptions = UICellAccessoryOutlineDisclosureStyle.header
+      
+      #outlineDisclosure = UICellAccessoryOutlineDisclosure.alloc().init()
+      outlineDisclosure = UICellAccessoryOutlineDisclosure.new()
+      #outlineDisclosure.style = disclosureOptions
+      
+      #outlineDisclosure.setStyle_(disclosureOptions)
+      #outlineDisclosure.setStyle_(1)
+      #outlineDisclosure.setStyle_(2)
+      
+      #pdbr.state(outlineDisclosure)
+      #outlineDisclosure.rotationAngle = math.pi
+      #print()
+      
+      #pdbr.state(outlineDisclosure)
+      print(outlineDisclosure.style)
+      #print(outlineDisclosure.rotationAngle)
+      cell.accessories = [
+        outlineDisclosure,
+      ]
+      
     else:
       disclosureIndicator = UICellAccessoryDisclosureIndicator.alloc().init()
-      #contentConfiguration.textProperties.font = UIFont.preferredFontForTextStyle_(str(objc_const(UIKit, 'UIFontTextStyleHeadline')))
       cell.accessories = [
         disclosureIndicator,
       ]

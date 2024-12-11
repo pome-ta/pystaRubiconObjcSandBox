@@ -199,9 +199,8 @@ class PrimaryCollectionViewController(UIViewController,
   @objc_method
   def collectionView_cellForItemAtIndexPath_(self, collectionView,
                                              indexPath) -> objc_id:
-    #return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(self.cellreg, indexPath, prefectures[indexPath.item])
-    return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
-      self.cellreg, indexPath, prefectures[indexPath.section][indexPath.row])
+    return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(self.cellreg, indexPath, prefectures[indexPath.item])
+    #return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(self.cellreg, indexPath, prefectures[indexPath.section][indexPath.row])
 
   # --- private
   @objc_method
