@@ -6,19 +6,15 @@
 '''
 
 import ctypes
-import math
 
-from pyrubicon.objc.api import ObjCClass, ObjCProtocol, ObjCInstance
+from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import objc_method, objc_property, objc_const
 from pyrubicon.objc.runtime import send_super, objc_id, load_library, SEL
-from pyrubicon.objc.types import NSInteger
 
 from rbedge.enumerations import (
   UICollectionLayoutListAppearance,
   UICollectionLayoutListHeaderMode,
   UICellAccessoryOutlineDisclosureStyle,
-  UITableViewStyle,
-  UITableViewRowAnimation,
 )
 from rbedge.functions import NSStringFromClass
 from rbedge import pdbr
@@ -26,16 +22,6 @@ from rbedge import pdbr
 UIKit = load_library('UIKit')  # todo: `objc_const` 用
 UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
-
-# --- TableView
-UITableView = ObjCClass('UITableView')
-UITableViewCell = ObjCClass('UITableViewCell')
-UITableViewHeaderFooterView = ObjCClass('UITableViewHeaderFooterView')
-UITableViewDataSource = ObjCProtocol('UITableViewDataSource')
-UITableViewDelegate = ObjCProtocol('UITableViewDelegate')
-
-UITapGestureRecognizer = ObjCClass('UITapGestureRecognizer')
-NSIndexSet = ObjCClass('NSIndexSet')
 
 # --- UICollectionView
 UICollectionView = ObjCClass('UICollectionView')
@@ -53,13 +39,13 @@ UICellAccessoryOutlineDisclosure = ObjCClass(
 # --- others
 UIColor = ObjCClass('UIColor')
 UIFont = ObjCClass('UIFont')
+UITapGestureRecognizer = ObjCClass('UITapGestureRecognizer')
+NSIndexSet = ObjCClass('NSIndexSet')
 
 # --- Global Variable
 UICollectionElementKindSectionHeader = objc_const(
   UIKit, 'UICollectionElementKindSectionHeader')
 UIFontTextStyleHeadline = objc_const(UIKit, 'UIFontTextStyleHeadline')
-
-#print(objc_const(UIKit,'UICollectionElementKindSectionHeader'))
 
 
 class Rail:
@@ -89,10 +75,6 @@ courseArray = [
 
 #courseArray[1].isShown = False
 
-items = [
-  'hoge',
-]
-
 
 class OutlineItem:
 
@@ -102,7 +84,6 @@ class OutlineItem:
 
 class ViewController(UIViewController):
 
-  tableView: UITableView = objc_property()
   collectionView: UICollectionView = objc_property()
 
   @objc_method
@@ -166,37 +147,26 @@ class ViewController(UIViewController):
     cell = collectionView.dequeueReusableCellWithReuseIdentifier_forIndexPath_(
       self.listCell_identifier, indexPath)
 
-    #print(indexPath)
+    text = courseArray[indexPath.section].stationArray[indexPath.row]
+    
+    '''
     contentConfiguration = cell.defaultContentConfiguration()
     contentConfiguration.text = courseArray[indexPath.section].stationArray[
       indexPath.row]
-    # containerCellRegistration
-    if indexPath.row == 0:
+
+    if indexPath.row == 0:  # containerCellRegistration
       contentConfiguration.textProperties.font = UIFont.preferredFontForTextStyle_(
         UIFontTextStyleHeadline)
-      #pdbr.state(cell.accessories)
       disclosureOptions = UICellAccessoryOutlineDisclosureStyle.header
 
       #outlineDisclosure = UICellAccessoryOutlineDisclosure.alloc().init()
       outlineDisclosure = UICellAccessoryOutlineDisclosure.new()
-      #outlineDisclosure.style = disclosureOptions
-
-      #outlineDisclosure.setStyle_(disclosureOptions)
-      #outlineDisclosure.setStyle_(1)
-      #outlineDisclosure.setStyle_(2)
-
-      #pdbr.state(outlineDisclosure)
-      #outlineDisclosure.rotationAngle = math.pi
-      #print()
-
-      #pdbr.state(outlineDisclosure)
-      #print(outlineDisclosure.style)
-      #print(outlineDisclosure.rotationAngle)
+      outlineDisclosure.setStyle_(disclosureOptions)
       cell.accessories = [
         outlineDisclosure,
       ]
 
-    else:
+    else:  # cellRegistration
       disclosureIndicator = UICellAccessoryDisclosureIndicator.alloc().init()
       cell.accessories = [
         disclosureIndicator,
@@ -204,27 +174,78 @@ class ViewController(UIViewController):
 
     cell.contentConfiguration = contentConfiguration
     return cell
+    '''
+    if indexPath.row == 0:  # containerCellRegistration
+      return self.containerCellRegistration(cell, indexPath, text)
+    else:  # cellRegistration
+      return self.cellRegistration(cell, indexPath, text)
+    
 
   @objc_method
   def collectionView_viewForSupplementaryElementOfKind_atIndexPath_(
-      self, collectionView, kind, indexPath):
-    #dequeueReusableSupplementaryViewOfKind:withReuseIdentifier:forIndexPath:
+      self, collectionView, kind, indexPath) -> ObjCInstance:
     headerView = collectionView.dequeueReusableSupplementaryViewOfKind_withReuseIdentifier_forIndexPath_(
       UICollectionElementKindSectionHeader, self.header_identifier, indexPath)
 
+    text = courseArray[indexPath.section].railName
+    '''
     contentConfiguration = headerView.defaultContentConfiguration()
     contentConfiguration.text = courseArray[indexPath.section].railName
-    #print(kind)
-    #print(indexPath)
-    #pdbr.state(headerView)
+
     disclosureOptions = UICellAccessoryOutlineDisclosureStyle.header
     outlineDisclosure = UICellAccessoryOutlineDisclosure.new()
+    outlineDisclosure.setStyle_(disclosureOptions)
+
     headerView.accessories = [
       outlineDisclosure,
     ]
 
     headerView.contentConfiguration = contentConfiguration
     return headerView
+    '''
+    return self.containerCellRegistration(headerView, indexPath,text)
+
+  # --- private
+  @objc_method
+  def containerCellRegistration(self, listCell, indexPath,text) -> ObjCInstance:
+    contentConfiguration = listCell.defaultContentConfiguration()
+    #contentConfiguration.text = courseArray[indexPath.section].stationArray[indexPath.row]
+    contentConfiguration.text =  text
+    
+    contentConfiguration.textProperties.font = UIFont.preferredFontForTextStyle_(
+    UIFontTextStyleHeadline)
+    disclosureOptions = UICellAccessoryOutlineDisclosureStyle.header
+
+    #outlineDisclosure = UICellAccessoryOutlineDisclosure.alloc().init()
+    outlineDisclosure = UICellAccessoryOutlineDisclosure.new()
+    outlineDisclosure.setStyle_(disclosureOptions)
+    listCell.accessories = [
+      outlineDisclosure,
+    ]
+    
+    listCell.contentConfiguration = contentConfiguration
+    return listCell
+    
+
+    
+  # --- private
+  @objc_method
+  def cellRegistration(self, listCell, indexPath,text) -> ObjCInstance:
+    contentConfiguration = listCell.defaultContentConfiguration()
+    #contentConfiguration.text = courseArray[indexPath.section].stationArray[indexPath.row]
+    contentConfiguration.text =  text
+    
+    disclosureIndicator = UICellAccessoryDisclosureIndicator.alloc().init()
+    listCell.accessories = [
+      disclosureIndicator,
+    ]
+    
+    listCell.contentConfiguration = contentConfiguration
+    return listCell
+    
+
+    
+
 
   # --- private
   @objc_method
