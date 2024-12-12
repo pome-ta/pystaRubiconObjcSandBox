@@ -78,8 +78,142 @@ courseArray = [
 
 class OutlineItem:
 
-  def __init__(self):
-    pass
+  def __init__(self,
+               title: str,
+               imageName: str = None,
+               storyboardName: str = None,
+               subitems: list = []):
+    self.title = title
+    self.imageName = imageName
+    self.storyboardName = storyboardName
+    self.subitems = subitems
+
+
+buttonItems = [
+  OutlineItem(title='ButtonsTitle',
+              imageName='rectangle',
+              storyboardName="ButtonViewController"),
+  OutlineItem(title="MenuButtonsTitle",
+              imageName="list.bullet.rectangle",
+              storyboardName="MenuButtonViewController"),
+]
+
+controlsSubItems = [
+  OutlineItem(title='ButtonsTitle',
+              imageName="rectangle.on.rectangle",
+              subitems=buttonItems),
+  OutlineItem(title="PageControlTitle",
+              imageName="photo.on.rectangle",
+              subitems=[
+                OutlineItem(title="DefaultPageControlTitle",
+                            imageName=None,
+                            storyboardName="DefaultPageControlViewController"),
+                OutlineItem(title="CustomPageControlTitle",
+                            imageName=None,
+                            storyboardName="CustomPageControlViewController")
+              ]),
+  OutlineItem(title="SearchBarsTitle",
+              imageName="magnifyingglass",
+              subitems=[
+                OutlineItem(title="DefaultSearchBarTitle",
+                            imageName=None,
+                            storyboardName="DefaultSearchBarViewController"),
+                OutlineItem(title="CustomSearchBarTitle",
+                            imageName=None,
+                            storyboardName="CustomSearchBarViewController")
+              ]),
+  OutlineItem(title="SegmentedControlsTitle",
+              imageName="square.split.3x1",
+              storyboardName="SegmentedControlViewController"),
+  OutlineItem(title="SlidersTitle",
+              imageName=None,
+              storyboardName="SliderViewController"),
+  OutlineItem(title="SwitchesTitle",
+              imageName=None,
+              storyboardName="SwitchViewController"),
+  OutlineItem(title="TextFieldsTitle",
+              imageName=None,
+              storyboardName="TextFieldViewController"),
+]
+
+controlsOutlineItem = OutlineItem(title="Controls",
+                                  imageName="slider.horizontal.3",
+                                  subitems=controlsSubItems)
+
+pickerSubItems = [
+  OutlineItem(title="DatePickerTitle",
+              imageName=None,
+              storyboardName="DatePickerController"),
+  OutlineItem(title="ColorPickerTitle",
+              imageName=None,
+              storyboardName="ColorPickerViewController"),
+  OutlineItem(title="FontPickerTitle",
+              imageName=None,
+              storyboardName="FontPickerViewController"),
+  OutlineItem(title="ImagePickerTitle",
+              imageName=None,
+              storyboardName="ImagePickerViewController"),
+]
+
+pickersOutlineItem = OutlineItem(title="Pickers",
+                                 imageName="list.bullet",
+                                 subitems=pickerSubItems)
+
+viewsOutlineItem = OutlineItem(
+  title="Views",
+  imageName="rectangle.stack.person.crop",
+  subitems=[
+    OutlineItem(title="ActivityIndicatorsTitle",
+                imageName=None,
+                storyboardName="ActivityIndicatorViewController"),
+    OutlineItem(title="AlertControllersTitle",
+                imageName=None,
+                storyboardName="AlertControllerViewController"),
+    OutlineItem(title="TextViewTitle",
+                imageName=None,
+                storyboardName="TextViewController"),
+    OutlineItem(title="ImagesTitle",
+                imageName="photo",
+                subitems=[
+                  OutlineItem(title="ImageViewTitle",
+                              imageName=None,
+                              storyboardName="ImageViewController"),
+                  OutlineItem(title="SymbolsTitle",
+                              imageName=None,
+                              storyboardName="SymbolViewController")
+                ]),
+    OutlineItem(title="ProgressViewsTitle",
+                imageName=None,
+                storyboardName="ProgressViewController"),
+    OutlineItem(title="StackViewsTitle",
+                imageName=None,
+                storyboardName="StackViewController"),
+    OutlineItem(title="ToolbarsTitle",
+                imageName="hammer",
+                subitems=[
+                  OutlineItem(title="DefaultToolBarTitle",
+                              imageName=None,
+                              storyboardName="DefaultToolbarViewController"),
+                  OutlineItem(title="TintedToolbarTitle",
+                              imageName=None,
+                              storyboardName="TintedToolbarViewController"),
+                  OutlineItem(title="CustomToolbarBarTitle",
+                              imageName=None,
+                              storyboardName="CustomToolbarViewController")
+                ]),
+    OutlineItem(title="VisualEffectTitle",
+                imageName=None,
+                storyboardName="VisualEffectViewController"),
+    OutlineItem(title="WebViewTitle",
+                imageName=None,
+                storyboardName="WebViewController"),
+  ])
+
+menuItems = [
+  controlsOutlineItem,
+  viewsOutlineItem,
+  pickersOutlineItem,
+]
 
 
 class ViewController(UIViewController):
@@ -129,7 +263,6 @@ class ViewController(UIViewController):
     ])
     self.collectionView = collectionView
 
-
   @objc_method
   def viewDidAppear_(self, animated: bool):
     send_super(__class__,
@@ -139,8 +272,7 @@ class ViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    pdbr.state(self.collectionView)
-
+    #pdbr.state(self.collectionView)
 
   # --- UICollectionViewDataSource
   @objc_method
