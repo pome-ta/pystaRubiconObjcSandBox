@@ -48,34 +48,6 @@ UICollectionElementKindSectionHeader = objc_const(
 UIFontTextStyleHeadline = objc_const(UIKit, 'UIFontTextStyleHeadline')
 
 
-class Rail:
-
-  def __init__(self, railName: str, stationArray: list, isShown: bool = True):
-    self.isShown = isShown
-    self.railName = railName
-    self.stationArray = stationArray
-
-
-
-headerArray = ['山手線', '東横線', '田園都市線', '常磐線',] # yapf: disable
-yamanoteArray = ['渋谷', '新宿', '池袋',] # yapf: disable
-toyokoArray = ['自由ヶ丘', '日吉',] # yapf: disable
-dentoArray = ['溝の口', '二子玉川',] # yapf: disable
-jobanArray = ['上野',] # yapf: disable
-
-
-courseArray = [
-  Rail(rail, stations) for rail, stations in zip(headerArray, [
-    yamanoteArray,
-    toyokoArray,
-    dentoArray,
-    jobanArray,
-  ])
-]
-
-#courseArray[1].isShown = False
-
-
 class OutlineItem:
 
   def __init__(self,
@@ -237,8 +209,6 @@ menuItems = [
   SupplementaryItem(viewsOutlineItem),
   SupplementaryItem(pickersOutlineItem),
 ]
-
-#a=SupplementaryItem(  controlsOutlineItem,)
 
 
 class ViewController(UIViewController):
