@@ -10,7 +10,7 @@ import ctypes
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import objc_method, objc_property, objc_const
-from pyrubicon.objc.runtime import send_super, objc_id, load_library, SEL
+from pyrubicon.objc.runtime import send_super, objc_id, load_library
 
 from rbedge.enumerations import (
   UICollectionLayoutListAppearance,
@@ -244,7 +244,7 @@ class ViewController(UIViewController):
       UICollectionViewListCell, UICollectionElementKindSectionHeader,
       self.header_identifier)
 
-    #collectionView.delegate = self
+    collectionView.delegate = self
     collectionView.dataSource = self
 
     # --- Layout
@@ -342,9 +342,15 @@ class ViewController(UIViewController):
     ]
 
     headerView.contentConfiguration = contentConfiguration
-    pdbr.state(headerView)
     return headerView
 
+  
+  # --- UICollectionViewDelegate
+  @objc_method
+  def collectionView_didSelectItemAtIndexPath_(self, collectionView, indexPath):
+    # xxx: `section` は検知しないから、判断なくてもいい？
+    print(indexPath)
+  
   # --- private
   @objc_method
   def generateLayout(self) -> ObjCInstance:
