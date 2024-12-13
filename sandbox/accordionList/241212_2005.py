@@ -78,14 +78,10 @@ class SupplementaryItem:
 
     def append_loop(parent, n=1):
       for child in parent.subitems:
-        #print(f'{n}: {child.title}')
         child.indentationLevel = n
         self.children.append(child)
         if child.subitems:
           append_loop(child, n + 1)
-        else:
-          #self.indentationLevel -= 1
-          pass
 
     append_loop(self, 1)
 
