@@ -76,13 +76,18 @@ class SupplementaryItem:
 
   def _create_children(self):
 
-    def append_loop(parent):
+    def append_loop(parent, n=1):
       for child in parent.subitems:
+        #print(f'{n}: {child.title}')
+        child.indentationLevel = n
         self.children.append(child)
         if child.subitems:
-          append_loop(child)
+          append_loop(child, n + 1)
+        else:
+          #self.indentationLevel -= 1
+          pass
 
-    append_loop(self)
+    append_loop(self, 1)
 
 
 buttonItems = [
@@ -95,7 +100,7 @@ buttonItems = [
 ]
 
 controlsSubItems = [
-  OutlineItem(title='ButtonsTitle',
+  OutlineItem(title='ButtonsTitles',
               imageName='rectangle.on.rectangle',
               subitems=buttonItems),
   OutlineItem(title='PageControlTitle',
@@ -212,6 +217,9 @@ menuItems = [
 ]
 
 
+#a = SupplementaryItem(controlsOutlineItem)
+
+
 class ViewController(UIViewController):
 
   collectionView: UICollectionView = objc_property()
@@ -278,8 +286,6 @@ class ViewController(UIViewController):
   @objc_method
   def collectionView_numberOfItemsInSection_(self, collectionView,
                                              section: int) -> int:
-
-    #return len(rail.stationArray) if (rail :=courseArray[section]).isShown else 0
     return len(menuItems[section].children)
 
   @objc_method
@@ -287,13 +293,35 @@ class ViewController(UIViewController):
                                              indexPath) -> objc_id:
     cell = collectionView.dequeueReusableCellWithReuseIdentifier_forIndexPath_(
       self.listCell_identifier, indexPath)
-
     target_item = menuItems[indexPath.section].children[indexPath.row]
 
+    contentConfiguration = cell.defaultContentConfiguration()
+    contentConfiguration.text = target_item.title
+    if (image := target_item.imageName) is not None:
+      contentConfiguration.image = UIImage.systemImageNamed_(image)
+
     if target_item.subitems:  # containerCellRegistration
-      return self.containerCellRegistration(cell, indexPath, target_item)
+      contentConfiguration.textProperties.font = UIFont.preferredFontForTextStyle_(
+        UIFontTextStyleHeadline)
+      disclosureOptions = UICellAccessoryOutlineDisclosureStyle.header
+
+      outlineDisclosure = UICellAccessoryOutlineDisclosure.new()
+      outlineDisclosure.setStyle_(disclosureOptions)
+      cell.accessories = [
+        outlineDisclosure,
+      ]
+      
+
     else:  # cellRegistration
-      return self.cellRegistration(cell, indexPath, target_item)
+      disclosureIndicator = UICellAccessoryDisclosureIndicator.alloc().init()
+      cell.accessories = [
+        disclosureIndicator,
+      ]
+      
+
+    cell.indentationLevel = target_item.indentationLevel
+    cell.contentConfiguration = contentConfiguration
+    return cell
 
   @objc_method
   def collectionView_viewForSupplementaryElementOfKind_atIndexPath_(
@@ -309,10 +337,6 @@ class ViewController(UIViewController):
     if (image := target_item.imageName) is not None:
       contentConfiguration.image = UIImage.systemImageNamed_(image)
 
-    #contentConfiguration.setImage_(None)
-    #pdbr.state(contentConfiguration)
-    #pdbr.state(headerView)
-
     disclosureOptions = UICellAccessoryOutlineDisclosureStyle.header
     outlineDisclosure = UICellAccessoryOutlineDisclosure.new()
     outlineDisclosure.setStyle_(disclosureOptions)
@@ -323,52 +347,6 @@ class ViewController(UIViewController):
 
     headerView.contentConfiguration = contentConfiguration
     return headerView
-
-  # --- private
-  @objc_method
-  def containerCellRegistration(self, listCell, indexPath,
-                                item) -> ObjCInstance:
-    contentConfiguration = listCell.defaultContentConfiguration()
-    #contentConfiguration.text = courseArray[indexPath.section].stationArray[indexPath.row]
-    '''
-    contentConfiguration.text = item.title
-    if (image := item.imageName) is not None:
-      contentConfiguration.image = UIImage.systemImageNamed_(image)
-    '''
-
-    contentConfiguration.textProperties.font = UIFont.preferredFontForTextStyle_(
-      UIFontTextStyleHeadline)
-    disclosureOptions = UICellAccessoryOutlineDisclosureStyle.header
-
-    #outlineDisclosure = UICellAccessoryOutlineDisclosure.alloc().init()
-    outlineDisclosure = UICellAccessoryOutlineDisclosure.new()
-    outlineDisclosure.setStyle_(disclosureOptions)
-    listCell.accessories = [
-      outlineDisclosure,
-    ]
-
-    listCell.contentConfiguration = contentConfiguration
-    listCell.indentationLevel = 1
-    return listCell
-
-  # --- private
-  @objc_method
-  def cellRegistration(self, listCell, indexPath, item) -> ObjCInstance:
-    contentConfiguration = listCell.defaultContentConfiguration()
-    '''
-    contentConfiguration.text = item.title
-    if (image := item.imageName) is not None:
-      contentConfiguration.image = UIImage.systemImageNamed_(image)
-    '''
-
-    disclosureIndicator = UICellAccessoryDisclosureIndicator.alloc().init()
-    listCell.accessories = [
-      disclosureIndicator,
-    ]
-
-    listCell.contentConfiguration = contentConfiguration
-    listCell.indentationLevel = 2
-    return listCell
 
   # --- private
   @objc_method
