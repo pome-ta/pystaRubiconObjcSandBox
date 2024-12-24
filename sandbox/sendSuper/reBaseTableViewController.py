@@ -1,11 +1,11 @@
 import ctypes
-from pyrubicon.objc.api import ObjCClass, objc_method, objc_property, ObjCInstance
+from pyrubicon.objc.api import ObjCClass, objc_method, objc_property, ObjCInstance, NSMutableArray
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import NSInteger
 
 from rbedge.enumerations import UIListContentTextAlignment
 
-#from caseElement import CaseElement  # todo: 型呼び出し
+from caseElement import CaseElement  # todo: 型呼び出し
 
 UITableViewController = ObjCClass('UITableViewController')
 UITableViewHeaderFooterView = ObjCClass('UITableViewHeaderFooterView')
@@ -13,6 +13,8 @@ UIListContentConfiguration = ObjCClass('UIListContentConfiguration')
 
 
 class BaseTableViewController(UITableViewController):
+  #testCells = objc_property(ctypes.py_object)
+  #headerFooterView_identifier = objc_property()
 
   @objc_method
   def initWithStyle_(self, style: NSInteger) -> ObjCInstance:
@@ -25,26 +27,42 @@ class BaseTableViewController(UITableViewController):
                          NSInteger,
                        ])
     this = ObjCInstance(_this)
-    print('initWithStyle: base')
-    this.testCells = []
+    #print('initWithStyle: base')
+    this.testCells: list[CaseElement] = []
+    this.headerFooterView_identifier = 'customHeaderFooterView'
     return this
 
+  '''
   @objc_method
   def dealloc(self):
     #send_super(__class__, self, 'dealloc')
-    print('\tdealloc: base')
+    #print('\tdealloc: base')
+    pass
+  '''
 
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')  # xxx: 不要?
     self.tableView.registerClass_forHeaderFooterViewReuseIdentifier_(
-      UITableViewHeaderFooterView, 'customHeaderFooterView')
+      UITableViewHeaderFooterView, self.headerFooterView_identifier)
+
+  @objc_method
+  def viewDidDisappear_(self, animated: bool):
+    send_super(__class__,
+               self,
+               'viewDidDisappear:',
+               animated,
+               argtypes=[
+                 ctypes.c_bool,
+               ])
+    #print('viewDidDisappear: base')
+    self.testCells = None
+    self.headerFooterView_identifier = None
 
   @objc_method
   def centeredHeaderView_(self, title):
-    # todo: let headerView: UITableViewHeaderFooterView = UITableViewHeaderFooterView()
     headerView = self.tableView.dequeueReusableHeaderFooterViewWithIdentifier_(
-      'customHeaderFooterView')
+      self.headerFooterView_identifier)
 
     content = UIListContentConfiguration.groupedHeaderConfiguration()
     content.text = title
