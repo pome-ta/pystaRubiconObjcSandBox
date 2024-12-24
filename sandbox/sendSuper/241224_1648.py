@@ -1,6 +1,7 @@
 '''
 note: 素の継承は`dealloc` 呼べてる
   - 同ファイル上でsubClass 作る
+  - baeeClass に役割を振る
 '''
 
 import ctypes
@@ -20,7 +21,20 @@ UIListContentConfiguration = ObjCClass('UIListContentConfiguration')
 
 class BaseTableViewController(UITableViewController):
 
-  #testCells: list = []
+  @objc_method
+  def initWithStyle_(self, style: NSInteger) -> ObjCInstance:
+    _this = send_super(__class__,
+                       self,
+                       'initWithStyle:',
+                       style,
+                       restype=objc_id,
+                       argtypes=[
+                         NSInteger,
+                       ])
+    this = ObjCInstance(_this)
+    print('initWithStyle: base')
+    this.testCells = []
+    return this
 
   @objc_method
   def viewDidLoad(self):
@@ -73,7 +87,7 @@ class BaseTableViewController(UITableViewController):
 
 
 class TableViewController(BaseTableViewController):
-
+  
   @objc_method
   def initWithStyle_(self, style: NSInteger) -> ObjCInstance:
     _this = send_super(__class__,
@@ -86,7 +100,6 @@ class TableViewController(BaseTableViewController):
                        ])
     this = ObjCInstance(_this)
     print('initWithStyle')
-    this.testCells = []
     return this
 
   @objc_method

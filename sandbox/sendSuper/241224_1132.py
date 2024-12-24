@@ -33,6 +33,7 @@ class BaseTableViewController(UITableViewController):
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')  # xxx: 不要?
+    print('hooooo')
     self.tableView.registerClass_forHeaderFooterViewReuseIdentifier_(
       UITableViewHeaderFooterView, 'customHeaderFooterView')
 
