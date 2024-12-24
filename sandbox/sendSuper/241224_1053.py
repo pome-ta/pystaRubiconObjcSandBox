@@ -8,6 +8,7 @@ from rbedge.enumerations import (
   UITableViewStyle, )
 from rbedge import pdbr
 
+UIViewController = ObjCClass('UIViewController')
 UITableViewController = ObjCClass('UITableViewController')
 '''
 def send_super(
@@ -23,16 +24,15 @@ def send_super(
 '''
 
 
-class TableViewController(UITableViewController):
+class ViewController(UIViewController):
 
-  '''
   @objc_method
   def init(self):
     send_super(__class__, self, 'init')  # xxx: 不要?
     print('init')
     return self
-  '''
 
+  '''
   @objc_method
   def initWithStyle_(self, style: NSInteger) -> ObjCInstance:
     this = send_super(__class__,
@@ -49,6 +49,7 @@ class TableViewController(UITableViewController):
     print(ObjCInstance(this))
     print(self)
     return ObjCInstance(this)
+    '''
 
   @objc_method
   def dealloc(self):
@@ -95,10 +96,14 @@ if __name__ == '__main__':
   from rbedge.functions import NSStringFromClass
   from rbedge.enumerations import UIModalPresentationStyle
   from rbedge import present_viewController
-
+  '''
   _style = UITableViewStyle.grouped
   main_vc = TableViewController.alloc().initWithStyle_(_style)
   _title = NSStringFromClass(TableViewController)
+  '''
+  pdbr.state(ViewController,1)
+  main_vc = ViewController.new()
+  _title = NSStringFromClass(ViewController)
   main_vc.navigationItem.title = _title
 
   style = UIModalPresentationStyle.fullScreen
