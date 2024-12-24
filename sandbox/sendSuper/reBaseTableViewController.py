@@ -14,9 +14,6 @@ UIListContentConfiguration = ObjCClass('UIListContentConfiguration')
 
 class BaseTableViewController(UITableViewController):
 
-  #testCells: list[CaseElement] = []
-  #testCells=objc_property(ctypes.py_object)
-  '''
   @objc_method
   def initWithStyle_(self, style: NSInteger) -> ObjCInstance:
     _this = send_super(__class__,
@@ -27,24 +24,15 @@ class BaseTableViewController(UITableViewController):
                        argtypes=[
                          NSInteger,
                        ])
-    
     this = ObjCInstance(_this)
-    
+    print('initWithStyle: base')
     this.testCells = []
-    [
-      self.tableView.registerClass_forCellReuseIdentifier_(
-        prototype['cellClass'], prototype['identifier'])
-      for prototype in prototypes
-    ]
-    
-
     return this
-  '''
 
   @objc_method
   def dealloc(self):
     #send_super(__class__, self, 'dealloc')
-    print('dealloc: base')
+    print('\tdealloc: base')
 
   @objc_method
   def viewDidLoad(self):

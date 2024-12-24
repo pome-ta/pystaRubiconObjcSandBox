@@ -13,6 +13,10 @@ from rbedge.enumerations import (
   UITableViewStyle, )
 from rbedge import pdbr
 
+
+from reBaseTableViewController import BaseTableViewController
+
+'''
 UITableViewController = ObjCClass('UITableViewController')
 UITableViewHeaderFooterView = ObjCClass('UITableViewHeaderFooterView')
 UIListContentConfiguration = ObjCClass('UIListContentConfiguration')
@@ -83,7 +87,7 @@ class BaseTableViewController(UITableViewController):
       cellTest.configHandler(view)
 
     return cell
-
+'''
 
 class TableViewController(BaseTableViewController):
   
@@ -99,6 +103,7 @@ class TableViewController(BaseTableViewController):
                        ])
     this = ObjCInstance(_this)
     print('initWithStyle')
+    #this.testCells = []
     return this
 
   @objc_method
