@@ -9,6 +9,9 @@ from rbedge.enumerations import (
 from rbedge import pdbr
 
 UITableViewController = ObjCClass('UITableViewController')
+UITableViewHeaderFooterView = ObjCClass('UITableViewHeaderFooterView')
+UIListContentConfiguration = ObjCClass('UIListContentConfiguration')
+
 '''
 def send_super(
     cls,
@@ -23,7 +26,63 @@ def send_super(
 '''
 
 
-class TableViewController(UITableViewController):
+class BaseTableViewController(UITableViewController):
+
+  testCells: list = []
+
+  @objc_method
+  def viewDidLoad(self):
+    send_super(__class__, self, 'viewDidLoad')  # xxx: 不要?
+    self.tableView.registerClass_forHeaderFooterViewReuseIdentifier_(
+      UITableViewHeaderFooterView, 'customHeaderFooterView')
+
+  @objc_method
+  def centeredHeaderView_(self, title):
+    # todo: let headerView: UITableViewHeaderFooterView = UITableViewHeaderFooterView()
+    headerView = self.tableView.dequeueReusableHeaderFooterViewWithIdentifier_(
+      'customHeaderFooterView')
+
+    content = UIListContentConfiguration.groupedHeaderConfiguration()
+    content.text = title
+    content.textProperties.alignment = UIListContentTextAlignment.center
+    headerView.contentConfiguration = content
+
+    return headerView
+
+  # MARK: - UITableViewDataSource
+  @objc_method
+  def tableView_viewForHeaderInSection_(self, tableView,
+                                        section: NSInteger) -> objc_id:
+    return self.centeredHeaderView_(self.testCells[section].title)
+
+  @objc_method
+  def tableView_titleForHeaderInSection_(self, tableView, section: NSInteger):
+    return self.testCells[section].title
+
+  @objc_method
+  def tableView_numberOfRowsInSection_(self, tableView,
+                                       section: NSInteger) -> NSInteger:
+    return 1
+
+  @objc_method
+  def numberOfSectionsInTableView_(self, tableView) -> NSInteger:
+    return len(self.testCells)
+
+  @objc_method
+  def tableView_cellForRowAtIndexPath_(self, tableView, indexPath) -> objc_id:
+    cellTest = self.testCells[indexPath.section]
+    cell = tableView.dequeueReusableCellWithIdentifier_forIndexPath_(
+      cellTest.cellID, indexPath)
+
+    if (view := cellTest.targetView(cell)):
+      cellTest.configHandler(view)
+
+    return cell
+
+
+
+
+class TableViewController(BaseTableViewController):
 
   '''
   @objc_method
@@ -45,6 +104,7 @@ class TableViewController(UITableViewController):
                       ])
     this = ObjCInstance(_this)
     this.hoge = 'hoge'
+    this.testCells = []
     print('h')
     #return self
     print(this)

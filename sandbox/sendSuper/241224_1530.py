@@ -1,3 +1,7 @@
+'''
+note: 素の継承は`dealloc` 呼べてる
+'''
+
 import ctypes
 from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import objc_method
@@ -9,59 +13,37 @@ from rbedge.enumerations import (
 from rbedge import pdbr
 
 UITableViewController = ObjCClass('UITableViewController')
-'''
-def send_super(
-    cls,
-    receiver,
-    selector,
-    *args,
-    restype=c_void_p,
-    argtypes=None,
-    varargs=None,
-    _allow_dealloc=False,
-):
-'''
+UITableViewHeaderFooterView = ObjCClass('UITableViewHeaderFooterView')
+UIListContentConfiguration = ObjCClass('UIListContentConfiguration')
 
 
 class TableViewController(UITableViewController):
 
-  '''
-  @objc_method
-  def init(self):
-    send_super(__class__, self, 'init')  # xxx: 不要?
-    print('init')
-    return self
-  '''
-
   @objc_method
   def initWithStyle_(self, style: NSInteger) -> ObjCInstance:
     _this = send_super(__class__,
-                      self,
-                      'initWithStyle:',
-                      style,
-                      restype=objc_id,
-                      argtypes=[
-                        NSInteger,
-                      ])
+                       self,
+                       'initWithStyle:',
+                       style,
+                       restype=objc_id,
+                       argtypes=[
+                         NSInteger,
+                       ])
     this = ObjCInstance(_this)
-    this.hoge = 'hoge'
-    print('h')
-    #return self
-    print(this)
-    
-    print(self)
+    print('initWithStyle')
     return this
 
   @objc_method
   def dealloc(self):
     #send_super(__class__, self, 'dealloc')
-    print('dealloc')
+    print('\tdealloc')
 
   # MARK: - View Life Cycle
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')  # xxx: 不要?
     #pdbr.state(self, 1)
+    print('viewDidLoad')
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -85,7 +67,7 @@ class TableViewController(UITableViewController):
                  ctypes.c_bool,
                ])
     print('viewDidDisappear')
-    print(self.retainCount())
+    #print(self.retainCount())
 
   @objc_method
   def didReceiveMemoryWarning(self):
