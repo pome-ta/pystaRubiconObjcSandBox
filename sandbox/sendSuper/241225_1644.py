@@ -5,6 +5,7 @@ note: 素の継承は`dealloc` 呼べてる
     - 要素呼び出しで、`dealloc` が発動しない
     - `self.testCells` 要素を使用後`None` で`dealloc` 出現
     - `property` として、持たせる場合にはどうすれば？
+    - `this` じゃなくて`self` でよくね？
 '''
 
 import ctypes
@@ -41,15 +42,15 @@ class TableViewController(BaseTableViewController):
 
   @objc_method
   def initWithStyle_(self, style: NSInteger) -> ObjCInstance:
-    _this = send_super(__class__,
-                       self,
-                       'initWithStyle:',
-                       style,
-                       restype=objc_id,
-                       argtypes=[
-                         NSInteger,
-                       ])
-    this = ObjCInstance(_this)
+    send_super(__class__,
+               self,
+               'initWithStyle:',
+               style,
+               restype=objc_id,
+               argtypes=[
+                 NSInteger,
+               ])
+
     print('initWithStyle')
     '''
     [
@@ -59,14 +60,13 @@ class TableViewController(BaseTableViewController):
     ]
     '''
     self.initPrototype()
-    return this
+    return self
 
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     #pdbr.state(self)
     print('\tdealloc')
-
 
   @objc_method
   def initPrototype(self):
@@ -75,8 +75,6 @@ class TableViewController(BaseTableViewController):
         prototype['cellClass'], prototype['identifier'])
       for prototype in prototypes
     ]
-
-
 
   # MARK: - View Life Cycle
   @objc_method
@@ -122,8 +120,8 @@ class TableViewController(BaseTableViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    print('viewDidDisappear')
-    #self.testCells = None
+    #print('viewDidDisappear')
+    self.testCells = None
     #pdbr.state(self)
 
   @objc_method

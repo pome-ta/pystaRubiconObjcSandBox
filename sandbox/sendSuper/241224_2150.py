@@ -6,7 +6,7 @@ import ctypes
 from enum import Enum
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance
-from pyrubicon.objc.api import objc_method
+from pyrubicon.objc.api import objc_method, objc_property, at
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import NSInteger
 
@@ -23,6 +23,7 @@ from reBaseTableViewController import BaseTableViewController
 from storyboard.progressViewController import prototypes
 
 NSProgress = ObjCClass('NSProgress')
+NSTimer = ObjCClass('NSTimer')
 
 UIColor = ObjCClass('UIColor')
 
@@ -36,34 +37,39 @@ class ProgressViewKind(Enum):
 
 class ProgressViewController(BaseTableViewController):
 
+  progress:NSProgress = objc_property()
+  updateTimer:NSTimer = objc_property()
+
   @objc_method
   def initWithStyle_(self, style: NSInteger) -> ObjCInstance:
-    _this = send_super(__class__,
-                       self,
-                       'initWithStyle:',
-                       style,
-                       restype=objc_id,
-                       argtypes=[
-                         NSInteger,
-                       ])
-    this = ObjCInstance(_this)
+    send_super(__class__,
+               self,
+               'initWithStyle:',
+               style,
+               restype=objc_id,
+               argtypes=[
+                 NSInteger,
+               ])
+
     self.initPrototype()
 
-    self.progressViews: list = [
-    ]  # Accumulated progress views from all table cells for progress updating.
+    # Accumulated progress views from all table cells for progress updating.
+    self.progressViews: list = []
     self.progress = NSProgress.progressWithTotalUnitCount_(10)
-    self.observer = progress.addObserver_forKeyPath_options_context_(self, self.progress.fractionCompleted, NSKeyValueObservingOptions.new, None)
-    #pdbr.state(self.progress, 1)
-    #print(self.progress.fractionCompleted)
-    #fractionCompleted
-    #NSKeyValueObservingOptions.new
+    self.progress.addObserver_forKeyPath_options_context_(
+      self, at('fractionCompleted'), NSKeyValueObservingOptions.new, None)
 
-    return this
+    #pdbr.state(self.progress)
+    return self
 
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print('\tdealloc')
+    self.progress.removeObserver_forKeyPath_(self, at('fractionCompleted'))
+    #pdbr.state(self.observer)
+
+    #print(self.progress)
 
   @objc_method
   def initPrototype(self):
@@ -76,7 +82,7 @@ class ProgressViewController(BaseTableViewController):
   @objc_method
   def observeValueForKeyPath_ofObject_change_context_(self, keyPath, obj,
                                                       change, context):
-    print('observeValueForKeyPath')
+    print('--- observeValueForKeyPath')
 
   # MARK: - View Life Cycle
   @objc_method
@@ -101,6 +107,8 @@ class ProgressViewController(BaseTableViewController):
                     self.configureTintedProgressView_),
       ])
 
+    #pdbr.state(self.progress)
+
   @objc_method
   def viewDidAppear_(self, animated: bool):
     send_super(__class__,
@@ -110,7 +118,18 @@ class ProgressViewController(BaseTableViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #print('viewDidAppear')
+
+    self.progress.completedUnitCount = 0
+
+    #scheduledTimerWithTimeInterval_repeats_block_
+    def timerBlock(timer: objc_id) -> objc_id:
+      if self.progress.completedUnitCount < self.progress.totalUnitCount:
+        self.progress.completedUnitCount += 1
+      else:
+        self.updateTimer.invalidate()
+
+    self.updateTimer = NSTimer.scheduledTimerWithTimeInterval_repeats_block_(
+      1.0, True, timerBlock)
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
@@ -122,6 +141,7 @@ class ProgressViewController(BaseTableViewController):
                  ctypes.c_bool,
                ])
     #print('viewDidDisappear')
+    self.updateTimer.invalidate()
 
   @objc_method
   def didReceiveMemoryWarning(self):
