@@ -46,11 +46,12 @@ class ProgressViewController(BaseTableViewController):
                        ])
     this = ObjCInstance(_this)
     self.initPrototype()
-    
-    self.progressViews:list = []  # Accumulated progress views from all table cells for progress updating.
-    observer=NSProgress.progressWithTotalUnitCount_(10)
-    pdbr.state(observer,1)
-    
+
+    self.progressViews: list = [
+    ]  # Accumulated progress views from all table cells for progress updating.
+    observer = NSProgress.progressWithTotalUnitCount_(10)
+    pdbr.state(observer, 1)
+
     return this
 
   @objc_method
@@ -125,7 +126,6 @@ class ProgressViewController(BaseTableViewController):
     # Reset the completed progress of the `UIProgressView`s.
     progressView.setProgress_animated_(0.0, False)
     self.progressViews.append(progressView)
-    
 
   @objc_method
   def configureBarStyleProgressView_(self, progressView):
