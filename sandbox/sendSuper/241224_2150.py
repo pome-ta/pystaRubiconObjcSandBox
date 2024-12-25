@@ -11,7 +11,9 @@ from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import NSInteger
 
 from rbedge.enumerations import (
-  UIProgressViewStyle, )
+  UIProgressViewStyle,
+  NSKeyValueObservingOptions,
+)
 from rbedge import pdbr
 
 from caseElement import CaseElement
@@ -49,8 +51,12 @@ class ProgressViewController(BaseTableViewController):
 
     self.progressViews: list = [
     ]  # Accumulated progress views from all table cells for progress updating.
-    observer = NSProgress.progressWithTotalUnitCount_(10)
-    pdbr.state(observer, 1)
+    self.progress = NSProgress.progressWithTotalUnitCount_(10)
+    self.observer = progress.addObserver_forKeyPath_options_context_(self, self.progress.fractionCompleted, NSKeyValueObservingOptions.new, None)
+    #pdbr.state(self.progress, 1)
+    #print(self.progress.fractionCompleted)
+    #fractionCompleted
+    #NSKeyValueObservingOptions.new
 
     return this
 
@@ -66,6 +72,11 @@ class ProgressViewController(BaseTableViewController):
         prototype['cellClass'], prototype['identifier'])
       for prototype in prototypes
     ]
+
+  @objc_method
+  def observeValueForKeyPath_ofObject_change_context_(self, keyPath, obj,
+                                                      change, context):
+    print('observeValueForKeyPath')
 
   # MARK: - View Life Cycle
   @objc_method
