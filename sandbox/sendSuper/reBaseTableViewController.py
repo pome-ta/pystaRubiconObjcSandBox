@@ -1,5 +1,6 @@
 import ctypes
-from pyrubicon.objc.api import ObjCClass, objc_method, objc_property, ObjCInstance, NSMutableArray
+from pyrubicon.objc.api import ObjCClass, ObjCInstance
+from pyrubicon.objc.api import objc_method
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import NSInteger
 
@@ -13,32 +14,29 @@ UIListContentConfiguration = ObjCClass('UIListContentConfiguration')
 
 
 class BaseTableViewController(UITableViewController):
-  #testCells = objc_property(ctypes.py_object)
-  #headerFooterView_identifier = objc_property()
 
   @objc_method
   def initWithStyle_(self, style: NSInteger) -> ObjCInstance:
-    _this = send_super(__class__,
-                       self,
-                       'initWithStyle:',
-                       style,
-                       restype=objc_id,
-                       argtypes=[
-                         NSInteger,
-                       ])
-    this = ObjCInstance(_this)
-    #print('initWithStyle: base')
-    this.testCells: list[CaseElement] = []
-    this.headerFooterView_identifier = 'customHeaderFooterView'
-    return this
+    send_super(__class__,
+               self,
+               'initWithStyle:',
+               style,
+               restype=objc_id,
+               argtypes=[
+                 NSInteger,
+               ])
 
-  '''
+    self.testCells: list[CaseElement] = []
+    self.headerFooterView_identifier = 'customHeaderFooterView'
+    return self
+
   @objc_method
-  def dealloc(self):
-    #send_super(__class__, self, 'dealloc')
-    #print('\tdealloc: base')
-    pass
-  '''
+  def setupPrototypes_(self, prototypes) -> None:
+    [
+      self.tableView.registerClass_forCellReuseIdentifier_(
+        prototype['cellClass'], prototype['identifier'])
+      for prototype in prototypes
+    ]
 
   @objc_method
   def viewDidLoad(self):
@@ -55,7 +53,7 @@ class BaseTableViewController(UITableViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #print('viewDidDisappear: base')
+    # todo: `dealloc` 呼び出す為、インスタンス変数を初期化
     self.testCells = None
     self.headerFooterView_identifier = None
 
