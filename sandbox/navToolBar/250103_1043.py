@@ -23,7 +23,42 @@ class ViewController(UIViewController):
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
-    self.navigationController.setToolbarHidden_(False)
+    self.navigationController.setToolbarHidden_animated_(False, True)
+
+    self.view.backgroundColor = UIColor.systemGreenColor()
+
+    #self.navigationController.setToolbarHidden_animated_(False, True)
+
+    toolbar = self.navigationController.toolbar
+    toolbar.setBackgroundColor_(UIColor.systemBlueColor())
+    #self.navigationController.toolbar.standardAppearance.setBackgroundColor_(UIColor.systemBlueColor())
+
+    #pdbr.state(self.navigationController.view)
+    #print(self.navigationController)
+    #print(self.navigationController.view)
+    #print(self.view)
+    #pdbr.state()
+    #print(self.navigationController.toolbar.size.height)
+    height = self.navigationController.toolbar.size.height
+
+    #self.view.addSubview_(toolbar)
+
+    layoutMarginsGuide = self.view.layoutMarginsGuide
+    #safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
+    safeAreaLayoutGuide = self.navigationController.view.safeAreaLayoutGuide
+    
+    #toolbar.translatesAutoresizingMaskIntoConstraints = False
+    '''
+    NSLayoutConstraint.activateConstraints_([
+      toolbar.bottomAnchor.constraintEqualToAnchor_(
+        safeAreaLayoutGuide.bottomAnchor),
+      toolbar.leadingAnchor.constraintEqualToAnchor_(
+        safeAreaLayoutGuide.leadingAnchor),
+      toolbar.trailingAnchor.constraintEqualToAnchor_(
+        safeAreaLayoutGuide.trailingAnchor),
+      toolbar.heightAnchor.constraintEqualToConstant_(height + 120.0)
+    ])
+    '''
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -46,6 +81,7 @@ class ViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print('viewDidAppear')
+    #pdbr.state(self.navigationController.toolbar)
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
@@ -62,6 +98,8 @@ class ViewController(UIViewController):
   def didReceiveMemoryWarning(self):
     send_super(__class__, self, 'didReceiveMemoryWarning')
     print(f'{__class__}: didReceiveMemoryWarning')
+
+
 if __name__ == '__main__':
   from rbedge.functions import NSStringFromClass
   from rbedge.enumerations import UIModalPresentationStyle
@@ -73,3 +111,4 @@ if __name__ == '__main__':
 
   presentation_style = UIModalPresentationStyle.fullScreen
   present_viewController(main_vc, presentation_style)
+
