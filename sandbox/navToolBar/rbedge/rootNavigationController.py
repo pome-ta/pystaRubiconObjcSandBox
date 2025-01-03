@@ -19,7 +19,7 @@ class RootNavigationController(UINavigationController,
   @objc_method
   def viewDidLoad(self):
     #self.initNavigationBarAppearance()
-    self.initToolbarAppearance()
+    #self.initToolbarAppearance()
     '''
     navigationBarAppearance = UINavigationBarAppearance.new()
     navigationBarAppearance.configureWithDefaultBackground()
@@ -59,8 +59,8 @@ class RootNavigationController(UINavigationController,
   def initToolbarAppearance(self):
     toolbarAppearance = UIToolbarAppearance.new()
     #toolbarAppearance.configureWithDefaultBackground()
-    toolbarAppearance.configureWithOpaqueBackground()
-    #toolbarAppearance.configureWithTransparentBackground()
+    #toolbarAppearance.configureWithOpaqueBackground()
+    toolbarAppearance.configureWithTransparentBackground()
     
     toolbar = self.toolbar
     toolbar.standardAppearance = toolbarAppearance
@@ -68,7 +68,7 @@ class RootNavigationController(UINavigationController,
     toolbar.compactAppearance = toolbarAppearance
     toolbar.compactScrollEdgeAppearance = toolbarAppearance
     
-    self.setToolbarHidden_(True)
+    #self.setToolbarHidden_(True)
 
 
   @objc_method

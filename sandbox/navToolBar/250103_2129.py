@@ -12,7 +12,6 @@ from rbedge.enumerations import (
   UIBarMetrics,
 )
 
-
 from rbedge import pdbr
 
 UIViewController = ObjCClass('UIViewController')
@@ -21,6 +20,7 @@ UIColor = ObjCClass('UIColor')
 UIImage = ObjCClass('UIImage')
 NSURL = ObjCClass('NSURL')
 UIScreen = ObjCClass('UIScreen')
+UIBarButtonItem = ObjCClass('UIBarButtonItem')
 
 
 class ViewController(UIViewController):
@@ -35,66 +35,23 @@ class ViewController(UIViewController):
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
-    
-    self.navigationController.setToolbarHidden_animated_(False, True)
 
     self.view.backgroundColor = UIColor.systemGreenColor()
-    
-    scale = int(UIScreen.mainScreen.scale)
-    #initWithData_scale_
-    # xxx: `lambda` の使い方が悪い
-    dataWithContentsOfURL = lambda path_str: NSData.dataWithContentsOfURL_(
-      NSURL.fileURLWithPath_(str(Path(path_str).absolute())))
+    self.navigationController.setToolbarHidden_animated_(False, False)
 
-    image_path = f'./images/toolbar_background.imageset/toolbar_background_{scale}x.png'
+    refreshBarButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItem(
+      UIBarButtonSystemItem.refresh, target=None, action=None)
+    
+    flexibleSpaceBarButtonItem = UIBarButtonItem.alloc(
+    ).initWithBarButtonSystemItem(UIBarButtonSystemItem.flexibleSpace,
+                                  target=None,
+                                  action=None)
 
-    toolbarBackgroundImage = UIImage.alloc().initWithData_scale_(
-      dataWithContentsOfURL(image_path), scale)
-    
-    
-    #self.navigationController.setToolbarHidden_animated_(False, True)
-
-    toolbar = self.navigationController.toolbar
-    
-    toolbar.setBackgroundImage(
-      toolbarBackgroundImage,
-      forToolbarPosition=UIBarPosition.bottom,
-      barMetrics=UIBarMetrics.default)
-    
-    self.navigationController.navigationBar.setBackgroundImage_forBarMetrics_(toolbarBackgroundImage, UIBarMetrics.default)
-    #toolbar.setBackgroundColor_(UIColor.systemBlueColor())
-    #pdbr.state(self.navigationController.navigationBar)
-    
-    #self.navigationController.toolbar.standardAppearance.setBackgroundColor_(UIColor.systemBlueColor())
-    #toolbar.standardAppearance.setBackgroundColor_(UIColor.systemBlueColor())
-
-    #pdbr.state(self.navigationController.view)
-    #print(self.navigationController)
-    #print(self.navigationController.view)
-    #print(self.view)
-    #pdbr.state()
-    #print(self.navigationController.toolbar.size.height)
-    height = self.navigationController.toolbar.size.height
-
-    #self.view.addSubview_(toolbarBackgroundImage)
-
-    layoutMarginsGuide = self.view.layoutMarginsGuide
-    #safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
-    safeAreaLayoutGuide = self.navigationController.view.safeAreaLayoutGuide
-    
-    #toolbar.translatesAutoresizingMaskIntoConstraints = False
-    '''
-    NSLayoutConstraint.activateConstraints_([
-      toolbar.bottomAnchor.constraintEqualToAnchor_(
-        safeAreaLayoutGuide.bottomAnchor),
-      toolbar.leadingAnchor.constraintEqualToAnchor_(
-        safeAreaLayoutGuide.leadingAnchor),
-      toolbar.trailingAnchor.constraintEqualToAnchor_(
-        safeAreaLayoutGuide.trailingAnchor),
-      toolbar.heightAnchor.constraintEqualToConstant_(height),
-    ])
-    '''
-    
+    actionBarButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItem(
+      UIBarButtonSystemItem.action, target=None, action=None)
+      
+    self.setToolbarItems_animated_([refreshBarButtonItem,flexibleSpaceBarButtonItem,actionBarButtonItem],True)
+    pdbr.state(self,1)
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
