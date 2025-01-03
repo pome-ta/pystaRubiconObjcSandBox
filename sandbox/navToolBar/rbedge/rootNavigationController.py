@@ -59,8 +59,8 @@ class RootNavigationController(UINavigationController,
   def initToolbarAppearance(self):
     toolbarAppearance = UIToolbarAppearance.new()
     #toolbarAppearance.configureWithDefaultBackground()
-    #toolbarAppearance.configureWithOpaqueBackground()
-    toolbarAppearance.configureWithTransparentBackground()
+    toolbarAppearance.configureWithOpaqueBackground()
+    #toolbarAppearance.configureWithTransparentBackground()
     
     toolbar = self.toolbar
     toolbar.standardAppearance = toolbarAppearance

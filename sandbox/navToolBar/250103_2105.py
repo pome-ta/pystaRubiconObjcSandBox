@@ -1,14 +1,26 @@
 import ctypes
+from pathlib import Path
 
-from pyrubicon.objc.api import ObjCClass, ObjCInstance
+from pyrubicon.objc.api import ObjCClass, ObjCInstance, NSData
 from pyrubicon.objc.api import objc_method
 from pyrubicon.objc.runtime import send_super, objc_id
+
+from rbedge.enumerations import (
+  UIBarStyle,
+  UIBarButtonSystemItem,
+  UIBarPosition,
+  UIBarMetrics,
+)
+
 
 from rbedge import pdbr
 
 UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 UIColor = ObjCClass('UIColor')
+UIImage = ObjCClass('UIImage')
+NSURL = ObjCClass('NSURL')
+UIScreen = ObjCClass('UIScreen')
 
 
 class ViewController(UIViewController):
@@ -23,15 +35,36 @@ class ViewController(UIViewController):
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
+    
     self.navigationController.setToolbarHidden_animated_(False, True)
 
     self.view.backgroundColor = UIColor.systemGreenColor()
+    
+    scale = int(UIScreen.mainScreen.scale)
+    #initWithData_scale_
+    # xxx: `lambda` の使い方が悪い
+    dataWithContentsOfURL = lambda path_str: NSData.dataWithContentsOfURL_(
+      NSURL.fileURLWithPath_(str(Path(path_str).absolute())))
 
+    image_path = f'./images/toolbar_background.imageset/toolbar_background_{scale}x.png'
+
+    toolbarBackgroundImage = UIImage.alloc().initWithData_scale_(
+      dataWithContentsOfURL(image_path), scale)
+    
+    
     #self.navigationController.setToolbarHidden_animated_(False, True)
 
     toolbar = self.navigationController.toolbar
     
+    toolbar.setBackgroundImage(
+      toolbarBackgroundImage,
+      forToolbarPosition=UIBarPosition.bottom,
+      barMetrics=UIBarMetrics.default)
+    
+    self.navigationController.navigationBar.setBackgroundImage_forBarMetrics_(toolbarBackgroundImage, UIBarMetrics.default)
     #toolbar.setBackgroundColor_(UIColor.systemBlueColor())
+    pdbr.state(self.navigationController.navigationBar)
+    
     #self.navigationController.toolbar.standardAppearance.setBackgroundColor_(UIColor.systemBlueColor())
     #toolbar.standardAppearance.setBackgroundColor_(UIColor.systemBlueColor())
 
