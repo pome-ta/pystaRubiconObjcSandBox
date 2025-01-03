@@ -45,7 +45,7 @@ class ProgressViewController(BaseTableViewController):
 
   # MARK: - Initialization
   @objc_method
-  def initWithStyle_(self, style: NSInteger) -> ObjCInstance:
+  def initWithStyle_(self, style: int) -> ObjCInstance:
     send_super(__class__,
                self,
                'initWithStyle:',
@@ -181,14 +181,14 @@ if __name__ == '__main__':
 
   from rbedge import present_viewController
 
-  _style = UITableViewStyle.grouped
-  main_vc = ProgressViewController.alloc().initWithStyle_(_style)
+  table_style = UITableViewStyle.grouped
+  main_vc = ProgressViewController.alloc().initWithStyle_(table_style)
   _title = NSStringFromClass(ProgressViewController)
   main_vc.navigationItem.title = _title
 
-  style = UIModalPresentationStyle.fullScreen
+  presentation_style = UIModalPresentationStyle.fullScreen
   #style = UIModalPresentationStyle.pageSheet
   #style = UIModalPresentationStyle.popover
 
-  present_viewController(main_vc, style)
+  present_viewController(main_vc, presentation_style)
 
