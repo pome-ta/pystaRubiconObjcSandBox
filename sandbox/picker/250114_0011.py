@@ -37,11 +37,10 @@ NSMutableAttributedString = ObjCClass('NSMutableAttributedString')
 NSAttributedString = ObjCClass('NSAttributedString')
 UILabel = ObjCClass('UILabel')
 UIFont = ObjCClass('UIFont')
+CIColor = ObjCClass('CIColor')
 
 UIPickerViewDataSource = ObjCProtocol('UIPickerViewDataSource')
 UIPickerViewDelegate = ObjCProtocol('UIPickerViewDelegate')
-
-print(type((NSAttributedStringKey.foregroundColor)))
 
 
 class RGB:
@@ -56,16 +55,13 @@ class ColorComponent(IntEnum):
   blue = auto()
 
 
-'''
+
 class PickerViewController(UIViewController,
                            protocols=[
                              UIPickerViewDataSource,
                              UIPickerViewDelegate,
                            ]):
-'''
 
-
-class PickerViewController(UIViewController):
 
   @objc_method
   def dealloc(self):
@@ -79,16 +75,16 @@ class PickerViewController(UIViewController):
     send_super(__class__, self, 'viewDidLoad')
     self.navigationItem.title = 'PickerViewTitle' if (
       title := self.navigationItem.title) is None else title
-    self.view.backgroundColor = UIColor.systemBackgroundColor()
+    #self.view.backgroundColor = UIColor.systemBackgroundColor()
 
     # --- pickerView
     # todo: 変数名`pickerView` だと、関数名に干渉する
     colorSwatchPickerView = UIPickerView.new()
     colorSwatchPickerView.dataSource = self
     colorSwatchPickerView.delegate = self
-
-    # --- colorSwatchView
-    colorSwatchView = UIView.new()
+    
+    #pdbr.state(colorSwatchPickerView.dataSource)
+    
 
     # --- Layout
     safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
@@ -96,30 +92,19 @@ class PickerViewController(UIViewController):
 
     self.view.addSubview_(colorSwatchPickerView)
     colorSwatchPickerView.translatesAutoresizingMaskIntoConstraints = False
-    self.view.addSubview_(colorSwatchView)
-    colorSwatchView.translatesAutoresizingMaskIntoConstraints = False
-
+    
     NSLayoutConstraint.activateConstraints_([
       colorSwatchPickerView.widthAnchor.constraintEqualToConstant_(375.0),
     ])
 
     NSLayoutConstraint.activateConstraints_([
-      colorSwatchView.trailingAnchor.constraintEqualToAnchor_constant_(
-        safeAreaLayoutGuide.trailingAnchor, -20.0),
-      colorSwatchView.topAnchor.constraintEqualToAnchor_constant_(
-        colorSwatchPickerView.bottomAnchor, 8.0),
-      colorSwatchView.bottomAnchor.constraintEqualToAnchor_constant_(
-        safeAreaLayoutGuide.bottomAnchor, -20.0),
-      colorSwatchPickerView.centerXAnchor.constraintEqualToAnchor_(
-        safeAreaLayoutGuide.centerXAnchor),
       colorSwatchPickerView.topAnchor.constraintEqualToAnchor_constant_(
         safeAreaLayoutGuide.topAnchor, 13.0),
-      colorSwatchView.leadingAnchor.constraintEqualToAnchor_constant_(
-        safeAreaLayoutGuide.leadingAnchor, 20.0),
+      
     ])
 
     self.colorSwatchPickerView = colorSwatchPickerView
-    self.colorSwatchView = colorSwatchView
+    
 
     self.numberOfColorValuesPerComponent = int(RGB.max / RGB.offset) + 1
 
@@ -129,10 +114,7 @@ class PickerViewController(UIViewController):
 
     self.configurePickerView()
 
-  @objc_method
-  def updateColorSwatchViewBackgroundColor(self):
-    self.colorSwatchView.backgroundColor = UIColor.colorWithRed_green_blue_alpha_(
-      self.redColor, self.greenColor, self.blueColor, 1.0)
+
 
   @objc_method
   def configurePickerView(self):
@@ -155,10 +137,7 @@ class PickerViewController(UIViewController):
       """
       self.colorSwatchPickerView.selectRow_inComponent_animated_(
         selectedRow, int(colorComponent), True)
-      self.pickerView(self.colorSwatchPickerView,
-                      didSelectRow=selectedRow,
-                      inComponent=int(colorComponent))
-    #pdbr.state(self.colorSwatchPickerView)
+      #self.pickerView(self.colorSwatchPickerView,didSelectRow=selectedRow,inComponent=int(colorComponent))
 
   # MARK: - UIPickerViewDataSource
   @objc_method
@@ -170,48 +149,16 @@ class PickerViewController(UIViewController):
     return self.numberOfColorValuesPerComponent
 
   # MARK: - UIPickerViewDelegate
-  '''
   @objc_rawmethod
-  def pickerView_attributedTitleForRow_forComponent_(
-      self, _cmd, _pickerView, _row, _component) -> ctypes.c_void_p:
-    colorValue = ObjCInstance(_row) * RGB.offset
-    # Set the initial colors for each picker segment.
-    value = colorValue / RGB.max
-    redColorComponent = RGB.min
-    greenColorComponent = RGB.min
-    blueColorComponent = RGB.min
-
-    if component == ColorComponent.red:
-      redColorComponent = value
-    if component == ColorComponent.green:
-      greenColorComponent = value
-    if component == ColorComponent.blue:
-      blueColorComponent = value
-
-    if redColorComponent < 0.5:
-      redColorComponent = 0.5
-    if blueColorComponent < 0.5:
-      blueColorComponent = 0.5
-    if greenColorComponent < 0.5:
-      greenColorComponent = 0.5
-
-    
-    foregroundColor = UIColor.colorWithRed_green_blue_alpha_(
-      redColorComponent, greenColorComponent, blueColorComponent, 1.0)
-    # Set the foreground color for the entire attributed string.
-    #attributes = NSDictionary.dictionaryWithObject(foregroundColor, forKey=NSForegroundColorAttributeName)
-    attributes = {str(NSAttributedStringKey.foregroundColor):foregroundColor,}
-    title = NSMutableAttributedString.alloc().initWithString_attributes_(
-      f'{int(colorValue)}', at(attributes))
-    return title
-    
-    
-    
+  def pickerView_titleForRow_forComponent_(self, _self, _cmd, pickerView, row,component)->ctypes.c_void_p:
+    return ns_from_py('hige'),ptr
+  
+  
   '''
-
+  # MARK: - UIPickerViewDelegate
   @objc_method
-  def pickerView_titleForRow_forComponent_(self, pickerView, row: int,
-                                           component: int) -> objc_id:
+  def pickerView_attributedTitleForRow_forComponent_(self, pickerView,
+                                                     row: int, component: int):
     colorValue = row * RGB.offset
     # Set the initial colors for each picker segment.
     value = colorValue / RGB.max
@@ -235,10 +182,13 @@ class PickerViewController(UIViewController):
 
     foregroundColor = UIColor.colorWithRed_green_blue_alpha_(
       redColorComponent, greenColorComponent, blueColorComponent, 1.0)
-    print(foregroundColor)
-    print(UIColor.redColor)
+    # Set the foreground color for the entire attributed string.
+    attributes = NSDictionary.dictionaryWithObject(
+      0, forKey=NSAttributedStringKey.foregroundColor)
 
-    return f'{int(colorValue)}'
+    title = NSMutableAttributedString.alloc().initWithString_attributes_(
+      f'{int(colorValue)}', attributes)
+    return title
 
   @objc_method
   def pickerView_didSelectRow_inComponent_(self, pickerView, row: int,
@@ -250,7 +200,7 @@ class PickerViewController(UIViewController):
       self.greenColor = colorComponentValue
     if component == ColorComponent.blue:
       self.blueColor = colorComponentValue
-    self.updateColorSwatchViewBackgroundColor()
+
 
   # MARK: - UIPickerViewAccessibilityDelegate
   def pickerView_accessibilityLabelForComponent_(self, pickerView,
@@ -261,6 +211,7 @@ class PickerViewController(UIViewController):
       return 'Green color component value'
     if component == ColorComponent.blue:
       return 'Blue color component value'
+  '''
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -283,6 +234,7 @@ class PickerViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print('viewDidAppear')
+    pdbr.state(self, 1)
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
