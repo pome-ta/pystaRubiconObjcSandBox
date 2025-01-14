@@ -141,6 +141,8 @@ class CustomViewController:
                                             13.0),
         self.colorSwatchView.leadingAnchor().constraintEqualToAnchor_constant_(
           safeAreaLayoutGuide.leadingAnchor(), 20.0),
+        self.colorSwatchPickerView.centerYAnchor().constraintEqualToAnchor_(
+          safeAreaLayoutGuide.centerYAnchor()),
       ])
 
       self.configurePickerView()
@@ -229,7 +231,7 @@ class CustomViewController:
     # --- `UIPickerViewDelegate` set up
     _methods = [
       pickerView_attributedTitleForRow_forComponent_,
-      pickerView_titleForRow_forComponent_,
+      #pickerView_titleForRow_forComponent_,
     ]
     _protocols = [
       'UIPickerViewDelegate',
@@ -294,6 +296,7 @@ class ObjcUIViewController:
       viewController = ObjCInstance(_viewController)
 
       # --- appearance
+      '''
       appearance = UINavigationBarAppearance.alloc()
       appearance.configureWithDefaultBackground()
       #appearance.configureWithOpaqueBackground()
@@ -309,6 +312,7 @@ class ObjcUIViewController:
       navigationBar.compactScrollEdgeAppearance = appearance
 
       #navigationBar.prefersLargeTitles = True
+      '''
 
       viewController.setEdgesForExtendedLayout_(0)
       #viewController.setExtendedLayoutIncludesOpaqueBars_(True)
