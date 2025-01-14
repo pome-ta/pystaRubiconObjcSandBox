@@ -74,7 +74,7 @@ class CustomViewController:
     self._viewController: UIViewController
     self.nav_title = 'UIPickerView'
 
-    self.numberOfColorValuesPerComponent = int(RGB.max / RGB.offset) + 1
+    self.numberOfColorValuesPerComponent = 1#int(RGB.max / RGB.offset) + 1
 
     self.redColor = RGB.min
     self.greenColor = RGB.min
@@ -221,6 +221,7 @@ class CustomViewController:
       title = NSMutableAttributedString.alloc().initWithString_attributes_(
         f'{int(colorValue)}', attributes)
 
+      pdbg.state(title)
       return title.ptr
 
     def pickerView_titleForRow_forComponent_(_self, _cmd, pickerView, row,

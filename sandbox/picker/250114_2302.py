@@ -74,9 +74,9 @@ class PickerViewController(UIViewController,
 
 class PickerViewController(UIViewController):
   #numberOfColorValuesPerComponent = objc_property(int)
-  #redColor = objc_property(float)
-  #greenColor = objc_property(float)
-  #blueColor = objc_property(float)
+  redColor = objc_property(float)
+  greenColor = objc_property(float)
+  blueColor = objc_property(float)
 
   @objc_method
   def dealloc(self):
@@ -137,6 +137,7 @@ class PickerViewController(UIViewController):
 
     self.colorSwatchPickerView = colorSwatchPickerView
     self.colorSwatchView = colorSwatchView
+    self.mutableAttributedString = NSMutableAttributedString.alloc()
 
     self.configurePickerView()
 
@@ -166,7 +167,9 @@ class PickerViewController(UIViewController):
       """
       self.colorSwatchPickerView.selectRow_inComponent_animated_(
         selectedRow, int(colorComponent), True)
-      #self.pickerView(self.colorSwatchPickerView,didSelectRow=selectedRow,inComponent=int(colorComponent))
+      self.pickerView(self.colorSwatchPickerView,
+                      didSelectRow=selectedRow,
+                      inComponent=int(colorComponent))
     #pdbr.state(self.colorSwatchPickerView)
 
   # MARK: - UIPickerViewDataSource
@@ -207,12 +210,15 @@ class PickerViewController(UIViewController):
     foregroundColor = UIColor.colorWithRed_green_blue_alpha_(
       redColorComponent, greenColorComponent, blueColorComponent, 1.0)
     # Set the foreground color for the entire attributed string.
-    attributes = NSDictionary.dictionaryWithObject(foregroundColor, forKey=NSForegroundColorAttributeName)
+    attributes = NSDictionary.dictionaryWithObject(
+      foregroundColor, forKey=NSForegroundColorAttributeName)
     #attributes = {str(NSForegroundColorAttributeName):foregroundColor,}
     #attributes = NSDictionary.dictionaryWithObject(foregroundColor, forKey='NSColor')
     #attributes = NSDictionary.dictionaryWithObject(UIColor.systemRedColor(),forKey='NSColor')
 
-    title = NSMutableAttributedString.alloc().initWithString_attributes_(
+    #title = NSMutableAttributedString.alloc().initWithString_attributes_(f'{int(colorValue)}', attributes)
+
+    title = self.mutableAttributedString.initWithString_attributes_(
       f'{int(colorValue)}', attributes)
     return title
 
@@ -220,38 +226,6 @@ class PickerViewController(UIViewController):
   def pickerView_titleForRow_forComponent_(self, pickerView, row: int,
                                            component: int):
     colorValue = row * RGB.offset
-    # Set the initial colors for each picker segment.
-    value = colorValue / RGB.max
-    redColorComponent = RGB.min
-    greenColorComponent = RGB.min
-    blueColorComponent = RGB.min
-
-    if component == ColorComponent.red:
-      redColorComponent = value
-    if component == ColorComponent.green:
-      greenColorComponent = value
-    if component == ColorComponent.blue:
-      blueColorComponent = value
-
-    if redColorComponent < 0.5:
-      redColorComponent = 0.5
-    if blueColorComponent < 0.5:
-      blueColorComponent = 0.5
-    if greenColorComponent < 0.5:
-      greenColorComponent = 0.5
-
-    foregroundColor = UIColor.colorWithRed_green_blue_alpha_(
-      redColorComponent, greenColorComponent, blueColorComponent, 1.0)
-    #attributes = NSDictionary.dictionaryWithObject(foregroundColor, forKey=NSForegroundColorAttributeName)
-    attributes = NSDictionary.dictionaryWithObject(foregroundColor,
-                                                   forKey='NSColor')
-
-    #NSColor
-    #attributes = {str(NSForegroundColorAttributeName):foregroundColor,}
-    title = NSMutableAttributedString.alloc().initWithString_attributes_(
-      f'{int(colorValue)}', attributes)
-    #print(title)
-
     return f'{int(colorValue)}'
 
   @objc_method
