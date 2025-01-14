@@ -1,11 +1,43 @@
 '''
   note: objc_util でやってみる
 '''
+import os
+import ctypes
+import ctypes.util
+#from ctypes import util
 from enum import IntEnum, auto
 from objc_util import ObjCClass, ObjCInstance, create_objc_class, on_main_thread
 from objc_util import sel, CGRect, ns
 
 import pdbg
+
+_lib_path = ['/usr/lib']
+_framework_path = ['/System/Library/Frameworks']
+
+
+def load_library(name):
+  path = ctypes.util.find_library(name)
+  if path is not None:
+    return ctypes.CDLL(path)
+
+  for loc in _lib_path:
+    try:
+      return ctypes.CDLL(os.path.join(loc, "lib" + name + ".dylib"))
+    except OSError:
+      pass
+
+  for loc in _framework_path:
+    try:
+      return ctypes.CDLL(os.path.join(loc, name + ".framework", name))
+    except OSError:
+      pass
+
+  raise ValueError(f"Library {name!r} not found")
+
+
+
+uikit = load_library('UIKit')
+print(uikit)
 
 # --- navigation
 UINavigationController = ObjCClass('UINavigationController')
@@ -155,35 +187,35 @@ class CustomViewController:
 
     def pickerView_attributedTitleForRow_forComponent_(_self, _cmd, pickerView,
                                                        row, component):
-      
+
       colorValue = row * RGB.offset
       # Set the initial colors for each picker segment.
       value = colorValue / RGB.max
       redColorComponent = RGB.min
       greenColorComponent = RGB.min
       blueColorComponent = RGB.min
-  
+
       if component == ColorComponent.red:
         redColorComponent = value
       if component == ColorComponent.green:
         greenColorComponent = value
       if component == ColorComponent.blue:
         blueColorComponent = value
-  
+
       if redColorComponent < 0.5:
         redColorComponent = 0.5
       if blueColorComponent < 0.5:
         blueColorComponent = 0.5
       if greenColorComponent < 0.5:
         greenColorComponent = 0.5
-  
+
       foregroundColor = UIColor.colorWithRed_green_blue_alpha_(
         redColorComponent, greenColorComponent, blueColorComponent, 1.0)
       return 0
 
     def pickerView_titleForRow_forComponent_(_self, _cmd, pickerView, row,
                                              component):
-      colorValue =row * RGB.offset
+      colorValue = row * RGB.offset
       return ns(f'{int(colorValue)}').ptr
 
     # --- `UIPickerViewDelegate` set up

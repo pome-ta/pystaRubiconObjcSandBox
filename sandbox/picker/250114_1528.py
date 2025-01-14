@@ -72,7 +72,7 @@ class CustomViewController:
 
   def __init__(self):
     self._viewController: UIViewController
-    self.nav_title = 'nav title'
+    self.nav_title = 'UIPickerView'
 
     self.numberOfColorValuesPerComponent = int(RGB.max / RGB.offset) + 1
 
