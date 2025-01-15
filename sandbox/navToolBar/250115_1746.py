@@ -21,6 +21,7 @@ UIImage = ObjCClass('UIImage')
 NSURL = ObjCClass('NSURL')
 UIScreen = ObjCClass('UIScreen')
 UIBarButtonItem = ObjCClass('UIBarButtonItem')
+UIToolbar = ObjCClass('UIToolbar')
 
 UIView = ObjCClass('UIView')
 
@@ -39,7 +40,11 @@ class ViewController(UIViewController):
     send_super(__class__, self, 'viewDidLoad')
 
     #self.view.backgroundColor = UIColor.systemGreenColor()
-    self.navigationController.setToolbarHidden_animated_(False, False)
+    #self.navigationController.setToolbarHidden_animated_(False, False)
+    toolbar = self.navigationController.toolbar
+    #pdbr.state(self.navigationController)
+    #pdbr.state(toolbar)
+    #print(toolbar.isTranslucent())
 
     # Note that there's no target/action since this represents empty space.
     trashBarButtonItem = UIBarButtonItem.alloc(
@@ -57,6 +62,14 @@ class ViewController(UIViewController):
       flexibleSpaceBarButtonItem,
       doneBarButtonItem,
     ]
+    
+    #toolbar.setItems_animated_(toolbarButtonItems, True)
+    #self.setToolbarItems_animated_(toolbarButtonItems, True)
+    #self.view.addSubview_(toolbar)
+    #pdbr.state(self)
+    #print(self.view._autolayoutTrace())
+    pdbr.state(self.view)
+    self.setToolbarItems_animated_(toolbarButtonItems, True)
 
     subView = UIView.new()
     subView.backgroundColor = UIColor.systemGreenColor()
@@ -66,7 +79,7 @@ class ViewController(UIViewController):
     safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
 
     self.view.addSubview_(subView)
-    subView.translatesAutoresizingMaskIntoConstraints = False
+    #subView.translatesAutoresizingMaskIntoConstraints = False
     NSLayoutConstraint.activateConstraints_([
       subView.centerXAnchor.constraintEqualToAnchor_(
         safeAreaLayoutGuide.centerXAnchor),
