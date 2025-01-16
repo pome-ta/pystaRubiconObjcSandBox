@@ -46,14 +46,13 @@ class ViewController(UIViewController):
     toolbarAppearance.configureWithDefaultBackground()
     #toolbarAppearance.configureWithOpaqueBackground()
     #toolbarAppearance.configureWithTransparentBackground()
-    #pdbr.state(toolbarAppearance)
     toolbarAppearance.setBackgroundColor_(UIColor.systemDarkYellowColor())
 
-    #navToolbar = self.navigationController.toolbar
-    toolbar = self.navigationController.toolbar
+    navToolbar = self.navigationController.toolbar
+    #toolbar = self.navigationController.toolbar
 
-    #toolbar = UIToolbar.alloc().initWithFrame_(navToolbar.frame)
-    #toolbar.setAutoresizingMask_(navToolbar.autoresizingMask)
+    toolbar = UIToolbar.alloc().initWithFrame_(navToolbar.frame)
+    toolbar.setAutoresizingMask_(navToolbar.autoresizingMask)
     #autoresizingMask
     #frame
     
