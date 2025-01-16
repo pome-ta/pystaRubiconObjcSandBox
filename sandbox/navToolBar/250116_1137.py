@@ -39,11 +39,8 @@ class ViewController(UIViewController):
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     self.view.backgroundColor = UIColor.systemGreenColor()
-    
-    
-    
-    
-    #self.navigationController.setToolbarHidden_animated_(False, False)
+
+    self.navigationController.setToolbarHidden_animated_(False, False)
 
     toolbar = self.navigationController.toolbar
     #pdbr.state(self.navigationController)
@@ -66,8 +63,8 @@ class ViewController(UIViewController):
       flexibleSpaceBarButtonItem,
       doneBarButtonItem,
     ]
-    
-    toolbar.setItems_animated_(toolbarButtonItems, True)
+
+    #toolbar.setItems_animated_(toolbarButtonItems, True)
     #self.setToolbarItems_animated_(toolbarButtonItems, True)
     #self.view.addSubview_(toolbar)
     #pdbr.state(self)
@@ -77,11 +74,15 @@ class ViewController(UIViewController):
 
     subView = UIView.new()
     subView.backgroundColor = UIColor.systemDarkYellowColor()
-    
+
     toolSizeView = UIView.new()
     toolSizeView.backgroundColor = UIColor.systemDarkRedColor()
-    
-    #pdbr.state(toolbar)
+
+    toolbarSize = toolbar.size
+    #toolbarSize.height
+    #toolbarSize.width
+
+    #pdbr.state(toolbar.size())
 
     # --- layout
     layoutMarginsGuide = self.view.layoutMarginsGuide
@@ -98,6 +99,17 @@ class ViewController(UIViewController):
         safeAreaLayoutGuide.widthAnchor, 0.9),
       subView.heightAnchor.constraintEqualToAnchor_multiplier_(
         safeAreaLayoutGuide.heightAnchor, 1.05),
+    ])
+
+    self.view.addSubview_(toolSizeView)
+    toolSizeView.translatesAutoresizingMaskIntoConstraints = False
+    NSLayoutConstraint.activateConstraints_([
+      toolSizeView.widthAnchor.constraintEqualToConstant_(toolbarSize.width),
+      toolSizeView.heightAnchor.constraintEqualToConstant_(toolbarSize.height),
+      toolSizeView.centerYAnchor.constraintEqualToAnchor_(
+        safeAreaLayoutGuide.centerYAnchor),
+      toolSizeView.centerXAnchor.constraintEqualToAnchor_(
+        safeAreaLayoutGuide.centerXAnchor),
     ])
 
   @objc_method
