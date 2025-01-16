@@ -39,14 +39,7 @@ class ViewController(UIViewController):
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     self.view.backgroundColor = UIColor.systemGreenColor()
-
-    #self.navigationController.setToolbarHidden_animated_(False, False)
-
-    toolbar = self.navigationController.toolbar
-    #pdbr.state(self.navigationController)
-    #pdbr.state(toolbar)
-    #print(toolbar.isTranslucent())
-
+    
     # Note that there's no target/action since this represents empty space.
     trashBarButtonItem = UIBarButtonItem.alloc(
     ).initWithBarButtonSystemItem_target_action_(UIBarButtonSystemItem.trash,
@@ -58,60 +51,13 @@ class ViewController(UIViewController):
     ).initWithBarButtonSystemItem_target_action_(UIBarButtonSystemItem.done,
                                                  None, None)
 
-    toolbarButtonItems = [
+    self.toolbarButtonItems = [
       trashBarButtonItem,
       flexibleSpaceBarButtonItem,
       doneBarButtonItem,
     ]
 
-    #toolbar.setItems_animated_(toolbarButtonItems, True)
-    #self.setToolbarItems_animated_(toolbarButtonItems, True)
-    #self.view.addSubview_(toolbar)
-    #pdbr.state(self)
-    #print(self.view._autolayoutTrace())
-    #pdbr.state(self.view)
-    #self.setToolbarItems_animated_(toolbarButtonItems, True)
 
-    subView = UIView.new()
-    subView.backgroundColor = UIColor.systemDarkYellowColor()
-
-    toolSizeView = UIView.new()
-    toolSizeView.backgroundColor = UIColor.systemDarkRedColor()
-
-    toolbarSize = toolbar.size
-    #toolbarSize.height
-    #toolbarSize.width
-
-    #pdbr.state(toolbar.size())
-
-    # --- layout
-    layoutMarginsGuide = self.view.layoutMarginsGuide
-    safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
-
-    self.view.addSubview_(subView)
-    subView.translatesAutoresizingMaskIntoConstraints = False
-    
-    NSLayoutConstraint.activateConstraints_([
-      subView.centerXAnchor.constraintEqualToAnchor_(
-        safeAreaLayoutGuide.centerXAnchor),
-      #subView.centerYAnchor.constraintEqualToAnchor_(safeAreaLayoutGuide.centerYAnchor),
-      subView.bottomAnchor.constraintEqualToAnchor_(safeAreaLayoutGuide.bottomAnchor),
-      subView.widthAnchor.constraintEqualToAnchor_multiplier_(
-        safeAreaLayoutGuide.widthAnchor, 0.9),
-      subView.heightAnchor.constraintEqualToAnchor_multiplier_(
-        safeAreaLayoutGuide.heightAnchor, 1.05),
-    ])
-
-    self.view.addSubview_(toolSizeView)
-    toolSizeView.translatesAutoresizingMaskIntoConstraints = False
-    NSLayoutConstraint.activateConstraints_([
-      toolSizeView.widthAnchor.constraintEqualToConstant_(toolbarSize.width),
-      toolSizeView.heightAnchor.constraintEqualToConstant_(toolbarSize.height),
-      toolSizeView.centerYAnchor.constraintEqualToAnchor_(
-        safeAreaLayoutGuide.centerYAnchor),
-      toolSizeView.centerXAnchor.constraintEqualToAnchor_(
-        safeAreaLayoutGuide.centerXAnchor),
-    ])
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -123,6 +69,9 @@ class ViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print('viewWillAppear')
+    self.setToolbarItems_(self.toolbarButtonItems)
+    #pdbr.state(self)
+    self.navigationController.setToolbarHidden_animated_(False, False)
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
