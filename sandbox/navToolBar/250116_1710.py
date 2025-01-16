@@ -20,6 +20,8 @@ UIColor = ObjCClass('UIColor')
 UIImage = ObjCClass('UIImage')
 NSURL = ObjCClass('NSURL')
 UIScreen = ObjCClass('UIScreen')
+
+UIToolbarAppearance = ObjCClass('UIToolbarAppearance')
 UIBarButtonItem = ObjCClass('UIBarButtonItem')
 UIToolbar = ObjCClass('UIToolbar')
 
@@ -38,19 +40,41 @@ class ViewController(UIViewController):
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
-    #self.view.backgroundColor = UIColor.systemGreenColor()
+    self.view.backgroundColor = UIColor.systemGreenColor()
+
+    toolbarAppearance = UIToolbarAppearance.new()
+    toolbarAppearance.configureWithDefaultBackground()
+    #toolbarAppearance.configureWithOpaqueBackground()
+    #toolbarAppearance.configureWithTransparentBackground()
+    #pdbr.state(toolbarAppearance)
+    #toolbarAppearance.setBackgroundColor_(UIColor.systemDarkYellowColor())
+
+    #navToolbar = self.navigationController.toolbar
+    toolbar = self.navigationController.toolbar
+
+    #toolbar = UIToolbar.alloc().initWithFrame_(navToolbar.frame)
+    #toolbar.setAutoresizingMask_(navToolbar.autoresizingMask)
+    #autoresizingMask
+    #frame
+    '''
     
-    #pdbr.state(self.navigationController.toolbar)
-    
-    
-    
-    
-    
-    #toolBar = UIToolbar.new()
-    #pdbr.state(toolBar.initInView_withFrame_withItemList_)
-    #print(UIToolbar.alloc().initInView_withFrame_withItemList_)
-    
-    # Note that there's no target/action since this represents empty space.
+    toolbar.standardAppearance = toolbarAppearance
+    toolbar.scrollEdgeAppearance = toolbarAppearance
+    toolbar.compactAppearance = toolbarAppearance
+    toolbar.compactScrollEdgeAppearance = toolbarAppearance
+    '''
+
+    #toolbar.setBarStyle_(1)
+    #toolbar.setTranslucent_(False)
+    #toolbar.setTintColor_(UIColor.systemDarkYellowColor())
+
+    #pdbr.state(self.navigationController)
+    #pdbr.state(toolbar)
+
+    #setToolbarItems_animated_
+    #setToolbarHidden_animated_
+    #setToolbar_
+
     trashBarButtonItem = UIBarButtonItem.alloc(
     ).initWithBarButtonSystemItem_target_action_(UIBarButtonSystemItem.trash,
                                                  None, None)
@@ -66,28 +90,15 @@ class ViewController(UIViewController):
       flexibleSpaceBarButtonItem,
       doneBarButtonItem,
     ]
-    
-    toolbarFrame = self.navigationController.toolbar.frame
-    toolbarAutoresizingMask = self.navigationController.toolbar.autoresizingMask
-    
-    toolBar = UIToolbar.alloc().initInView_withFrame_withItemList_(self.view, toolbarFrame, toolbarButtonItems)
-    
-    toolBar.setBarStyle_(1)
-    toolBar.setTranslucent_(False)
-    toolBar.setTintColor_(UIColor.systemDarkYellowColor())
-    toolBar.setBackgroundColor_(UIColor.systemBlueColor())
-    toolBar.setAutoresizingMask_(toolbarAutoresizingMask)
+
+    #self.navigationController.setToolbar_(toolbar)
+
+    #self.navigationController.setToolbarHidden_animated_(False, True)
     self.navigationController.setToolbarHidden_(False)
-    #pdbr.state(toolBar)
-    
-    self.view.addSubview_(toolBar)
-    #pdbr.state(self.navigationController)
-    #print(toolBar)
-    #pdbr.state(toolBar)
-    self.toolBar = toolBar
-    
+    #self.navigationController.setToolbarItems_animated_(toolbarButtonItems, True)
+    self.navigationController.setToolbarItems_(toolbarButtonItems)
 
-
+    #self.setToolbarItems_animated_(toolbarButtonItems, True)
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -99,8 +110,6 @@ class ViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print('viewWillAppear')
-    #self.navigationController.setToolbarHidden_(False)
-    
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -112,8 +121,6 @@ class ViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print('viewDidAppear')
-    #pdbr.state(self.view, 1)
-    #print(self.view.autolayoutTrace)
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
@@ -125,7 +132,6 @@ class ViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print('viewDidDisappear')
-    #pdbr.state(self.toolBar)
 
   @objc_method
   def didReceiveMemoryWarning(self):
