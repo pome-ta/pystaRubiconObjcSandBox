@@ -58,14 +58,6 @@ class TextFieldKind(Enum):
   searchTextField = 'searchTextField'
 
 
-'''
-class TextFieldViewController(BaseTableViewController,
-                              protocols=[
-                                UITextFieldDelegate,
-                              ]):
-'''
-
-
 class TextFieldViewController(BaseTableViewController):
 
   @objc_method
@@ -143,7 +135,6 @@ class TextFieldViewController(BaseTableViewController):
                  ctypes.c_bool,
                ])
     #print('viewDidAppear')
-    #pdbr.state(self)
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
