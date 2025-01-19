@@ -37,7 +37,8 @@ class DefaultSearchBarViewController(UIViewController,
     #self.navigationItem.title = title
     self.navigationItem.title = localizedString('DefaultSearchBarTitle')
 
-    self.searchBar = UISearchBar.alloc().init().autorelease()
+    #self.searchBar = UISearchBar.alloc().init().autorelease()
+    self.searchBar = UISearchBar.new()
     self.setlayout()
     self.configureSearchBar()
 

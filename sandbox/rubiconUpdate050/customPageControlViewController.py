@@ -73,7 +73,8 @@ class CustomPageControlViewController(UIViewController):
     self.view.backgroundColor = UIColor.systemBackgroundColor()
 
     # xxx: あとで切り出す
-    self.pageControl = UIPageControl.alloc().init().autorelease()
+    #self.pageControl = UIPageControl.alloc().init().autorelease()
+    self.pageControl = UIPageControl.new()
     self.colorView: UIView = UIView.new()
 
     self.setlayout()
