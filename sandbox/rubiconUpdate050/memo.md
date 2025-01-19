@@ -78,6 +78,8 @@ Pythonラッパーのガベージコレクションに関するリファレン�
   - Storyboard: 
 - [textFieldViewController](https://github.com/pome-ta/pystaRubiconObjcSandBox/blob/main/sandbox/rubiconUpdate050/textFieldViewController.py)
   - Storyboard: 
+  - `property` 不要？
+  - `UITextFieldDelegate` 不要？
 - [stepperViewController](https://github.com/pome-ta/pystaRubiconObjcSandBox/blob/main/sandbox/rubiconUpdate050/stepperViewController.py)
   - Storyboard: 
 - [activityIndicatorViewController](https://github.com/pome-ta/pystaRubiconObjcSandBox/blob/main/sandbox/rubiconUpdate050/activityIndicatorViewController.py)
