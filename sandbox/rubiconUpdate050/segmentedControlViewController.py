@@ -220,7 +220,7 @@ class SegmentedControlViewController(BaseTableViewController):
       localizedString('CheckTitle'),
       localizedString('SearchTitle'),
       localizedString('ToolsTitle'),
-    ]).autorelease()
+    ])#.autorelease()
 
     customBackgroundSegmentedControl.selectedSegmentIndex = 2
 
