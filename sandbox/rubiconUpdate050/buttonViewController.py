@@ -16,6 +16,7 @@ from rbedge.enumerations import (
   NSDirectionalRectEdge,
   UIButtonConfigurationSize,
 )
+from rbedge.pythonProcessUtils import dataWithContentsOfURL, mainScreen_scale
 
 from rbedge import pdbr
 
@@ -32,9 +33,6 @@ UIImage = ObjCClass('UIImage')
 NSAttributedString = ObjCClass('NSAttributedString')
 UIImageSymbolConfiguration = ObjCClass('UIImageSymbolConfiguration')
 UIFont = ObjCClass('UIFont')
-UIScreen = ObjCClass('UIScreen')
-NSURL = ObjCClass('NSURL')
-NSData = ObjCClass('NSData')
 UIImage = ObjCClass('UIImage')
 UIToolTipConfiguration = ObjCClass('UIToolTipConfiguration')
 UIAction = ObjCClass('UIAction')
@@ -530,19 +528,11 @@ class ButtonViewController(BaseTableViewController):
       #if traitCollection.userInterfaceIdiom == .mac
       #  button.preferredBehavioralStyle = .pad
       pass
-    # ref: [iphone - Retina display and [UIImage initWithData] - Stack Overflow](https://stackoverflow.com/questions/3289286/retina-display-and-uiimage-initwithdata)
-    # xxx: scale 指定これでいいのかな?
-    scale = int(UIScreen.mainScreen.scale)
+    scale = int(mainScreen_scale)
+    
     normal_str = f'./UIKitCatalogCreatingAndCustomizingViewsAndControls/UIKitCatalog/Assets.xcassets/background.imageset/stepper_and_segment_background_{scale}x.png'
     highlighted_str = f'./UIKitCatalogCreatingAndCustomizingViewsAndControls/UIKitCatalog/Assets.xcassets/background_highlighted.imageset/stepper_and_segment_background_highlighted_{scale}x.png'
     disabled_str = f'./UIKitCatalogCreatingAndCustomizingViewsAndControls/UIKitCatalog/Assets.xcassets/background_disabled.imageset/stepper_and_segment_background_disabled_{scale}x.png'
-
-    # xxx: あとで取り回し考える
-    from pathlib import Path
-
-    # xxx: `lambda` の使い方が悪い
-    dataWithContentsOfURL = lambda path_str: NSData.dataWithContentsOfURL_(
-      NSURL.fileURLWithPath_(str(Path(path_str).absolute())))
 
     background = UIImage.alloc().initWithData_scale_(
       dataWithContentsOfURL(normal_str), scale)

@@ -17,14 +17,14 @@ from rbedge.enumerations import (
   UISearchBarIcon,
 )
 
+from rbedge.pythonProcessUtils import dataWithContentsOfURL
+
 UIViewController = ObjCClass('UIViewController')
 UIColor = ObjCClass('UIColor')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 UISearchBar = ObjCClass('UISearchBar')
 UIScreen = ObjCClass('UIScreen')
-NSURL = ObjCClass('NSURL')
-NSData = ObjCClass('NSData')
 UIImage = ObjCClass('UIImage')
 
 
@@ -126,12 +126,6 @@ class CustomSearchBarViewController(UIViewController):
 
     search_bar_background_str = './UIKitCatalogCreatingAndCustomizingViewsAndControls/UIKitCatalog/Assets.xcassets/search_bar_background.imageset/search_bar_background_3x.png'
 
-    # xxx: あとで取り回し考える
-    from pathlib import Path
-
-    # xxx: `lambda` の使い方が悪い
-    dataWithContentsOfURL = lambda path_str: NSData.dataWithContentsOfURL_(
-      NSURL.fileURLWithPath_(str(Path(path_str).absolute())))
 
     self.searchBarView.backgroundImage = UIImage.alloc().initWithData_scale_(
       dataWithContentsOfURL(search_bar_background_str), scale)

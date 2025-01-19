@@ -5,8 +5,6 @@ note: wip 項目
   - 標準キーボードのみ機能するものあり
 '''
 from enum import Enum
-from pathlib import Path
-
 import ctypes
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, ObjCProtocol
@@ -26,7 +24,7 @@ from rbedge.enumerations import (
   UIControlEvents,
 )
 
-from rbedge.pythonProcessUtils import dataWithContentsOfURL
+from rbedge.pythonProcessUtils import dataWithContentsOfURL, mainScreen_scale
 
 from rbedge import pdbr
 
@@ -43,7 +41,6 @@ UITextFieldDelegate = ObjCProtocol('UITextFieldDelegate')
 UIImageView = ObjCClass('UIImageView')
 UIImage = ObjCClass('UIImage')
 UISearchToken = ObjCClass('UISearchToken')
-UIScreen = ObjCClass('UIScreen')
 UIButton = ObjCClass('UIButton')
 
 
@@ -252,7 +249,7 @@ class TextFieldViewController(BaseTableViewController):
     # カスタム画像の背景を持つテキストフィールドには枠線を付ける必要はありません。
     textField.borderStyle = UITextBorderStyle.none
 
-    scale = int(UIScreen.mainScreen.scale)
+    scale = int(mainScreen_scale)
     background_str = f'./UIKitCatalogCreatingAndCustomizingViewsAndControls/UIKitCatalog/Assets.xcassets/text_field_background.imageset/text_field_background_{scale}x.png'
 
     purpleImage_str = f'./UIKitCatalogCreatingAndCustomizingViewsAndControls/UIKitCatalog/Assets.xcassets/text_field_purple_right_view.imageset/text_field_purple_right_view_{scale}x.png'
