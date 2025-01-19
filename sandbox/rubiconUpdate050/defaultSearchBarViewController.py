@@ -19,26 +19,28 @@ from rbedge.functions import NSStringFromClass
 
 UIViewController = ObjCClass('UIViewController')
 UISearchBar = ObjCClass('UISearchBar')
-UISearchBarDelegate = ObjCProtocol('UISearchBarDelegate')
+#UISearchBarDelegate = ObjCProtocol('UISearchBarDelegate')
 
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
-
-
+'''
 class DefaultSearchBarViewController(UIViewController,
                                      protocols=[UISearchBarDelegate]):
 
-  searchBar = objc_property()
+  #searchBar = objc_property()
+'''
+
+
+class DefaultSearchBarViewController(UIViewController):
 
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')  # xxx: 不要?
     # --- Navigation
-    title = NSStringFromClass(__class__)
-    #self.navigationItem.title = title
-    self.navigationItem.title = localizedString('DefaultSearchBarTitle')
-
+    self.navigationItem.title = localizedString('DefaultSearchBarTitle') if (
+      title := self.navigationItem.title) is None else title
+    
     #self.searchBar = UISearchBar.alloc().init().autorelease()
-    self.searchBar = UISearchBar.new()
+    self.searchBarView = UISearchBar.new()
     self.setlayout()
     self.configureSearchBar()
 
@@ -46,27 +48,27 @@ class DefaultSearchBarViewController(UIViewController,
   def setlayout(self):
     safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
     # xxx: 仮置き
-    self.searchBar.frame = CGRectMake(0.0, 0.0, 375.0, 56.0)
-    self.searchBar.delegate = self
-    self.view.addSubview_(self.searchBar)
+    self.searchBarView.frame = CGRectMake(0.0, 0.0, 375.0, 56.0)
+    self.searchBarView.delegate = self
+    self.view.addSubview_(self.searchBarView)
 
-    self.searchBar.translatesAutoresizingMaskIntoConstraints = False
+    self.searchBarView.translatesAutoresizingMaskIntoConstraints = False
     NSLayoutConstraint.activateConstraints_([
-      self.searchBar.trailingAnchor.constraintEqualToAnchor_(
+      self.searchBarView.trailingAnchor.constraintEqualToAnchor_(
         safeAreaLayoutGuide.trailingAnchor),
-      self.searchBar.topAnchor.constraintEqualToAnchor_(
+      self.searchBarView.topAnchor.constraintEqualToAnchor_(
         safeAreaLayoutGuide.topAnchor),
-      self.searchBar.leadingAnchor.constraintEqualToAnchor_(
+      self.searchBarView.leadingAnchor.constraintEqualToAnchor_(
         safeAreaLayoutGuide.leadingAnchor),
     ])
 
   # MARK: - Configuration
   @objc_method
   def configureSearchBar(self):
-    self.searchBar.showsCancelButton = True
-    self.searchBar.showsScopeBar = True
+    self.searchBarView.showsCancelButton = True
+    self.searchBarView.showsScopeBar = True
 
-    self.searchBar.scopeButtonTitles = [
+    self.searchBarView.scopeButtonTitles = [
       localizedString('Scope One'),
       localizedString('Scope Two'),
     ]
