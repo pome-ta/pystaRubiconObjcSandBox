@@ -4,9 +4,10 @@ note: wip 項目
   - `CustomTextField` class の`init` って機能してる？
   - 標準キーボードのみ機能するものあり
 '''
-
 from enum import Enum
 from pathlib import Path
+
+import ctypes
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, ObjCProtocol
 from pyrubicon.objc.api import objc_method, objc_property
@@ -57,10 +58,21 @@ class TextFieldKind(Enum):
   searchTextField = 'searchTextField'
 
 
+'''
 class TextFieldViewController(BaseTableViewController,
                               protocols=[
                                 UITextFieldDelegate,
                               ]):
+'''
+
+
+class TextFieldViewController(BaseTableViewController):
+
+  @objc_method
+  def dealloc(self):
+    # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
+    #print('\tdealloc')
+    pass
 
   @objc_method
   def initWithStyle_(self, style: NSInteger) -> ObjCInstance:
@@ -109,6 +121,56 @@ class TextFieldViewController(BaseTableViewController,
                     TextFieldKind.customTextField.value,
                     self.configureCustomTextField_),
       ])
+
+  @objc_method
+  def viewWillAppear_(self, animated: bool):
+    send_super(__class__,
+               self,
+               'viewWillAppear:',
+               animated,
+               argtypes=[
+                 ctypes.c_bool,
+               ])
+    #print('viewWillAppear')
+
+  @objc_method
+  def viewDidAppear_(self, animated: bool):
+    send_super(__class__,
+               self,
+               'viewDidAppear:',
+               animated,
+               argtypes=[
+                 ctypes.c_bool,
+               ])
+    #print('viewDidAppear')
+    #pdbr.state(self)
+
+  @objc_method
+  def viewWillDisappear_(self, animated: bool):
+    send_super(__class__,
+               self,
+               'viewWillDisappear:',
+               animated,
+               argtypes=[
+                 ctypes.c_bool,
+               ])
+    #print('viewDidDisappear')
+
+  @objc_method
+  def viewDidDisappear_(self, animated: bool):
+    send_super(__class__,
+               self,
+               'viewDidDisappear:',
+               animated,
+               argtypes=[
+                 ctypes.c_bool,
+               ])
+    #print('viewDidDisappear')
+
+  @objc_method
+  def didReceiveMemoryWarning(self):
+    send_super(__class__, self, 'didReceiveMemoryWarning')
+    print(f'{__class__}: didReceiveMemoryWarning')
 
   # MARK: - Configuration
   @objc_method
