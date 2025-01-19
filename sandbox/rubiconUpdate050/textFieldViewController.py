@@ -26,6 +26,8 @@ from rbedge.enumerations import (
   UIControlEvents,
 )
 
+from rbedge.pythonProcessUtils import dataWithContentsOfURL
+
 from rbedge import pdbr
 
 from caseElement import CaseElement
@@ -42,8 +44,6 @@ UIImageView = ObjCClass('UIImageView')
 UIImage = ObjCClass('UIImage')
 UISearchToken = ObjCClass('UISearchToken')
 UIScreen = ObjCClass('UIScreen')
-NSURL = ObjCClass('NSURL')
-NSData = ObjCClass('NSData')
 UIButton = ObjCClass('UIButton')
 
 
@@ -253,14 +253,9 @@ class TextFieldViewController(BaseTableViewController):
     textField.borderStyle = UITextBorderStyle.none
 
     scale = int(UIScreen.mainScreen.scale)
-
     background_str = f'./UIKitCatalogCreatingAndCustomizingViewsAndControls/UIKitCatalog/Assets.xcassets/text_field_background.imageset/text_field_background_{scale}x.png'
 
     purpleImage_str = f'./UIKitCatalogCreatingAndCustomizingViewsAndControls/UIKitCatalog/Assets.xcassets/text_field_purple_right_view.imageset/text_field_purple_right_view_{scale}x.png'
-
-    # xxx: `lambda` の使い方が悪い
-    dataWithContentsOfURL = lambda path_str: NSData.dataWithContentsOfURL_(
-      NSURL.fileURLWithPath_(str(Path(path_str).absolute())))
 
     background_img = UIImage.alloc().initWithData_scale_(
       dataWithContentsOfURL(background_str), scale)
