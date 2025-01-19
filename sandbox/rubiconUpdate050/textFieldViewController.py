@@ -7,8 +7,8 @@ note: wip 項目
 from enum import Enum
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass, ObjCInstance, ObjCProtocol
-from pyrubicon.objc.api import objc_method, objc_property
+from pyrubicon.objc.api import ObjCClass, ObjCInstance
+from pyrubicon.objc.api import objc_method
 from pyrubicon.objc.runtime import send_super, objc_id, SEL
 from pyrubicon.objc.types import NSInteger, CGRect, CGFloat, CGRectMake, UIEdgeInsetsMake
 
@@ -36,7 +36,6 @@ from storyboard.textFieldViewController import prototypes
 
 UISearchTextField = ObjCClass('UISearchTextField')  # todo: 型確認用
 UIColor = ObjCClass('UIColor')
-UITextFieldDelegate = ObjCProtocol('UITextFieldDelegate')
 
 UIImageView = ObjCClass('UIImageView')
 UIImage = ObjCClass('UIImage')
@@ -315,8 +314,8 @@ class TextFieldViewController(BaseTableViewController):
 # Custom text field for controlling input text placement.
 # 入力テキストの配置を制御するためのカスタム テキスト フィールド。
 class CustomTextField(ObjCClass('UITextField')):
-  leftMarginPadding: CGFloat = objc_property(float)
-  rightMarginPadding: CGFloat = objc_property(float)
+  #leftMarginPadding: CGFloat = objc_property(float)
+  #rightMarginPadding: CGFloat = objc_property(float)
 
   @objc_method
   def init(self) -> ObjCInstance:
