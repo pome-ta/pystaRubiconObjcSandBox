@@ -97,7 +97,7 @@ class ButtonViewController(BaseTableViewController):
     self.navigationItem.title = localizedString('ButtonsTitle') if (
       title := self.navigationItem.title) is None else title
 
-    self.testCells.extend([
+    self.testCells_extend([
       # 00
       CaseElement(localizedString('DefaultTitle'),
                   ButtonKind.buttonSystem.value,
@@ -117,7 +117,7 @@ class ButtonViewController(BaseTableViewController):
 
     if True:  # xxx: `#available(iOS 15, *)`
       # These button styles are available on iOS 15 or later.
-      self.testCells.extend([
+      self.testCells_extend([
         # 04
         CaseElement(localizedString('GrayTitle'),
                     ButtonKind.buttonStyleGray.value,
@@ -141,14 +141,14 @@ class ButtonViewController(BaseTableViewController):
       ])
 
     if True:  # xxx: `traitCollection.userInterfaceIdiom != .mac`
-      self.testCells.extend([
+      self.testCells_extend([
         # 16
         CaseElement(localizedString('ButtonColorTitle'),
                     ButtonKind.buttonTitleColor.value,
                     self.configureTitleTextButton_),
       ])
 
-    self.testCells.extend([
+    self.testCells_extend([
       # 08
       CaseElement(localizedString('ImageTitle'), ButtonKind.buttonImage.value,
                   self.configureImageButton_),
@@ -163,7 +163,7 @@ class ButtonViewController(BaseTableViewController):
 
     if True:  # xxx: `#available(iOS 15, *)`
       if True:  # xxx: `traitCollection.userInterfaceIdiom != .mac`
-        self.testCells.extend([
+        self.testCells_extend([
           # 11
           CaseElement(localizedString('LargeSymbolTitle'),
                       ButtonKind.buttonLargeSymbol.value,
@@ -171,7 +171,7 @@ class ButtonViewController(BaseTableViewController):
         ])
 
     if True:  # xxx: `#available(iOS 15, *)`
-      self.testCells.extend([
+      self.testCells_extend([
         # 12
         CaseElement(localizedString('SymbolStringTitle'),
                     ButtonKind.buttonSymbolText.value,

@@ -58,7 +58,7 @@ class StepperViewController(BaseTableViewController):
     self.navigationItem.title = localizedString('SteppersTitle') if (
       title := self.navigationItem.title) is None else title
 
-    self.testCells.extend([
+    self.testCells_extend([
       CaseElement(localizedString('DefaultStepperTitle'),
                   StepperKind.defaultStepper.value,
                   self.configureDefaultStepper_),

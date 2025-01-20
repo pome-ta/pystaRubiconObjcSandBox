@@ -59,6 +59,17 @@ class BaseTableViewController(UITableViewController):
     self.headerFooterView_identifier = None
 
   @objc_method
+  def testCells_extend(self, testCells: ctypes.py_object):
+    """`@available(iOS 15.0, *)` で弾く用
+    """
+    for testCell in testCells:
+      if not isinstance(testCell, CaseElement):
+        continue
+      if (cell := testCell).configHandler is None:
+        continue
+      self.testCells.append(cell)
+
+  @objc_method
   def centeredHeaderView_(self, title):
     headerView = self.tableView.dequeueReusableHeaderFooterViewWithIdentifier_(
       self.headerFooterView_identifier)

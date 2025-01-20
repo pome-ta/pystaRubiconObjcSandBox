@@ -80,7 +80,7 @@ class SegmentedControlViewController(BaseTableViewController):
     self.navigationItem.title = localizedString('SegmentedControlsTitle') if (
       title := self.navigationItem.title) is None else title
 
-    self.testCells.extend([
+    self.testCells_extend([
       CaseElement(localizedString('DefaultTitle'),
                   SegmentKind.segmentDefault.value,
                   self.configureDefaultSegmentedControl_),
@@ -97,7 +97,7 @@ class SegmentedControlViewController(BaseTableViewController):
     if self.traitCollection.userInterfaceIdiom != UIUserInterfaceIdiom.mac:
       # Tinted segmented control is only available on iOS.
       # ティント・セグメンテッド・コントロールはiOSでのみ利用可能。
-      self.testCells.extend([
+      self.testCells_extend([
         CaseElement(localizedString('Tinted'), SegmentKind.segmentTinted.value,
                     self.configureTintedSegmentedControl_),
       ])

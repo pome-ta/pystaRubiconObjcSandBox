@@ -31,6 +31,9 @@ UIImageSymbolConfiguration = ObjCClass('UIImageSymbolConfiguration')
 UIColor = ObjCClass('UIColor')
 
 
+
+
+
 # Cell identifier for each slider table view cell.
 # スライダー テーブル ビューの各セルのセル識別子。
 class SliderKind(Enum):
@@ -63,13 +66,14 @@ class SliderViewController(BaseTableViewController):
     self.navigationItem.title = localizedString('SlidersTitle') if (
       title := self.navigationItem.title) is None else title
 
-    self.testCells.extend([
+    self.testCells_extend([
       CaseElement(localizedString('DefaultTitle'),
                   SliderKind.sliderDefault.value,
                   self.configureDefaultSlider_),
     ])
+
     # todo: `@available(iOS 15.0, *)`
-    self.testCells.extend([
+    self.testCells_extend([
       CaseElement(localizedString('CustomTitle'),
                   SliderKind.sliderCustom.value, self.configureCustomSlider_),
       CaseElement(localizedString('MinMaxImagesTitle'),

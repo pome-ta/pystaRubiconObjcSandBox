@@ -84,7 +84,7 @@ class TextFieldViewController(BaseTableViewController):
     self.navigationItem.title = localizedString('TextFieldsTitle') if (
       title := self.navigationItem.title) is None else title
 
-    self.testCells.extend([
+    self.testCells_extend([
       CaseElement(localizedString('DefaultTextFieldTitle'),
                   TextFieldKind.textField.value, self.configureTextField_),
       CaseElement(localizedString('TintedTextFieldTitle'),
@@ -99,7 +99,7 @@ class TextFieldViewController(BaseTableViewController):
     ])
 
     if self.traitCollection.userInterfaceIdiom != UIUserInterfaceIdiom.mac:
-      self.testCells.extend([
+      self.testCells_extend([
         # Show text field with specific kind of keyboard for iOS only.
         # iOS の場合のみ、特定の種類のキーボードを使用してテキスト フィールドを表示します。
         CaseElement(localizedString('SpecificKeyboardTextFieldTitle'),
