@@ -13,8 +13,11 @@ from rbedge.enumerations import (
   UIImageSymbolWeight,
   UIBehavioralStyle,
 )
+from rbedge.pythonProcessUtils import (
+  mainScreen_scale,
+  dataWithContentsOfURL,
+)
 
-from rbedge.pythonProcessUtils import dataWithContentsOfURL, mainScreen_scale
 from rbedge import pdbr
 
 from caseElement import CaseElement

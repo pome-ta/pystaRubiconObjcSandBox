@@ -23,8 +23,10 @@ from rbedge.enumerations import (
   UIControlState,
   UIControlEvents,
 )
-
-from rbedge.pythonProcessUtils import dataWithContentsOfURL, mainScreen_scale
+from rbedge.pythonProcessUtils import (
+  mainScreen_scale,
+  dataWithContentsOfURL,
+)
 
 from rbedge import pdbr
 

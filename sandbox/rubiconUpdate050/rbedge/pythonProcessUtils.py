@@ -33,7 +33,16 @@ def dataWithContentsOfURL(path_str: str | Path) -> NSData:
 
 def get_srgb_named_style(named: str,
                          userInterfaceStyle: UIUserInterfaceStyle) -> list:
-  # todo: 本来`UIColor.colorNamed:` で呼び出す。asset(bundle) の取り込みが難しそうなので、独自に直で呼び出し
+  """r,g,b,a をlist で返す
+  `UIColor(named: "")` 等、Bundle で呼ぶAssets をPython 側で取得
+  Bundle 紐付けができないため、手動でpath を指定
+  :param named: 取得するfile name
+  :param userInterfaceStyle: UIUserInterfaceStyle(light かdark)
+  :type named: str
+  :type userInterfaceStyle: UIUserInterfaceStyle
+  :returns: rgba のfloat の配列
+  :rtype: list
+  """
   _path = Path(
     f'./UIKitCatalogCreatingAndCustomizingViewsAndControls/UIKitCatalog/Assets.xcassets/{named}.colorset/Contents.json'
   )

@@ -21,7 +21,10 @@ from rbedge.globalVariables import (
   UIFontTextStyle,
 )
 
-from rbedge.pythonProcessUtils import dataWithContentsOfURL, mainScreen_scale
+from rbedge.pythonProcessUtils import (
+  mainScreen_scale,
+  dataWithContentsOfURL,
+)
 
 from rbedge import pdbr
 
@@ -335,7 +338,6 @@ class ButtonViewController(BaseTableViewController):
     systemPurple = UIColor.systemPurpleColor()
     renderingMode = UIImageRenderingMode.alwaysOriginal
     # ref: [swift - iOS 13 `withTintColor` not obeying the color I assign - Stack Overflow](https://stackoverflow.com/questions/58867627/ios-13-withtintcolor-not-obeying-the-color-i-assign)
-
     image = _systemImageNamed.imageWithTintColor_(
       systemPurple).imageWithRenderingMode_(renderingMode)
     button.accessibilityLabel = localizedString('X')
