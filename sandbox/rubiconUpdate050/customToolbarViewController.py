@@ -17,7 +17,10 @@ from rbedge.enumerations import (
   UIControlState,
 )
 from rbedge.globalVariables import NSAttributedStringKey
-from rbedge.pythonProcessUtils import dataWithContentsOfURL
+from rbedge.pythonProcessUtils import (
+  mainScreen_scale,
+  dataWithContentsOfURL,
+)
 
 from rbedge import pdbr
 
@@ -31,7 +34,6 @@ UIToolbar = ObjCClass('UIToolbar')
 UIToolbarAppearance = ObjCClass('UIToolbarAppearance')
 UIBarButtonItem = ObjCClass('UIBarButtonItem')
 UIImage = ObjCClass('UIImage')
-UIScreen = ObjCClass('UIScreen')
 NSDictionary = ObjCClass('NSDictionary')
 
 
@@ -52,7 +54,7 @@ class CustomToolbarViewController(UIViewController):
 
     self.view.backgroundColor = UIColor.systemBackgroundColor()
 
-    scale = int(UIScreen.mainScreen.scale)
+    scale = int(mainScreen_scale)
 
     image_path = f'./UIKitCatalogCreatingAndCustomizingViewsAndControls/UIKitCatalog/Assets.xcassets/toolbar_background.imageset/toolbar_background_{scale}x.png'
 

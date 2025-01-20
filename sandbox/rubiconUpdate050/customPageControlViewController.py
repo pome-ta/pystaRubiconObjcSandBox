@@ -10,7 +10,10 @@ from pyrubicon.objc.api import objc_method
 from pyrubicon.objc.runtime import send_super, SEL
 from pyrubicon.objc.types import CGRectMake
 
-from rbedge.enumerations import UIControlEvents, UIPageControlBackgroundStyle
+from rbedge.enumerations import (
+  UIControlEvents,
+  UIPageControlBackgroundStyle,
+)
 from rbedge.functions import NSStringFromClass
 from pyLocalizedString import localizedString
 

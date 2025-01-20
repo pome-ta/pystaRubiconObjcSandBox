@@ -8,16 +8,18 @@ from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import objc_method
 from pyrubicon.objc.runtime import send_super, objc_id
 
-from rbedge import pdbr
-
-from pyLocalizedString import localizedString
-
 from rbedge.enumerations import (
   UIControlState,
   UISearchBarIcon,
 )
+from rbedge.pythonProcessUtils import (
+  mainScreen_scale,
+  dataWithContentsOfURL,
+)
 
-from rbedge.pythonProcessUtils import dataWithContentsOfURL
+from rbedge import pdbr
+
+from pyLocalizedString import localizedString
 
 UIViewController = ObjCClass('UIViewController')
 UIColor = ObjCClass('UIColor')
@@ -120,12 +122,9 @@ class CustomSearchBarViewController(UIViewController):
     self.searchBarView.showsBookmarkButton = True
     self.searchBarView.setTintColor_(UIColor.systemPurpleColor())
 
-    # ref: [iphone - Retina display and [UIImage initWithData] - Stack Overflow](https://stackoverflow.com/questions/3289286/retina-display-and-uiimage-initwithdata)
-    # xxx: scale 指定これでいいのかな?
-    scale = int(UIScreen.mainScreen.scale)
+    scale = int(mainScreen_scale)
 
     search_bar_background_str = './UIKitCatalogCreatingAndCustomizingViewsAndControls/UIKitCatalog/Assets.xcassets/search_bar_background.imageset/search_bar_background_3x.png'
-
 
     self.searchBarView.backgroundImage = UIImage.alloc().initWithData_scale_(
       dataWithContentsOfURL(search_bar_background_str), scale)
