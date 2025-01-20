@@ -1,7 +1,6 @@
 """
   note: Storyboard 実装なし
 """
-
 import ctypes
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance

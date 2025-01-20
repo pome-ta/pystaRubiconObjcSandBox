@@ -2,7 +2,6 @@
   note: Storyboard 実装なし
 '''
 import ctypes
-from pathlib import Path
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
 from pyrubicon.objc.api import objc_method
