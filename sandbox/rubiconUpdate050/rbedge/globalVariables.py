@@ -140,3 +140,12 @@ class NSNotificationName:
   keyboardWillHideNotification: str = constUIKit(
     'UIKeyboardWillHideNotification')
 
+
+UITextFieldTextDidChangeNotification = constUIKit(
+  'UITextFieldTextDidChangeNotification')
+
+UIKeyboardAnimationDurationUserInfoKey = constUIKit(
+  'UIKeyboardAnimationDurationUserInfoKey')
+UIKeyboardFrameBeginUserInfoKey = constUIKit('UIKeyboardFrameBeginUserInfoKey')
+UIKeyboardFrameEndUserInfoKey = constUIKit('UIKeyboardFrameEndUserInfoKey')
+
