@@ -5,8 +5,7 @@ from pyrubicon.objc.api import objc_method
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import NSInteger
 
-from rbedge.enumerations import (
-  UIActivityIndicatorViewStyle, )
+from rbedge.enumerations import UIActivityIndicatorViewStyle
 
 from rbedge import pdbr
 
