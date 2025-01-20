@@ -371,9 +371,6 @@ class ButtonViewController(BaseTableViewController):
 
     # Set the button's title for highlighted state (note this is not supported in Mac Catalyst).
     # > ボタンのタイトルを強調表示状態に設定します (これは Mac Catalyst ではサポートされていないことに注意してください)。
-    #NSAttributedStringKey.foregroundColor
-    #NSAttributedStringKey.strikethroughStyle
-
     highlightedTitleAttributes = NSDictionary.dictionaryWithObjects_forKeys_([
       UIColor.systemGreenColor(),
       NSUnderlineStyle.thick,
@@ -406,7 +403,6 @@ class ButtonViewController(BaseTableViewController):
     else:
       button.setImage_forState_(buttonImage, UIControlState.normal)
 
-    #UIFontTextStyle.body
     config = UIImageSymbolConfiguration.configurationWithTextStyle_scale_(
       UIFontTextStyle.body, UIImageSymbolScale.large)
 
@@ -428,7 +424,6 @@ class ButtonViewController(BaseTableViewController):
       # iOS 15 の場合は、UIButtonConfiguration を使用して画像を設定します。
       buttonConfig = UIButtonConfiguration.plainButtonConfiguration()
 
-      #UIFontTextStyle.largeTitle
       buttonConfig.preferredSymbolConfigurationForImage = UIImageSymbolConfiguration.configurationWithTextStyle_(
         UIFontTextStyle.largeTitle)
 
@@ -455,7 +450,6 @@ class ButtonViewController(BaseTableViewController):
       # iOS 15 の場合は、UIButtonConfiguration を使用して画像を設定します。
       buttonConfig = UIButtonConfiguration.plainButtonConfiguration()
 
-      #UIFontTextStyle.body
       buttonConfig.preferredSymbolConfigurationForImage = UIImageSymbolConfiguration.configurationWithTextStyle_(
         UIFontTextStyle.body)
 
@@ -464,7 +458,6 @@ class ButtonViewController(BaseTableViewController):
 
     else:
       button.setImage_forState_(buttonImage, UIControlState.normal)
-      #UIFontTextStyle.body
       config = UIImageSymbolConfiguration.configurationWithTextStyle_scale_(
         UIFontTextStyle.body, UIImageSymbolScale.small)
       button.setPreferredSymbolConfiguration_forImageInState_(
@@ -472,7 +465,6 @@ class ButtonViewController(BaseTableViewController):
 
     button.setTitle_forState_(localizedString('Person'), UIControlState.normal)
 
-    #UIFontTextStyle.body
     button.titleLabel.font = UIFont.preferredFontForTextStyle_(
       UIFontTextStyle.body)
 
@@ -489,7 +481,6 @@ class ButtonViewController(BaseTableViewController):
     if True:  # xxx: `available(iOS 15, *)`
       buttonConfig = UIButtonConfiguration.plainButtonConfiguration()
 
-      #UIFontTextStyle.body
       buttonConfig.preferredSymbolConfigurationForImage = UIImageSymbolConfiguration.configurationWithTextStyle_(
         UIFontTextStyle.body)
 
@@ -502,7 +493,6 @@ class ButtonViewController(BaseTableViewController):
 
     button.setTitle_forState_(localizedString('Person'), UIControlState.normal)
 
-    #UIFontTextStyle.body
     button.titleLabel.font = UIFont.preferredFontForTextStyle_(
       UIFontTextStyle.body)
 
@@ -587,7 +577,7 @@ class ButtonViewController(BaseTableViewController):
 
     buttonConfig = UIButtonConfiguration.plainButtonConfiguration()
     buttonConfig.image = UIImage.systemImageNamed('tray')
-    #UIFontTextStyle.body
+
     buttonConfig.preferredSymbolConfigurationForImage = UIImageSymbolConfiguration.configurationWithTextStyle_(
       UIFontTextStyle.body)
 
@@ -595,7 +585,6 @@ class ButtonViewController(BaseTableViewController):
 
     button.setTitle_forState_(localizedString('Button'), UIControlState.normal)
 
-    #UIFontTextStyle.body
     button.titleLabel.font = UIFont.preferredFontForTextStyle_(
       UIFontTextStyle.body)
 
@@ -659,7 +648,6 @@ class ButtonViewController(BaseTableViewController):
       # xxx: `button.configuration?.image` を直接呼んでも変化しないので再定義している
       buttonConfig = UIButtonConfiguration.plainButtonConfiguration()
       buttonConfig.image = image
-      #UIFontTextStyle.largeTitle
       buttonConfig.preferredSymbolConfigurationForImage = UIImageSymbolConfiguration.configurationWithTextStyle_(
         UIFontTextStyle.largeTitle)
       _button.configuration = buttonConfig
@@ -671,7 +659,6 @@ class ButtonViewController(BaseTableViewController):
 
     buttonConfig = UIButtonConfiguration.plainButtonConfiguration()
     buttonConfig.image = UIImage.systemImageNamed('cart')
-    #UIFontTextStyle.largeTitle
     buttonConfig.preferredSymbolConfigurationForImage = UIImageSymbolConfiguration.configurationWithTextStyle_(
       UIFontTextStyle.largeTitle)
 
