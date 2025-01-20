@@ -16,6 +16,7 @@ UIKeyboardAnimationDurationUserInfoKey = constUIKit(
 UIKeyboardFrameBeginUserInfoKey = constUIKit('UIKeyboardFrameBeginUserInfoKey')
 UIKeyboardFrameEndUserInfoKey = constUIKit('UIKeyboardFrameEndUserInfoKey')
 
+UICollectionElementKindSectionHeader = constUIKit('UICollectionElementKindSectionHeader')
 
 # ref: [UIFontTextStyle | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uifont/textstyle?language=objc)
 @dataclass
