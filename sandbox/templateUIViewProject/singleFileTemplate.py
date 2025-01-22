@@ -134,7 +134,7 @@ class MainViewController(UIViewController):
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
-    #print('\tdealloc')
+    print('\tdealloc')
     pass
 
   # MARK: - View Life Cycle
@@ -151,7 +151,7 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #print('viewWillAppear')
+    print('viewWillAppear')
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -162,7 +162,7 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #print('viewDidAppear')
+    print('viewDidAppear')
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
@@ -173,7 +173,7 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #print('viewDidDisappear')
+    print('viewWillDisappear')
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
@@ -184,7 +184,7 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #print('viewDidDisappear')
+    print('viewDidDisappear')
 
   @objc_method
   def didReceiveMemoryWarning(self):

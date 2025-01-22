@@ -9,17 +9,22 @@ import pdbr
 
 ObjCClass.auto_rename = True
 
-from ctypes import byref, cast, Structure
+#from ctypes import byref, cast, Structure
+import ctypes
 import functools
 
 ### --- onMainThread --- ###
 from pyrubicon.objc.api import Block, ObjCClass, ObjCInstance
 from pyrubicon.objc.runtime import libobjc, objc_block, objc_id
 
+
+asyncio.set_event_loop_policy(EventLoopPolicy())
+loop = asyncio.new_event_loop()
+
 NSThread = ObjCClass('NSThread')
 
 
-class struct_dispatch_queue_s(Structure):
+class struct_dispatch_queue_s(ctypes.Structure):
   pass  # No _fields_, because this is an opaque structure.
 
 
@@ -27,7 +32,7 @@ _dispatch_main_q = struct_dispatch_queue_s.in_dll(libobjc, '_dispatch_main_q')
 
 
 def dispatch_get_main_queue():
-  return ObjCInstance(cast(byref(_dispatch_main_q), objc_id))
+  return ObjCInstance(ctypes.cast(ctypes.byref(_dispatch_main_q), objc_id))
 
 
 libobjc.dispatch_async.restype = None
@@ -103,6 +108,7 @@ class RootNavigationController(UINavigationController,
     send_super(__class__, self, 'viewDidDisappear:')
     #loop.stop()
     #loop.shutdown_asyncgens()
+    print('RootNavigationController: viewDidDisappear')
 
   @objc_method
   def doneButtonTapped_(self, sender):
@@ -111,6 +117,7 @@ class RootNavigationController(UINavigationController,
     visibleViewController.dismissViewControllerAnimated_completion_(True, None)
 
     #sys.exit()
+    loop.stop()
     #loop.close()
     #del loop
 
@@ -129,6 +136,12 @@ class RootNavigationController(UINavigationController,
 
 # --- ViewController
 class FirstViewController(UIViewController):
+
+  @objc_method
+  def dealloc(self):
+    # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
+    print('\tdealloc')
+    pass
 
   @objc_method
   def onTap_(self, sender):
@@ -167,6 +180,55 @@ class FirstViewController(UIViewController):
       tapButton.heightAnchor.constraintEqualToAnchor_multiplier_(
         self.view.heightAnchor, 0.1),
     ])
+
+  @objc_method
+  def viewWillAppear_(self, animated: bool):
+    send_super(__class__,
+               self,
+               'viewWillAppear:',
+               animated,
+               argtypes=[
+                 ctypes.c_bool,
+               ])
+    print('viewWillAppear')
+
+  @objc_method
+  def viewDidAppear_(self, animated: bool):
+    send_super(__class__,
+               self,
+               'viewDidAppear:',
+               animated,
+               argtypes=[
+                 ctypes.c_bool,
+               ])
+    print('viewDidAppear')
+
+  @objc_method
+  def viewWillDisappear_(self, animated: bool):
+    send_super(__class__,
+               self,
+               'viewWillDisappear:',
+               animated,
+               argtypes=[
+                 ctypes.c_bool,
+               ])
+    print('viewWillDisappear')
+
+  @objc_method
+  def viewDidDisappear_(self, animated: bool):
+    send_super(__class__,
+               self,
+               'viewDidDisappear:',
+               animated,
+               argtypes=[
+                 ctypes.c_bool,
+               ])
+    print('viewDidDisappear')
+
+  @objc_method
+  def didReceiveMemoryWarning(self):
+    send_super(__class__, self, 'didReceiveMemoryWarning')
+    print(f'{__class__}: didReceiveMemoryWarning')
 
 
 class SecondViewController(UIViewController):
@@ -236,8 +298,9 @@ def present_viewController(myVC: UIViewController):
 if __name__ == "__main__":
   vc = FirstViewController.new()
   present_viewController(vc)
-  asyncio.set_event_loop_policy(EventLoopPolicy())
-  loop = asyncio.new_event_loop()
+  
   #loop.stop()
-  loop.run_forever(lifecycle=iOSLifecycle())
+  loop.run_forever_cooperatively(lifecycle=iOSLifecycle())
+  print('hogeeeeee')
+  #loop.stop()
 
