@@ -109,11 +109,6 @@ class RootNavigationController(UINavigationController,
     #loop.stop()
     #loop.shutdown_asyncgens()
     print('RootNavigationController: viewDidDisappear')
-    loop.stop()
-    print(loop)
-    print(dir(loop))
-    #loop.close()
-    #del loop
 
   @objc_method
   def doneButtonTapped_(self, sender):
@@ -125,8 +120,6 @@ class RootNavigationController(UINavigationController,
     #loop.stop()
     #loop.close()
     #del loop
-    #loop.close()
-    
 
   @objc_method
   def navigationController_willShowViewController_animated_(
@@ -231,7 +224,6 @@ class FirstViewController(UIViewController):
                  ctypes.c_bool,
                ])
     print('viewDidDisappear')
-    #loop.close()
 
   @objc_method
   def didReceiveMemoryWarning(self):
@@ -300,10 +292,8 @@ def present_viewController(myVC: UIViewController):
   UIModalPresentationPageSheet = 1
   '''
   presentVC.setModalPresentationStyle_(1)
-  print('present: s')
 
   rootVC.presentViewController_animated_completion_(presentVC, True, None)
-  print('present: e')
   loop.stop()
 
 
@@ -313,10 +303,8 @@ if __name__ == "__main__":
   
   #loop.stop()
   #print(dir(loop))
-  #loop.run_forever_cooperatively(lifecycle=iOSLifecycle())
   loop.run_forever(lifecycle=iOSLifecycle())
   print('hogeeeeee')
   #loop.stop()
-
 
 
