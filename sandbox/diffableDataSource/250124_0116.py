@@ -31,6 +31,9 @@ UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
 NSDiffableDataSourceSnapshot = ObjCClass('NSDiffableDataSourceSnapshot')
 
 
+pdbr.state(UICollectionViewDiffableDataSource.new())
+
+
 class ModernCollectionViewViewController(UIViewController):
 
   @objc_method
@@ -97,8 +100,13 @@ class ModernCollectionViewViewController(UIViewController):
       return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
         cellRegistration, indexPath, identifier)
 
-    return UICollectionViewDiffableDataSource.alloc(
+    dataSource = UICollectionViewDiffableDataSource.alloc(
     ).initWithCollectionView_cellProvider_(collectionView, cellProvider)
+    #dataSource.impl.sectionIdentifiers.lastObject= int
+    #itemIdentifiers
+    #pdbr.state(dataSource.impl.sectionIdentifiers)
+    #print(dataSource.impl.sectionIdentifiers)
+    return dataSource
 
   @objc_method
   def initData(self):
