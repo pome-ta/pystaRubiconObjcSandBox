@@ -4,9 +4,9 @@
 
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass
+from pyrubicon.objc.api import ObjCClass, Block
 from pyrubicon.objc.api import objc_method
-from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGRectMake
 
 from rbedge.enumerations import (
@@ -23,6 +23,12 @@ UICollectionLayoutListConfiguration = ObjCClass(
   'UICollectionLayoutListConfiguration')
 UICollectionViewCompositionalLayout = ObjCClass(
   'UICollectionViewCompositionalLayout')
+UICollectionViewDiffableDataSource = ObjCClass(
+  'UICollectionViewDiffableDataSource')
+UICollectionViewCellRegistration = ObjCClass(
+  'UICollectionViewCellRegistration')
+UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
+NSDiffableDataSourceSnapshot = ObjCClass('NSDiffableDataSourceSnapshot')
 
 
 class ModernCollectionViewViewController(UIViewController):
@@ -38,11 +44,13 @@ class ModernCollectionViewViewController(UIViewController):
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     # xxx: `collectionView` での関数名衝突回避
-    listCollectionView = UICollectionView.alloc()
+    modernCollectionView = UICollectionView.alloc()
 
-    self.configureLayout_(listCollectionView)
+    self.configureLayout_(modernCollectionView)
+    modernDataSource = self.configureCellRegistration_(modernCollectionView)
 
-    self.listCollectionView = listCollectionView
+    self.modernCollectionView = modernCollectionView
+    self.modernDataSource = modernDataSource
 
   @objc_method  # --- private
   def configureLayout_(self, collectionView):
@@ -74,7 +82,30 @@ class ModernCollectionViewViewController(UIViewController):
 
   @objc_method  # --- private
   def configureCellRegistration_(self, collectionView):
-    pass
+
+    @Block
+    def configurationHandler(cell: objc_id, indexPath: objc_id,
+                             item: objc_id) -> None:
+      contentConfiguration = cell.defaultContentConfiguration
+
+    cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
+      UICollectionViewListCell, configurationHandler)
+
+    @Block
+    def cellProvider(collectionView: objc_id, indexPath: objc_id,
+                     identifier: objc_id) -> objc_id:
+      return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
+        cellRegistration, indexPath, identifier)
+
+    return UICollectionViewDiffableDataSource.alloc(
+    ).initWithCollectionView_cellProvider_(collectionView, cellProvider)
+
+  @objc_method
+  def initData(self):
+    snapshot = NSDiffableDataSourceSnapshot.new()
+    snapshot.appendSectionsWithIdentifiers_([0])
+    snapshot.appendItemsWithIdentifiers_([])
+    self.modernDataSource.applySnapshot_animatingDifferences_(snapshot, True)
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -97,6 +128,7 @@ class ModernCollectionViewViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print('viewDidAppear')
+    self.initData()
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
