@@ -104,8 +104,10 @@ class ModernCollectionViewViewController(UIViewController):
   def initData(self):
     snapshot = NSDiffableDataSourceSnapshot.new()
     snapshot.appendSectionsWithIdentifiers_([0])
-    snapshot.appendItemsWithIdentifiers_(['a',])
+    snapshot.appendItemsWithIdentifiers_([])
     self.modernDataSource.applySnapshot_animatingDifferences_(snapshot, True)
+    pdbr.state(self.modernDataSource.impl)
+    #pdbr.state(snapshot.impl)
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -129,6 +131,7 @@ class ModernCollectionViewViewController(UIViewController):
                ])
     #print('viewDidAppear')
     self.initData()
+    #pdbr.state(self.modernCollectionView.dataSource)
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
