@@ -1,6 +1,6 @@
 import sys
 import asyncio
-from pyrubicon.objc.eventloop import EventLoopPolicy, iOSLifecycle,libcf
+from pyrubicon.objc.eventloop import EventLoopPolicy, iOSLifecycle
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method
 from pyrubicon.objc.runtime import SEL, send_super
@@ -109,17 +109,11 @@ class RootNavigationController(UINavigationController,
     #loop.stop()
     #loop.shutdown_asyncgens()
     print('RootNavigationController: viewDidDisappear')
-    
-    #libcf.CFRunLoopStop(libcf.CFRunLoopGetMain())
-    #loop.stop()
-    loop._running=False
+    loop.stop()
     print(loop)
-    #print(dir(loop))
-    #loop.stop()
-    loop.close()
+    print(dir(loop))
+    #loop.close()
     #del loop
-    #loop.shutdown_asyncgens()
-    
 
   @objc_method
   def doneButtonTapped_(self, sender):
@@ -286,8 +280,8 @@ class SecondViewController(UIViewController):
 
 
 # --- main
-@onMainThread
-def present_viewController(myVC: UIViewController):
+#@onMainThread
+async def present_viewController(myVC: UIViewController):
   
   app = ObjCClass('UIApplication').sharedApplication
   window = app.keyWindow if app.keyWindow else app.windows[0]
@@ -315,12 +309,13 @@ def present_viewController(myVC: UIViewController):
 
 if __name__ == "__main__":
   vc = FirstViewController.new()
-  present_viewController(vc)
+  #present_viewController(vc)
   
   #loop.stop()
   #print(dir(loop))
   #loop.run_forever_cooperatively(lifecycle=iOSLifecycle())
-  loop.run_forever(lifecycle=iOSLifecycle())
+  #loop.run_forever(lifecycle=iOSLifecycle())
+  loop.run_until_complete(present_viewController(vc), lifecycle=iOSLifecycle())
   print('hogeeeeee')
   #loop.stop()
 
