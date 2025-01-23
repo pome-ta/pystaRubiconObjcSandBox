@@ -1,5 +1,8 @@
 from dataclasses import dataclass
 
+# ref: [NSURLErrorNotConnectedToInternet | Apple Developer Documentation](https://developer.apple.com/documentation/foundation/1508628-url_loading_system_error_codes/nsurlerrornotconnectedtointernet?language=objc)
+NSURLErrorNotConnectedToInternet = -1009
+
 
 # ref: [UIModalPresentationStyle | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uimodalpresentationstyle)
 @dataclass
@@ -147,6 +150,7 @@ class UIImageRenderingMode:
 # ref: [NSUnderlineStyle | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/nsunderlinestyle?language=objc)
 @dataclass
 class NSUnderlineStyle:
+  # ref: [NSAttributedString.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/NSAttributedString.rs.html#87)
   none: int = 0x00  # xxx: patternSolid ?
   single: int = 0x01
   thick: int = 0x02
@@ -358,7 +362,7 @@ class UIUserInterfaceStyle:
 # ref: [UIBarMetrics | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uibarmetrics?language=objc)
 @dataclass
 class UIBarMetrics:
-  default: int = 0  # xxx: '`' で囲まれてる
+  default: int = 0  # xxx: '`' で囲まれてる
   compact: int = 1
   defaultPrompt: int = 101
   compactPrompt: int = 102
@@ -442,15 +446,6 @@ class UIKeyboardType:
   asciiCapableNumberPad: int = 11
 
 
-# ref: [UISplitViewControllerColumn | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uisplitviewcontrollercolumn?language=objc)
-@dataclass
-class UISplitViewControllerColumn:
-  primary: int = 0
-  supplementary: int = 1
-  secondary: int = 2
-  compact: int = 3
-
-
 # ref: [UISplitViewControllerDisplayMode | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uisplitviewcontrollerdisplaymode?language=objc)
 @dataclass
 class UISplitViewControllerDisplayMode:
@@ -478,4 +473,388 @@ class UICellAccessoryOutlineDisclosureStyle:
   automatic: int = 0
   header: int = 1
   cell: int = 2
+
+
+# ref: [UITableViewRowAnimation | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uitableview/rowanimation?language=objc)
+@dataclass
+class UITableViewRowAnimation:
+  # ref: [UITableView.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UITableView.rs.html#59)
+  fade: int = 0
+  right: int = 1
+  left: int = 2
+  top: int = 3
+  bottom: int = 4
+  none: int = 5
+  middle: int = 6
+  automatic: int = 100
+
+
+# ref: [UIActivityIndicatorViewStyle | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uiactivityindicatorview/style-swift.enum?language=objc)
+@dataclass
+class UIActivityIndicatorViewStyle:
+  # ref: [UIActivityIndicatorView.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UIActivityIndicatorView.rs.html#14)
+  large: int = 101
+  medium: int = 100
+  whiteLarge: int = 0  # todo: Deprecated
+  white: int = 1  # todo: Deprecated
+  gray: int = 2  # todo: Deprecated
+
+
+# ref: [UIAlertControllerStyle | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uialertcontroller/style?language=objc)
+@dataclass
+class UIAlertControllerStyle:
+  # ref: [UIAlertController.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UIAlertController.rs.html#31)
+  actionSheet: int = 0
+  alert: int = 1
+
+
+# ref: [UIAlertActionStyle | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uialertaction/style-swift.enum?language=objc)
+@dataclass
+class UIAlertActionStyle:
+  # ref: [UIAlertController.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UIAlertController.rs.html#11)
+  default: int = 0
+  cancel: int = 1
+  destructive: int = 2
+
+
+# ref: [NSLineBreakMode | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/nslinebreakmode?language=objc)
+@dataclass
+class NSLineBreakMode:
+  # ref: [NSParagraphStyle.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/NSParagraphStyle.rs.html#11)
+  byWordWrapping: int = 0
+  byCharWrapping: int = 1
+  byClipping: int = 2
+  byTruncatingHead: int = 3
+  byTruncatingTail: int = 4
+  byTruncatingMiddle: int = 5
+
+
+# ref: [UIFontDescriptorSymbolicTraits | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uifontdescriptor/symbolictraits-swift.struct?language=objc)
+@dataclass
+class UIFontDescriptorSymbolicTraits:
+  # ref: [UIFontDescriptor.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UIFontDescriptor.rs.html#11)
+  traitItalic: int = 1 << 0
+  traitBold: int = 1 << 1
+  traitExpanded: int = 1 << 5
+  traitCondensed: int = 1 << 6
+  traitMonoSpace: int = 1 << 10
+  traitVertical: int = 1 << 11
+  traitUIOptimized: int = 1 << 12
+  traitTightLeading: int = 1 << 15
+  traitLooseLeading: int = 1 << 16
+  classMask: int = 0xF0000000
+  classUnknown: int = 0 << 28  # xxx: ?
+  classOldStyleSerifs: int = 1 << 28
+  classTransitionalSerifs: int = 2 << 28
+  classModernSerifs: int = 3 << 28
+  classClarendonSerifs: int = 4 << 28
+  classSlabSerifs: int = 5 << 28
+  classFreeformSerifs: int = 7 << 28
+  classSansSerif: int = 8 << 28
+  classOrnamentals: int = 9 << 28
+  classScripts: int = 10 << 28
+  classSymbolic: int = 12 << 28
+
+
+# ref: [NSLayoutAttribute | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/nslayoutconstraint/attribute?language=objc)
+@dataclass
+class NSLayoutAttribute:
+  # ref [NSLayoutConstraint.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/NSLayoutConstraint.rs.html#49)
+  left: int = 1
+  right: int = 2
+  top: int = 3
+  bottom: int = 4
+  leading: int = 5
+  trailing: int = 6
+  width: int = 7
+  height: int = 8
+  centerX: int = 9
+  centerY: int = 10
+  lastBaseline: int = 11
+  firstBaseline: int = 12
+  leftMargin: int = 13
+  rightMargin: int = 14
+  topMargin: int = 15
+  bottomMargin: int = 16
+  leadingMargin: int = 17
+  trailingMargin: int = 18
+  centerXWithinMargins: int = 19
+  centerYWithinMargins: int = 20
+  notAnAttribute: int = 0
+
+
+# ref: [NSLayoutRelation | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/nslayoutconstraint/relation-swift.enum?language=objc)
+@dataclass
+class NSLayoutRelation:
+  # ref: [NSLayoutConstraint.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/NSLayoutConstraint.rs.html#28)
+  lessThanOrEqual: int = -1
+  equal: int = 0
+  greaterThanOrEqual: int = 1
+
+
+# ref: [UIViewAnimationCurve | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uiview/animationcurve?language=objc)
+@dataclass
+class UIViewAnimationCurve:
+  # ref: [UIView.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UIView.rs.html#14)
+  easeInOut: int = 0
+  easeIn: int = 1
+  easeOut: int = 2
+  linear: int = 3
+
+
+# ref: [UIProgressViewStyle | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uiprogressview/style?language=objc)
+@dataclass
+class UIProgressViewStyle:
+  default: int = 0
+  bar: int = 1
+
+
+# ref: [NSKeyValueObservingOptions | Apple Developer Documentation](https://developer.apple.com/documentation/foundation/nskeyvalueobservingoptions?language=objc)
+@dataclass
+class NSKeyValueObservingOptions:
+  new: int = 0x01
+  old: int = 0x02
+  initial: int = 0x04
+  prior: int = 0x08
+
+
+# ref: [UILayoutConstraintAxis | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/nslayoutconstraint/axis?language=objc)
+@dataclass
+class UILayoutConstraintAxis:
+  # ref: [UIView.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UIView.rs.html#1002)
+  horizontal: int = 0
+  vertical: int = 1
+
+
+# wip: [text.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/text.rs.html#8)
+'''
+(!TARGET_CPU_X86_64 || (TARGET_OS_IPHONE && !TARGET_OS_MACCATALYST))
+<https://github.com/xamarin/xamarin-macios/issues/12111>
+TODO: Make this work with mac catalyst
+const TARGET_ABI_USES_IOS_VALUES: bool =
+    !cfg!(any(target_arch = "x86", target_arch = "x86_64")) || cfg!(not(target_os = "macos"));
+'''
+
+
+# ref: [NSTextAlignment | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/nstextalignment?language=objc)
+@dataclass
+class NSTextAlignment:
+  # ref: [text.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/text.rs.html#26)
+  left: int = 0
+  right: int = 2  # wip: `TARGET_ABI_USES_IOS_VALUES`
+  center: int = 1  # wip: `TARGET_ABI_USES_IOS_VALUES`
+  justified: int = 3
+  natural: int = 4
+
+
+# ref: [UIControlContentVerticalAlignment | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uicontrol/contentverticalalignment-swift.enum?language=objc)
+@dataclass
+class UIControlContentVerticalAlignment:
+  # ref: [UIControl.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UIControl.rs.html#52)
+  center: int = 0
+  top: int = 1
+  bottom: int = 2
+  fill: int = 3
+
+
+# ref: [UIControlContentHorizontalAlignment | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uicontrol/contenthorizontalalignment-swift.enum?language=objc)
+@dataclass
+class UIControlContentHorizontalAlignment:
+  # ref: [UIControl.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UIControl.rs.html#75)
+  center: int = 0
+  left: int = 1
+  right: int = 2
+  fill: int = 3
+  leading: int = 4
+  trailing: int = 5
+
+
+# ref: [UIStackViewAlignment | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uistackview/alignment-swift.enum?language=objc)
+@dataclass
+class UIStackViewAlignment:
+  # ref: [UIStackView.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UIStackView.rs.html#39)
+  fill: int = 0
+  leading: int = 1
+  top: int = 1  # xxx: [UIStackViewAlignment Enum (UIKit) | Microsoft Learn](https://learn.microsoft.com/en-us/dotnet/api/uikit.uistackviewalignment?view=xamarin-ios-sdk-12)
+  firstBaseline: int = 2
+  center: int = 3
+  trailing: int = 4
+  bottom: int = 4  # xxx: [UIStackViewAlignment Enum (UIKit) | Microsoft Learn](https://learn.microsoft.com/en-us/dotnet/api/uikit.uistackviewalignment?view=xamarin-ios-sdk-12)
+  lastBaseline: int = 5
+
+
+# ref: [UIBarStyle | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uibarstyle?language=objc)
+@dataclass
+class UIBarStyle:
+  # ref: [UIInterface.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UIInterface.rs.html#12)
+  default: int = 0
+  black: int = 1
+  blackOpaque: int = 1  # xxx: deprecated
+  blackTranslucent: int = 2  # xxx: deprecated
+
+
+# ref: [UIBarPosition | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uibarposition?language=objc)
+@dataclass
+class UIBarPosition:
+  # ref: [UIBarCommon.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UIBarCommon.rs.html#40)
+  any: int = 0
+  bottom: int = 1
+  top: int = 2
+  topAttached: int = 3
+
+
+# ref: [UIBarMetrics | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uibarmetrics?language=objc)
+@dataclass
+class UIBarMetrics:
+  # ref: [UIBarCommon.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UIBarCommon.rs.html#11)
+  default: int = 0
+  compact: int = 1
+  defaultPrompt: int = 101
+  compactPrompt: int = 102
+  landscapePhone: int = default  # xxx: deprecated
+  landscapePhonePrompt: int = default  # xxx: deprecated
+
+
+# ref: [UIBlurEffectStyle | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uiblureffect/style?language=objc)
+@dataclass
+class UIBlurEffectStyle:
+  # ref: [UIBlurEffect.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UIBlurEffect.rs.html#12)
+  extraLight: int = 0
+  light: int = 1
+  dark: int = 2
+  extraDark: int = 3
+  regular: int = 4
+  prominent: int = 5
+  systemUltraThinMaterial: int = 6
+  systemThinMaterial: int = 7
+  systemMaterial: int = 8
+  systemThickMaterial: int = 9
+  systemChromeMaterial: int = 10
+  systemUltraThinMaterialLight: int = 11
+  systemThinMaterialLight: int = 12
+  systemMaterialLight: int = 13
+  systemThickMaterialLight: int = 14
+  systemChromeMaterialLight: int = 15
+  systemUltraThinMaterialDark: int = 16
+  systemThinMaterialDark: int = 17
+  systemMaterialDark: int = 18
+  systemThickMaterialDark: int = 19
+  systemChromeMaterialDark: int = 20
+
+
+# ref: [UIDatePickerMode | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uidatepicker/mode?language=objc)
+@dataclass
+class UIDatePickerMode:
+  # ref: [UIDatePicker.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UIDatePicker.rs.html#15)
+  time: int = 0
+  date: int = 1
+  dateAndTime: int = 2
+  countDownTimer: int = 3
+  yearAndMonth: int = 4
+
+
+# ref: [UIDatePickerStyle | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uidatepickerstyle?language=objc)
+@dataclass
+class UIDatePickerStyle:
+  # ref: [UIDatePicker.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UIDatePicker.rs.html#40)
+  automatic: int = 0
+  wheels: int = 1
+  compact: int = 2
+  inline: int = 3
+
+
+# ref: [NSDateFormatterStyle | Apple Developer Documentation](https://developer.apple.com/documentation/foundation/nsdateformatterstyle?language=objc)
+@dataclass
+class NSDateFormatterStyle:
+  none: int = 0
+  short: int = 1
+  medium: int = 2
+  long: int = 3
+  full: int = 4
+
+
+# ref: [NSCalendarUnit | Apple Developer Documentation](https://developer.apple.com/documentation/foundation/nscalendarunit)
+@dataclass
+class NSCalendarUnit:
+  # ref: [NSCalendar.rs - source](https://docs.rs/objc2-foundation/0.2.2/aarch64-apple-ios/src/objc2_foundation/generated/NSCalendar.rs.html#94)
+  era: int = 2
+  year: int = 4
+  month: int = 8
+  day: int = 16
+  hour: int = 32
+  minute: int = 64
+  second: int = 128
+  weekday: int = 512
+  weekdayOrdinal: int = 1024
+  quarter: int = 2048
+  weekOfMonth: int = 4096
+  weekOfYear: int = 8192
+  yearForWeekOfYear: int = 16384
+  nanosecond: int = 32768
+  calendar: int = 1048576
+  timeZone: int = 2097152
+  # deprecated ---
+  NSEraCalendarUnit: int = 2
+  NSYearCalendarUnit: int = 4
+  NSMonthCalendarUnit: int = 8
+  NSDayCalendarUnit: int = 16
+  NSHourCalendarUnit: int = 32
+  NSMinuteCalendarUnit: int = 64
+  NSSecondCalendarUnit: int = 128
+  # `NSCalendarUnitWeekOfMonth` or `NSCalendarUnitWeekOfYear` , depending on which you mean
+  NSWeekCalendarUnit: int = 256
+  NSWeekdayCalendarUnit: int = 512
+  NSWeekdayOrdinalCalendarUnit: int = 1024
+  NSQuarterCalendarUnit: int = 2048
+  NSWeekOfMonthCalendarUnit: int = 4096
+  NSWeekOfYearCalendarUnit: int = 8192
+  NSYearForWeekOfYearCalendarUnit: int = 16384
+  NSCalendarCalendarUnit: int = 1048576
+  NSTimeZoneCalendarUnit: int = 2097152
+  # --- deprecated
+
+
+# ref: [UIBarButtonItemStyle | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uibarbuttonitem/style-swift.enum?language=objc)
+@dataclass
+class UIBarButtonItemStyle:
+  # ref: [UIBarButtonItem.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UIBarButtonItem.rs.html#14)
+  plain: int = 0
+  bordered: int = 1  # Deprecated
+  done: int = 2
+
+
+# ref: [UIFontDescriptorSymbolicTraits | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uifontdescriptor/symbolictraits-swift.struct?language=objc)
+@dataclass
+class UIFontDescriptorSymbolicTraits:
+  # ref: [UIFontDescriptor.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UIFontDescriptor.rs.html#11)
+  traitItalic: int = 1 << 0
+  traitBold: int = 1 << 1
+  traitExpanded: int = 1 << 5
+  traitCondensed: int = 1 << 6
+  traitMonoSpace: int = 1 << 10
+  traitVertical: int = 1 << 11
+  traitUIOptimized: int = 1 << 12
+  traitTightLeading: int = 1 << 15
+  traitLooseLeading: int = 1 << 16
+  classMask: int = 0xF0000000
+  UIFontDescriptorClassUnknown: int = 0 << 28  # xxx: Swift ?
+  classOldStyleSerifs: int = 1 << 28
+  classTransitionalSerifs: int = 2 << 28
+  classModernSerifs: int = 3 << 28
+  classClarendonSerifs: int = 4 << 28
+  classSlabSerifs: int = 5 << 28
+  classFreeformSerifs: int = 7 << 28
+  classSansSerif: int = 8 << 28
+  classOrnamentals: int = 9 << 28
+  classScripts: int = 10 << 28
+  classSymbolic: int = 12 << 28
+
+
+# ref: [UIImagePickerControllerSourceType | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uiimagepickercontroller/sourcetype-swift.enum?language=objc)
+@dataclass
+class UIImagePickerControllerSourceType:
+  # ref: [UIImagePickerController.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UIImagePickerController.rs.html#12)
+  photoLibrary: int = 0  # todo: deprecated
+  camera: int = 1
+  savedPhotosAlbum: int = 2  # todo: deprecated
 
