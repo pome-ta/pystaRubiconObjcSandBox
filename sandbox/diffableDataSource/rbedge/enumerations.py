@@ -254,7 +254,7 @@ class UISplitViewControllerColumn:
 # ref: [UICollectionLayoutListAppearance | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uicollectionlayoutlistappearance?language=objc)
 @dataclass
 class UICollectionLayoutListAppearance:
-  # xxx: 独自調査 a.k.a: 勘
+  # ref: [UICollectionLayoutList.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UICollectionLayoutList.rs.html#16)
   plain: int = 0
   grouped: int = 1
   insetGrouped: int = 2

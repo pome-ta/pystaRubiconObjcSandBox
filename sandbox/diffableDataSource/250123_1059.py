@@ -2,7 +2,7 @@ import ctypes
 
 from pyrubicon.objc.api import ObjCClass
 from pyrubicon.objc.api import objc_method
-from pyrubicon.objc.runtime import send_super, objc_id
+from pyrubicon.objc.runtime import send_super
 
 from rbedge import pdbr
 
@@ -10,7 +10,8 @@ UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 UIColor = ObjCClass('UIColor')
 
-class CustomToolbarViewController(UIViewController):
+
+class MainViewController(UIViewController):
 
   @objc_method
   def dealloc(self):
@@ -22,7 +23,6 @@ class CustomToolbarViewController(UIViewController):
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
-    
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -46,7 +46,6 @@ class CustomToolbarViewController(UIViewController):
                ])
     #print('viewDidAppear')
 
-
   @objc_method
   def viewWillDisappear_(self, animated: bool):
     send_super(__class__,
@@ -57,7 +56,6 @@ class CustomToolbarViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print('viewWillDisappear')
-    
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
@@ -76,15 +74,13 @@ class CustomToolbarViewController(UIViewController):
     print(f'{__class__}: didReceiveMemoryWarning')
 
 
-
-
 if __name__ == '__main__':
   from rbedge.functions import NSStringFromClass
   from rbedge.enumerations import UIModalPresentationStyle
   from rbedge import present_viewController
 
-  main_vc = CustomToolbarViewController.new()
-  _title = NSStringFromClass(CustomToolbarViewController)
+  main_vc = MainViewController.new()
+  _title = NSStringFromClass(MainViewController)
   main_vc.navigationItem.title = _title
 
   presentation_style = UIModalPresentationStyle.fullScreen
