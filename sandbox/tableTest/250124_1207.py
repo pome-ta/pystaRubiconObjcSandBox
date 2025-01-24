@@ -77,7 +77,7 @@ class TableViewControllerTest(UITableViewController):
 
   @objc_method
   def tableView_cellForRowAtIndexPath_(self, tableView:objc_id,
-                                       indexPath:ObjCInstance) -> objc_id:
+                                       indexPath:objc_id) -> objc_id:
 
     #print(indexPath)
     

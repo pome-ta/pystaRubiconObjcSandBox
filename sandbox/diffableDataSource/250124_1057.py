@@ -4,7 +4,7 @@
 
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass, Block
+from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block, NSString
 from pyrubicon.objc.api import objc_method
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGRectMake
@@ -29,10 +29,7 @@ UICollectionViewCellRegistration = ObjCClass(
   'UICollectionViewCellRegistration')
 UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
 NSDiffableDataSourceSnapshot = ObjCClass('NSDiffableDataSourceSnapshot')
-NSOrderedSet = ObjCClass('NSOrderedSet')
 
-#pdbr.state(NSOrderedSet)
-#pdbr.state(UICollectionViewDiffableDataSource.new())
 
 
 class ModernCollectionViewViewController(UIViewController):
@@ -90,46 +87,36 @@ class ModernCollectionViewViewController(UIViewController):
     @Block
     def configurationHandler(cell: objc_id, indexPath: objc_id,
                              item: objc_id) -> None:
-      contentConfiguration = cell.defaultContentConfiguration
+      #contentConfiguration = cell.defaultContentConfiguration
+      pass
 
     cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
       UICollectionViewListCell, configurationHandler)
 
     @Block
-    def cellProvider(collectionView: objc_id, indexPath: objc_id,
-                     identifier: objc_id) -> objc_id:
+    def cellProvider(collectionView: ObjCInstance, indexPath: ObjCInstance,
+                     identifier: objc_id) -> ObjCInstance:
+                       
+      
+      
       return collectionView.dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
         cellRegistration, indexPath, identifier)
 
-    dataSource = UICollectionViewDiffableDataSource.alloc().initWithCollectionView_cellProvider_(collectionView, cellProvider)
-    
-    #dataSource = UICollectionViewDiffableDataSource.alloc()
-    #pdbr.state(dataSource)
-    
-    #dataSource.impl.sectionIdentifiers = NSOrderedSet.orderedSetWithArray_([ctypes.c_int])
-    #dataSource.impl.sectionIdentifiers.initWithOrderedSet_(NSOrderedSet.orderedSetWithArray_([int]))
-    #orderedSetWithArray_
-    #initWithOrderedSet
-    #dataSource.impl.sectionIdentifiers.lastObject= int
-    #itemIdentifiers
-    #pdbr.state(dataSource.impl.sectionIdentifiers)
-    #pdbr.state(dataSource.impl)
-    #print(dataSource.impl.sectionIdentifiers)
+    dataSource = UICollectionViewDiffableDataSource.alloc(
+    ).initWithCollectionView_cellProvider_(collectionView, cellProvider)
+
     return dataSource
 
   @objc_method
   def initData(self):
     snapshot = NSDiffableDataSourceSnapshot.new()
     snapshot.appendSectionsWithIdentifiers_([0])
-    snapshot.appendItemsWithIdentifiers_([])
+    snapshot.appendItemsWithIdentifiers_([NSString.stringWithString_('a'), NSString.stringWithString_('b'),])
     self.modernDataSource.applySnapshot_animatingDifferences_(snapshot, True)
-    #pdbr.state(self.modernDataSource.impl)
-    #pdbr.state(snapshot.impl.sectionIdentifiers)
-    #pdbr.state(self.modernCollectionView, 1)
-    #_autolayoutTrace
-    #print(self.modernCollectionView.__repr__)
-    
-    
+    #pdbr.state(snapshot.itemIdentifiers)
+    #pdbr.state(snapshot.impl)
+    #self.modernCollectionView.dataSource.applySnapshot_animatingDifferences_(snapshot, True)
+    #snapshot = None
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -178,7 +165,7 @@ class ModernCollectionViewViewController(UIViewController):
     #print('viewDidDisappear')
     #self.modernDataSource = None
     #self.modernCollectionView = None
-    
+    #self.initData = None
 
   @objc_method
   def didReceiveMemoryWarning(self):
