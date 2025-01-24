@@ -1,3 +1,26 @@
+# 📝 2025/01/24
+
+## `NSIndexPath` のエラーで落ちる
+
+- `appendItemsWithIdentifiers_` で、追加をすると落ちる
+  - 追加しないと落ちない
+  - `appendSectionsWithIdentifiers_` へは、複数入れても問題ない
+- [Important | NSDiffableDataSourceSnapshot](https://developer.apple.com/documentation/uikit/nsdiffabledatasourcesnapshotreference?language=objc#:~:text=Important) の理解として、`NSNumber` や、`NSString` で呼び出しているつもりだけど、、、(`NSObject` をsubclassとしたHashable なもの)
+- どこかの`Block` 処理の型がダメか？
+  - `*` があるのは、ポインタ（？）として`objc_id` で良い？
+    - `id` って、Rubicon だとどのように指定するのだろうか
+      - `objc_id` で良さそう？
+        - [objc_id | rubicon.objc.runtime — Low-level Objective-C runtime access - Rubicon 0.5.0](https://rubicon-objc.readthedocs.io/en/stable/reference/rubicon-objc-runtime.html#rubicon.objc.runtime.objc_id)
+      - となると、他の引数の型を考えないといけないのか
+  - `ObjCBlock` と、`objc_block` 使ってないな、、、
+
+
+[NSDiffableDataSourceSnapshotReference | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/nsdiffabledatasourcesnapshotreference?language=objc)
+
+[objc_id | rubicon.objc.runtime — Low-level Objective-C runtime access - Rubicon 0.5.0](https://rubicon-objc.readthedocs.io/en/stable/reference/rubicon-objc-runtime.html#rubicon.objc.runtime.objc_id)
+
+
+
 # 📝 2025/01/23
 
 ## DataSource
