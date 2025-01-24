@@ -31,9 +31,6 @@ UICollectionViewCell = ObjCClass('UICollectionViewCell')
 UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
 NSDiffableDataSourceSnapshot = ObjCClass('NSDiffableDataSourceSnapshot')
 
-NSIndexPath = ObjCClass('NSIndexPath')
-pdbr.state(NSIndexPath)
-
 
 class ModernCollectionViewViewController(UIViewController):
 
@@ -48,13 +45,16 @@ class ModernCollectionViewViewController(UIViewController):
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     # xxx: `collectionView` での関数名衝突回避
-    modernCollectionView = UICollectionView.alloc()
+    self.modernCollectionView = UICollectionView.alloc()
+    #pdbr.state(self.modernCollectionView)
+    #registerClass_forCellWithReuseIdentifier_
+    
 
-    self.configureLayout_(modernCollectionView)
-    modernDataSource = self.configureCellRegistration_(modernCollectionView)
+    self.configureLayout_(self.modernCollectionView)
+    self.modernDataSource = self.configureCellRegistration_(self.modernCollectionView)
 
-    self.modernCollectionView = modernCollectionView
-    self.modernDataSource = modernDataSource
+    #self.modernCollectionView = modernCollectionView
+    #self.modernDataSource = modernDataSource
 
   @objc_method  # --- private
   def configureLayout_(self, collectionView):
@@ -108,7 +108,7 @@ class ModernCollectionViewViewController(UIViewController):
       cell.contentConfiguration = content
 
     cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
-      UICollectionViewCell, configurationHandler)
+      UICollectionViewListCell, configurationHandler)
 
     dataSource = UICollectionViewDiffableDataSource.alloc(
     ).initWithCollectionView_cellProvider_(
@@ -116,11 +116,13 @@ class ModernCollectionViewViewController(UIViewController):
       Block(
         lambda collectionView, indexPath, identifier: collectionView.
         dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
-          cellRegistration, indexPath, 'h'), objc_id, *[
-            object,
-            ctypes.py_object,
+          cellRegistration, indexPath, identifier), objc_id, *[
+            objc_id,
+            objc_id,
             objc_id,
           ]))
+    
+    #pdbr.state(self.modernCollectionView.dataSource)
     return dataSource
 
   @objc_method
@@ -145,17 +147,27 @@ class ModernCollectionViewViewController(UIViewController):
                ])
     #print('viewDidAppear')
     snapshot = NSDiffableDataSourceSnapshot.new()
+    _section = NSNumber.numberWithInt_(0)
     snapshot.appendSectionsWithIdentifiers_([
-      NSNumber.numberWithInt_(0),
+      _section,
     ])
+    
+    
+    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_([
+      NSString.stringWithString_('a'),
+      NSString.stringWithString_('b'),
+    ], _section)
     '''
     snapshot.appendItemsWithIdentifiers_([
       NSString.stringWithString_('a'),
       NSString.stringWithString_('b'),
     ])
     '''
+    
+    #pdbr.state(snapshot)
 
-    self.modernDataSource.applySnapshot_animatingDifferences_(snapshot, True)
+    #self.modernDataSource.applySnapshot_animatingDifferences_(snapshot, True)
+    #self.modernDataSource.applySnapshotUsingReloadData_(snapshot)
 
     #pdbr.state(self.modernDataSource.sectionIdentifierForIndex_(0))
 
