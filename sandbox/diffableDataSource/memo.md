@@ -1,3 +1,9 @@
+# 📝 2025/01/25
+
+## Swift 実行のdump とか
+
+`applySnapshot` したら、dataSource 側が変わるはず
+
 ```
 snapshot---
 --- dump

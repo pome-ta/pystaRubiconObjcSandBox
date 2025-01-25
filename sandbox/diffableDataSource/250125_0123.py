@@ -140,10 +140,12 @@ class ModernCollectionViewViewController(UIViewController):
       _section,
     ])
 
+    '''
     snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_([
       NSString.stringWithString_('a'),
       NSString.stringWithString_('b'),
     ], _section)
+    '''
     '''
     snapshot.appendItemsWithIdentifiers_([
       NSString.stringWithString_('a'),
@@ -154,10 +156,11 @@ class ModernCollectionViewViewController(UIViewController):
 
     #pdbr.state(snapshot)
     #pdbr.state(self.modernCollectionView)
+    print(snapshot)
 
     self.modernDataSource.applySnapshot_animatingDifferences_(snapshot, True)
     #self.modernDataSource.applySnapshot_toSection_animatingDifferences_(snapshot, _section, True)
-    pdbr.state(self.modernDataSource)
+    #pdbr.state(self.modernDataSource)
     #self.modernCollectionView.reloadData()
     #self.modernDataSource.applySnapshotUsingReloadData_(snapshot)
 
