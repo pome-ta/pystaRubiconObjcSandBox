@@ -46,9 +46,6 @@ class ModernCollectionViewViewController(UIViewController):
     send_super(__class__, self, 'viewDidLoad')
     # xxx: `collectionView` での関数名衝突回避
     self.modernCollectionView = UICollectionView.alloc()
-    #pdbr.state(self.modernCollectionView)
-    #registerClass_forCellWithReuseIdentifier_
-
     self.configureLayout_(self.modernCollectionView)
     self.modernDataSource = self.configureCellRegistration_(
       self.modernCollectionView)
@@ -84,16 +81,7 @@ class ModernCollectionViewViewController(UIViewController):
         safeAreaLayoutGuide.heightAnchor, 0.8),
     ])
 
-  '''
-  @objc_method  # --- Block
-  def configurationHandler(self, _cell: ctypes.c_void_p,
-                           _indexPath: ctypes.c_void_p,
-                           _item: ctypes.c_void_p) -> None:
-    cell = ObjCInstance(_cell)
-    content = cell.defaultContentConfiguration()
-    content.text = ObjCInstance(_item)
-    cell.contentConfiguration = content
-  '''
+  
 
   @objc_method  # --- private
   def configureCellRegistration_(self, collectionView):
@@ -114,11 +102,11 @@ class ModernCollectionViewViewController(UIViewController):
     ).initWithCollectionView_cellProvider_(
       collectionView,
       Block(
-        lambda collectionView, indexPath, identifier: collectionView.
+        lambda collectionView, indexPath, identifier: ObjCInstance(collectionView).
         dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
-          cellRegistration, indexPath, identifier), objc_id, *[
-            objc_id,
-            objc_id,
+          cellRegistration, ObjCInstance(indexPath), identifier), objc_id, *[
+            ctypes.c_void_p,
+            ctypes.c_void_p,
             objc_id,
           ]))
 
@@ -162,10 +150,15 @@ class ModernCollectionViewViewController(UIViewController):
       NSString.stringWithString_('b'),
     ])
     '''
+    
 
     #pdbr.state(snapshot)
+    #pdbr.state(self.modernCollectionView)
 
-    #self.modernDataSource.applySnapshot_animatingDifferences_(snapshot, True)
+    self.modernDataSource.applySnapshot_animatingDifferences_(snapshot, True)
+    #self.modernDataSource.applySnapshot_toSection_animatingDifferences_(snapshot, _section, True)
+    pdbr.state(self.modernDataSource)
+    #self.modernCollectionView.reloadData()
     #self.modernDataSource.applySnapshotUsingReloadData_(snapshot)
 
     #pdbr.state(self.modernDataSource.sectionIdentifierForIndex_(0))
