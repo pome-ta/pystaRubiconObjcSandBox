@@ -5,7 +5,7 @@
 import ctypes
 
 from pyrubicon.objc.api import ObjCClass, Block
-from pyrubicon.objc.api import objc_method
+from pyrubicon.objc.api import objc_method, NSString, NSNumber
 from pyrubicon.objc.runtime import send_super, objc_id
 
 from rbedge.enumerations import (
@@ -14,6 +14,7 @@ from rbedge.enumerations import (
 from rbedge import pdbr
 
 UICollectionViewController = ObjCClass('UICollectionViewController')
+UICollectionViewController.declare_property('dataSource')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 UIColor = ObjCClass('UIColor')
 
@@ -54,7 +55,36 @@ class ModernCollectionViewViewController(UICollectionViewController):
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
-    # xxx: `collectionView` での関数名衝突回避
+    self.configureCellRegistration()
+
+  @objc_method  # --- private
+  def configureCellRegistration(self):
+
+    @Block
+    def configurationHandler(_cell: ctypes.c_void_p,
+                             _indexPath: ctypes.c_void_p,
+                             _item: ctypes.c_void_p) -> None:
+      cell = ObjCInstance(_cell)
+      content = cell.defaultContentConfiguration()
+      content.text = ObjCInstance(_item)
+      cell.contentConfiguration = content
+
+    cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
+      UICollectionViewListCell, configurationHandler)
+
+    self.dataSource = UICollectionViewDiffableDataSource.alloc(
+    ).initWithCollectionView_cellProvider_(
+      self.collectionView,
+      Block(
+        lambda collectionView, indexPath, identifier: ObjCInstance(
+          collectionView).
+        dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
+          cellRegistration, ObjCInstance(indexPath), identifier), objc_id, *[
+            ctypes.c_void_p,
+            ctypes.c_void_p,
+            objc_id,
+          ]))
+
   @objc_method
   def viewWillAppear_(self, animated: bool):
     send_super(__class__,
@@ -76,7 +106,19 @@ class ModernCollectionViewViewController(UICollectionViewController):
                  ctypes.c_bool,
                ])
     #print('viewDidAppear')
-    pdbr.state(self.dataSource())
+    snapshot = NSDiffableDataSourceSnapshot.new()
+    _section = NSNumber.numberWithInt_(0)
+    snapshot.appendSectionsWithIdentifiers_([
+      _section,
+    ])
+
+    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_([''
+      #NSString.stringWithString_('a'),
+      #NSString.stringWithString_('b'),
+    ], _section)
+    
+    self.dataSource.applySnapshot_animatingDifferences_(snapshot, True)
+    #pdbr.state(self.dataSource)
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
