@@ -50,9 +50,6 @@ class ModernCollectionViewViewController(UIViewController):
     self.modernDataSource = self.configureCellRegistration_(
       self.modernCollectionView)
 
-    #self.modernCollectionView = modernCollectionView
-    #self.modernDataSource = modernDataSource
-
   @objc_method  # --- private
   def configureLayout_(self, collectionView):
     _appearance = UICollectionLayoutListAppearance.plain
@@ -81,8 +78,6 @@ class ModernCollectionViewViewController(UIViewController):
         safeAreaLayoutGuide.heightAnchor, 0.8),
     ])
 
-  
-
   @objc_method  # --- private
   def configureCellRegistration_(self, collectionView):
 
@@ -102,15 +97,14 @@ class ModernCollectionViewViewController(UIViewController):
     ).initWithCollectionView_cellProvider_(
       collectionView,
       Block(
-        lambda collectionView, indexPath, identifier: ObjCInstance(collectionView).
+        lambda collectionView, indexPath, identifier: ObjCInstance(
+          collectionView).
         dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
           cellRegistration, ObjCInstance(indexPath), identifier), objc_id, *[
             ctypes.c_void_p,
             ctypes.c_void_p,
             objc_id,
           ]))
-
-    #pdbr.state(self.modernCollectionView.dataSource)
     return dataSource
 
   @objc_method
@@ -134,28 +128,40 @@ class ModernCollectionViewViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print('viewDidAppear')
-    snapshot = NSDiffableDataSourceSnapshot.new()
+    #snapshot = NSDiffableDataSourceSnapshot.new()
+    snapshot = self.modernDataSource.snapshot()
+
     _section = NSNumber.numberWithInt_(0)
     snapshot.appendSectionsWithIdentifiers_([
       _section,
     ])
 
-    
     snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_([
       NSString.stringWithString_('a'),
       NSString.stringWithString_('b'),
     ], _section)
-    
     '''
     snapshot.appendItemsWithIdentifiers_([
       NSString.stringWithString_('a'),
       NSString.stringWithString_('b'),
     ])
     '''
-    
 
     #pdbr.state(snapshot.impl)
     #pdbr.state(self.modernCollectionView)
+    #pdbr.state(self.modernCollectionView)
+    pdbr.state(self.modernDataSource.impl)
+    '''
+    self.modernCollectionView.reloadData()
+    pdbr.state(self.modernCollectionView)
+    print('---')
+    print(self.modernDataSource)
+    print('---')
+    print(self.modernDataSource.snapshot())
+    print('---')
+    print(snapshot)
+    '''
+    '''
     print('snapshot')
     print(snapshot.impl)
     print('modernDataSource ---')
@@ -164,6 +170,7 @@ class ModernCollectionViewViewController(UIViewController):
     self.modernDataSource.applySnapshot_animatingDifferences_(snapshot, True)
     print('--- modernDataSource')
     print(self.modernDataSource.snapshot().impl)
+    '''
     #self.modernDataSource.applySnapshot_toSection_animatingDifferences_(snapshot, _section, True)
     #pdbr.state(self.modernDataSource)
     #self.modernCollectionView.reloadData()
