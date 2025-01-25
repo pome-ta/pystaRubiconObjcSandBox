@@ -1,3 +1,31 @@
+```
+snapshot---
+--- dump
+▿ UIKit.NSDiffableDataSourceSnapshot<Swift.Int, Swift.String>
+  ▿ _implWrapper: UIKit.NSDiffableDataSourceSnapshot<Swift.Int, Swift.String>.(unknown context at $7ff806f2d4fc).ImplWrapper #0
+    - impl: <__UIDiffableDataSourceSnapshot 0x60000021ada0: sectionCounts=<_UIDataSourceSnapshotter: 0x600000269e60; 1 section with item counts: [2] >; sections=[0x600000269be0]; identifiers=[0x600000269b60]> #1
+      - super: NSObject
+--- debugPrint
+UIKit.NSDiffableDataSourceSnapshot<Swift.Int, Swift.String>(_implWrapper: UIKit.NSDiffableDataSourceSnapshot<Swift.Int, Swift.String>.(unknown context at $7ff806f2d4fc).ImplWrapper)
+dataSource---
+--- dump
+▿ UIKit.NSDiffableDataSourceSnapshot<Swift.Int, Swift.String>
+  ▿ _implWrapper: UIKit.NSDiffableDataSourceSnapshot<Swift.Int, Swift.String>.(unknown context at $7ff806f2d4fc).ImplWrapper #0
+    - impl: <__UIDiffableDataSourceSnapshot 0x600000269c60: sectionCounts=<_UIDataSourceSnapshotter: 0x600000269c40; 0 sections with item counts: [] >; sections=[0x600000008c00]; identifiers=[0x600000008c00]> #1
+      - super: NSObject
+--- debugPrint
+UIKit.NSDiffableDataSourceSnapshot<Swift.Int, Swift.String>(_implWrapper: UIKit.NSDiffableDataSourceSnapshot<Swift.Int, Swift.String>.(unknown context at $7ff806f2d4fc).ImplWrapper)
+dataSource---
+--- dump
+▿ UIKit.NSDiffableDataSourceSnapshot<Swift.Int, Swift.String>
+  ▿ _implWrapper: UIKit.NSDiffableDataSourceSnapshot<Swift.Int, Swift.String>.(unknown context at $7ff806f2d4fc).ImplWrapper #0
+    - impl: <__UIDiffableDataSourceSnapshot 0x6000002759a0: sectionCounts=<_UIDataSourceSnapshotter: 0x600000275d80; 1 section with item counts: [2] >; sections=[0x600000269be0]; identifiers=[0x600000269b60]> #1
+      - super: NSObject
+--- debugPrint
+UIKit.NSDiffableDataSourceSnapshot<Swift.Int, Swift.String>(_implWrapper: UIKit.NSDiffableDataSourceSnapshot<Swift.Int, Swift.String>.(unknown context at $7ff806f2d4fc).ImplWrapper)
+```
+
+
 # 📝 2025/01/24
 
 ## `NSIndexPath` のエラーで落ちる
