@@ -112,13 +112,15 @@ class ModernCollectionViewViewController(UICollectionViewController):
       _section,
     ])
 
-    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_([''
-      #NSString.stringWithString_('a'),
-      #NSString.stringWithString_('b'),
+    snapshot.appendItemsWithIdentifiers_intoSectionWithIdentifier_([
+      NSString.stringWithString_('a'),
+      NSString.stringWithString_('b'),
     ], _section)
     
-    self.dataSource.applySnapshot_animatingDifferences_(snapshot, True)
-    #pdbr.state(self.dataSource)
+    #self.dataSource.applySnapshot_animatingDifferences_(snapshot, True)
+    self.dataSource.setImpl_(snapshot.impl)
+    pdbr.state(self.dataSource)
+    #pdbr.state(snapshot.impl)
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
