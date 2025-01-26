@@ -1,3 +1,6 @@
+"""
+いけたかも？
+"""
 import sys
 import asyncio
 from pyrubicon.objc.eventloop import EventLoopPolicy, iOSLifecycle, libcf
