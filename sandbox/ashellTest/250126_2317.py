@@ -1,12 +1,8 @@
-"""
-いけたかも?
-"""
-import sys
 import asyncio
 from pyrubicon.objc.eventloop import EventLoopPolicy, iOSLifecycle, libcf
 
-from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method
-from pyrubicon.objc.runtime import SEL, send_super
+from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method, ObjCInstance
+from pyrubicon.objc.runtime import SEL, send_super,Class,Foundation
 
 import pdbr
 
@@ -52,7 +48,11 @@ def onMainThread(func):
 
   return wrapper
 
-
+def NSStringFromClass(cls: Class) -> ObjCInstance:
+  _NSStringFromClass = Foundation.NSStringFromClass
+  _NSStringFromClass.restype = ctypes.c_void_p
+  _NSStringFromClass.argtypes = [Class]
+  return ObjCInstance(_NSStringFromClass(cls))
 ### --- ###
 
 # --- UINavigationController
@@ -110,13 +110,14 @@ class RootNavigationController(UINavigationController,
     send_super(__class__, self, 'viewDidDisappear:')
     print('RootNavigationController: viewDidDisappear')
     
-    loop.stop()
+    
 
   @objc_method
   def doneButtonTapped_(self, sender):
     visibleViewController = self.visibleViewController
 
     visibleViewController.dismissViewControllerAnimated_completion_(True, None)
+    loop.stop()
 
   @objc_method
   def navigationController_willShowViewController_animated_(
@@ -150,7 +151,7 @@ class FirstViewController(UIViewController):
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     # --- Navigation
-    self.navigationItem.title = 'FirstView'
+    #self.navigationItem.title = 'FirstView'
 
     # --- View
     self.view.backgroundColor = UIColor.systemBlueColor()
@@ -298,7 +299,9 @@ def present_viewController(myVC: UIViewController):
 
 
 if __name__ == "__main__":
+  print('---')
   vc = FirstViewController.new()
+  vc.navigationItem.title  =NSStringFromClass(FirstViewController)
   present_viewController(vc)
 
   #loop.stop()
@@ -308,5 +311,4 @@ if __name__ == "__main__":
   loop.run_forever()
   print('hogeeeeee')
   #loop.stop()
-
 

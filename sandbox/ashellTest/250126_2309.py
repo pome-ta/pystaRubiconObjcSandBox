@@ -1,5 +1,6 @@
 """
 いけたかも？
+だめか
 """
 import sys
 import asyncio
