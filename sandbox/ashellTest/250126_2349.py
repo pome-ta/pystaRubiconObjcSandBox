@@ -1,5 +1,6 @@
 """
 いけたかも?
+どこかの場面で落ちちゃう
 """
 import sys
 import asyncio

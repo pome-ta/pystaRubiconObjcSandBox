@@ -66,9 +66,14 @@ def present_viewController(viewController: ObjCInstance,
   ) and automatic <= modalPresentationStyle <= blurOverFullScreen else pageSheet
 
   presentViewController.setModalPresentationStyle_(style)
+  print('pre: presentViewController')
+  @Block
+  def completion()->None:
+    print('block')
 
   rootViewController.presentViewController_animated_completion_(
-    presentViewController, True, None)
+    presentViewController, True, completion)
+  print('modern: presentViewController')
 
 
 def NSStringFromClass(cls: Class) -> ObjCInstance:
@@ -87,7 +92,19 @@ class RootNavigationController(UINavigationController):
 
   @objc_method
   def viewDidLoad(self):
+    print('RootNavigationController: viewDidLoad')
     self.delegate = self
+
+  @objc_method
+  def viewDidDisappear_(self, animated: bool):
+    send_super(__class__,
+               self,
+               'viewDidDisappear:',
+               animated,
+               argtypes=[
+                 ctypes.c_bool,
+               ])
+    print('RootNavigationController: viewDidDisappear')
 
   @objc_method
   def doneButtonTapped_(self, sender):
