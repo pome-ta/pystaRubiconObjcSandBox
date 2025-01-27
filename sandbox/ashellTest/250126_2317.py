@@ -2,7 +2,7 @@ import asyncio
 from pyrubicon.objc.eventloop import EventLoopPolicy, iOSLifecycle, libcf
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method, ObjCInstance
-from pyrubicon.objc.runtime import SEL, send_super,Class,Foundation
+from pyrubicon.objc.runtime import SEL, send_super, Class, Foundation
 
 import pdbr
 
@@ -48,11 +48,14 @@ def onMainThread(func):
 
   return wrapper
 
+
 def NSStringFromClass(cls: Class) -> ObjCInstance:
   _NSStringFromClass = Foundation.NSStringFromClass
   _NSStringFromClass.restype = ctypes.c_void_p
   _NSStringFromClass.argtypes = [Class]
   return ObjCInstance(_NSStringFromClass(cls))
+
+
 ### --- ###
 
 # --- UINavigationController
@@ -109,8 +112,6 @@ class RootNavigationController(UINavigationController,
   def viewDidDisappear_(self, animated: bool):
     send_super(__class__, self, 'viewDidDisappear:')
     print('RootNavigationController: viewDidDisappear')
-    
-    
 
   @objc_method
   def doneButtonTapped_(self, sender):
@@ -301,7 +302,7 @@ def present_viewController(myVC: UIViewController):
 if __name__ == "__main__":
   print('---')
   vc = FirstViewController.new()
-  vc.navigationItem.title  =NSStringFromClass(FirstViewController)
+  vc.navigationItem.title = NSStringFromClass(FirstViewController)
   present_viewController(vc)
 
   #loop.stop()

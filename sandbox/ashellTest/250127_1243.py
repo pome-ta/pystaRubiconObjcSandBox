@@ -1,3 +1,10 @@
+"""
+いけたかも?
+`loop.close()`
+"""
+import sys
+import os
+import time
 import asyncio
 from pyrubicon.objc.eventloop import EventLoopPolicy, iOSLifecycle, libcf
 
@@ -8,6 +15,7 @@ import pdbr
 
 ObjCClass.auto_rename = True
 
+#from ctypes import byref, cast, Structure
 import ctypes
 import functools
 
@@ -116,11 +124,14 @@ class RootNavigationController(UINavigationController,
                argtypes=[
                  ctypes.c_bool,
                ])
-    print(f'nav_dis_pre: {loop}')
     print('RootNavigationController: viewDidDisappear')
-
+    #time.sleep(1)
+    #print(dir(loop))
     loop.stop()
-    print(f'nav_dis_mdn: {loop}')
+    
+    
+    #os.system('exit')
+    #sys.exit(0)
 
   @objc_method
   def doneButtonTapped_(self, sender):
@@ -130,6 +141,9 @@ class RootNavigationController(UINavigationController,
     @Block
     def completion() -> None:
       print('block: doneButtonTapped')
+      #loop.stop()
+      #time.sleep(1)
+      
 
     #visibleViewController.dismissViewControllerAnimated_completion_(True, None)
     visibleViewController.dismissViewControllerAnimated_completion_(
@@ -156,7 +170,7 @@ class FirstViewController(UIViewController):
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print('\tdealloc')
-    #pass
+    pass
 
   @objc_method
   def onTap_(self, sender):
@@ -239,6 +253,7 @@ class FirstViewController(UIViewController):
                  ctypes.c_bool,
                ])
     print('viewDidDisappear')
+    #loop.close()
 
   @objc_method
   def didReceiveMemoryWarning(self):
@@ -289,6 +304,7 @@ class SecondViewController(UIViewController):
 # --- main
 @onMainThread
 def present_viewController(myVC: UIViewController):
+
   app = ObjCClass('UIApplication').sharedApplication
   window = app.keyWindow if app.keyWindow else app.windows[0]
   rootVC = window.rootViewController
@@ -306,29 +322,31 @@ def present_viewController(myVC: UIViewController):
   UIModalPresentationPageSheet = 1
   '''
   presentVC.setModalPresentationStyle_(1)
-  print('present: start')
-
+  print('present: s')
+  
   @Block
-  def completion() -> None:
+  def completion()->None:
     print('present_completion')
 
-  rootVC.presentViewController_animated_completion_(presentVC, True,
-                                                    completion)
-  print('present: end')
+  rootVC.presentViewController_animated_completion_(presentVC, True, completion)
+  print('present: e')
+  #loop.stop()
 
 
 if __name__ == "__main__":
-  print('--- run ---')
-
+  print('--')
   vc = FirstViewController.new()
   vc.navigationItem.title = NSStringFromClass(FirstViewController)
   present_viewController(vc)
-  print(f'main: {loop}')
-  loop.run_forever()
-  print(f'forever: {loop}')
 
+  #loop.stop()
+  #print(dir(loop))
+  #loop.run_forever_cooperatively(lifecycle=iOSLifecycle())
+  #loop.run_forever(lifecycle=iOSLifecycle())
+  loop.run_forever()
+  #loop.stop()
+  #loop.run_forever_cooperatively()
   loop.close()
-  print('--- end ---')
-  print(f'close: {loop}')
-  del loop
+  print('hogeeeeee')
+  #loop.stop()
 
