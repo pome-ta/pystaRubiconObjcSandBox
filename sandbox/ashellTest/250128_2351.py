@@ -1,5 +1,4 @@
 import asyncio
-from time import sleep
 from pyrubicon.objc.eventloop import EventLoopPolicy, iOSLifecycle
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method, ObjCInstance
@@ -118,13 +117,7 @@ class RootNavigationController(UINavigationController,
                  ctypes.c_bool,
                ])
     print('RootNavigationController: viewDidDisappear')
-    #print(f'pre: {loop}')
-    #loop.call_soon_threadsafe(loop.stop)
-    loop.stop()
-    while loop.is_running():
-      #print(f'while: {loop.is_running()}')
-      sleep(0.2)
-    #print(f'mdn: {loop}')
+    loop.call_soon_threadsafe(loop.stop)
 
   @objc_method
   def doneButtonTapped_(self, sender):
@@ -134,17 +127,10 @@ class RootNavigationController(UINavigationController,
     @Block
     def completion() -> None:
       print('block: doneButtonTapped')
-      '''
-      while loop.is_running():
-        #print(f'while: {loop.is_running()}')
-        sleep(0.2)
-      '''
-      #print(dir(loop))
-      #print(loop.is_running())
 
     #visibleViewController.dismissViewControllerAnimated_completion_(True, None)
-    visibleViewController.dismissViewControllerAnimated_completion_(True, completion)
-    #self.dismissViewControllerAnimated_completion_(True, completion)
+    #visibleViewController.dismissViewControllerAnimated_completion_(True, completion)
+    self.dismissViewControllerAnimated_completion_(True, completion)
     print('modern: doneButtonTapped')
 
   @objc_method
@@ -337,13 +323,11 @@ if __name__ == "__main__":
   print(f'main: {loop}')
   #loop.run_forever(lifecycle=iOSLifecycle())
   loop.run_forever()
-  #loop.run_forever_cooperatively(lifecycle=iOSLifecycle())
   print(f'forever: {loop}')
   #loop.call_soon(loop.shutdown_asyncgens)
   
   
   
-  '''
   import warnings
   with warnings.catch_warnings():
     #warnings.filterwarnings('error')
@@ -355,7 +339,6 @@ if __name__ == "__main__":
       print(f'わーにんぐ: {e}')
     finally:
       loop.close()
-  '''
   print('--- end ---')
   print(f'close: {loop}')
 
