@@ -120,7 +120,7 @@ class RootNavigationController(UINavigationController,
     #print(f'nav_dis_pre: {loop}')
     print('RootNavigationController: viewDidDisappear')
 
-    #loop.stop()
+    loop.stop()
     #print(f'nav_dis_mdn: {loop}')
 
   @objc_method
@@ -133,8 +133,8 @@ class RootNavigationController(UINavigationController,
       print('block: doneButtonTapped')
 
     #visibleViewController.dismissViewControllerAnimated_completion_(True, None)
-    visibleViewController.dismissViewControllerAnimated_completion_(
-      True, completion)
+    #visibleViewController.dismissViewControllerAnimated_completion_(True, completion)
+    self.dismissViewControllerAnimated_completion_(True, completion)
     print('modern: doneButtonTapped')
 
   @objc_method
@@ -321,6 +321,7 @@ def present_viewController(myVC: UIViewController):
 def run(_loop):
   pass
 
+
 if __name__ == "__main__":
   print('--- run ---')
 
@@ -334,5 +335,5 @@ if __name__ == "__main__":
   loop.close()
   print('--- end ---')
   print(f'close: {loop}')
-  del loop
+  #del loop
 
