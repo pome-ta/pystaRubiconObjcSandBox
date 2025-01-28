@@ -116,8 +116,14 @@ class RootNavigationController(UINavigationController,
                argtypes=[
                  ctypes.c_bool,
                ])
+    #print(f'nav_dis_pre: {loop}')
     print('RootNavigationController: viewDidDisappear')
     loop.call_soon_threadsafe(loop.stop)
+    #loop.call_soon_threadsafe(loop.shutdown_asyncgens)
+    #loop.call_soon(loop.shutdown_asyncgens)
+
+    #loop.stop()
+    #print(f'nav_dis_mdn: {loop}')
 
   @objc_method
   def doneButtonTapped_(self, sender):
@@ -127,6 +133,10 @@ class RootNavigationController(UINavigationController,
     @Block
     def completion() -> None:
       print('block: doneButtonTapped')
+      #print(dir(loop))
+      #loop.stop()
+      #loop.shutdown_asyncgens()
+      #loop.call_soon(loop.stop)
 
     #visibleViewController.dismissViewControllerAnimated_completion_(True, None)
     #visibleViewController.dismissViewControllerAnimated_completion_(True, completion)
@@ -325,20 +335,14 @@ if __name__ == "__main__":
   loop.run_forever()
   print(f'forever: {loop}')
   #loop.call_soon(loop.shutdown_asyncgens)
-  
-  
-  
-  import warnings
-  with warnings.catch_warnings():
-    #warnings.filterwarnings('error')
-    warnings.filterwarnings('ignore')
-    try:
-      loop.shutdown_asyncgens()
-      print('--- shutdown_asyncgens')
-    except RuntimeWarning as e:
-      print(f'わーにんぐ: {e}')
-    finally:
-      loop.close()
+  try:
+    loop.shutdown_asyncgens()
+    #loop.call_soon_threadsafe(loop.close)
+  except :
+    print('a')
+  finally:
+    loop.close()
   print('--- end ---')
   print(f'close: {loop}')
+  #del loop
 
