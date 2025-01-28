@@ -1,5 +1,5 @@
-import threading
 import asyncio
+
 from pyrubicon.objc.eventloop import EventLoopPolicy, iOSLifecycle, libcf
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol, objc_method, ObjCInstance
@@ -117,11 +117,11 @@ class RootNavigationController(UINavigationController,
                argtypes=[
                  ctypes.c_bool,
                ])
-    #print(f'nav_dis_pre: {loop}')
+    print(f'nav_dis_pre: {loop}')
     print('RootNavigationController: viewDidDisappear')
 
-    #loop.stop()
-    #print(f'nav_dis_mdn: {loop}')
+    loop.stop()
+    print(f'nav_dis_mdn: {loop}')
 
   @objc_method
   def doneButtonTapped_(self, sender):
@@ -317,9 +317,6 @@ def present_viewController(myVC: UIViewController):
                                                     completion)
   print('present: end')
 
-
-def run(_loop):
-  pass
 
 if __name__ == "__main__":
   print('--- run ---')
