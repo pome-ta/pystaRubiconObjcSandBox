@@ -25,10 +25,22 @@ toga は、無の状態(と、表現をしていいのか？) からのスター
 
 ### Semaphore
 
+Python デフォではなくて、Swift Python 呼んでる感じだ
+
+
 - [Pyto/Pyto/Model/Python Bridging/PyMainThread.swift at main · pome-ta/Pyto · GitHub](https://github.com/pome-ta/Pyto/blob/main/Pyto/Model/Python%20Bridging/PyMainThread.swift)
   - `let semaphore = Python.Semaphore(value: 0)` ってところ
+  - `semaphore?.signal()` ってなんやろか？
 - [Semaphoreを使ってPythonの非同期処理の平行処理数をコントロールする](https://zenn.dev/yosemat/articles/39c36d0ed88a7c)
 - [【Swift】@escaping属性のクロージャとは #Xcode - Qiita](https://qiita.com/imchino/items/48564b0c23a64f539060)
+
+
+
+### 終了状態を検知できるか？
+
+- [iOSアプリのライフサイクル #Swift - Qiita](https://qiita.com/KenNagami/items/766d5f95940c76a8c3cd)
+  - `applicationWillResignActive` これとか？
+- [NotificationCenterを使用して、アプリの状態を認識する #iOS - Qiita](https://qiita.com/tosh_3/items/df52802514cc9737e75b)
 
 ### Python を埋め込む
 
