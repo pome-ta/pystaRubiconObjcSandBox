@@ -316,7 +316,7 @@ def present_viewController(myVC: UIViewController):
   UIModalPresentationFullScreen = 0
   UIModalPresentationPageSheet = 1
   '''
-  presentVC.setModalPresentationStyle_(1)
+  presentVC.setModalPresentationStyle_(0)
   print('present: start')
 
   @Block

@@ -48,6 +48,7 @@ def NSStringFromClass(cls: Class) -> ObjCInstance:
 UINavigationController = ObjCClass('UINavigationController')
 UIBarButtonItem = ObjCClass('UIBarButtonItem')
 
+
 UINavigationBarAppearance = ObjCClass('UINavigationBarAppearance')
 
 
@@ -229,15 +230,20 @@ def present_viewController(viewController: ObjCInstance,
       #mediumDetent,
       largeDetent,
     ])
-    sheet.setPrefersGrabberVisible_(True)
+    
     sheet.setSelectedDetentIdentifier_(UISheetPresentationControllerDetentIdentifierLarge)
     sheet.setPrefersScrollingExpandsWhenScrolledToEdge_(False)
-    pdbr.state(sheet, 1)
+    sheet.setPrefersEdgeAttachedInCompactHeight_(True)
+    sheet.setWidthFollowsPreferredContentSizeWhenEdgeAttached_(True)
+    sheet.setPrefersGrabberVisible_(True)
+    #sheet.setModalPresentationStyle_(style)
+    #pdbr.state(sheet, 1)
 
   
   #pdbr.state(presentViewController)
 
   #presentViewController.setModalPresentationStyle_(style)
+
   print('pre: presentViewController')
 
   @Block
