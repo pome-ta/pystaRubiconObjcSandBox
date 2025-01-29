@@ -298,7 +298,7 @@ class SecondViewController(UIViewController):
 
 
 # --- main
-@onMainThread
+#@onMainThread
 def present_viewController(myVC: UIViewController):
   app = ObjCClass('UIApplication').sharedApplication
   window = app.keyWindow if app.keyWindow else app.windows[0]

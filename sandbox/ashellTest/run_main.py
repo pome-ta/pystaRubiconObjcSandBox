@@ -48,7 +48,6 @@ def NSStringFromClass(cls: Class) -> ObjCInstance:
 UINavigationController = ObjCClass('UINavigationController')
 UIBarButtonItem = ObjCClass('UIBarButtonItem')
 
-
 UINavigationBarAppearance = ObjCClass('UINavigationBarAppearance')
 
 
@@ -124,7 +123,7 @@ class MainViewController(UIViewController):
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print('\tdealloc')
-    pass
+    #pass
 
   # MARK: - View Life Cycle
   @objc_method
@@ -189,10 +188,11 @@ UISheetPresentationControllerDetent = ObjCClass(
 largeDetent = UISheetPresentationControllerDetent.largeDetent()
 mediumDetent = UISheetPresentationControllerDetent.mediumDetent()
 
+UISheetPresentationControllerDetentIdentifierLarge = objc_const(
+  UIKit, 'UISheetPresentationControllerDetentIdentifierLarge')
 
-UISheetPresentationControllerDetentIdentifierLarge = objc_const(UIKit, 'UISheetPresentationControllerDetentIdentifierLarge')
-
-UISheetPresentationControllerDetentIdentifierMedium = objc_const(UIKit, 'UISheetPresentationControllerDetentIdentifierMedium')
+UISheetPresentationControllerDetentIdentifierMedium = objc_const(
+  UIKit, 'UISheetPresentationControllerDetentIdentifierMedium')
 
 import pdbr
 
@@ -230,8 +230,9 @@ def present_viewController(viewController: ObjCInstance,
       #mediumDetent,
       largeDetent,
     ])
-    
-    sheet.setSelectedDetentIdentifier_(UISheetPresentationControllerDetentIdentifierLarge)
+
+    sheet.setSelectedDetentIdentifier_(
+      UISheetPresentationControllerDetentIdentifierLarge)
     sheet.setPrefersScrollingExpandsWhenScrolledToEdge_(False)
     sheet.setPrefersEdgeAttachedInCompactHeight_(True)
     sheet.setWidthFollowsPreferredContentSizeWhenEdgeAttached_(True)
@@ -239,7 +240,6 @@ def present_viewController(viewController: ObjCInstance,
     #sheet.setModalPresentationStyle_(style)
     #pdbr.state(sheet, 1)
 
-  
   #pdbr.state(presentViewController)
 
   #presentViewController.setModalPresentationStyle_(style)
