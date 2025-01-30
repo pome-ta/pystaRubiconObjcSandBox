@@ -317,10 +317,10 @@ class CFSocketHandle(events.Handle):
   def cancel(self):
     """(Potentially) cancel the socket handle.
 
-        A socket handle can have both reader and writer components; a call to cancel a
-        socket handle will only be successful if *both* the reader and writer component
-        have been disabled. If either is still active, cancel() will be a no-op.
-        """
+    A socket handle can have both reader and writer components; a call to cancel a
+    socket handle will only be successful if *both* the reader and writer component
+    have been disabled. If either is still active, cancel() will be a no-op.
+    """
     if self._reader is None and self._writer is None and self._src:
       super().cancel()
       del self._loop._sockets[self._fd]
@@ -369,9 +369,9 @@ class CFEventLoop(unix_events.SelectorEventLoop):
   def add_reader(self, fd, callback, *args):
     """Add a reader callback.
 
-        Method is a direct call through to _add_reader to reflect an
-        internal implementation detail added in Python3.5.
-        """
+    Method is a direct call through to _add_reader to reflect an
+    internal implementation detail added in Python3.5.
+    """
     self._add_reader(fd, callback, *args)
 
   def _remove_reader(self, fd):
@@ -384,9 +384,9 @@ class CFEventLoop(unix_events.SelectorEventLoop):
   def remove_reader(self, fd):
     """Remove a reader callback.
 
-        Method is a direct call through to _remove_reader to reflect an
-        internal implementation detail added in Python3.5.
-        """
+    Method is a direct call through to _remove_reader to reflect an
+    internal implementation detail added in Python3.5.
+    """
     self._remove_reader(fd)
 
   def _add_writer(self, fd, callback, *args):
@@ -401,9 +401,9 @@ class CFEventLoop(unix_events.SelectorEventLoop):
   def add_writer(self, fd, callback, *args):
     """Add a writer callback.
 
-        Method is a direct call through to _add_writer to reflect an
-        internal implementation detail added in Python3.5.
-        """
+    Method is a direct call through to _add_writer to reflect an
+    internal implementation detail added in Python3.5.
+    """
     self._add_writer(fd, callback, *args)
 
   def _remove_writer(self, fd):
@@ -416,9 +416,9 @@ class CFEventLoop(unix_events.SelectorEventLoop):
   def remove_writer(self, fd):
     """Remove a writer callback.
 
-        Method is a direct call through to _remove_writer to reflect an
-        internal implementation detail added in Python3.5.
-        """
+    Method is a direct call through to _remove_writer to reflect an
+    internal implementation detail added in Python3.5.
+    """
     self._remove_writer(fd)
 
   ######################################################################
@@ -459,14 +459,14 @@ class CFEventLoop(unix_events.SelectorEventLoop):
   def run_until_complete(self, future, **kw):
     """Run until the Future is done.
 
-        If the argument is a coroutine, it is wrapped in a Task.
+    If the argument is a coroutine, it is wrapped in a Task.
 
-        WARNING: It would be disastrous to call run_until_complete()
-        with the same coroutine twice -- it would wrap it in two
-        different Tasks and that can't be good.
+    WARNING: It would be disastrous to call run_until_complete()
+    with the same coroutine twice -- it would wrap it in two
+    different Tasks and that can't be good.
 
-        Return the Future's result, or raise its exception.
-        """
+    Return the Future's result, or raise its exception.
+    """
 
     def stop(f):
       self.stop()
@@ -501,14 +501,14 @@ class CFEventLoop(unix_events.SelectorEventLoop):
   def run_forever_cooperatively(self, lifecycle=None):
     """A non-blocking version of :meth:`run_forever`.
 
-        This may seem like nonsense; however, an iOS app is not expected to
-        invoke a blocking "main event loop" method. As a result, we need to
-        be able to *start* Python event loop handling, but then return control
-        to the main app to start the actual event loop.
+    This may seem like nonsense; however, an iOS app is not expected to
+    invoke a blocking "main event loop" method. As a result, we need to
+    be able to *start* Python event loop handling, but then return control
+    to the main app to start the actual event loop.
 
-        The implementation is effectively all the parts of a call to
-        :meth:`run_forever()`, but without any of the shutdown/cleanup logic.
-        """
+    The implementation is effectively all the parts of a call to
+    :meth:`run_forever()`, but without any of the shutdown/cleanup logic.
+    """
     if not self._lifecycle:
       self._set_lifecycle(
         lifecycle if lifecycle else CFLifecycle(self._cfrunloop))
@@ -531,13 +531,13 @@ class CFEventLoop(unix_events.SelectorEventLoop):
   def call_soon(self, callback, *args, context=None):
     """Arrange for a callback to be called as soon as possible.
 
-        This operates as a FIFO queue: callbacks are called in the
-        order in which they are registered.  Each callback will be
-        called exactly once.
+    This operates as a FIFO queue: callbacks are called in the
+    order in which they are registered.  Each callback will be
+    called exactly once.
 
-        Any positional arguments after the callback will be passed to
-        the callback when it is called.
-        """
+    Any positional arguments after the callback will be passed to
+    the callback when it is called.
+    """
     self._check_not_coroutine(callback, "call_soon")
 
     return CFTimerHandle(
@@ -552,19 +552,19 @@ class CFEventLoop(unix_events.SelectorEventLoop):
   def call_later(self, delay, callback, *args, context=None):
     """Arrange for a callback to be called at a given time.
 
-        Return a Handle: an opaque object with a cancel() method that
-        can be used to cancel the call.
+    Return a Handle: an opaque object with a cancel() method that
+    can be used to cancel the call.
 
-        The delay can be an int or float, expressed in seconds.  It is
-        always relative to the current time.
+    The delay can be an int or float, expressed in seconds.  It is
+    always relative to the current time.
 
-        Each callback will be called exactly once.  If two callbacks
-        are scheduled for exactly the same time, it undefined which
-        will be called first.
+    Each callback will be called exactly once.  If two callbacks
+    are scheduled for exactly the same time, it undefined which
+    will be called first.
 
-        Any positional arguments after the callback will be passed to
-        the callback when it is called.
-        """
+    Any positional arguments after the callback will be passed to
+    the callback when it is called.
+    """
     self._check_not_coroutine(callback, "call_later")
 
     return CFTimerHandle(
@@ -577,8 +577,8 @@ class CFEventLoop(unix_events.SelectorEventLoop):
   def call_at(self, when, callback, *args, context=None):
     """Like call_later(), but uses an absolute time.
 
-        Absolute time corresponds to the event loop's time() method.
-        """
+    Absolute time corresponds to the event loop's time() method.
+    """
     self._check_not_coroutine(callback, "call_at")
 
     return CFTimerHandle(
@@ -591,10 +591,10 @@ class CFEventLoop(unix_events.SelectorEventLoop):
   def time(self):
     """Return the time according to the event loop's clock.
 
-        This is a float expressed in seconds since an epoch, but the
-        epoch, precision, accuracy and drift are unspecified and may
-        differ per event loop.
-        """
+    This is a float expressed in seconds since an epoch, but the
+    epoch, precision, accuracy and drift are unspecified and may
+    differ per event loop.
+    """
     return libcf.CFAbsoluteTimeGetCurrent()
 
   def stop(self):
