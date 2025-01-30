@@ -18,6 +18,7 @@ from pyrubicon.objc.runtime import libobjc, objc_block, objc_id
 
 asyncio.set_event_loop_policy(EventLoopPolicy())
 loop = asyncio.new_event_loop()
+loop.set_debug(True)
 
 NSThread = ObjCClass('NSThread')
 
@@ -298,7 +299,7 @@ class SecondViewController(UIViewController):
 
 
 # --- main
-#@onMainThread
+@onMainThread
 def present_viewController(myVC: UIViewController):
   app = ObjCClass('UIApplication').sharedApplication
   window = app.keyWindow if app.keyWindow else app.windows[0]
@@ -316,7 +317,7 @@ def present_viewController(myVC: UIViewController):
   UIModalPresentationFullScreen = 0
   UIModalPresentationPageSheet = 1
   '''
-  presentVC.setModalPresentationStyle_(0)
+  presentVC.setModalPresentationStyle_(1)
   print('present: start')
 
   @Block
@@ -335,6 +336,7 @@ if __name__ == "__main__":
   vc.navigationItem.title = NSStringFromClass(FirstViewController)
   present_viewController(vc)
   print(f'main: {loop}')
+  #print(f'main: {dir(loop)}')
   #loop.run_forever(lifecycle=iOSLifecycle())
   loop.run_forever()
   #loop.run_forever_cooperatively(lifecycle=iOSLifecycle())
@@ -343,7 +345,7 @@ if __name__ == "__main__":
   
   
   
-  '''
+  #'''
   import warnings
   with warnings.catch_warnings():
     #warnings.filterwarnings('error')
@@ -355,7 +357,7 @@ if __name__ == "__main__":
       print(f'わーにんぐ: {e}')
     finally:
       loop.close()
-  '''
+  #'''
   print('--- end ---')
   print(f'close: {loop}')
 
