@@ -9,7 +9,7 @@ import pdbr
 ObjCClass.auto_rename = True
 
 #############################################################
-# --- util
+# --- utils
 #############################################################
 from pyrubicon.objc.runtime import Class, Foundation
 
@@ -20,6 +20,21 @@ def NSStringFromClass(cls: Class) -> ObjCInstance:
   _NSStringFromClass.argtypes = [Class]
   return ObjCInstance(_NSStringFromClass(cls))
 
+
+#############################################################
+# --- lifeCycle
+#############################################################
+'''
+import asyncio
+import logging
+
+from pyrubicon.objc.eventloop import EventLoopPolicy
+
+logging.basicConfig(level=logging.DEBUG)
+asyncio.set_event_loop_policy(EventLoopPolicy())
+loop = asyncio.new_event_loop()
+loop.set_debug(True)
+'''
 
 #############################################################
 # --- mainThread
@@ -106,10 +121,11 @@ class RootNavigationController(UINavigationController):
                  ctypes.c_bool,
                ])
     print(f'{NSStringFromClass(__class__)}: viewDidAppear_')
-    print('▪︎ ---')
+    print('↓ ---')
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
+    print('↑ ---')
     send_super(__class__,
                self,
                'viewWillDisappear:',
@@ -143,6 +159,8 @@ class RootNavigationController(UINavigationController):
     def completion() -> None:
       print('block: doneButtonTapped')
 
+    #visibleViewController = self.visibleViewController
+    #visibleViewController.dismissViewControllerAnimated_completion_(True, completion)
     self.dismissViewControllerAnimated_completion_(True, completion)
     print('doneButtonTapped: end')
 
@@ -206,10 +224,11 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
     print(f'\t{NSStringFromClass(__class__)}: viewDidAppear_')
-    print('▪︎ ---')
+    print('\t↓ ---')
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
+    print('\t↑ ---')
     send_super(__class__,
                self,
                'viewWillDisappear:',
@@ -268,8 +287,9 @@ def present_viewController(viewController: ObjCInstance,
 if __name__ == '__main__':
   print('--- run')
   main_vc = MainViewController.new()
-
   presentation_style = 1
   present_viewController(main_vc, presentation_style)
+  #print('--- run_forever: start')
+  #loop.run_forever()
   print('--- end')
 
