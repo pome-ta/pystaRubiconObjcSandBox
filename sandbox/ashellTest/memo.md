@@ -1,3 +1,109 @@
+# 📝 2025/01/31
+
+## `asyncio` オベンキョ
+
+
+### [Pythonにasyncioってあるけどよく知らなかったので調べた](https://zenn.dev/knowhere_imai/articles/ba850780152b01) めも
+
+> シングルスレッドで動作する**並行**処理
+
+
+> Pythonでは`await` 無しでコルーチンを実行することはできません
+
+`await` 無しだから、これが出たのかな？
+
+
+```
+RuntimeWarning: coroutine 'BaseEventLoop.shutdown_asyncgens' was never awaited
+  loop.shutdown_asyncgens()
+RuntimeWarning: Enable tracemalloc to get the object allocation traceback
+```
+
+
+### Pythonista3 Discord
+
+[18.5.3. タスクとコルーチン — Python 3.6.15 ドキュメント](https://docs.python.org/ja/3.6/library/asyncio-task.html#example-hello-world-coroutine)
+
+
+3.10 のドキュメントない？
+
+
+現在、Pythonista3 Pyto a-Shell ごとに挙動が違う
+
+- Pythonista3 
+  - `#### ベース` 以下の通り
+- Pyto
+  - `### ベース` だと初動から、`RuntimeError: Event loop is closed`
+
+- a-Shell
+  - `DeprecationWarning` は出るが、動く
+
+
+#### ベース
+
+> 2回目以降は`RuntimeError: Event loop is closed`
+
+
+```python
+import asyncio
+
+
+async def hello_world():
+  print("Hello World!")
+
+
+loop = asyncio.get_event_loop()
+# Blocking call which returns when the hello_world() coroutine is done
+loop.run_until_complete(hello_world())
+loop.close()
+```
+
+
+#### 提案
+
+```
+DeprecationWarning: There is no current event loop
+  loop = asyncio.get_event_loop()
+```
+
+とは、出るけど、動いてる
+
+```python
+import asyncio
+
+
+async def hello_world():
+  print("Hello World!")
+
+asyncio.set_event_loop(asyncio.new_event_loop())
+loop = asyncio.get_event_loop()
+# Blocking call which returns when the hello_world() coroutine is done
+loop.run_until_complete(hello_world())
+loop.close()
+```
+
+
+#### 追加
+
+これだと、エラーもWarning も出ないけど、同じ処理になってるのかしら？
+
+```python
+import asyncio
+
+
+async def hello_world():
+  print("Hello World!")
+
+
+loop = asyncio.new_event_loop()
+# Blocking call which returns when the hello_world() coroutine is done
+loop.run_until_complete(hello_world())
+loop.close()
+```
+
+
+
+
 # 📝 2025/01/30
 
 ## `eventloop.py` 調査
@@ -40,6 +146,9 @@ Pyto では、Pythonista3 と似た感じの処理をしていたので、a-shel
 - [CFRunLoop | Apple Developer Documentation](https://developer.apple.com/documentation/corefoundation/cfrunloop?language=objc)
 - [Run Loops](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/Multithreading/RunLoopManagement/RunLoopManagement.html#//apple_ref/doc/uid/10000057i-CH16)
 - [Introduction | Threading Programming Guide](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/Multithreading/Introduction/Introduction.html#//apple_ref/doc/uid/10000057i)
+
+
+
 
 
 
