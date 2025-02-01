@@ -60,7 +60,7 @@ class RootNavigationController(UINavigationController):
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
-    print('↑ ---')
+    #print('↑ ---')
     send_super(__class__,
                self,
                'viewWillDisappear:',

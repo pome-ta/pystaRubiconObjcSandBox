@@ -215,6 +215,6 @@ if __name__ == '__main__':
   _title = NSStringFromClass(MainViewController)
   main_vc.navigationItem.title = _title
 
-  presentation_style = 0  #UIModalPresentationStyle.fullScreen
+  presentation_style = 1  #UIModalPresentationStyle.fullScreen
   present_viewController(main_vc, presentation_style)
 
