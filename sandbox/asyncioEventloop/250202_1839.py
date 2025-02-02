@@ -23,6 +23,7 @@ def NSStringFromClass(cls: Class) -> ObjCInstance:
   return ObjCInstance(_NSStringFromClass(cls))
 
 
+# todo: from objc_util.py of Pythonista3
 ExceptionHandlerFuncType = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
 
 

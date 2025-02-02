@@ -9,7 +9,8 @@ from .enumerations import (
   UIRectEdge,
   UIBarButtonSystemItem,
 )
-#from .functions import NSStringFromClass
+
+from .functions import NSStringFromClass
 from . import pdbr
 
 UINavigationController = ObjCClass('UINavigationController')
@@ -21,7 +22,7 @@ class RootNavigationController(UINavigationController):
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
-    #print(f'- {NSStringFromClass(__class__)}: dealloc')
+    print(f'- {NSStringFromClass(__class__)}: dealloc')
     loop.stop()
 
   @objc_method
@@ -88,19 +89,7 @@ class RootNavigationController(UINavigationController):
 
   @objc_method
   def doneButtonTapped_(self, sender):
-    #print('doneButtonTapped: start')
-    '''
-    @Block
-    def completion() -> None:
-      print('block: doneButtonTapped')
-    '''
-
-    #visibleViewController = self.visibleViewController
-    #visibleViewController.dismissViewControllerAnimated_completion_(True, completion)
-    #pdbr.state(self)
-    #self.dismissViewControllerAnimated_completion_(True, completion)
     self.dismissViewControllerAnimated_completion_(True, None)
-    #print('doneButtonTapped: end')
 
   @objc_method
   def navigationController_willShowViewController_animated_(

@@ -8,6 +8,7 @@ from rbedge.functions import NSStringFromClass
 
 UIViewController = ObjCClass('UIViewController')
 
+
 class MainViewController(UIViewController):
 
   @objc_method
@@ -78,13 +79,12 @@ class MainViewController(UIViewController):
     print(f'\t{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
 
 
-
-
-
 if __name__ == '__main__':
   from rbedge.app import App
-  #print('--- run')
+
+  print('--- run')
   main_vc = MainViewController.new()
+
   app = App(main_vc)
   app.main_loop(1)
 
