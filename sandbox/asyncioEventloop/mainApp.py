@@ -1,7 +1,7 @@
 import ctypes
 
 from pyrubicon.objc.api import ObjCClass
-from pyrubicon.objc.api import objc_method
+from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, SEL
 
 from rbedge.functions import NSStringFromClass
@@ -19,6 +19,7 @@ touchUpInside = 1 << 6
 
 
 class SecondViewController(UIViewController):
+  tapButton: UIButton = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -37,7 +38,7 @@ class SecondViewController(UIViewController):
     send_super(__class__, self, 'viewDidLoad')
     print(f'\t{NSStringFromClass(__class__)}: viewDidLoad')
     self.navigationItem.title = NSStringFromClass(__class__)
-    
+
     config = UIButtonConfiguration.tintedButtonConfiguration()
     config.title = 'Tap'
     config.baseBackgroundColor = UIColor.systemPinkColor()
@@ -61,10 +62,9 @@ class SecondViewController(UIViewController):
       tapButton.heightAnchor.constraintEqualToAnchor_multiplier_(
         self.view.heightAnchor, 0.1),
     ])
-    
+
     self.tapButton = tapButton
     #tapButton.release()
-    
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -89,6 +89,7 @@ class SecondViewController(UIViewController):
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewDidAppear_')
     #print('\t↓ ---')
+    print(self.tapButton)
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
@@ -113,15 +114,13 @@ class SecondViewController(UIViewController):
                  ctypes.c_bool,
                ])
     print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
-    self.tapButton = None
-    
-    
+    #self.tapButton = None
 
   @objc_method
   def didReceiveMemoryWarning(self):
     send_super(__class__, self, 'didReceiveMemoryWarning')
     print(f'\t{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
-    
+
   @objc_method
   def onTap_(self, sender):
     #navigationController = self.navigationController
@@ -145,7 +144,7 @@ class MainViewController(UIViewController):
     send_super(__class__, self, 'viewDidLoad')
     print(f'\t{NSStringFromClass(__class__)}: viewDidLoad')
     self.navigationItem.title = NSStringFromClass(__class__)
-    
+
     config = UIButtonConfiguration.tintedButtonConfiguration()
     config.title = 'Tap'
     config.baseBackgroundColor = UIColor.systemPinkColor()
@@ -220,7 +219,7 @@ class MainViewController(UIViewController):
   def didReceiveMemoryWarning(self):
     send_super(__class__, self, 'didReceiveMemoryWarning')
     print(f'\t{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
-    
+
   @objc_method
   def onTap_(self, sender):
     svc = SecondViewController.new()
