@@ -23,7 +23,14 @@ class RootNavigationController(UINavigationController):
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print(f'- {NSStringFromClass(__class__)}: dealloc')
-    #loop.stop()
+    '''
+    for viewController in self.viewControllers:
+      #pdbr.state(viewController, 1)
+      #viewController.release()
+      pass
+    '''
+    pdbr.state(self,1)
+    loop.stop()
 
   @objc_method
   def loadView(self):
@@ -81,7 +88,7 @@ class RootNavigationController(UINavigationController):
                  ctypes.c_bool,
                ])
     #print(f'{NSStringFromClass(__class__)}: viewDidDisappear_')
-    loop.stop()
+    #loop.stop()
 
   @objc_method
   def didReceiveMemoryWarning(self):
@@ -93,6 +100,7 @@ class RootNavigationController(UINavigationController):
     #visibleViewController = self.visibleViewController
     #visibleViewController.dismissViewControllerAnimated_completion_(True, None)
     self.dismissViewControllerAnimated_completion_(True, None)
+    #loop.stop()
 
   @objc_method
   def navigationController_willShowViewController_animated_(

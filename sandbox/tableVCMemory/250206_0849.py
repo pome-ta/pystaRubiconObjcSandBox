@@ -16,16 +16,17 @@ UITableViewController = ObjCClass('UITableViewController')
 UITableViewHeaderFooterView = ObjCClass('UITableViewHeaderFooterView')
 UIListContentConfiguration = ObjCClass('UIListContentConfiguration')
 
-
 UITableViewController = ObjCClass('UITableViewController')
 
+
 class TableViewController(UITableViewController):
+  
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     #pdbr.state(self)
     print(f'\t\t- {NSStringFromClass(__class__)}: dealloc')
-
+  
   @objc_method
   def loadView(self):
     send_super(__class__, self, 'loadView')
@@ -42,7 +43,8 @@ class TableViewController(UITableViewController):
                  NSInteger,
                ])
     print(f'\t\t{NSStringFromClass(__class__)}: initWithStyle:')
-    return self
+    return self#.autorelease()
+
 
 if __name__ == '__main__':
   from rbedge.app import App
