@@ -32,7 +32,7 @@ class TableViewController(UITableViewController):
     print(f'\t\t{NSStringFromClass(__class__)}: loadView')
 
   @objc_method
-  def initWithStyle_(self, style: NSInteger) -> ObjCInstance:
+  def initWithStyle_(self, style: NSInteger) -> ObjCClass:
     send_super(__class__,
                self,
                'initWithStyle:',

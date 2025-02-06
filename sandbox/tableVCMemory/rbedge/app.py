@@ -13,6 +13,7 @@ class App:
 
   def __init__(self, viewController):
     self.viewController = viewController
+    self.rootNavigationController = RootNavigationController.alloc()
 
   def main_loop(self, modalPresentationStyle: int = 0):
 
@@ -28,8 +29,8 @@ class App:
 
       #from .rootNavigationController import RootNavigationController
 
-      presentViewController = RootNavigationController.alloc(
-      ).initWithRootViewController_(viewController)
+      presentViewController = self.rootNavigationController.initWithRootViewController_(viewController)
+      #presentViewController = RootNavigationController.alloc().initWithRootViewController_(viewController)
 
       # xxx: style 指定を力技で確認
       automatic = UIModalPresentationStyle.automatic  # -2
