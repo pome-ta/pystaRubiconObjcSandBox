@@ -25,6 +25,8 @@ items = ['ほげ', 'ふが',]  # yapf: disable
 
 
 class TableViewController(UITableViewController):
+
+  cellItems = NSString = objc_property()
   cellIdentifier: NSString = objc_property()
 
   @objc_method
@@ -48,6 +50,8 @@ class TableViewController(UITableViewController):
                  NSInteger,
                ])
     print(f'\t\t{NSStringFromClass(__class__)}: initWithStyle:')
+    self.cellItems = items
+    #self.cellItems=['ほげ', 'ふが',]  # yapf: disable
     self.cellIdentifier = NSString.stringWithString_('customCell')
     self.tableView.registerClass_forCellReuseIdentifier_(
       UITableViewCell, self.cellIdentifier)
@@ -61,20 +65,20 @@ class TableViewController(UITableViewController):
 
   @objc_method
   def numberOfSectionsInTableView_(self, tableView) -> NSInteger:
-    return len(items)
+    return len(self.cellItems)
 
   @objc_method
   def tableView_cellForRowAtIndexPath_(self, tableView, indexPath) -> objc_id:
     cell = tableView.dequeueReusableCellWithIdentifier_forIndexPath_(
       self.cellIdentifier, indexPath)
     content = cell.defaultContentConfiguration()
-    content.text = items[indexPath.section]
+    content.text = self.cellItems[indexPath.section]
     #print(indexPath)
     #pdbr.state(indexPath)
     content.textProperties.numberOfLines = 1
 
     cell.contentConfiguration = content
-    
+
     return cell
 
 
@@ -94,5 +98,4 @@ if __name__ == '__main__':
   presentation_style = UIModalPresentationStyle.fullScreen
   app = App(main_vc)
   app.main_loop(presentation_style)
-
 
