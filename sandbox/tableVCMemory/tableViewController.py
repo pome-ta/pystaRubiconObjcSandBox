@@ -51,6 +51,7 @@ class TableViewController(UITableViewController):
                ])
     print(f'\t\t{NSStringFromClass(__class__)}: initWithStyle:')
     self.cellItems = items
+    #self.cellItems = [CustomCell(i) for i in items]
     #self.cellItems=['ほげ', 'ふが',]  # yapf: disable
     self.cellIdentifier = NSString.stringWithString_('customCell')
     self.tableView.registerClass_forCellReuseIdentifier_(
@@ -73,8 +74,6 @@ class TableViewController(UITableViewController):
       self.cellIdentifier, indexPath)
     content = cell.defaultContentConfiguration()
     content.text = self.cellItems[indexPath.section]
-    #print(indexPath)
-    #pdbr.state(indexPath)
     content.textProperties.numberOfLines = 1
 
     cell.contentConfiguration = content
