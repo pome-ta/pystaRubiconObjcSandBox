@@ -21,7 +21,7 @@ UITableViewController = ObjCClass('UITableViewController')
 UITableViewCell = ObjCClass('UITableViewCell')
 
 
-items = ['ほげ', 'ふが',]  # yapf: disable
+items = ['ほげ', 'ふが',]  # yapf: disable
 
 
 class TableViewController(UITableViewController):
@@ -67,7 +67,14 @@ class TableViewController(UITableViewController):
   def tableView_cellForRowAtIndexPath_(self, tableView, indexPath) -> objc_id:
     cell = tableView.dequeueReusableCellWithIdentifier_forIndexPath_(
       self.cellIdentifier, indexPath)
+    content = cell.defaultContentConfiguration()
+    content.text = items[indexPath.section]
+    #print(indexPath)
+    #pdbr.state(indexPath)
+    content.textProperties.numberOfLines = 1
 
+    cell.contentConfiguration = content
+    
     return cell
 
 
@@ -87,4 +94,5 @@ if __name__ == '__main__':
   presentation_style = UIModalPresentationStyle.fullScreen
   app = App(main_vc)
   app.main_loop(presentation_style)
+
 

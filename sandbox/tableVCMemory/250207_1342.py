@@ -67,7 +67,14 @@ class TableViewController(UITableViewController):
   def tableView_cellForRowAtIndexPath_(self, tableView, indexPath) -> objc_id:
     cell = tableView.dequeueReusableCellWithIdentifier_forIndexPath_(
       self.cellIdentifier, indexPath)
+    content = cell.defaultContentConfiguration()
+    content.text = items[indexPath.section]
+    #print(indexPath)
+    #pdbr.state(indexPath)
+    content.textProperties.numberOfLines = 1
 
+    cell.contentConfiguration = content
+    
     return cell
 
 
