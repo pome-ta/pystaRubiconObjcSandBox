@@ -12,6 +12,9 @@ from rbedge import pdbr
 from tableViewController import TableViewController
 
 
+
+items = ['ほげ', 'ふが',]  # yapf: disable
+
 class ViewController(TableViewController):
 
   @objc_method
@@ -23,6 +26,7 @@ class ViewController(TableViewController):
   def loadView(self):
     send_super(__class__, self, 'loadView')
     print(f'\t{NSStringFromClass(__class__)}: loadView')
+    [self.cellItems.addObject_(i) for i in items]
 
   @objc_method
   def initWithStyle_(self, style: NSInteger) -> ObjCClass:
