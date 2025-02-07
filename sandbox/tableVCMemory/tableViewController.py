@@ -39,8 +39,7 @@ class TableViewController(UITableViewController):
     send_super(__class__, self, 'loadView')
     print(f'\t\t{NSStringFromClass(__class__)}: loadView')
     self.cellItems = NSMutableArray.new()
-    #self.cellItems = [CustomCell(i) for i in items]
-    #self.cellItems=['ほげ', 'ふが',]  # yapf: disable
+    #[self.cellItems.addObject_(i) for i in items]
     self.cellIdentifier = NSString.stringWithString_('customCell')
     self.tableView.registerClass_forCellReuseIdentifier_(
       UITableViewCell, self.cellIdentifier)
@@ -77,6 +76,7 @@ class TableViewController(UITableViewController):
     content.textProperties.numberOfLines = 1
 
     cell.contentConfiguration = content
+    print(self)
 
     return cell
 
