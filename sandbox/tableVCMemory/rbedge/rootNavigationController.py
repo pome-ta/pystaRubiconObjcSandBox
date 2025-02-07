@@ -23,14 +23,16 @@ class RootNavigationController(UINavigationController):
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print(f'- {NSStringFromClass(__class__)}: dealloc')
-    '''
-    for viewController in self.viewControllers:
-      #pdbr.state(viewController, 1)
-      #viewController.release()
+    ''' xxx: UserWarning
+    try:
+      send_super(__class__, self, 'dealloc')
+    except Exception as e:
       pass
+    finally:
+      loop.stop()
     '''
-    pdbr.state(self,1)
     loop.stop()
+    
 
   @objc_method
   def loadView(self):

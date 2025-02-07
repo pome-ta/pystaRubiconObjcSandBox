@@ -24,7 +24,6 @@ class TableViewController(UITableViewController):
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
-    #pdbr.state(self)
     print(f'\t\t- {NSStringFromClass(__class__)}: dealloc')
   
   @objc_method
@@ -43,7 +42,7 @@ class TableViewController(UITableViewController):
                  NSInteger,
                ])
     print(f'\t\t{NSStringFromClass(__class__)}: initWithStyle:')
-    return self#.autorelease()
+    return self
 
 
 if __name__ == '__main__':
