@@ -41,6 +41,12 @@ class ViewController(TableViewController):
     print(f'\t{NSStringFromClass(__class__)}: initWithStyle:')
     return self
 
+    # MARK: - View Life Cycle
+  @objc_method
+  def viewDidLoad(self):
+    send_super(__class__, self, 'viewDidLoad')  # xxx: 不要?
+    print(f'\t{NSStringFromClass(__class__)}: viewDidLoad')
+
 
 if __name__ == '__main__':
   from rbedge.app import App
