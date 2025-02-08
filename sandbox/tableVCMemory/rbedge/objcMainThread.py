@@ -19,13 +19,17 @@ def dispatch_get_main_queue():
 
 
 libobjc.dispatch_async.restype = None
-libobjc.dispatch_async.argtypes = [objc_id, objc_block]
+libobjc.dispatch_async.argtypes = [
+  objc_id,
+  objc_block,
+]
 
 
 def onMainThread(func):
 
   @functools.wraps(func)
   def wrapper(*args, **kwargs):
+    print(f'# NSThread.isMainThread: {NSThread.isMainThread}')
     if NSThread.isMainThread:
       func(*args, **kwargs)
     block = Block(functools.partial(func, *args, **kwargs), None)

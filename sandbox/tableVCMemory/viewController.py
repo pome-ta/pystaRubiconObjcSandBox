@@ -49,6 +49,7 @@ if __name__ == '__main__':
     UITableViewStyle,
     UIModalPresentationStyle,
   )
+  print(__name__)
 
   table_style = UITableViewStyle.plain
   main_vc = ViewController.alloc().initWithStyle_(table_style)
@@ -58,4 +59,5 @@ if __name__ == '__main__':
   presentation_style = UIModalPresentationStyle.fullScreen
   app = App(main_vc)
   app.main_loop(presentation_style)
+  print('--- end ---\n')
 

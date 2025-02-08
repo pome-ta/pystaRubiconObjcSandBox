@@ -12,14 +12,16 @@ UIViewController = ObjCClass('UIViewController')  # todo: アノテーション�
 class App:
 
   def __init__(self, viewController):
+    print('App.__init__')
     self.viewController = viewController
-    #self.rootNavigationController = RootNavigationController.alloc()
-
+    
   def main_loop(self, modalPresentationStyle: int = 0):
+    print('App.main_loop')
 
     @onMainThread
     def present_viewController(viewController: UIViewController,
                                _style: int) -> None:
+      print('\t# present_viewController')
       sharedApplication = UIApplication.sharedApplication
       keyWindow = sharedApplication.windows.firstObject()
       rootViewController = keyWindow.rootViewController

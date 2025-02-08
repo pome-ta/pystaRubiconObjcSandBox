@@ -23,14 +23,6 @@ class RootNavigationController(UINavigationController):
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print(f'- {NSStringFromClass(__class__)}: dealloc')
-    ''' xxx: UserWarning
-    try:
-      send_super(__class__, self, 'dealloc')
-    except Exception as e:
-      pass
-    finally:
-      loop.stop()
-    '''
     loop.stop()
     
 
@@ -89,7 +81,7 @@ class RootNavigationController(UINavigationController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #print(f'{NSStringFromClass(__class__)}: viewDidDisappear_')
+    print(f'{NSStringFromClass(__class__)}: viewDidDisappear_')
     #loop.stop()
 
   @objc_method
@@ -99,10 +91,7 @@ class RootNavigationController(UINavigationController):
 
   @objc_method
   def doneButtonTapped_(self, sender):
-    #visibleViewController = self.visibleViewController
-    #visibleViewController.dismissViewControllerAnimated_completion_(True, None)
     self.dismissViewControllerAnimated_completion_(True, None)
-    #loop.stop()
 
   @objc_method
   def navigationController_willShowViewController_animated_(

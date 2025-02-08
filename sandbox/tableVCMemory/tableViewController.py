@@ -76,7 +76,7 @@ class TableViewController(UITableViewController):
     content.textProperties.numberOfLines = 1
 
     cell.contentConfiguration = content
-    print(self)
+    #print(self)
 
     return cell
 
