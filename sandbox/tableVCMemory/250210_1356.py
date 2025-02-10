@@ -9,24 +9,17 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
 
 from rbedge.functions import NSStringFromClass
-from rbedge import pdbr
 
 
 class Engine(NSObject):
 
   @objc_method
   def dealloc(self):
-    #send_super(__class__, self, 'dealloc')
     print(f'\t- {NSStringFromClass(__class__)}: dealloc')
-    print(
-      f'\t# {NSStringFromClass(__class__)}.retainCount: {self.retainCount()}')
 
   @objc_method
   def init(self):
     send_super(__class__, self, 'init', restype=objc_id)
-    print(f'{NSStringFromClass(__class__)}: int')
-    print(
-      f'\t# {NSStringFromClass(__class__)}.retainCount: {self.retainCount()}')
     return self
 
 
@@ -36,31 +29,18 @@ class Car(NSObject):
 
   @objc_method
   def dealloc(self):
-    #send_super(__class__, self, 'dealloc')
     print(f'\t- {NSStringFromClass(__class__)}: dealloc')
-    print(
-      f'\t# {NSStringFromClass(__class__)}.retainCount: {self.retainCount()}')
 
   @objc_method
-  def initWithEngine_(self, engine):
+  def init(self):
     send_super(__class__, self, 'init', restype=objc_id)
-    print(f'{NSStringFromClass(__class__)}: initWithEngine:')
-    print(
-      f'\t# {NSStringFromClass(__class__)}.retainCount: {self.retainCount()}')
-    self.engine = engine
-    print(
-      f'\t# {NSStringFromClass(__class__)}.retainCount: {self.retainCount()}')
-
     return self
 
 
 def main():
-
+  car = Car.new()
   engine = Engine.new()
-  print(f'# {engine}.retainCount: {engine.retainCount()}')
-  car = Car.alloc().initWithEngine_(engine)
-  print(f'# {car}.retainCount: {car.retainCount()}')
-  #car.engine = engine
+  car.engine = engine
 
 
 if __name__ == '__main__':
