@@ -1,9 +1,9 @@
 from pyrubicon.objc.api import ObjCClass
+from pyrubicon.objc.runtime import objc_id, send_message
 
 from .lifeCycle import loop
 from .enumerations import UIModalPresentationStyle
 from .objcMainThread import onMainThread
-from .rootNavigationController import RootNavigationController
 
 UIApplication = ObjCClass('UIApplication')
 UIViewController = ObjCClass('UIViewController')  # todo: アノテーション用
@@ -12,16 +12,28 @@ UIViewController = ObjCClass('UIViewController')  # todo: アノテーション�
 class App:
 
   def __init__(self, viewController):
-    print('App.__init__')
+    print('App: __init__')
     self.viewController = viewController
-    
+  '''
+  def __del__(self):
+    print('App: __del__')
+    try:
+      print('try')
+      send_message(self, 'autorelease', restype=objc_id, argtypes=[])
+    except (NameError, TypeError):
+      print('except')
+      # Handle interpreter shutdown gracefully where send_message might be deleted
+      # (NameError) or set to None (TypeError).
+      pass
+  '''
+
   def main_loop(self, modalPresentationStyle: int = 0):
-    print('App.main_loop')
+    print('App: main_loop')
 
     @onMainThread
     def present_viewController(viewController: UIViewController,
                                _style: int) -> None:
-      print('\t# present_viewController')
+      print(f'\t# present_viewController')
       sharedApplication = UIApplication.sharedApplication
       keyWindow = sharedApplication.windows.firstObject()
       rootViewController = keyWindow.rootViewController
@@ -29,10 +41,10 @@ class App:
       while _presentedViewController := rootViewController.presentedViewController:
         rootViewController = _presentedViewController
 
-      #from .rootNavigationController import RootNavigationController
+      from .rootNavigationController import RootNavigationController
 
-      #presentViewController = self.rootNavigationController.initWithRootViewController_(viewController)
-      presentViewController = RootNavigationController.alloc().initWithRootViewController_(viewController)
+      presentViewController = RootNavigationController.alloc(
+      ).initWithRootViewController_(viewController)
 
       # xxx: style 指定を力技で確認
       automatic = UIModalPresentationStyle.automatic  # -2

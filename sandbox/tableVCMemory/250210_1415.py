@@ -48,29 +48,18 @@ class Car(NSObject):
     print(
       f'\t# {NSStringFromClass(__class__)}.retainCount: {self.retainCount()}')
     self.engine = engine
-    print(
-      f'\t# {NSStringFromClass(__class__)}.retainCount: {self.retainCount()}')
+    #print(f'\t# {NSStringFromClass(__class__)}.retainCount: {self.retainCount()}')
 
     return self
-  '''
-  @objc_method
-  def init(self):
-    send_super(__class__, self, 'init', restype=objc_id)
-    print(f'{NSStringFromClass(__class__)}: init')
-    print(
-      f'\t# {NSStringFromClass(__class__)}.retainCount: {self.retainCount()}')
-    
-    return self
-  '''
+  
 
 def main():
 
   engine = Engine.new()
   print(f'# {engine}.retainCount: {engine.retainCount()}')
-  #car = Car.alloc().initWithEngine_(engine)
-  car = Car.new()
+  car = Car.alloc().initWithEngine_(engine)
   print(f'# {car}.retainCount: {car.retainCount()}')
-  car.engine = engine
+  
 
 
 if __name__ == '__main__':
