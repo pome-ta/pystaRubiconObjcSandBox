@@ -13,6 +13,9 @@ from rbedge import pdbr
 
 
 class Engine(NSObject):
+  
+  car = objc_property(weak=True)
+  #car = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -41,6 +44,7 @@ class Car(NSObject):
     print(
       f'\t# {NSStringFromClass(__class__)}.retainCount: {self.retainCount()}')
   
+  
   @objc_method
   def initWithEngine_(self, engine):
     send_super(__class__, self, 'init', restype=objc_id)
@@ -62,6 +66,7 @@ class Car(NSObject):
     
     return self
   '''
+  
 
 def main():
 
@@ -71,6 +76,8 @@ def main():
   car = Car.new()
   print(f'# {car}.retainCount: {car.retainCount()}')
   car.engine = engine
+  engine.car = car
+  
 
 
 if __name__ == '__main__':

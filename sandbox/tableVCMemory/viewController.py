@@ -17,8 +17,8 @@ items = ['ほげ', 'ふが',]  # yapf: disable
 
 class ViewController(TableViewController):
 
-  #engine: Engine = objc_property()
-  #car: Car = objc_property()
+  engine: Engine = objc_property()
+  car: Car = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -37,9 +37,11 @@ class ViewController(TableViewController):
     #car = Car.new()
     print(f'# {car}.retainCount: {car.retainCount()}')
     #car.engine = engine
+    engine.car = car
+    
 
-    #self.engine = engine
-    #self.car = car
+    self.engine = engine
+    self.car = car
 
   @objc_method
   def initWithStyle_(self, style: NSInteger) -> ObjCClass:
