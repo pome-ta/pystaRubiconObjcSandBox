@@ -38,7 +38,6 @@ class ViewController(TableViewController):
     print(f'# {car}.retainCount: {car.retainCount()}')
     #car.engine = engine
     engine.car = car
-    
 
     self.engine = engine
     self.car = car
@@ -86,7 +85,6 @@ class ViewController(TableViewController):
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
-    #print('\t↑ ---')
     send_super(__class__,
                self,
                'viewWillDisappear:',
