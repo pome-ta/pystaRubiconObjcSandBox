@@ -176,15 +176,20 @@ class BaseTableViewController(UITableViewController):
       # getattr(self, str(cellTest.configHandlerName))(view)
       #send_message(self, SEL(str(cellTest.configHandlerName)), view, restype=None, argtypes=[objc_id])
       #pdbr.state(NSThread)
+      '''
       print('/ ---')
       print(f'mainThread:\n\t{NSThread.mainThread}')
       print('---')
       print(f'currentThread:\n\t{NSThread.currentThread}')
       print('--- /')
-      pdbr.state()
+      pdbr.state(self, 1)
+      '''
+      
+      #self.performSelector_onThread_withObject_waitUntilDone_(SEL(str(cellTest.configHandlerName)), NSThread.currentThread, view, True)
       #self.performSelector_withObject_(SEL(str(cellTest.configHandlerName)),view)
       #self.performSelectorOnMainThread_withObject_waitUntilDone_(SEL(str(cellTest.configHandlerName)),view, False)
       #self.performSelector_withObject_afterDelay_(SEL(str(cellTest.configHandlerName)),view, 2.0)
+      #cellTest.configHandler(view)
       pass
     
     return cell

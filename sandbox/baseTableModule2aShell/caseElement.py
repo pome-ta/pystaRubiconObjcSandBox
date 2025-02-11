@@ -1,3 +1,4 @@
+'''
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.api import NSObject, NSString
 from pyrubicon.objc.runtime import send_super, objc_id, send_message, SEL
@@ -51,4 +52,4 @@ class CaseElement:
   def targetView(self, cell):
     return cell.contentView.subviews()[0] if cell is not None else None
 
-'''
+

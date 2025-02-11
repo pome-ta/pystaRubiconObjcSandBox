@@ -114,10 +114,13 @@ class ActivityIndicatorViewController(BaseTableViewController):
                                                                   ActivityIndicatorKind.mediumIndicator.value,
                                                                   'configureMediumActivityIndicatorView:'))
     '''
-    c1 = CaseElement.alloc().initWithTitle_cellID_configHandlerName_(localizedString('MediumIndicatorTitle'), ActivityIndicatorKind.mediumIndicator.value, 'configureMediumActivityIndicatorView:')
+    #c1 = CaseElement.alloc().initWithTitle_cellID_configHandlerName_(localizedString('MediumIndicatorTitle'), ActivityIndicatorKind.mediumIndicator.value, 'configureMediumActivityIndicatorView:')
     
-    c2 = CaseElement.alloc().initWithTitle_cellID_configHandlerName_(localizedString('LargeIndicatorTitle'), ActivityIndicatorKind.largeIndicator.value, 'configureLargeActivityIndicatorView:')
-    self.testCells.addObject_(c1)
+    #c2 = CaseElement.alloc().initWithTitle_cellID_configHandlerName_(localizedString('LargeIndicatorTitle'), ActivityIndicatorKind.largeIndicator.value, 'configureLargeActivityIndicatorView:')
+    c1 = CaseElement(localizedString('MediumIndicatorTitle'), ActivityIndicatorKind.mediumIndicator.value, self.configureMediumActivityIndicatorView_)
+    
+    self.testCells.append(c1)
+    #self.testCells.addObject_(c1)
     #self.testCells.addObject_(c2)
     # self.testCells.addObject_(c2)
     # pdbr.state(self, 1)
@@ -197,7 +200,7 @@ class ActivityIndicatorViewController(BaseTableViewController):
                  ctypes.c_bool,
                ])
     print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
-    #self.testCells = None
+    self.testCells = None
   
   @objc_method
   def didReceiveMemoryWarning(self):

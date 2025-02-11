@@ -3,7 +3,6 @@ from pyrubicon.objc.api import objc_method
 from pyrubicon.objc.runtime import objc_id, send_super
 from pyrubicon.objc.types import CGRectMake, NSInteger
 
-
 from rbedge.enumerations import (
   UIActivityIndicatorViewStyle, )
 
@@ -20,8 +19,6 @@ UIFont = ObjCClass('UIFont')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 
-
-
 def add_prototype(identifier: str):
 
   def _create_reuse_dict(cellClass: CustomTableViewCell):
@@ -36,21 +33,18 @@ def add_prototype(identifier: str):
 prototypes: list[dict[CustomTableViewCell | str, str]] = []
 
 
-
 @add_prototype('mediumIndicator')
 class MediumIndicator(CustomTableViewCell):
 
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
-    # pdbr.state(self)
     print(f'\t\t- {NSStringFromClass(__class__)}: dealloc')
 
-    
   @objc_method
-  def overrideCell(self):
+  def overrideCell(self) -> None:
     send_super(__class__, self, 'overrideCell')
-    
+
     activityIndicatorView = UIActivityIndicatorView.alloc().initWithFrame_(
       CGRectMake(177.5, 12.0, 20.0, 20.0))
     _style = UIActivityIndicatorViewStyle.medium
@@ -68,19 +62,16 @@ class MediumIndicator(CustomTableViewCell):
     ])
 
 
-
-
 @add_prototype('largeTintedIndicator')
 class LargeTintedIndicator(CustomTableViewCell):
 
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
-    # pdbr.state(self)
     print(f'\t\t- {NSStringFromClass(__class__)}: dealloc')
 
   @objc_method
-  def overrideCell(self):
+  def overrideCell(self) -> None:
     send_super(__class__, self, 'overrideCell')
     activityIndicatorView = UIActivityIndicatorView.alloc().initWithFrame_(
       CGRectMake(168.0, -41.0, 39.0, 126.0))
@@ -107,11 +98,10 @@ class MediumTintedIndicator(CustomTableViewCell):
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
-    # pdbr.state(self)
     print(f'\t\t- {NSStringFromClass(__class__)}: dealloc')
 
   @objc_method
-  def overrideCell(self):
+  def overrideCell(self) -> None:
     send_super(__class__, self, 'overrideCell')
     activityIndicatorView = UIActivityIndicatorView.alloc().initWithFrame_(
       CGRectMake(177.5, 12.0, 20.0, 20.0))
@@ -136,11 +126,10 @@ class LargeIndicator(CustomTableViewCell):
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
-    # pdbr.state(self)
     print(f'\t\t- {NSStringFromClass(__class__)}: dealloc')
 
   @objc_method
-  def overrideCell(self):
+  def overrideCell(self) -> None:
     send_super(__class__, self, 'overrideCell')
     activityIndicatorView = UIActivityIndicatorView.alloc().initWithFrame_(
       CGRectMake(168.0, -41.0, 39.0, 126.0))  # .autorelease()
