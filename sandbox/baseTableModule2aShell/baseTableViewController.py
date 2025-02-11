@@ -16,6 +16,7 @@ UITableViewController = ObjCClass('UITableViewController')
 UITableViewHeaderFooterView = ObjCClass('UITableViewHeaderFooterView')
 UIListContentConfiguration = ObjCClass('UIListContentConfiguration')
 
+NSThread = ObjCClass('NSThread')
 
 class BaseTableViewController(UITableViewController):
   # testCells: NSMutableArray = objc_property(weak=True)
@@ -173,7 +174,17 @@ class BaseTableViewController(UITableViewController):
     if (view := cellTest.targetView(cell)):
       # cellTest.configHandler(view)
       # getattr(self, str(cellTest.configHandlerName))(view)
-      send_message(self, SEL(str(cellTest.configHandlerName)), view, restype=None, argtypes=[objc_id])
+      #send_message(self, SEL(str(cellTest.configHandlerName)), view, restype=None, argtypes=[objc_id])
+      #pdbr.state(NSThread)
+      print('/ ---')
+      print(f'mainThread:\n\t{NSThread.mainThread}')
+      print('---')
+      print(f'currentThread:\n\t{NSThread.currentThread}')
+      print('--- /')
+      pdbr.state()
+      #self.performSelector_withObject_(SEL(str(cellTest.configHandlerName)),view)
+      #self.performSelectorOnMainThread_withObject_waitUntilDone_(SEL(str(cellTest.configHandlerName)),view, False)
+      #self.performSelector_withObject_afterDelay_(SEL(str(cellTest.configHandlerName)),view, 2.0)
       pass
     
     return cell

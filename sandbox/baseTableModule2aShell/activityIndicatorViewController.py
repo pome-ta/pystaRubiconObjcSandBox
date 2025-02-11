@@ -118,7 +118,7 @@ class ActivityIndicatorViewController(BaseTableViewController):
     
     c2 = CaseElement.alloc().initWithTitle_cellID_configHandlerName_(localizedString('LargeIndicatorTitle'), ActivityIndicatorKind.largeIndicator.value, 'configureLargeActivityIndicatorView:')
     self.testCells.addObject_(c1)
-    self.testCells.addObject_(c2)
+    #self.testCells.addObject_(c2)
     # self.testCells.addObject_(c2)
     # pdbr.state(self, 1)
     # print(self.retain())

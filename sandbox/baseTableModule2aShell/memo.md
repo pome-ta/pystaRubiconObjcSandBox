@@ -4,3 +4,4 @@
 
 - `_prototype` の`overrideCell` method を除去して`initWithStyle_reuseIdentifier_` に全部入れた
   - 違うぽいので、戻す
+- 各セルのinstance method 呼び出しがダメっぽい。それ以外を一度整備するか？
