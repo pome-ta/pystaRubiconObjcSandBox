@@ -12,15 +12,16 @@ UITableViewCell = ObjCClass('UITableViewCell')
 
 
 class CustomTableViewCell(UITableViewCell):
-  
+
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print(f'\t\t\t- {NSStringFromClass(__class__)}: dealloc')
-  
+
   @objc_method
   def initWithStyle_reuseIdentifier_(self, style: NSInteger, reuseIdentifier):
-    print(f'\t\t\t{NSStringFromClass(__class__)}: initWithStyle_')
+    print(
+      f'\t\t\t{NSStringFromClass(__class__)}: initWithStyle:reuseIdentifier:')
     super_args = [
       style,
       reuseIdentifier,
@@ -29,21 +30,18 @@ class CustomTableViewCell(UITableViewCell):
       NSInteger,
       objc_id,
     ]
-    
+
     send_super(__class__,
                self,
                'initWithStyle:reuseIdentifier:',
                *super_args,
                argtypes=super_argtypes)
+
     self.overrideCell()
     return self
-  
-  @objc_method
-  def loadView(self):
-    send_super(__class__, self, 'loadView')
-    print(f'\t\t\t{NSStringFromClass(__class__)}: loadView')
-  
+
   @objc_method
   def overrideCell(self):
     print(f'\t\t\t{NSStringFromClass(__class__)}: prototype.overrideCell')
     pass
+

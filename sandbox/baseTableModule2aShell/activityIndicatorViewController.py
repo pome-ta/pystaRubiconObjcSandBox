@@ -34,16 +34,7 @@ class ActivityIndicatorViewController(BaseTableViewController):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print(f'\t- {NSStringFromClass(__class__)}: dealloc')
   
-  @objc_method
-  def loadView(self):
-    send_super(__class__, self, 'loadView')
-    print(f'\t{NSStringFromClass(__class__)}: loadView')
-    [
-      self.tableView.registerClass_forCellReuseIdentifier_(
-        prototype['cellClass'], prototype['identifier'])
-      for prototype in prototypes
-    ]
-  
+
   @objc_method
   def initWithStyle_(self, style: NSInteger) -> ObjCInstance:
     send_super(__class__,
@@ -57,7 +48,19 @@ class ActivityIndicatorViewController(BaseTableViewController):
     print(f'\t{NSStringFromClass(__class__)}: initWithStyle_')
     # self.setupPrototypes_(prototypes)
     return self
+
+  @objc_method
+  def loadView(self):
+    send_super(__class__, self, 'loadView')
+    print(f'\t{NSStringFromClass(__class__)}: loadView')
+    [
+      self.tableView.registerClass_forCellReuseIdentifier_(
+        prototype['cellClass'], prototype['identifier'])
+      for prototype in prototypes
+    ]
   
+
+
   # MARK: - View Life Cycle
   @objc_method
   def viewDidLoad(self):
@@ -105,10 +108,17 @@ class ActivityIndicatorViewController(BaseTableViewController):
     # self.testCells.addObject_(CaseElement.alloc().initWithTitle_cellID_targetSelf_configHandlerName_(localizedString('MediumIndicatorTitle'), ActivityIndicatorKind.mediumIndicator.value, self, 'configureMediumActivityIndicatorView:'))
     
     # c1 = CaseElement.alloc().initWithTitle_cellID_configHandlerName_(localizedString('MediumIndicatorTitle'), ActivityIndicatorKind.mediumIndicator.value, 'configureMediumActivityIndicatorView:')
+    '''
     self.testCells.addObject_(
       CaseElement.alloc().initWithTitle_cellID_configHandlerName_(localizedString('MediumIndicatorTitle'),
                                                                   ActivityIndicatorKind.mediumIndicator.value,
                                                                   'configureMediumActivityIndicatorView:'))
+    '''
+    c1 = CaseElement.alloc().initWithTitle_cellID_configHandlerName_(localizedString('MediumIndicatorTitle'), ActivityIndicatorKind.mediumIndicator.value, 'configureMediumActivityIndicatorView:')
+    
+    c2 = CaseElement.alloc().initWithTitle_cellID_configHandlerName_(localizedString('LargeIndicatorTitle'), ActivityIndicatorKind.largeIndicator.value, 'configureLargeActivityIndicatorView:')
+    self.testCells.addObject_(c1)
+    self.testCells.addObject_(c2)
     # self.testCells.addObject_(c2)
     # pdbr.state(self, 1)
     # print(self.retain())
@@ -187,6 +197,7 @@ class ActivityIndicatorViewController(BaseTableViewController):
                  ctypes.c_bool,
                ])
     print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
+    #self.testCells = None
   
   @objc_method
   def didReceiveMemoryWarning(self):
@@ -200,6 +211,8 @@ class ActivityIndicatorViewController(BaseTableViewController):
     # pdbr.state(activityIndicator)
     activityIndicator.style = UIActivityIndicatorViewStyle.medium
     activityIndicator.hidesWhenStopped = True
+    
+    activityIndicator.color = UIColor.systemPurpleColor()
     
     activityIndicator.startAnimating()
     # When the activity is done, be sure to use UIActivityIndicatorView.stopAnimating().

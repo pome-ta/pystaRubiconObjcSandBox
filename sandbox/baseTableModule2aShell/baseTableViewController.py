@@ -31,7 +31,10 @@ class BaseTableViewController(UITableViewController):
   def loadView(self):
     send_super(__class__, self, 'loadView')
     print(f'\t\t{NSStringFromClass(__class__)}: loadView')
-  
+    self.testCells = []#NSMutableArray.new()
+    # self.testCells = NSMutableArray.array()
+    self.headerFooterViewIdentifier = NSString.stringWithString_('customHeaderFooterView')
+  '''
   @objc_method
   def initWithStyle_(self, style: NSInteger) -> ObjCInstance:
     send_super(__class__,
@@ -44,11 +47,9 @@ class BaseTableViewController(UITableViewController):
                ])
     
     print(f'\t\t{NSStringFromClass(__class__)}: initWithStyle_')
-    self.testCells = NSMutableArray.new()
-    # self.testCells = NSMutableArray.array()
-    self.headerFooterViewIdentifier = NSString.stringWithString_('customHeaderFooterView')
     
     return self
+  '''
   
   @objc_method
   def viewDidLoad(self):
@@ -101,7 +102,7 @@ class BaseTableViewController(UITableViewController):
                  ctypes.c_bool,
                ])
     # print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
-    # self.testCells = None
+    #self.testCells = None
   
   @objc_method
   def didReceiveMemoryWarning(self):
@@ -173,5 +174,6 @@ class BaseTableViewController(UITableViewController):
       # cellTest.configHandler(view)
       # getattr(self, str(cellTest.configHandlerName))(view)
       send_message(self, SEL(str(cellTest.configHandlerName)), view, restype=None, argtypes=[objc_id])
+      pass
     
     return cell
