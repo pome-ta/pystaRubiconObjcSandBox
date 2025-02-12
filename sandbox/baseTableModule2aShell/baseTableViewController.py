@@ -20,7 +20,7 @@ NSThread = ObjCClass('NSThread')
 
 class BaseTableViewController(UITableViewController):
   # testCells: NSMutableArray = objc_property(weak=True)
-  testCells: NSMutableArray = objc_property()
+  testCells: NSMutableArray = objc_property(object)
   headerFooterViewIdentifier: NSString = objc_property()
   
   @objc_method
@@ -34,7 +34,7 @@ class BaseTableViewController(UITableViewController):
     print(f'\t\t{NSStringFromClass(__class__)}: loadView')
     self.testCells = []#NSMutableArray.new()
     # self.testCells = NSMutableArray.array()
-    self.headerFooterViewIdentifier = NSString.stringWithString_('customHeaderFooterView')
+    self.headerFooterViewIdentifier = 'customHeaderFooterView' #NSString.stringWithString_('customHeaderFooterView')
   '''
   @objc_method
   def initWithStyle_(self, style: NSInteger) -> ObjCInstance:

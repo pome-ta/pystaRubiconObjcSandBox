@@ -200,7 +200,7 @@ class ActivityIndicatorViewController(BaseTableViewController):
                  ctypes.c_bool,
                ])
     print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
-    self.testCells = None
+    #self.testCells = None
   
   @objc_method
   def didReceiveMemoryWarning(self):
