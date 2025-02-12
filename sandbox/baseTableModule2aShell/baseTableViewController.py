@@ -172,7 +172,7 @@ class BaseTableViewController(UITableViewController):
       cellTest.cellID, indexPath)
     
     if (view := cellTest.targetView(cell)):
-      # cellTest.configHandler(view)
+      cellTest.configHandler(view)
       # getattr(self, str(cellTest.configHandlerName))(view)
       #send_message(self, SEL(str(cellTest.configHandlerName)), view, restype=None, argtypes=[objc_id])
       #pdbr.state(NSThread)

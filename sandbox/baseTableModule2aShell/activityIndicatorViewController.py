@@ -117,7 +117,7 @@ class ActivityIndicatorViewController(BaseTableViewController):
     #c1 = CaseElement.alloc().initWithTitle_cellID_configHandlerName_(localizedString('MediumIndicatorTitle'), ActivityIndicatorKind.mediumIndicator.value, 'configureMediumActivityIndicatorView:')
     
     #c2 = CaseElement.alloc().initWithTitle_cellID_configHandlerName_(localizedString('LargeIndicatorTitle'), ActivityIndicatorKind.largeIndicator.value, 'configureLargeActivityIndicatorView:')
-    c1 = CaseElement(localizedString('MediumIndicatorTitle'), ActivityIndicatorKind.mediumIndicator.value, self.configureMediumActivityIndicatorView_)
+    c1 = CaseElement(localizedString('MediumIndicatorTitle'), ActivityIndicatorKind.mediumIndicator.value, self,'configureMediumActivityIndicatorView:')
     
     self.testCells.append(c1)
     #self.testCells.addObject_(c1)
@@ -200,7 +200,8 @@ class ActivityIndicatorViewController(BaseTableViewController):
                  ctypes.c_bool,
                ])
     print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
-    #self.testCells = None
+    # xxx: a-shell で動くけど、Pythonista3 の２回目の`dealloc` が呼ばれない
+    self.testCells = None
   
   @objc_method
   def didReceiveMemoryWarning(self):

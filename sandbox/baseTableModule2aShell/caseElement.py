@@ -37,19 +37,64 @@ class CaseElement(NSObject):
 
 
 '''
+
+from pyrubicon.objc.api import Block
+from pyrubicon.objc.runtime import objc_id, send_message,SEL
+
+from rbedge.objcMainThread import onMainThread
+from rbedge import pdbr
+
+
 class CaseElement:
 
-  def __init__(self, title: str, cellID: str, configHandler):
+  def __init__(self, title: str, cellID: str, target,configHandler:str):
     # セルの視覚的なタイトル (テーブル セクションのヘッダー タイトル)
     self.title = title
     # nib ファイル内でセルを検索するためのテーブルビューのセルの識別子。
     self.cellID = cellID
     # セルのサブビューを設定するための構成ハンドラー。
     # xxx: ガバガバ
-    self.configHandler = configHandler
+    self.target = target
+    self._configHandler = configHandler
 
-  #@staticmethod
-  def targetView(self, cell):
+  
+  def __del__(self):
+    print('\t\t__del__')
+    
+    self.title = None
+    self.cellID = None
+    
+    self.target = None
+    self._configHandler = None
+    
+  
+  #@onMainThread
+  def configHandler(self, view):
+    
+    
+    @Block
+    def block_handler(v:objc_id)->None:
+      #self._configHandler(v)
+      #self.target.performSelector_withObject_(SEL(self._configHandlerName), v)
+      #self.target.performSelectorOnMainThread_withObject_waitUntilDone_(SEL(self._configHandlerName),v, False)
+      send_message(self.target,self._configHandler , v, restype=None, argtypes=[objc_id])
+      
+    block_handler(view)
+    
+    
+    #target.performSelector_withObject_(SEL(self._configHandlerName), view)
+    #self.target.performSelectorOnMainThread_withObject_waitUntilDone_(SEL(self._configHandlerName),view, False)
+    #sel = SEL(self._configHandlerName)
+    
+    #pdbr.state(self._configHandler)
+    #print(self._configHandler)
+    #self._configHandler(view)
+    #print(self._configHandler)
+    #print(dir(self._configHandler))
+    #send_message(self.target,self._configHandler , view, restype=None, argtypes=[objc_id])
+    pass
+
+  @staticmethod
+  def targetView(cell):
     return cell.contentView.subviews()[0] if cell is not None else None
-
 
