@@ -117,7 +117,7 @@ class ActivityIndicatorViewController(BaseTableViewController):
     #c1 = CaseElement.alloc().initWithTitle_cellID_configHandlerName_(localizedString('MediumIndicatorTitle'), ActivityIndicatorKind.mediumIndicator.value, 'configureMediumActivityIndicatorView:')
     
     #c2 = CaseElement.alloc().initWithTitle_cellID_configHandlerName_(localizedString('LargeIndicatorTitle'), ActivityIndicatorKind.largeIndicator.value, 'configureLargeActivityIndicatorView:')
-    c1 = CaseElement(localizedString('MediumIndicatorTitle'), ActivityIndicatorKind.mediumIndicator.value, self,'configureMediumActivityIndicatorView:')
+    c1 = CaseElement(localizedString('MediumIndicatorTitle'), ActivityIndicatorKind.mediumIndicator.value, 'configureMediumActivityIndicatorView:')
     
     self.testCells.append(c1)
     #self.testCells.addObject_(c1)

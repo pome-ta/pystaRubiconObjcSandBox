@@ -1,6 +1,6 @@
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass, ObjCInstance
+from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.api import NSString, NSMutableArray
 from pyrubicon.objc.runtime import send_super, objc_id, send_message, SEL
@@ -172,8 +172,8 @@ class BaseTableViewController(UITableViewController):
       cellTest.cellID, indexPath)
     
     if (view := cellTest.targetView(cell)):
-      cellTest.configHandler(view)
-      # getattr(self, str(cellTest.configHandlerName))(view)
+      #cellTest.configHandler(view)
+      #getattr(self, cellTest.configHandlerName)(view)
       #send_message(self, SEL(str(cellTest.configHandlerName)), view, restype=None, argtypes=[objc_id])
       #pdbr.state(NSThread)
       '''
@@ -184,12 +184,13 @@ class BaseTableViewController(UITableViewController):
       print('--- /')
       pdbr.state(self, 1)
       '''
+  
       
-      #self.performSelector_onThread_withObject_waitUntilDone_(SEL(str(cellTest.configHandlerName)), NSThread.currentThread, view, True)
+      self.performSelector_onThread_withObject_waitUntilDone_(SEL(str(cellTest.configHandlerName)), NSThread.mainThread, view, True)
       #self.performSelector_withObject_(SEL(str(cellTest.configHandlerName)),view)
       #self.performSelectorOnMainThread_withObject_waitUntilDone_(SEL(str(cellTest.configHandlerName)),view, False)
       #self.performSelector_withObject_afterDelay_(SEL(str(cellTest.configHandlerName)),view, 2.0)
       #cellTest.configHandler(view)
-      pass
+      
     
     return cell
