@@ -3,7 +3,7 @@ import ctypes
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.api import NSString, NSMutableArray
-from pyrubicon.objc.runtime import send_super, objc_id, send_message, SEL
+from pyrubicon.objc.runtime import send_super, objc_id, send_message, SEL,Class
 from pyrubicon.objc.types import NSInteger
 
 from rbedge.enumerations import UIListContentTextAlignment
@@ -20,7 +20,7 @@ NSThread = ObjCClass('NSThread')
 
 class BaseTableViewController(UITableViewController):
   # testCells: NSMutableArray = objc_property(weak=True)
-  testCells: NSMutableArray = objc_property(object)
+  testCells: NSMutableArray = objc_property()
   headerFooterViewIdentifier: NSString = objc_property()
   
   @objc_method
@@ -32,9 +32,9 @@ class BaseTableViewController(UITableViewController):
   def loadView(self):
     send_super(__class__, self, 'loadView')
     print(f'\t\t{NSStringFromClass(__class__)}: loadView')
-    self.testCells = []#NSMutableArray.new()
-    # self.testCells = NSMutableArray.array()
-    self.headerFooterViewIdentifier = 'customHeaderFooterView' #NSString.stringWithString_('customHeaderFooterView')
+    self.testCells = NSMutableArray.new()
+    self.headerFooterViewIdentifier = 'customHeaderFooterView' #
+    
   '''
   @objc_method
   def initWithStyle_(self, style: NSInteger) -> ObjCInstance:
@@ -123,7 +123,7 @@ class BaseTableViewController(UITableViewController):
       self.testCells.addObject_(cell)
       #self.testCells.append(cell)
   '''
-  '''
+  
   @objc_method
   def centeredHeaderView_(self, title)->objc_id:
     headerView = self.tableView.dequeueReusableHeaderFooterViewWithIdentifier_(
@@ -135,22 +135,14 @@ class BaseTableViewController(UITableViewController):
     headerView.contentConfiguration = content
 
     return headerView
-  '''
+  
   
   # MARK: - UITableViewDataSource
   @objc_method
   def tableView_viewForHeaderInSection_(self, tableView,
                                         section: NSInteger) -> objc_id:
-    # return self.centeredHeaderView_(self.testCells[section].title)
-    headerView = self.tableView.dequeueReusableHeaderFooterViewWithIdentifier_(
-      self.headerFooterViewIdentifier)
+    return self.centeredHeaderView_(self.testCells[section].title)
     
-    content = UIListContentConfiguration.groupedHeaderConfiguration()
-    content.text = self.testCells[section].title
-    content.textProperties.alignment = UIListContentTextAlignment.center
-    headerView.contentConfiguration = content
-    
-    return headerView
   
   @objc_method
   def tableView_titleForHeaderInSection_(self, tableView, section: NSInteger):
@@ -166,31 +158,16 @@ class BaseTableViewController(UITableViewController):
     return len(self.testCells)
   
   @objc_method
-  def tableView_cellForRowAtIndexPath_(self, tableView, indexPath) -> objc_id:
+  def tableView_cellForRowAtIndexPath_(self, tableView:Class, indexPath:Class) -> Class:
+    
     cellTest = self.testCells[indexPath.section]
     cell = tableView.dequeueReusableCellWithIdentifier_forIndexPath_(
       cellTest.cellID, indexPath)
     
     if (view := cellTest.targetView(cell)):
-      #cellTest.configHandler(view)
-      #getattr(self, cellTest.configHandlerName)(view)
-      #send_message(self, SEL(str(cellTest.configHandlerName)), view, restype=None, argtypes=[objc_id])
-      #pdbr.state(NSThread)
-      '''
-      print('/ ---')
-      print(f'mainThread:\n\t{NSThread.mainThread}')
-      print('---')
-      print(f'currentThread:\n\t{NSThread.currentThread}')
-      print('--- /')
-      pdbr.state(self, 1)
-      '''
-  
-      
-      self.performSelector_onThread_withObject_waitUntilDone_(SEL(str(cellTest.configHandlerName)), NSThread.mainThread, view, True)
-      #self.performSelector_withObject_(SEL(str(cellTest.configHandlerName)),view)
-      #self.performSelectorOnMainThread_withObject_waitUntilDone_(SEL(str(cellTest.configHandlerName)),view, False)
-      #self.performSelector_withObject_afterDelay_(SEL(str(cellTest.configHandlerName)),view, 2.0)
-      #cellTest.configHandler(view)
+      pass
+    print(tableView)
+    print(type(tableView))
       
     
     return cell
