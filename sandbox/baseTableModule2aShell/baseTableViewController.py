@@ -19,8 +19,8 @@ UIListContentConfiguration = ObjCClass('UIListContentConfiguration')
 NSThread = ObjCClass('NSThread')
 
 class BaseTableViewController(UITableViewController):
-  # testCells: NSMutableArray = objc_property(weak=True)
-  testCells: NSMutableArray = objc_property()
+  testCells: NSMutableArray = objc_property(weak=True)
+  #testCells: NSMutableArray = objc_property()
   headerFooterViewIdentifier: NSString = objc_property()
   
   @objc_method

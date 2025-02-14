@@ -202,8 +202,10 @@ class ActivityIndicatorViewController(BaseTableViewController):
       cellTest.cellID, indexPath)
 
     if (view := cellTest.targetView(cell)):
-      self.performSelector_withObject_(SEL(str(cellTest.configHandlerName)), view)
+      #self.performSelector_withObject_(SEL(str(cellTest.configHandlerName)), view)
+      #self.configureMediumActivityIndicatorView_(view)
       #pdbr.state(self, 1)
+      pass
     
 
     return cell

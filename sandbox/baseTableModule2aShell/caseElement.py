@@ -8,18 +8,15 @@ from rbedge import pdbr
 
 class CaseElement(NSObject):
   # セルの視覚的なタイトル (テーブル セクションのヘッダー タイトル)
-  title: NSString = objc_property()
+  title: NSString = objc_property(weak=True)
   # nib ファイル内でセルを検索するためのテーブルビューのセルの識別子
-  cellID: NSString = objc_property()
+  cellID: NSString = objc_property(weak=True)
   # セルのサブビューを設定するための構成ハンドラー。
   # xxx: ガバガバ
   # configHandler = objc_property()
   #configHandler = objc_property(object)
-  configHandlerName: NSString = objc_property()
-  print('---')
-  print(configHandlerName)
-  print(type(configHandlerName))
-  print('---')
+  configHandlerName: NSString = objc_property(weak=True)
+  
   
 
   @objc_method
