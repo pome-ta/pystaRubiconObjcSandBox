@@ -3,7 +3,7 @@ from enum import Enum
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import objc_method, at
-from pyrubicon.objc.runtime import send_super, objc_id, objc_block, SEL, Class
+from pyrubicon.objc.runtime import send_super, objc_id, objc_block, SEL, Class, objc_super
 from pyrubicon.objc.types import NSInteger
 
 from rbedge.enumerations import UIActivityIndicatorViewStyle
@@ -66,9 +66,9 @@ class ActivityIndicatorViewController(BaseTableViewController):
     self.navigationItem.title = localizedString('ActivityIndicatorsTitle') if (
       title := self.navigationItem.title) is None else title
 
-    c1 = CaseElement.alloc().initWithTitle_cellID_(
+    c1 = CaseElement.alloc().initWithTitle_cellID_configHandlerName_(
       localizedString('MediumIndicatorTitle'),
-      ActivityIndicatorKind.mediumIndicator.value)
+      ActivityIndicatorKind.mediumIndicator.value, 'configureMediumActivityIndicatorView:')
 
     #c2 = CaseElement.alloc().initWithTitle_cellID_configHandlerName_(localizedString('LargeIndicatorTitle'), ActivityIndicatorKind.largeIndicator.value, 'configureLargeActivityIndicatorView:')
     #c1 = CaseElement(localizedString('MediumIndicatorTitle'), ActivityIndicatorKind.mediumIndicator.value, 'configureMediumActivityIndicatorView:')
@@ -192,28 +192,21 @@ class ActivityIndicatorViewController(BaseTableViewController):
 
     activityIndicator.startAnimating()
     # When the activity is done, be sure to use UIActivityIndicatorView.stopAnimating().
-  
-  
-  @objc_method
-  def tableView_cellForRowAtIndexPath_(self, tableView, indexPath) -> objc_id:
-    super_args = [
-      tableView,
-      indexPath,
-    ]
-    super_argtypes = [
-      Class,
-      Class,
-    ]
-    return send_super(__class__,
-                      self,
-                      'tableView:cellForRowAtIndexPath:',
-                      *super_args,
-                      argtypes=super_argtypes)
 
+  @objc_method
+  def tableView_cellForRowAtIndexPath_(self, tableView,
+                                       indexPath) -> ObjCInstance:
+
+    cellTest = self.testCells[indexPath.section]
+    cell = tableView.dequeueReusableCellWithIdentifier_forIndexPath_(
+      cellTest.cellID, indexPath)
+
+    if (view := cellTest.targetView(cell)):
+      self.performSelector_withObject_(SEL(str(cellTest.configHandlerName)), view)
+      #pdbr.state(self, 1)
     
-  
-  
-  
+
+    return cell
 
 
 if __name__ == '__main__':

@@ -15,24 +15,27 @@ class CaseElement(NSObject):
   # xxx: ガバガバ
   # configHandler = objc_property()
   #configHandler = objc_property(object)
-  #configHandlerName: NSString = objc_property() 
+  configHandlerName: NSString = objc_property()
+  print('---')
+  print(configHandlerName)
+  print(type(configHandlerName))
+  print('---')
   
+
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print(f'\t\t- {NSStringFromClass(__class__)}: dealloc')
-  
+
   @objc_method
-  def initWithTitle_cellID_(
-      self, title, cellID):
+  def initWithTitle_cellID_configHandlerName_(self, title, cellID,
+                                              configHandlerName):
     self.title = title
     self.cellID = cellID
-    #self.configHandlerName = configHandlerName
+    self.configHandlerName = configHandlerName
     return self
-  
+
   @objc_method
   def targetView(self, cell):
     return cell.contentView.subviews()[0] if cell is not None else None
-
-
 

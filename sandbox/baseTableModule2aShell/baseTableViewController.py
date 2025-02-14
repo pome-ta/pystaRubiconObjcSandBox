@@ -163,11 +163,6 @@ class BaseTableViewController(UITableViewController):
     cellTest = self.testCells[indexPath.section]
     cell = tableView.dequeueReusableCellWithIdentifier_forIndexPath_(
       cellTest.cellID, indexPath)
-    
-    if (view := cellTest.targetView(cell)):
-      pass
-    print(tableView)
-    print(type(tableView))
       
     
     return cell
