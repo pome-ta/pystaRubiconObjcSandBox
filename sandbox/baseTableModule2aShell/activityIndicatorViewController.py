@@ -68,7 +68,8 @@ class ActivityIndicatorViewController(BaseTableViewController):
 
     c1 = CaseElement.alloc().initWithTitle_cellID_configHandlerName_(
       localizedString('MediumIndicatorTitle'),
-      ActivityIndicatorKind.mediumIndicator.value, 'configureMediumActivityIndicatorView:')
+      ActivityIndicatorKind.mediumIndicator.value,
+      'configureMediumActivityIndicatorView:')
 
     #c2 = CaseElement.alloc().initWithTitle_cellID_configHandlerName_(localizedString('LargeIndicatorTitle'), ActivityIndicatorKind.largeIndicator.value, 'configureLargeActivityIndicatorView:')
     #c1 = CaseElement(localizedString('MediumIndicatorTitle'), ActivityIndicatorKind.mediumIndicator.value, 'configureMediumActivityIndicatorView:')
@@ -162,7 +163,7 @@ class ActivityIndicatorViewController(BaseTableViewController):
     activityIndicator.style = UIActivityIndicatorViewStyle.medium
     activityIndicator.hidesWhenStopped = True
 
-    activityIndicator.color = UIColor.systemPurpleColor()
+    activityIndicator.color = UIColor.systemRedColor()
 
     activityIndicator.startAnimating()
     # When the activity is done, be sure to use UIActivityIndicatorView.stopAnimating().
@@ -202,11 +203,12 @@ class ActivityIndicatorViewController(BaseTableViewController):
       cellTest.cellID, indexPath)
 
     if (view := cellTest.targetView(cell)):
+      getattr(self, SEL('configureMediumActivityIndicatorView_'))(view)
+
       #self.performSelector_withObject_(SEL(str(cellTest.configHandlerName)), view)
       #self.configureMediumActivityIndicatorView_(view)
       #pdbr.state(self, 1)
       pass
-    
 
     return cell
 
