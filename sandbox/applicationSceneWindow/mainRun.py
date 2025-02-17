@@ -38,16 +38,10 @@ while (windowScene := objectEnumerator.nextObject()):
 
 #[requestSceneSessionActivation:userActivity:options:errorHandler: | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uiapplication/requestscenesessionactivation(_:useractivity:options:errorhandler:)?language=objc)
 #[activateSceneSessionForRequest:errorHandler: | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uiapplication/activatescenesessionforrequest:errorhandler:?language=objc)
-#activateSceneSessionForRequest:errorHandler:
-#pdbr.state(WindowScene.new())
-#window = UIWindow.alloc().initWithWindowScene_(windowScene)
-#pdbr.state(windowScene.windows)
-#pdbr.state(UIWindow.alloc())
-#pdbr.state(window)
-newWindowScene = WindowScene.new()
-sharedApplication.activateSceneSessionForRequest_errorHandler_(newWindowScene, None)
-#print(sharedApplication.supportsMultipleScenes)
-#pdbr.state(sharedApplication)
-#pdbr.state(objectEnumerator.nextObject())
-pdbr.state(newWindowScene)
+
+#newWindowScene = WindowScene.new()
+#sharedApplication.activateSceneSessionForRequest_errorHandler_(newWindowScene, None)
+
+pdbr.state(sharedApplication)
+#pdbr.state(UIApplication.new())
 
