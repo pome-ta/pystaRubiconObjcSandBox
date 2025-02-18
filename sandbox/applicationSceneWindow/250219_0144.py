@@ -338,8 +338,18 @@ class MainOperation(NSOperation):
     while (windowScene := objectEnumerator.nextObject()):
       if windowScene.activationState == UISceneActivationState.foregroundActive:
         break
+    #pdbr.state(windowScene)
+    window = UIWindow.alloc().initWithWindowScene_(windowScene)
+    window.makeKeyAndVisible()
+    #pdbr.state(window)
+    #pdbr.state(window.rootViewController)
+    rootViewController = RootViewController.new()
+    navigationViewController = RootNavigationController.alloc(
+    ).initWithRootViewController_(rootViewController)
+    window.rootViewController = navigationViewController
     pdbr.state(windowScene)
-    print(windowScene.keyWindow)
+    #rootViewController.presentViewController_animated_completion_(MainViewController.new(), True, None)
+
 
 if __name__ == '__main__':
   print('--- run')
