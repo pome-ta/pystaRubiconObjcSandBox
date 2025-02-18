@@ -23,9 +23,9 @@ UISceneSessionActivationRequest = ObjCClass('UISceneSessionActivationRequest')
 UIWindow = ObjCClass('UIWindow')
 
 
-
 class NewWindowScene(UIWindowScene):
   pass
+
 
 sharedApplication = UIApplication.sharedApplication
 connectedScenes = sharedApplication.connectedScenes
