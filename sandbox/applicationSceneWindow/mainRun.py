@@ -57,6 +57,7 @@ NSSetUncaughtExceptionHandler(_handler)
 
 UIApplication = ObjCClass('UIApplication')
 UIWindow = ObjCClass('UIWindow')
+UIWindowScene = ObjCClass('UIWindowScene')
 
 NSOperation = ObjCClass("NSOperation")
 NSOperationQueue = ObjCClass("NSOperationQueue")
@@ -263,7 +264,6 @@ class MainViewController(UIViewController):
     send_super(__class__, self, 'viewDidLoad')
     print(f'\t{NSStringFromClass(__class__)}: viewDidLoad')
     self.navigationItem.title = NSStringFromClass(__class__)
-    
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -317,6 +317,29 @@ class MainViewController(UIViewController):
     print(f'\t{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
 
 
+#initWithSession_connectionOptions_
+
+
+class NewUIWindowScene(UIWindowScene):
+
+  @objc_method
+  def dealloc(self):
+    print(f'- {NSStringFromClass(__class__)}: dealloc')
+
+  @objc_method
+  def initWithSession_connectionOptions_(self, scene, connectionOptions):
+    send_super(__class__,
+               self,
+               'initWithSession:connectionOptions:',
+               scene,
+               connectionOptions,
+               argtypes=[
+                 objc_id,
+                 objc_id,
+               ])
+    return self
+
+
 #############################################################
 # --- mainThread ?
 #############################################################
@@ -338,8 +361,24 @@ class MainOperation(NSOperation):
     while (windowScene := objectEnumerator.nextObject()):
       if windowScene.activationState == UISceneActivationState.foregroundActive:
         break
-    pdbr.state(windowScene)
-    print(windowScene.keyWindow)
+    
+    keyWindow = windowScene.keyWindow
+    base_rootViewController = keyWindow.rootViewController
+    
+    window = UIWindow.alloc().initWithWindowScene_(windowScene)
+    window.makeKeyAndVisible()
+    window.rootViewController = base_rootViewController
+    window.resignKeyWindow()
+    pdbr.state(windowScene.keyWindow)
+    
+    
+    
+    
+    #pdbr.state(base_rootViewController)
+    #session
+    #print(windowScene.keyWindow)
+    #pdbr.state(UIWindowScene.new())
+
 
 if __name__ == '__main__':
   print('--- run')
