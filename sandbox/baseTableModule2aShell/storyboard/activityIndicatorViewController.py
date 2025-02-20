@@ -49,7 +49,7 @@ class MediumIndicator(CustomTableViewCell):
       CGRectMake(177.5, 12.0, 20.0, 20.0))
     _style = UIActivityIndicatorViewStyle.medium
     activityIndicatorView.setActivityIndicatorViewStyle_(_style)
-    activityIndicatorView.startAnimating()
+    #activityIndicatorView.startAnimating()
     # activityIndicatorView.startAnimation()
     activityIndicatorView.translatesAutoresizingMaskIntoConstraints = False
     self.contentView.addSubview_(activityIndicatorView)
@@ -76,8 +76,8 @@ class LargeTintedIndicator(CustomTableViewCell):
     activityIndicatorView = UIActivityIndicatorView.alloc().initWithFrame_(
       CGRectMake(168.0, -41.0, 39.0, 126.0))
     _style = UIActivityIndicatorViewStyle.large
-    activityIndicatorView.setActivityIndicatorViewStyle_(_style)
-    activityIndicatorView.startAnimating()
+    #activityIndicatorView.setActivityIndicatorViewStyle_(_style)
+    #activityIndicatorView.startAnimating()
     # activityIndicatorView.startAnimation()
     activityIndicatorView.translatesAutoresizingMaskIntoConstraints = False
     self.contentView.addSubview_(activityIndicatorView)
@@ -107,7 +107,7 @@ class MediumTintedIndicator(CustomTableViewCell):
       CGRectMake(177.5, 12.0, 20.0, 20.0))
     _style = UIActivityIndicatorViewStyle.medium
     activityIndicatorView.setActivityIndicatorViewStyle_(_style)
-    activityIndicatorView.startAnimating()
+    #activityIndicatorView.startAnimating()
     # activityIndicatorView.startAnimation()
     activityIndicatorView.translatesAutoresizingMaskIntoConstraints = False
     self.contentView.addSubview_(activityIndicatorView)
@@ -135,7 +135,7 @@ class LargeIndicator(CustomTableViewCell):
       CGRectMake(168.0, -41.0, 39.0, 126.0))  # .autorelease()
     _style = UIActivityIndicatorViewStyle.large
     activityIndicatorView.setActivityIndicatorViewStyle_(_style)
-    activityIndicatorView.startAnimating()
+    #activityIndicatorView.startAnimating()
     # activityIndicatorView.startAnimation()
     activityIndicatorView.translatesAutoresizingMaskIntoConstraints = False
     self.contentView.addSubview_(activityIndicatorView)

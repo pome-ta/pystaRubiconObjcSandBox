@@ -167,7 +167,7 @@ class ActivityIndicatorViewController(BaseTableViewController):
 
     activityIndicator.color = UIColor.systemRedColor()
 
-    activityIndicator.startAnimating()
+    #activityIndicator.startAnimating()
     # When the activity is done, be sure to use UIActivityIndicatorView.stopAnimating().
 
   @objc_method
@@ -175,7 +175,7 @@ class ActivityIndicatorViewController(BaseTableViewController):
     activityIndicator.style = UIActivityIndicatorViewStyle.large
     activityIndicator.hidesWhenStopped = True
 
-    activityIndicator.startAnimating()
+    #activityIndicator.startAnimating()
     # When the activity is done, be sure to use UIActivityIndicatorView.stopAnimating().
 
   @objc_method
@@ -184,7 +184,7 @@ class ActivityIndicatorViewController(BaseTableViewController):
     activityIndicator.hidesWhenStopped = True
     activityIndicator.color = UIColor.systemPurpleColor()
 
-    activityIndicator.startAnimating()
+    #activityIndicator.startAnimating()
     # When the activity is done, be sure to use UIActivityIndicatorView.stopAnimating().
 
   @objc_method
@@ -193,7 +193,7 @@ class ActivityIndicatorViewController(BaseTableViewController):
     activityIndicator.hidesWhenStopped = True
     activityIndicator.color = UIColor.systemPurpleColor()
 
-    activityIndicator.startAnimating()
+    #activityIndicator.startAnimating()
     # When the activity is done, be sure to use UIActivityIndicatorView.stopAnimating().
   '''
   @objc_method
