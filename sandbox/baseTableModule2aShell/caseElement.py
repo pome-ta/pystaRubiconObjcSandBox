@@ -15,7 +15,8 @@ class CaseElement(NSObject):
   # xxx: ガバガバ
   # configHandler = objc_property()
   #configHandler = objc_property(object)
-  configHandlerName: NSString = objc_property(weak=True)
+  #configHandlerName: NSString = objc_property(weak=True)
+  configHandlerName: NSString = objc_property()
   
   
 

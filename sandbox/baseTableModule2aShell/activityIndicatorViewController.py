@@ -235,7 +235,8 @@ if __name__ == '__main__':
   presentation_style = UIModalPresentationStyle.pageSheet
 
   app = App(main_vc)
-  print(app)
+  print('---')
+  #print(app)
   # pdbr.state(main_vc, 1)
   app.main_loop(presentation_style)
   print('--- end ---\n')

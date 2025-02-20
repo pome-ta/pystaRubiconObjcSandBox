@@ -30,6 +30,7 @@ class CustomTableViewCell(UITableViewCell):
       NSInteger,
       objc_id,
     ]
+    
 
     send_super(__class__,
                self,

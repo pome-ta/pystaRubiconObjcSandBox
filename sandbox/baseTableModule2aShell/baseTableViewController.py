@@ -179,9 +179,10 @@ class BaseTableViewController(UITableViewController):
     if (view := cellTest.targetView(cell)):
       #getattr(self, SEL('configureMediumActivityIndicatorView_'))(view)
 
-      self.performSelector_withObject_(SEL(str(cellTest.configHandlerName)), view)
+      #self.performSelector_withObject_(SEL(str(cellTest.configHandlerName)), view)
       #self.configureMediumActivityIndicatorView_(view)
       #pdbr.state(self, 1)
       #pass
+      cellTest.configHandlerName = None
 
     return cell
