@@ -24,8 +24,6 @@ class RootNavigationController(UINavigationController):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print(f'- {NSStringFromClass(__class__)}: dealloc')
     loop.stop()
-    print(self)
-    print(id(self))
     print('--- stop')
     
 
