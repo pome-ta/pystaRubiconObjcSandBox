@@ -317,6 +317,27 @@ class MainViewController(UIViewController):
     print(f'\t{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
 
 
+#initWithSession_connectionOptions_
+
+
+class NewUIWindowScene(UIWindowScene):
+
+  @objc_method
+  def dealloc(self):
+    print(f'- {NSStringFromClass(__class__)}: dealloc')
+
+  @objc_method
+  def initWithSession_connectionOptions_(self, scene, connectionOptions):
+    send_super(__class__,
+               self,
+               'initWithSession:connectionOptions:',
+               scene,
+               connectionOptions,
+               argtypes=[
+                 objc_id,
+                 objc_id,
+               ])
+    return self
 
 
 #############################################################
@@ -341,7 +362,32 @@ class MainOperation(NSOperation):
       if windowScene.activationState == UISceneActivationState.foregroundActive:
         break
 
-    pdbr.state(windowScene.delegate)
+    keyWindow = windowScene.keyWindow
+    base_rootViewController = keyWindow.rootViewController
+
+    window = UIWindow.alloc().initWithWindowScene_(windowScene)
+    window.makeKeyAndVisible()
+    window.rootViewController = base_rootViewController
+    
+    
+    viewController=MainViewController.new()
+    
+    
+    presentViewController = RootNavigationController.alloc().initWithRootViewController_(viewController)
+    
+
+    window.rootViewController.presentViewController_animated_completion_(presentViewController, True, None)
+
+    #presentViewController = RootNavigationController.alloc().initWithRootViewController_(viewController)
+
+    #presentViewController = RootNavigationController.alloc().initWithRootViewController_(viewController)
+    #window.resignKeyWindow()
+    #pdbr.state(windowScene.keyWindow)
+
+    #pdbr.state(base_rootViewController)
+    #session
+    #print(windowScene.keyWindow)
+    #pdbr.state(UIWindowScene.new())
 
 
 if __name__ == '__main__':
