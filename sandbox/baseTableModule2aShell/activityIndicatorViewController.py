@@ -44,24 +44,25 @@ class ActivityIndicatorViewController(BaseTableViewController):
                argtypes=[
                  NSInteger,
                ])
-    print(f'\t{NSStringFromClass(__class__)}: initWithStyle_')
+    #print(f'\t{NSStringFromClass(__class__)}: initWithStyle_')
     return self
 
   @objc_method
   def loadView(self):
     send_super(__class__, self, 'loadView')
-    print(f'\t{NSStringFromClass(__class__)}: loadView')
+    #print(f'\t{NSStringFromClass(__class__)}: loadView')
     [
       self.tableView.registerClass_forCellReuseIdentifier_(
         prototype['cellClass'], prototype['identifier'])
       for prototype in prototypes
     ]
+    
 
   # MARK: - View Life Cycle
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')  # xxx: 不要?
-    print(f'\t{NSStringFromClass(__class__)}: viewDidLoad')
+    #print(f'\t{NSStringFromClass(__class__)}: viewDidLoad')
 
     self.navigationItem.title = localizedString('ActivityIndicatorsTitle') if (
       title := self.navigationItem.title) is None else title
@@ -113,7 +114,7 @@ class ActivityIndicatorViewController(BaseTableViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    print(f'\t{NSStringFromClass(__class__)}: viewWillAppear_')
+    #print(f'\t{NSStringFromClass(__class__)}: viewWillAppear_')
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -124,7 +125,7 @@ class ActivityIndicatorViewController(BaseTableViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    print(f'\t{NSStringFromClass(__class__)}: viewDidAppear_')
+    #print(f'\t{NSStringFromClass(__class__)}: viewDidAppear_')
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
@@ -150,6 +151,7 @@ class ActivityIndicatorViewController(BaseTableViewController):
     print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
     # xxx: a-shell で動くけど、Pythonista3 の２回目の`dealloc` が呼ばれない
     #self.testCells = None
+    prototypes = None
 
   @objc_method
   def didReceiveMemoryWarning(self):
@@ -193,7 +195,7 @@ class ActivityIndicatorViewController(BaseTableViewController):
 
     activityIndicator.startAnimating()
     # When the activity is done, be sure to use UIActivityIndicatorView.stopAnimating().
-
+  '''
   @objc_method
   def tableView_cellForRowAtIndexPath_(self, tableView,
                                        indexPath) -> ObjCInstance:
@@ -203,14 +205,15 @@ class ActivityIndicatorViewController(BaseTableViewController):
       cellTest.cellID, indexPath)
 
     if (view := cellTest.targetView(cell)):
-      getattr(self, SEL('configureMediumActivityIndicatorView_'))(view)
+      #getattr(self, SEL('configureMediumActivityIndicatorView_'))(view)
 
-      #self.performSelector_withObject_(SEL(str(cellTest.configHandlerName)), view)
+      self.performSelector_withObject_(SEL(str(cellTest.configHandlerName)), view)
       #self.configureMediumActivityIndicatorView_(view)
       #pdbr.state(self, 1)
-      pass
+      #pass
 
     return cell
+  '''
 
 
 if __name__ == '__main__':

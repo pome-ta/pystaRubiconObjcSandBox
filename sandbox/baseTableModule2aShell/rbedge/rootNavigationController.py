@@ -89,7 +89,11 @@ class RootNavigationController(UINavigationController):
 
   @objc_method
   def doneButtonTapped_(self, sender):
-    self.dismissViewControllerAnimated_completion_(True, None)
+    visibleViewController = self.visibleViewController
+    visibleViewController.dismissViewControllerAnimated_completion_(True, None)
+    #print(visibleViewController)
+    #print(self)
+    #self.dismissViewControllerAnimated_completion_(True, None)
 
   @objc_method
   def navigationController_willShowViewController_animated_(

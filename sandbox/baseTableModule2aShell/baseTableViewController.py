@@ -31,7 +31,7 @@ class BaseTableViewController(UITableViewController):
   @objc_method
   def loadView(self):
     send_super(__class__, self, 'loadView')
-    print(f'\t\t{NSStringFromClass(__class__)}: loadView')
+    #print(f'\t\t{NSStringFromClass(__class__)}: loadView')
     self.testCells = NSMutableArray.new()
     self.headerFooterViewIdentifier = 'customHeaderFooterView' #
     
@@ -55,7 +55,7 @@ class BaseTableViewController(UITableViewController):
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')  # xxx: 不要?
-    print(f'\t\t{NSStringFromClass(__class__)}: viewDidLoad')
+    #print(f'\t\t{NSStringFromClass(__class__)}: viewDidLoad')
     self.tableView.registerClass_forHeaderFooterViewReuseIdentifier_(
       UITableViewHeaderFooterView, self.headerFooterViewIdentifier)
   
@@ -68,7 +68,7 @@ class BaseTableViewController(UITableViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    print(f'\t{NSStringFromClass(__class__)}: viewWillAppear_')
+    #print(f'\t{NSStringFromClass(__class__)}: viewWillAppear_')
   
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -79,7 +79,7 @@ class BaseTableViewController(UITableViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    print(f'\t{NSStringFromClass(__class__)}: viewDidAppear_')
+    #print(f'\t{NSStringFromClass(__class__)}: viewDidAppear_')
   
   @objc_method
   def viewWillDisappear_(self, animated: bool):
@@ -102,8 +102,8 @@ class BaseTableViewController(UITableViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    # print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
-    #self.testCells = None
+    print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
+    self.testCells = None
   
   @objc_method
   def didReceiveMemoryWarning(self):
@@ -157,6 +157,7 @@ class BaseTableViewController(UITableViewController):
   def numberOfSectionsInTableView_(self, tableView) -> NSInteger:
     return len(self.testCells)
   
+  '''
   @objc_method
   def tableView_cellForRowAtIndexPath_(self, tableView:Class, indexPath:Class) -> Class:
     
@@ -165,4 +166,22 @@ class BaseTableViewController(UITableViewController):
       cellTest.cellID, indexPath)
       
     
+    return cell
+  '''
+  @objc_method
+  def tableView_cellForRowAtIndexPath_(self, tableView,
+                                       indexPath) -> ObjCInstance:
+
+    cellTest = self.testCells[indexPath.section]
+    cell = tableView.dequeueReusableCellWithIdentifier_forIndexPath_(
+      cellTest.cellID, indexPath)
+
+    if (view := cellTest.targetView(cell)):
+      #getattr(self, SEL('configureMediumActivityIndicatorView_'))(view)
+
+      self.performSelector_withObject_(SEL(str(cellTest.configHandlerName)), view)
+      #self.configureMediumActivityIndicatorView_(view)
+      #pdbr.state(self, 1)
+      #pass
+
     return cell
