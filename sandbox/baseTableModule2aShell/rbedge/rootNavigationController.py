@@ -25,7 +25,6 @@ class RootNavigationController(UINavigationController):
     print(f'- {NSStringFromClass(__class__)}: dealloc')
     loop.stop()
     print('--- stop')
-    
 
   @objc_method
   def loadView(self):
@@ -83,7 +82,6 @@ class RootNavigationController(UINavigationController):
                  ctypes.c_bool,
                ])
     print(f'{NSStringFromClass(__class__)}: viewDidDisappear_')
-    
 
   @objc_method
   def didReceiveMemoryWarning(self):
@@ -98,6 +96,22 @@ class RootNavigationController(UINavigationController):
     '''
     #print(visibleViewController)
     #print(self)
+    #self.dismissViewControllerAnimated_completion_(True, None)
+    '''
+    from .enumerations import UISceneActivationState
+
+    sharedApplication = ObjCClass('UIApplication').sharedApplication
+    connectedScenes = sharedApplication.connectedScenes
+    objectEnumerator = connectedScenes.objectEnumerator()
+
+    while (windowScene := objectEnumerator.nextObject()):
+      if windowScene.activationState == UISceneActivationState.foregroundActive:
+        break
+
+    keyWindow = windowScene.keyWindow
+    rootViewController = keyWindow.rootViewController
+    rootViewController.dismissViewControllerAnimated_completion_(True, None)
+    '''
     self.dismissViewControllerAnimated_completion_(True, None)
 
   @objc_method

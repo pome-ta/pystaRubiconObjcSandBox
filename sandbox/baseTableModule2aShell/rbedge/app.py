@@ -2,7 +2,10 @@ from pyrubicon.objc.api import ObjCClass
 from pyrubicon.objc.runtime import objc_id, send_message
 
 from .lifeCycle import loop
-from .enumerations import UIModalPresentationStyle
+from .enumerations import (
+  UISceneActivationState,
+  UIModalPresentationStyle,
+)
 from .objcMainThread import onMainThread
 from .rootNavigationController import RootNavigationController
 
@@ -13,13 +16,11 @@ NSOperation = ObjCClass("NSOperation")
 NSOperationQueue = ObjCClass("NSOperationQueue")
 
 
-
 class App:
 
   def __init__(self, viewController):
     print('App: __init__')
     self.viewController = viewController
-
 
   def main_loop(self, modalPresentationStyle: int = 0):
     print('App: main_loop')
@@ -28,12 +29,24 @@ class App:
     def present_viewController(viewController: UIViewController,
                                _style: int) -> None:
       print(f'\t# present_viewController')
+      '''
       sharedApplication = UIApplication.sharedApplication
       keyWindow = sharedApplication.windows.firstObject()
       rootViewController = keyWindow.rootViewController
 
       while _presentedViewController := rootViewController.presentedViewController:
         rootViewController = _presentedViewController
+      '''
+      sharedApplication = UIApplication.sharedApplication
+      connectedScenes = sharedApplication.connectedScenes
+      objectEnumerator = connectedScenes.objectEnumerator()
+
+      while (windowScene := objectEnumerator.nextObject()):
+        if windowScene.activationState == UISceneActivationState.foregroundActive:
+          break
+
+      keyWindow = windowScene.keyWindow
+      rootViewController = keyWindow.rootViewController
 
       #from .rootNavigationController import RootNavigationController
 

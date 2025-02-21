@@ -878,3 +878,10 @@ class WKNavigationActionPolicy:
   allow: int = 1
   download: int = 2
 
+
+class UISceneActivationState:
+  unattached = -1
+  foregroundActive = 0
+  foregroundInactive = 1
+  background = 2
+  
