@@ -3,7 +3,7 @@ import ctypes
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.api import NSString, NSMutableArray
-from pyrubicon.objc.runtime import send_super, objc_id, send_message, SEL, Class
+from pyrubicon.objc.runtime import send_super, objc_id, send_message, SEL
 from pyrubicon.objc.types import NSInteger
 
 from rbedge.enumerations import UIListContentTextAlignment
@@ -20,8 +20,8 @@ NSThread = ObjCClass('NSThread')
 
 
 class BaseTableViewController(UITableViewController):
-  testCells: NSMutableArray = objc_property(weak=True)
-  #testCells: NSMutableArray = objc_property()
+  #testCells: NSMutableArray = objc_property(weak=True)
+  testCells: NSMutableArray = objc_property()
   headerFooterViewIdentifier: NSString = objc_property()
 
   @objc_method
@@ -102,7 +102,7 @@ class BaseTableViewController(UITableViewController):
                  ctypes.c_bool,
                ])
     print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
-    self.testCells = None
+    #self.testCells = None
 
   @objc_method
   def didReceiveMemoryWarning(self):

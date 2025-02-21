@@ -18,8 +18,7 @@ class CustomTableViewCell(UITableViewCell):
 
   @objc_method
   def initWithStyle_reuseIdentifier_(self, style: NSInteger, reuseIdentifier):
-    print(
-      f'\t\t\t{NSStringFromClass(__class__)}: initWithStyle:reuseIdentifier:')
+    #print(f'\t\t\t{NSStringFromClass(__class__)}: initWithStyle:reuseIdentifier:')
     super_args = [
       style,
       reuseIdentifier,
@@ -40,6 +39,6 @@ class CustomTableViewCell(UITableViewCell):
 
   @objc_method
   def overrideCell(self):
-    print(f'\t\t\t{NSStringFromClass(__class__)}: prototype.overrideCell')
+    #print(f'\t\t\t{NSStringFromClass(__class__)}: prototype.overrideCell')
     pass
 

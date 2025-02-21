@@ -6,9 +6,7 @@ from pyrubicon.objc.api import objc_method
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import NSInteger
 
-
 from caseElement import CaseElement
-
 
 from baseTableViewController import BaseTableViewController
 from storyboard.testMainViewController import prototypes
@@ -22,7 +20,6 @@ UIColor = ObjCClass('UIColor')
 class testKind(Enum):
   hoge = 'hoge'
   fuga = 'fuga'
-  
 
 
 class TestMainViewController(BaseTableViewController):
@@ -54,7 +51,6 @@ class TestMainViewController(BaseTableViewController):
         prototype['cellClass'], prototype['identifier'])
       for prototype in prototypes
     ]
-    
 
   # MARK: - View Life Cycle
   @objc_method
@@ -66,12 +62,9 @@ class TestMainViewController(BaseTableViewController):
       title := self.navigationItem.title) is None else title
 
     c1 = CaseElement.alloc().initWithTitle_cellID_configHandlerName_(
-      'hogehoge',
-      testKind.hoge.value,
-      'configureHogeView:')
+      'hogehoge', testKind.hoge.value, 'configureHogeView:')
 
     self.testCells.addObject_(c1)
-    
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -119,7 +112,7 @@ class TestMainViewController(BaseTableViewController):
     print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
     # xxx: a-shell で動くけど、Pythonista3 の2回目の`dealloc` が呼ばれない
     #self.testCells = None
-    prototypes = None
+    #prototypes = None
 
   @objc_method
   def didReceiveMemoryWarning(self):
@@ -128,14 +121,16 @@ class TestMainViewController(BaseTableViewController):
 
   # MARK: - Configuration
   @objc_method
-  def configureHogeView_(self, view):
+  def configureHogeView_(self, newLabel):
+    newLabel.text = '変化後'
     #pdbr.state(view)
-    view.backgroundColor = UIColor.systemCyanColor()
+    #view.backgroundColor = UIColor.systemCyanColor()
+    
+    #print(view)
 
   @objc_method
   def configureFugaView_(self, view):
     pdbr.state(view)
-
 
 
 if __name__ == '__main__':
@@ -158,9 +153,6 @@ if __name__ == '__main__':
 
   app = App(main_vc)
   print('---')
-  #print(app)
-  # pdbr.state(main_vc, 1)
   app.main_loop(presentation_style)
   print('--- end ---\n')
-
 

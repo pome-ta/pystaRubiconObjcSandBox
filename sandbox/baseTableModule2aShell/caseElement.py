@@ -8,9 +8,11 @@ from rbedge import pdbr
 
 class CaseElement(NSObject):
   # セルの視覚的なタイトル (テーブル セクションのヘッダー タイトル)
-  title: NSString = objc_property(weak=True)
+  #title: NSString = objc_property(weak=True)
+  title: NSString = objc_property()
   # nib ファイル内でセルを検索するためのテーブルビューのセルの識別子
-  cellID: NSString = objc_property(weak=True)
+  #cellID: NSString = objc_property(weak=True)
+  cellID: NSString = objc_property()
   # セルのサブビューを設定するための構成ハンドラー。
   # xxx: ガバガバ
   # configHandler = objc_property()

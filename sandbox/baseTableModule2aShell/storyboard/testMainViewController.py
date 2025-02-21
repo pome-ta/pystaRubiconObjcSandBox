@@ -8,6 +8,7 @@ from rbedge import pdbr
 from ._prototype import CustomTableViewCell
 
 UIView = ObjCClass('UIView')
+UILabel = ObjCClass('UILabel')
 UIColor = ObjCClass('UIColor')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
@@ -39,19 +40,48 @@ class Hoge(CustomTableViewCell):
     send_super(__class__, self, 'overrideCell')
 
     newView = UIView.new()
-    newView.backgroundColor = UIColor.systemDarkPurpleColor()
+    #newView.backgroundColor = UIColor.systemDarkPurpleColor()
+    
+    
+    newLabel = UILabel.new()
+    newLabel.text = '変化前'
+    newLabel.translatesAutoresizingMaskIntoConstraints = False
+    self.contentView.addSubview_(newLabel)
+    NSLayoutConstraint.activateConstraints_([
+      newLabel.heightAnchor.constraintEqualToConstant_(32.0),
+      newLabel.widthAnchor.constraintEqualToConstant_(64.0),
+      newLabel.centerXAnchor.constraintEqualToAnchor_(
+        self.contentView.centerXAnchor),
+      newLabel.centerYAnchor.constraintEqualToAnchor_(
+        self.contentView.centerYAnchor),
+    ])
+    
+    
+    
+    '''
+
+    newLabel.translatesAutoresizingMaskIntoConstraints = False
+    newView.addSubview_(newLabel)
+
+    NSLayoutConstraint.activateConstraints_([
+      newLabel.widthAnchor.constraintEqualToAnchor_multiplier_(
+        newView.widthAnchor, 1.0),
+      newLabel.heightAnchor.constraintEqualToAnchor_multiplier_(
+        newView.heightAnchor, 1.0),
+    ])
 
     newView.translatesAutoresizingMaskIntoConstraints = False
     self.contentView.addSubview_(newView)
 
     NSLayoutConstraint.activateConstraints_([
-      newView.heightAnchor.constraintEqualToConstant_(42.0),
-      newView.widthAnchor.constraintEqualToConstant_(42.0),
+      newView.heightAnchor.constraintEqualToConstant_(32.0),
+      newView.widthAnchor.constraintEqualToConstant_(64.0),
       newView.centerXAnchor.constraintEqualToAnchor_(
         self.contentView.centerXAnchor),
       newView.centerYAnchor.constraintEqualToAnchor_(
         self.contentView.centerYAnchor),
     ])
+    '''
 
 
 @add_prototype('fuga')
