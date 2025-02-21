@@ -125,7 +125,7 @@ class TestMainViewController(BaseTableViewController):
     newLabel.text = '変化後'
     #pdbr.state(view)
     #view.backgroundColor = UIColor.systemCyanColor()
-    
+
     #print(view)
 
   @objc_method
