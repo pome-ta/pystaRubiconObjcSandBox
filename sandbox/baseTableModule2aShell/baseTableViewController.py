@@ -3,7 +3,7 @@ import ctypes
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.api import NSString, NSMutableArray
-from pyrubicon.objc.runtime import send_super, objc_id, send_message, SEL,Class
+from pyrubicon.objc.runtime import send_super, objc_id, send_message, SEL, Class
 from pyrubicon.objc.types import NSInteger
 
 from rbedge.enumerations import UIListContentTextAlignment
@@ -18,24 +18,24 @@ UIListContentConfiguration = ObjCClass('UIListContentConfiguration')
 
 NSThread = ObjCClass('NSThread')
 
+
 class BaseTableViewController(UITableViewController):
   testCells: NSMutableArray = objc_property(weak=True)
   #testCells: NSMutableArray = objc_property()
   headerFooterViewIdentifier: NSString = objc_property()
-  
+
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print(f'\t\t- {NSStringFromClass(__class__)}: dealloc')
-  
+
   @objc_method
   def loadView(self):
     send_super(__class__, self, 'loadView')
     #print(f'\t\t{NSStringFromClass(__class__)}: loadView')
     self.testCells = NSMutableArray.new()
-    self.headerFooterViewIdentifier = 'customHeaderFooterView' #
-    
-  '''
+    self.headerFooterViewIdentifier = 'customHeaderFooterView'  #
+
   @objc_method
   def initWithStyle_(self, style: NSInteger) -> ObjCInstance:
     send_super(__class__,
@@ -46,19 +46,18 @@ class BaseTableViewController(UITableViewController):
                argtypes=[
                  NSInteger,
                ])
-    
-    print(f'\t\t{NSStringFromClass(__class__)}: initWithStyle_')
-    
+
+    #print(f'\t\t{NSStringFromClass(__class__)}: initWithStyle_')
+
     return self
-  '''
-  
+
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')  # xxx: 不要?
     #print(f'\t\t{NSStringFromClass(__class__)}: viewDidLoad')
     self.tableView.registerClass_forHeaderFooterViewReuseIdentifier_(
       UITableViewHeaderFooterView, self.headerFooterViewIdentifier)
-  
+
   @objc_method
   def viewWillAppear_(self, animated: bool):
     send_super(__class__,
@@ -69,7 +68,7 @@ class BaseTableViewController(UITableViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewWillAppear_')
-  
+
   @objc_method
   def viewDidAppear_(self, animated: bool):
     send_super(__class__,
@@ -80,7 +79,7 @@ class BaseTableViewController(UITableViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewDidAppear_')
-  
+
   @objc_method
   def viewWillDisappear_(self, animated: bool):
     # print('\t↑ ---')
@@ -92,7 +91,7 @@ class BaseTableViewController(UITableViewController):
                  ctypes.c_bool,
                ])
     # print(f'\t{NSStringFromClass(__class__)}: viewWillDisappear_')
-  
+
   @objc_method
   def viewDidDisappear_(self, animated: bool):
     send_super(__class__,
@@ -104,12 +103,12 @@ class BaseTableViewController(UITableViewController):
                ])
     print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
     self.testCells = None
-  
+
   @objc_method
   def didReceiveMemoryWarning(self):
     send_super(__class__, self, 'didReceiveMemoryWarning')
     print(f'\t{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
-  
+
   '''
   @objc_method
   def testCellsExtend_(self, addCells) -> None:
@@ -123,9 +122,9 @@ class BaseTableViewController(UITableViewController):
       self.testCells.addObject_(cell)
       #self.testCells.append(cell)
   '''
-  
+
   @objc_method
-  def centeredHeaderView_(self, title)->objc_id:
+  def centeredHeaderView_(self, title) -> objc_id:
     headerView = self.tableView.dequeueReusableHeaderFooterViewWithIdentifier_(
       self.headerFooterViewIdentifier)
 
@@ -135,28 +134,26 @@ class BaseTableViewController(UITableViewController):
     headerView.contentConfiguration = content
 
     return headerView
-  
-  
+
   # MARK: - UITableViewDataSource
   @objc_method
   def tableView_viewForHeaderInSection_(self, tableView,
                                         section: NSInteger) -> objc_id:
     return self.centeredHeaderView_(self.testCells[section].title)
-    
-  
+
   @objc_method
   def tableView_titleForHeaderInSection_(self, tableView, section: NSInteger):
     return self.testCells[section].title
-  
+
   @objc_method
   def tableView_numberOfRowsInSection_(self, tableView,
                                        section: NSInteger) -> NSInteger:
     return 1
-  
+
   @objc_method
   def numberOfSectionsInTableView_(self, tableView) -> NSInteger:
     return len(self.testCells)
-  
+
   '''
   @objc_method
   def tableView_cellForRowAtIndexPath_(self, tableView:Class, indexPath:Class) -> Class:
@@ -168,6 +165,7 @@ class BaseTableViewController(UITableViewController):
     
     return cell
   '''
+
   @objc_method
   def tableView_cellForRowAtIndexPath_(self, tableView,
                                        indexPath) -> ObjCInstance:
@@ -179,10 +177,12 @@ class BaseTableViewController(UITableViewController):
     if (view := cellTest.targetView(cell)):
       #getattr(self, SEL('configureMediumActivityIndicatorView_'))(view)
 
-      self.performSelector_withObject_(SEL(str(cellTest.configHandlerName)), view)
+      self.performSelector_withObject_(SEL(str(cellTest.configHandlerName)),
+                                       view)
       #self.configureMediumActivityIndicatorView_(view)
       #pdbr.state(self, 1)
       #pass
       #cellTest.configHandlerName = None
 
     return cell
+

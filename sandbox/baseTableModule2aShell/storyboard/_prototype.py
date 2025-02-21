@@ -1,5 +1,3 @@
-import ctypes
-
 from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import objc_method
 from pyrubicon.objc.runtime import send_super, objc_id
@@ -30,7 +28,6 @@ class CustomTableViewCell(UITableViewCell):
       NSInteger,
       objc_id,
     ]
-    
 
     send_super(__class__,
                self,

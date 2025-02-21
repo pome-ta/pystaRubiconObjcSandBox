@@ -23,12 +23,12 @@ class App:
     self.viewController = viewController
 
   def main_loop(self, modalPresentationStyle: int = 0):
-    print('App: main_loop')
+    #print('App: main_loop')
 
     @onMainThread
     def present_viewController(viewController: UIViewController,
                                _style: int) -> None:
-      print(f'\t# present_viewController')
+      #print(f'\t# present_viewController')
       '''
       sharedApplication = UIApplication.sharedApplication
       keyWindow = sharedApplication.windows.firstObject()
