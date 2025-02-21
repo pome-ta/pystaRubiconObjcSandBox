@@ -11,6 +11,17 @@ from caseElement import CaseElement
 from baseTableViewController import BaseTableViewController
 from storyboard.testMainViewController import prototypes
 
+from rbedge.enumerations import (
+  UIControlState,
+  UIControlEvents,
+  UIButtonConfigurationCornerStyle,
+  UIImageRenderingMode,
+  NSUnderlineStyle,
+  UIImageSymbolScale,
+  NSDirectionalRectEdge,
+  UIButtonConfigurationSize,
+)
+
 from rbedge.functions import NSStringFromClass
 from rbedge import pdbr
 
@@ -57,7 +68,6 @@ class TestMainViewController(BaseTableViewController):
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     #print(f'\t{NSStringFromClass(__class__)}: viewDidLoad')
-
     self.navigationItem.title = 'title' if (
       title := self.navigationItem.title) is None else title
 
@@ -112,7 +122,6 @@ class TestMainViewController(BaseTableViewController):
     print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
     # xxx: a-shell で動くけど、Pythonista3 の2回目の`dealloc` が呼ばれない
     #self.testCells = None
-    #prototypes = None
 
   @objc_method
   def didReceiveMemoryWarning(self):
@@ -121,16 +130,18 @@ class TestMainViewController(BaseTableViewController):
 
   # MARK: - Configuration
   @objc_method
-  def configureHogeView_(self, newLabel):
-    newLabel.text = '変化後'
-    #pdbr.state(view)
-    #view.backgroundColor = UIColor.systemCyanColor()
-
-    #print(view)
+  def configureHogeView_(self, button):
+    button.addTarget_action_forControlEvents_(self, SEL('buttonClicked:'),
+                                              UIControlEvents.touchUpInside)
 
   @objc_method
-  def configureFugaView_(self, view):
-    pdbr.state(view)
+  def configureFugaView_(self, button):
+    pass
+
+  # MARK: - Button Actions
+  @objc_method
+  def buttonClicked_(self, sender):
+    print(f'Button was clicked.{sender}')
 
 
 if __name__ == '__main__':
