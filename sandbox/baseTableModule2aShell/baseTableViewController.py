@@ -48,7 +48,6 @@ class BaseTableViewController(UITableViewController):
                ])
 
     #print(f'\t\t{NSStringFromClass(__class__)}: initWithStyle_')
-
     return self
 
   @objc_method
@@ -154,18 +153,6 @@ class BaseTableViewController(UITableViewController):
   def numberOfSectionsInTableView_(self, tableView) -> NSInteger:
     return len(self.testCells)
 
-  '''
-  @objc_method
-  def tableView_cellForRowAtIndexPath_(self, tableView:Class, indexPath:Class) -> Class:
-    
-    cellTest = self.testCells[indexPath.section]
-    cell = tableView.dequeueReusableCellWithIdentifier_forIndexPath_(
-      cellTest.cellID, indexPath)
-      
-    
-    return cell
-  '''
-
   @objc_method
   def tableView_cellForRowAtIndexPath_(self, tableView,
                                        indexPath) -> ObjCInstance:
@@ -175,14 +162,9 @@ class BaseTableViewController(UITableViewController):
       cellTest.cellID, indexPath)
 
     if (view := cellTest.targetView(cell)):
-      #getattr(self, SEL('configureMediumActivityIndicatorView_'))(view)
+      configHandlerName = str(cellTest.configHandlerName)
 
-      self.performSelector_withObject_(SEL(str(cellTest.configHandlerName)),
-                                       view)
-      #self.configureMediumActivityIndicatorView_(view)
-      #pdbr.state(self, 1)
-      #pass
-      #cellTest.configHandlerName = None
+      self.performSelector_withObject_(SEL(configHandlerName), view)
 
     return cell
 

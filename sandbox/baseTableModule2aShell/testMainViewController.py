@@ -132,7 +132,7 @@ class TestMainViewController(BaseTableViewController):
   @objc_method
   def configureHogeView_(self, button):
     button.addTarget_action_forControlEvents_(self, SEL('buttonClicked:'),UIControlEvents.touchUpInside)
-    pass
+    
 
   @objc_method
   def configureFugaView_(self, button):
