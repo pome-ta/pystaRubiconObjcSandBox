@@ -49,7 +49,7 @@ class testKind(Enum):
 
 
 class TestMainViewController(BaseTableViewController):
-  cartItemCount = objc_property(NSInteger)
+  cartItemCount:NSInteger = objc_property(NSInteger)
 
   @objc_method
   def dealloc(self):
@@ -87,10 +87,17 @@ class TestMainViewController(BaseTableViewController):
     self.navigationItem.title = 'title' if (
       title := self.navigationItem.title) is None else title
 
+    self.cartItemCount = 0
+    
     c1 = CaseElement.alloc().initWithTitle_cellID_configHandlerName_(
       'hogehoge', testKind.hoge.value, 'configureHogeView:')
 
+    c2 = CaseElement.alloc().initWithTitle_cellID_configHandlerName_(
+      'fugafuga', testKind.fuga.value, 'configureFugaView:')
+
+
     self.testCells.addObject_(c1)
+    self.testCells.addObject_(c2)
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
