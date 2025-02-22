@@ -3,7 +3,7 @@ from enum import Enum
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import objc_method
-from pyrubicon.objc.runtime import send_super, objc_id
+from pyrubicon.objc.runtime import send_super, objc_id, SEL
 from pyrubicon.objc.types import NSInteger
 
 from caseElement import CaseElement
@@ -131,7 +131,7 @@ class TestMainViewController(BaseTableViewController):
   # MARK: - Configuration
   @objc_method
   def configureHogeView_(self, button):
-    #button.addTarget_action_forControlEvents_(self, SEL('buttonClicked:'),UIControlEvents.touchUpInside)
+    button.addTarget_action_forControlEvents_(self, SEL('buttonClicked:'),UIControlEvents.touchUpInside)
     pass
 
   @objc_method
