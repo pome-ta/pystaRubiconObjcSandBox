@@ -97,7 +97,7 @@ class TestMainViewController(BaseTableViewController):
     c2 = CaseElement.alloc().initWithTitle_cellID_configHandlerName_(
       'fugafuga', testKind.fuga.value, 'configureFugaView:')
 
-    self.testCells.addObject_(c1)
+    #self.testCells.addObject_(c1)
     self.testCells.addObject_(c2)
 
   @objc_method
@@ -155,7 +155,7 @@ class TestMainViewController(BaseTableViewController):
     print(repr(self.cartItemCount))
     #print(self.cartItemCount)
     '''
-    del self.cartItemCount
+    #del self.cartItemCount
 
 
   @objc_method

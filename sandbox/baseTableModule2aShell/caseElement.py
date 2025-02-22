@@ -1,6 +1,7 @@
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.api import NSObject, NSString
-from pyrubicon.objc.runtime import send_super, objc_id, send_message, SEL
+from pyrubicon.objc.runtime import send_super, objc_id, SEL
+
 
 from rbedge.functions import NSStringFromClass
 from rbedge import pdbr
@@ -35,6 +36,12 @@ class CaseElement(NSObject):
     self.configHandlerName = configHandlerName
     return self
 
+  
+  @objc_method
+  def target_withObject_(self, target,view):
+    target.performSelector_withObject_(SEL(self.configHandlerName), view)
+    
+    
   @objc_method
   def targetView(self, cell):
     return cell.contentView.subviews()[0] if cell is not None else None

@@ -16,7 +16,7 @@ UITableViewController = ObjCClass('UITableViewController')
 UITableViewHeaderFooterView = ObjCClass('UITableViewHeaderFooterView')
 UIListContentConfiguration = ObjCClass('UIListContentConfiguration')
 
-NSThread = ObjCClass('NSThread')
+
 
 
 class BaseTableViewController(UITableViewController):
@@ -89,7 +89,7 @@ class BaseTableViewController(UITableViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    # print(f'\t{NSStringFromClass(__class__)}: viewWillDisappear_')
+    print(f'\t{NSStringFromClass(__class__)}: viewWillDisappear_')
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
@@ -101,7 +101,6 @@ class BaseTableViewController(UITableViewController):
                  ctypes.c_bool,
                ])
     print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
-    #self.testCells = None
 
   @objc_method
   def didReceiveMemoryWarning(self):
@@ -165,6 +164,9 @@ class BaseTableViewController(UITableViewController):
       configHandlerName = str(cellTest.configHandlerName)
 
       self.performSelector_withObject_(SEL(configHandlerName), view)
+      
+      
+      
 
     return cell
 
