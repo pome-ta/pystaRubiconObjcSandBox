@@ -12,8 +12,8 @@ from .rootNavigationController import RootNavigationController
 UIApplication = ObjCClass('UIApplication')
 UIViewController = ObjCClass('UIViewController')  # todo: アノテーション用
 
-NSOperation = ObjCClass("NSOperation")
-NSOperationQueue = ObjCClass("NSOperationQueue")
+#NSOperation = ObjCClass("NSOperation")
+#NSOperationQueue = ObjCClass("NSOperationQueue")
 
 
 class App:

@@ -94,9 +94,7 @@ class RootNavigationController(UINavigationController):
     visibleViewController = self.visibleViewController
     visibleViewController.dismissViewControllerAnimated_completion_(True, None)
     '''
-    #print(visibleViewController)
-    #print(self)
-    #self.dismissViewControllerAnimated_completion_(True, None)
+    
     '''
     from .enumerations import UISceneActivationState
 
@@ -112,6 +110,7 @@ class RootNavigationController(UINavigationController):
     rootViewController = keyWindow.rootViewController
     rootViewController.dismissViewControllerAnimated_completion_(True, None)
     '''
+    
     self.dismissViewControllerAnimated_completion_(True, None)
 
   @objc_method
