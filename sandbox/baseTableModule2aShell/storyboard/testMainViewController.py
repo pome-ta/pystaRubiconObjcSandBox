@@ -42,7 +42,7 @@ class Hoge(CustomTableViewCell):
   def overrideCell(self) -> None:
     send_super(__class__, self, 'overrideCell')
 
-    type = UIButtonType.contactAdd
+    type = UIButtonType.system
     button = UIButton.buttonWithType_(type)
 
     button.translatesAutoresizingMaskIntoConstraints = False

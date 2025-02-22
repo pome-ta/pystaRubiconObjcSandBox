@@ -1,10 +1,10 @@
 import ctypes
 from enum import Enum
 
-from pyrubicon.objc.api import ObjCClass, ObjCInstance
-from pyrubicon.objc.api import objc_method
+from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
+from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id, SEL
-from pyrubicon.objc.types import NSInteger
+from pyrubicon.objc.types import NSInteger, CGPoint
 
 from caseElement import CaseElement
 
@@ -22,10 +22,25 @@ from rbedge.enumerations import (
   UIButtonConfigurationSize,
 )
 
+from rbedge.globalVariables import (
+  NSAttributedStringKey,
+  UIFontTextStyle,
+)
+
 from rbedge.functions import NSStringFromClass
 from rbedge import pdbr
 
 UIColor = ObjCClass('UIColor')
+UIButtonConfiguration = ObjCClass('UIButtonConfiguration')
+UIColor = ObjCClass('UIColor')
+NSAttributedString = ObjCClass('NSAttributedString')
+UIImageSymbolConfiguration = ObjCClass('UIImageSymbolConfiguration')
+UIFont = ObjCClass('UIFont')
+UIImage = ObjCClass('UIImage')
+NSDictionary = ObjCClass('NSDictionary')
+UIToolTipConfiguration = ObjCClass('UIToolTipConfiguration')
+UIAction = ObjCClass('UIAction')
+UIButton = ObjCClass('UIButton')  # todo: 型確認用
 
 
 class testKind(Enum):
@@ -34,6 +49,7 @@ class testKind(Enum):
 
 
 class TestMainViewController(BaseTableViewController):
+  cartItemCount = objc_property(NSInteger)
 
   @objc_method
   def dealloc(self):
@@ -128,10 +144,79 @@ class TestMainViewController(BaseTableViewController):
     send_super(__class__, self, 'didReceiveMemoryWarning')
     print(f'\t{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
 
+  @objc_method
+  def toolTipInteraction_configurationAtPoint_(
+      self, interaction, point: CGPoint) -> ctypes.c_void_p:
+    return UIToolTipConfiguration.configurationWithToolTip_('hoge').ptr
+
+  @objc_method
+  def addToCart_(self, _action: ctypes.c_void_p) -> None:
+    print('いい')
+    
+    action = ObjCInstance(_action)
+
+    self.cartItemCount = 0 if self.cartItemCount > 0 else 12
+
+    if action.sender.isKindOfClass_(UIButton):
+      button = action.sender
+      button.setNeedsUpdateConfiguration()
+    
+
   # MARK: - Configuration
   @objc_method
   def configureHogeView_(self, button):
-    button.addTarget_action_forControlEvents_(self, SEL('buttonClicked:'),UIControlEvents.touchUpInside)
+    config = UIButtonConfiguration.filledButtonConfiguration()
+    config.buttonSize = UIButtonConfigurationSize.large
+    config.image = UIImage.systemImageNamed('cart.fill')
+    config.title = 'Add to Cart'
+    config.cornerStyle = UIButtonConfigurationCornerStyle.capsule
+    config.baseBackgroundColor = UIColor.systemTealColor()
+    button.configuration = config
+    
+
+    button.toolTip = ''  # The value will be determined in its delegate. > 値はデリゲート内で決定されます。
+    # xxx: wip
+    # button.toolTipInteraction.delegate = self
+    button.addAction_forControlEvents_(
+      UIAction.actionWithHandler_(Block(self.addToCart_, None,
+                                        ctypes.c_void_p)),
+      UIControlEvents.touchUpInside)
+
+    button.changesSelectionAsPrimaryAction = True
+    
+
+    @Block
+    def _handler(button_id: objc_id) -> None:
+      _button = ObjCInstance(button_id)
+
+      # Start with the current button's configuration.
+      # > 現在のボタンの設定から始めます。
+      # newConfig = _button.configuration
+      newConfig = UIButtonConfiguration.filledButtonConfiguration()
+      newConfig.buttonSize = UIButtonConfigurationSize.large
+      newConfig.title = 'Add to Cart'
+      newConfig.cornerStyle = UIButtonConfigurationCornerStyle.capsule
+      newConfig.baseBackgroundColor = UIColor.systemTealColor()
+
+      if _button.isSelected():
+        # xxx: これだと`0` の時、取れない?
+        newConfig.image = UIImage.systemImageNamed('cart.fill.badge.plus') if self.cartItemCount > 0 else UIImage.systemImageNamed('cart.badge.plus')
+        # xxx: 力技
+        newConfig.subtitle = f'{self.cartItemCount}items'
+        #newConfig.subtitle = f'{1}items'
+        print('あ')
+      else:
+        # As the button is highlighted (pressed), apply a temporary image and subtitle.
+        # > ボタンがハイライト表示される(押される)と、一時的な画像と字幕が適用されます。
+        newConfig.image = UIImage.systemImageNamed('cart.fill')
+        newConfig.subtitle = ' '  # xxx: 文字パディング
+
+      newConfig.imagePadding = 8
+      _button.configuration = newConfig
+
+    # This handler is called when this button needs updating.
+    # > このハンドラーは、このボタンを更新する必要がある場合に呼び出されます。
+    button.configurationUpdateHandler = _handler
     
 
   @objc_method
@@ -143,6 +228,9 @@ class TestMainViewController(BaseTableViewController):
   def buttonClicked_(self, sender):
     print(f'Button was clicked.{sender}')
 
+  @objc_method
+  def toggleButtonClicked_(self, sender):
+    print(f'Toggle action: {sender}')
 
 if __name__ == '__main__':
   from rbedge.app import App
