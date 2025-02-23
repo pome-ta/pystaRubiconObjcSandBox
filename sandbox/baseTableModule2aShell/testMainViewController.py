@@ -2,8 +2,8 @@ import ctypes
 from enum import Enum
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
-from pyrubicon.objc.api import objc_method, objc_property, at
-from pyrubicon.objc.runtime import send_super, objc_id, SEL
+from pyrubicon.objc.api import objc_method, objc_property, objc_block
+from pyrubicon.objc.runtime import send_super, objc_id, SEL,Class
 from pyrubicon.objc.types import NSInteger, CGPoint
 
 from caseElement import CaseElement
@@ -67,13 +67,13 @@ class TestMainViewController(BaseTableViewController):
                argtypes=[
                  NSInteger,
                ])
-    #print(f'\t{NSStringFromClass(__class__)}: initWithStyle_')
+    print(f'\t{NSStringFromClass(__class__)}: initWithStyle_')
     return self
 
   @objc_method
   def loadView(self):
     send_super(__class__, self, 'loadView')
-    #print(f'\t{NSStringFromClass(__class__)}: loadView')
+    print(f'\t{NSStringFromClass(__class__)}: loadView')
     [
       self.tableView.registerClass_forCellReuseIdentifier_(
         prototype['cellClass'], prototype['identifier'])
@@ -85,7 +85,7 @@ class TestMainViewController(BaseTableViewController):
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
-    #print(f'\t{NSStringFromClass(__class__)}: viewDidLoad')
+    print(f'\t{NSStringFromClass(__class__)}: viewDidLoad')
     self.navigationItem.title = 'title' if (
       title := self.navigationItem.title) is None else title
 
@@ -97,7 +97,7 @@ class TestMainViewController(BaseTableViewController):
     c2 = CaseElement.alloc().initWithTitle_cellID_configHandlerName_(
       'fugafuga', testKind.fuga.value, 'configureFugaView:')
 
-    #self.testCells.addObject_(c1)
+    self.testCells.addObject_(c1)
     self.testCells.addObject_(c2)
 
   @objc_method
@@ -109,7 +109,7 @@ class TestMainViewController(BaseTableViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #print(f'\t{NSStringFromClass(__class__)}: viewWillAppear_')
+    print(f'\t{NSStringFromClass(__class__)}: viewWillAppear_')
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -120,7 +120,7 @@ class TestMainViewController(BaseTableViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #print(f'\t{NSStringFromClass(__class__)}: viewDidAppear_')
+    print(f'\t{NSStringFromClass(__class__)}: viewDidAppear_')
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
@@ -132,7 +132,7 @@ class TestMainViewController(BaseTableViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    # print(f'\t{NSStringFromClass(__class__)}: viewWillDisappear_')
+    print(f'\t{NSStringFromClass(__class__)}: viewWillDisappear_')
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
@@ -144,18 +144,6 @@ class TestMainViewController(BaseTableViewController):
                  ctypes.c_bool,
                ])
     print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
-    #print(dir(self))
-    #pdbr.state(self.cartItemCount)
-    '''
-    from pprint import pprint
-    pprint(self._cached_objects.valuerefs())
-    #pdbr.state(self._cached_objects)
-    print('___')
-    print(id(self.cartItemCount))
-    print(repr(self.cartItemCount))
-    #print(self.cartItemCount)
-    '''
-    #del self.cartItemCount
 
 
   @objc_method
@@ -168,21 +156,19 @@ class TestMainViewController(BaseTableViewController):
       self, interaction, point: CGPoint) -> ctypes.c_void_p:
     return UIToolTipConfiguration.configurationWithToolTip_('hoge').ptr
 
+
+  
   @objc_method
   def addToCart_(self, _action: ctypes.c_void_p) -> None:
     action = ObjCInstance(_action)
-    '''
-    #pdbr.state(self.cartItemCount)
-    print(type(self.cartItemCount))
-    print(self.cartItemCount)
-    pdbr.state(self.cartItemCount.intValue)
-    '''
+    
 
     self.cartItemCount = 0 if self.cartItemCount.intValue > 0 else 12
 
     if action.sender.isKindOfClass_(UIButton):
       button = action.sender
       button.setNeedsUpdateConfiguration()
+  
 
   # MARK: - Configuration
   @objc_method
@@ -198,10 +184,23 @@ class TestMainViewController(BaseTableViewController):
     button.toolTip = ''  # The value will be determined in its delegate. > 値はデリゲート内で決定されます。
     # xxx: wip
     # button.toolTipInteraction.delegate = self
-    button.addAction_forControlEvents_(
-      UIAction.actionWithHandler_(Block(self.addToCart_, None,
-                                        ctypes.c_void_p)),
-      UIControlEvents.touchUpInside)
+    '''
+    @Block
+    def addToCart_(_action: objc_id) -> None:
+      print(_action)
+      action = ObjCInstance(_action)
+      #pdbr.state(action)
+      
+  
+      self.cartItemCount = 0 if self.cartItemCount.intValue > 0 else 12
+  
+      if action.sender.isKindOfClass_(UIButton):
+        button = action.sender
+        button.setNeedsUpdateConfiguration()
+    button.addAction_forControlEvents_(UIAction.actionWithHandler_(addToCart_), UIControlEvents.touchUpInside)
+    '''
+    button.addAction_forControlEvents_(UIAction.actionWithHandler_(Block(self.addToCart_, None, ctypes.c_void_p)), UIControlEvents.touchUpInside)
+    
 
     button.changesSelectionAsPrimaryAction = True
 
@@ -242,7 +241,8 @@ class TestMainViewController(BaseTableViewController):
 
   @objc_method
   def configureFugaView_(self, button):
-    pass
+    button.addTarget_action_forControlEvents_(self, SEL('buttonClicked:'),
+                                              UIControlEvents.touchUpInside)
 
   # MARK: - Button Actions
   @objc_method

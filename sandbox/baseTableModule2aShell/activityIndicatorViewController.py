@@ -57,6 +57,7 @@ class ActivityIndicatorViewController(BaseTableViewController):
       for prototype in prototypes
     ]
     
+    
 
   # MARK: - View Life Cycle
   @objc_method
@@ -115,6 +116,7 @@ class ActivityIndicatorViewController(BaseTableViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewWillAppear_')
+    #self.tableView.reloadData()
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -151,7 +153,8 @@ class ActivityIndicatorViewController(BaseTableViewController):
     print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
     # xxx: a-shell で動くけど、Pythonista3 の２回目の`dealloc` が呼ばれない
     #self.testCells = None
-    prototypes = None
+    #prototypes = None
+    #pdbr.state(self.tableView)
 
   @objc_method
   def didReceiveMemoryWarning(self):
@@ -161,13 +164,20 @@ class ActivityIndicatorViewController(BaseTableViewController):
   # MARK: - Configuration
   @objc_method
   def configureMediumActivityIndicatorView_(self, activityIndicator):
-    # pdbr.state(activityIndicator)
-    activityIndicator.style = UIActivityIndicatorViewStyle.medium
+    #pdbr.state(activityIndicator)
+    
+    #activityIndicator.style = UIActivityIndicatorViewStyle.medium
+    activityIndicator.setStyle_(UIActivityIndicatorViewStyle.large)
+    #initWithActivityIndicatorStyle_
+    
     activityIndicator.hidesWhenStopped = True
-
+    
     activityIndicator.color = UIColor.systemRedColor()
+    #pdbr.state(activityIndicator)
 
-    #activityIndicator.startAnimating()
+    activityIndicator.startAnimating()
+    
+    
     # When the activity is done, be sure to use UIActivityIndicatorView.stopAnimating().
 
   @objc_method
