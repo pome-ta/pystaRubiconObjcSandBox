@@ -256,36 +256,35 @@ UIApplication = ObjCClass('UIApplication')
 
 class App:
 
-  def __init__(self, viewController):
+  sharedApplication = UIApplication.sharedApplication
+  __objectEnumerator = sharedApplication.connectedScenes.objectEnumerator()
+  while (__windowScene := __objectEnumerator.nextObject()):
+    if __windowScene.activationState == 0:
+      break
+  rootViewController = __windowScene.keyWindow.rootViewController
+
+  def __init__(self, viewController, modalPresentationStyle=1):
     self.viewController = viewController
-    self.rootViewController = None
+    self.modalPresentationStyle = modalPresentationStyle
 
-  def main_loop(self, modalPresentationStyle: int = 0):
-    #print('App: main_loop')
-
-    sharedApplication = UIApplication.sharedApplication
-    connectedScenes = sharedApplication.connectedScenes
-    objectEnumerator = connectedScenes.objectEnumerator()
-    while (windowScene := objectEnumerator.nextObject()):
-      # UISceneActivationState.foregroundActive = 0
-      if windowScene.activationState == 0:
-        break
-    keyWindow = windowScene.keyWindow
-    self.rootViewController = keyWindow.rootViewController
+  def present(self):
 
     @onMainThread
     def present_viewController(viewController: UIViewController,
-                               _style: int) -> None:
+                               style: int) -> None:
 
       presentViewController = RootNavigationController.alloc(
       ).initWithRootViewController_(viewController)
 
-      presentViewController.setModalPresentationStyle_(_style)
+      presentViewController.setModalPresentationStyle_(style)
 
       self.rootViewController.presentViewController_animated_completion_(
         presentViewController, True, None)
 
-    present_viewController(self.viewController, modalPresentationStyle)
+    present_viewController(self.viewController, self.modalPresentationStyle)
+    self.main_loop()
+
+  def main_loop(self):
     loop.run_forever()
     loop.close()
 
@@ -295,7 +294,8 @@ if __name__ == '__main__':
   main_vc = MainViewController.new()
   presentation_style = 1
 
-  app = App(main_vc)
-  app.main_loop(presentation_style)
+  app = App(main_vc, presentation_style)
+  app.present()
+
   print('--- end ---')
 

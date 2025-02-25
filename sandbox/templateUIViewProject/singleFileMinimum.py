@@ -9,31 +9,15 @@ from rbedge import pdbr
 ObjCClass.auto_rename = True
 
 #############################################################
-# --- utils
-#############################################################
-from pyrubicon.objc.runtime import Class, Foundation
-
-
-def NSStringFromClass(cls: Class) -> ObjCInstance:
-  _NSStringFromClass = Foundation.NSStringFromClass
-  _NSStringFromClass.restype = ctypes.c_void_p
-  _NSStringFromClass.argtypes = [Class]
-  return ObjCInstance(_NSStringFromClass(cls))
-
-
-#############################################################
 # --- lifeCycle
 #############################################################
 
 import asyncio
-import logging
 
 from pyrubicon.objc.eventloop import EventLoopPolicy
 
-#logging.basicConfig(level=logging.DEBUG)
 asyncio.set_event_loop_policy(EventLoopPolicy())
 loop = asyncio.new_event_loop()
-#loop.set_debug(True)
 
 #############################################################
 # --- mainThread
@@ -86,75 +70,15 @@ class RootNavigationController(UINavigationController):
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
-    print(f'- {NSStringFromClass(__class__)}: dealloc')
     loop.stop()
-
-  @objc_method
-  def loadView(self):
-    send_super(__class__, self, 'loadView')
-    print(f'{NSStringFromClass(__class__)}: loadView')
 
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
-    print(f'{NSStringFromClass(__class__)}: viewDidLoad')
     self.delegate = self
 
   @objc_method
-  def viewWillAppear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewWillAppear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
-    print(f'{NSStringFromClass(__class__)}: viewWillAppear_')
-
-  @objc_method
-  def viewDidAppear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewDidAppear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
-    print(f'{NSStringFromClass(__class__)}: viewDidAppear_')
-    print('↓ ---')
-
-  @objc_method
-  def viewWillDisappear_(self, animated: bool):
-    print('↑ ---')
-    send_super(__class__,
-               self,
-               'viewWillDisappear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
-    print(f'{NSStringFromClass(__class__)}: viewWillDisappear_')
-
-  @objc_method
-  def viewDidDisappear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewDidDisappear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
-    print(f'{NSStringFromClass(__class__)}: viewDidDisappear_')
-
-  @objc_method
-  def didReceiveMemoryWarning(self):
-    send_super(__class__, self, 'didReceiveMemoryWarning')
-    print(f'{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
-
-  @objc_method
   def doneButtonTapped_(self, sender):
-    print(f'{NSStringFromClass(__class__)}: doneButtonTapped:')
-
     self.dismissViewControllerAnimated_completion_(True, None)
 
   @objc_method
@@ -163,8 +87,7 @@ class RootNavigationController(UINavigationController):
     viewController.setEdgesForExtendedLayout_(0)
     _UIBarButtonSystemItem_close = 24
     closeButtonItem = UIBarButtonItem.alloc(
-    ).initWithBarButtonSystemItem_target_action_(_UIBarButtonSystemItem_close,
-                                                 navigationController,
+    ).initWithBarButtonSystemItem_target_action_(24, navigationController,
                                                  SEL('doneButtonTapped:'))
     visibleViewController = navigationController.visibleViewController
 
@@ -181,71 +104,10 @@ UIViewController = ObjCClass('UIViewController')
 class MainViewController(UIViewController):
 
   @objc_method
-  def dealloc(self):
-    # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
-    print(f'\t - {NSStringFromClass(__class__)}: dealloc')
-
-  @objc_method
-  def loadView(self):
-    send_super(__class__, self, 'loadView')
-    print(f'\t{NSStringFromClass(__class__)}: loadView')
-
-  @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
-    print(f'\t{NSStringFromClass(__class__)}: viewDidLoad')
-    self.navigationItem.title = NSStringFromClass(__class__)
-
-  @objc_method
-  def viewWillAppear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewWillAppear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
-    print(f'\t{NSStringFromClass(__class__)}: viewWillAppear_')
-
-  @objc_method
-  def viewDidAppear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewDidAppear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
-    print(f'\t{NSStringFromClass(__class__)}: viewDidAppear_')
-    print('\t↓ ---')
-
-  @objc_method
-  def viewWillDisappear_(self, animated: bool):
-    print('\t↑ ---')
-    send_super(__class__,
-               self,
-               'viewWillDisappear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
-    print(f'\t{NSStringFromClass(__class__)}: viewWillDisappear_')
-
-  @objc_method
-  def viewDidDisappear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewDidDisappear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
-    print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
-
-  @objc_method
-  def didReceiveMemoryWarning(self):
-    send_super(__class__, self, 'didReceiveMemoryWarning')
-    print(f'\t{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
+    self.navigationItem.title = 'title'
+    # todo: 処理を書く
 
 
 #############################################################
@@ -263,7 +125,7 @@ class App:
       break
   rootViewController = __windowScene.keyWindow.rootViewController
 
-  def __init__(self, viewController, modalPresentationStyle):
+  def __init__(self, viewController, modalPresentationStyle=1):
     self.viewController = viewController
     self.modalPresentationStyle = modalPresentationStyle
 
@@ -290,16 +152,9 @@ class App:
 
 
 if __name__ == '__main__':
-  print('--- run')
   main_vc = MainViewController.new()
   presentation_style = 1
 
-  #app = App(main_vc)
-  #app.main_loop(presentation_style)
-  #app.present(presentation_style)
-  #aa = App.sharedApplication
   app = App(main_vc, presentation_style)
   app.present()
-
-  print('--- end ---')
 
