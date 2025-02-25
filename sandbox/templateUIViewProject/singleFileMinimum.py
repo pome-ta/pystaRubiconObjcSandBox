@@ -87,7 +87,6 @@ class RootNavigationController(UINavigationController):
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print(f'- {NSStringFromClass(__class__)}: dealloc')
-    #pdbr.state(self)
     loop.stop()
 
   @objc_method
@@ -157,7 +156,6 @@ class RootNavigationController(UINavigationController):
     print(f'{NSStringFromClass(__class__)}: doneButtonTapped:')
 
     self.dismissViewControllerAnimated_completion_(True, None)
-    
 
   @objc_method
   def navigationController_willShowViewController_animated_(
@@ -256,7 +254,6 @@ class MainViewController(UIViewController):
 UIApplication = ObjCClass('UIApplication')
 
 
-
 class App:
 
   def __init__(self, viewController):
@@ -270,6 +267,7 @@ class App:
     connectedScenes = sharedApplication.connectedScenes
     objectEnumerator = connectedScenes.objectEnumerator()
     while (windowScene := objectEnumerator.nextObject()):
+      # UISceneActivationState.foregroundActive = 0
       if windowScene.activationState == 0:
         break
     keyWindow = windowScene.keyWindow
@@ -287,8 +285,6 @@ class App:
       self.rootViewController.presentViewController_animated_completion_(
         presentViewController, True, None)
 
-    
-
     present_viewController(self.viewController, modalPresentationStyle)
     loop.run_forever()
     loop.close()
@@ -298,7 +294,8 @@ if __name__ == '__main__':
   print('--- run')
   main_vc = MainViewController.new()
   presentation_style = 1
-  
+
   app = App(main_vc)
   app.main_loop(presentation_style)
+  print('--- end ---')
 

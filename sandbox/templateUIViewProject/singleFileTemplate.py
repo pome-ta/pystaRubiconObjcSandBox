@@ -87,7 +87,6 @@ class RootNavigationController(UINavigationController):
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print(f'- {NSStringFromClass(__class__)}: dealloc')
-    #pdbr.state(self)
     loop.stop()
 
   @objc_method
@@ -157,7 +156,6 @@ class RootNavigationController(UINavigationController):
     print(f'{NSStringFromClass(__class__)}: doneButtonTapped:')
 
     self.dismissViewControllerAnimated_completion_(True, None)
-    
 
   @objc_method
   def navigationController_willShowViewController_animated_(
@@ -251,38 +249,53 @@ class MainViewController(UIViewController):
 
 
 #############################################################
-# --- present
+# --- app present
 #############################################################
 UIApplication = ObjCClass('UIApplication')
 
 
-@onMainThread
-def present_viewController(viewController: ObjCInstance,
-                           modalPresentationStyle: int = 0):
-  sharedApplication = UIApplication.sharedApplication
-  keyWindow = sharedApplication.windows.firstObject()
-  rootViewController = keyWindow.rootViewController
-  while _presentedViewController := rootViewController.presentedViewController:
-    rootViewController = _presentedViewController
-  presentViewController = RootNavigationController.alloc(
-  ).initWithRootViewController_(viewController)
+class App:
 
-  presentViewController.setModalPresentationStyle_(modalPresentationStyle)
+  def __init__(self, viewController):
+    self.viewController = viewController
+    self.rootViewController = None
 
-  #print('present_viewController: start')
-  rootViewController.presentViewController_animated_completion_(
-    presentViewController, True, None)
-  #print('present_viewController: end')
+  def main_loop(self, modalPresentationStyle: int = 0):
+    #print('App: main_loop')
+
+    sharedApplication = UIApplication.sharedApplication
+    connectedScenes = sharedApplication.connectedScenes
+    objectEnumerator = connectedScenes.objectEnumerator()
+    while (windowScene := objectEnumerator.nextObject()):
+      # UISceneActivationState.foregroundActive = 0
+      if windowScene.activationState == 0:
+        break
+    keyWindow = windowScene.keyWindow
+    self.rootViewController = keyWindow.rootViewController
+
+    @onMainThread
+    def present_viewController(viewController: UIViewController,
+                               _style: int) -> None:
+
+      presentViewController = RootNavigationController.alloc(
+      ).initWithRootViewController_(viewController)
+
+      presentViewController.setModalPresentationStyle_(_style)
+
+      self.rootViewController.presentViewController_animated_completion_(
+        presentViewController, True, None)
+
+    present_viewController(self.viewController, modalPresentationStyle)
+    loop.run_forever()
+    loop.close()
 
 
 if __name__ == '__main__':
   print('--- run')
   main_vc = MainViewController.new()
   presentation_style = 1
-  present_viewController(main_vc, presentation_style)
-  print('--- run_forever: start')
-  loop.run_forever()
-  print('--- run_forever: close')
-  loop.close()
-  print('--- end')
+
+  app = App(main_vc)
+  app.main_loop(presentation_style)
+  print('--- end ---')
 
