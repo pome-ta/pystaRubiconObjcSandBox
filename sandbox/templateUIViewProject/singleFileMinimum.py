@@ -256,22 +256,19 @@ UIApplication = ObjCClass('UIApplication')
 
 class App:
 
+  sharedApplication = UIApplication.sharedApplication
+  #rootViewController = __class__.get_rootViewController()
+  __objectEnumerator = sharedApplication.connectedScenes.objectEnumerator()
+  while (__windowScene := __objectEnumerator.nextObject()):
+    if __windowScene.activationState == 0:
+      break
+  rootViewController = __windowScene.keyWindow.rootViewController
+
   def __init__(self, viewController):
     self.viewController = viewController
-    self.rootViewController = None
+    #self.rootViewController = None
 
-  def main_loop(self, modalPresentationStyle: int = 0):
-    #print('App: main_loop')
-
-    sharedApplication = UIApplication.sharedApplication
-    connectedScenes = sharedApplication.connectedScenes
-    objectEnumerator = connectedScenes.objectEnumerator()
-    while (windowScene := objectEnumerator.nextObject()):
-      # UISceneActivationState.foregroundActive = 0
-      if windowScene.activationState == 0:
-        break
-    keyWindow = windowScene.keyWindow
-    self.rootViewController = keyWindow.rootViewController
+  def present(self, modalPresentationStyle: int = 0):
 
     @onMainThread
     def present_viewController(viewController: UIViewController,
@@ -286,6 +283,9 @@ class App:
         presentViewController, True, None)
 
     present_viewController(self.viewController, modalPresentationStyle)
+    self.main_loop()
+
+  def main_loop(self):
     loop.run_forever()
     loop.close()
 
@@ -295,7 +295,9 @@ if __name__ == '__main__':
   main_vc = MainViewController.new()
   presentation_style = 1
 
-  app = App(main_vc)
-  app.main_loop(presentation_style)
+  #app = App(main_vc)
+  #app.main_loop(presentation_style)
+  #app.present(presentation_style)
+  aa = App.sharedApplication
   print('--- end ---')
 
