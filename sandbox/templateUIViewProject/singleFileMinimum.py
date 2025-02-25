@@ -257,32 +257,31 @@ UIApplication = ObjCClass('UIApplication')
 class App:
 
   sharedApplication = UIApplication.sharedApplication
-  #rootViewController = __class__.get_rootViewController()
   __objectEnumerator = sharedApplication.connectedScenes.objectEnumerator()
   while (__windowScene := __objectEnumerator.nextObject()):
     if __windowScene.activationState == 0:
       break
   rootViewController = __windowScene.keyWindow.rootViewController
 
-  def __init__(self, viewController):
+  def __init__(self, viewController, modalPresentationStyle):
     self.viewController = viewController
-    #self.rootViewController = None
+    self.modalPresentationStyle = modalPresentationStyle
 
-  def present(self, modalPresentationStyle: int = 0):
+  def present(self):
 
     @onMainThread
     def present_viewController(viewController: UIViewController,
-                               _style: int) -> None:
+                               style: int) -> None:
 
       presentViewController = RootNavigationController.alloc(
       ).initWithRootViewController_(viewController)
 
-      presentViewController.setModalPresentationStyle_(_style)
+      presentViewController.setModalPresentationStyle_(style)
 
       self.rootViewController.presentViewController_animated_completion_(
         presentViewController, True, None)
 
-    present_viewController(self.viewController, modalPresentationStyle)
+    present_viewController(self.viewController, self.modalPresentationStyle)
     self.main_loop()
 
   def main_loop(self):
@@ -298,6 +297,9 @@ if __name__ == '__main__':
   #app = App(main_vc)
   #app.main_loop(presentation_style)
   #app.present(presentation_style)
-  aa = App.sharedApplication
+  #aa = App.sharedApplication
+  app = App(main_vc, presentation_style)
+  app.present()
+
   print('--- end ---')
 
