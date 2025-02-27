@@ -9,7 +9,7 @@ from pyrubicon.objc.runtime import Foundation
 
 ObjCClass.auto_rename = True
 
-#############################################################
+#######################################################
 # --- exception
 #######################################################
 # todo: from objc_util.py of Pythonista3
