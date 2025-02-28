@@ -5,17 +5,22 @@ import ctypes
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
 from pyrubicon.objc.api import objc_method
 from pyrubicon.objc.runtime import objc_id, send_super, SEL
-
-from rbedge import pdbr
+# todo: utils ###############################################
+from pyrubicon.objc.runtime import Class, Foundation
+# todo: lifeCycle ###########################################
+import asyncio
+import logging
+from pyrubicon.objc.eventloop import EventLoopPolicy
+# todo: mainThread ##########################################
+import functools
+from pyrubicon.objc.runtime import libobjc, objc_block
 
 ObjCClass.auto_rename = True
+
 
 #############################################################
 # --- utils
 #############################################################
-from pyrubicon.objc.runtime import Class, Foundation
-
-
 def NSStringFromClass(cls: Class) -> ObjCInstance:
   _NSStringFromClass = Foundation.NSStringFromClass
   _NSStringFromClass.restype = ctypes.c_void_p
@@ -55,12 +60,6 @@ NSSetUncaughtExceptionHandler(_handler)
 #############################################################
 # --- lifeCycle
 #############################################################
-
-import asyncio
-import logging
-
-from pyrubicon.objc.eventloop import EventLoopPolicy
-
 #logging.basicConfig(level=logging.DEBUG)
 asyncio.set_event_loop_policy(EventLoopPolicy())
 loop = asyncio.new_event_loop()
@@ -69,9 +68,6 @@ loop = asyncio.new_event_loop()
 #############################################################
 # --- mainThread
 #############################################################
-import functools
-from pyrubicon.objc.runtime import libobjc, objc_block
-
 NSThread = ObjCClass('NSThread')
 
 
@@ -191,14 +187,11 @@ class RootNavigationController(UINavigationController):
   @objc_method
   def navigationController_willShowViewController_animated_(
       self, navigationController, viewController, animated: bool):
-    viewController.setEdgesForExtendedLayout_(0)
-    _UIBarButtonSystemItem_close = 24
-    closeButtonItem = UIBarButtonItem.alloc(
-    ).initWithBarButtonSystemItem_target_action_(_UIBarButtonSystemItem_close,
-                                                 navigationController,
-                                                 SEL('doneButtonTapped:'))
-    visibleViewController = navigationController.visibleViewController
+    #closeButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItem_target_action_(24, navigationController, SEL('doneButtonTapped:'))
+    closeButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItem(
+      24, target=navigationController, action=SEL('doneButtonTapped:'))
 
+    visibleViewController = navigationController.visibleViewController
     navigationItem = visibleViewController.navigationItem
     navigationItem.rightBarButtonItem = closeButtonItem
 
@@ -301,8 +294,7 @@ class App:
   def present(self):
 
     @onMainThread
-    def present_viewController(viewController: UIViewController,
-                               style: int) -> None:
+    def present_viewController(viewController: UIViewController, style: int):
 
       presentViewController = RootNavigationController.alloc(
       ).initWithRootViewController_(viewController)
@@ -321,7 +313,7 @@ class App:
 
 
 if __name__ == '__main__':
-  print('--- run')
+  print('--- run ---')
   main_vc = MainViewController.new()
   presentation_style = 1
 
