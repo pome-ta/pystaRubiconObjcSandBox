@@ -13,8 +13,8 @@ from rbedge import pdbr
 UIViewController = ObjCClass('UIViewController')
 
 
-
 class SfSymbolsViewController(UIViewController):
+
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
