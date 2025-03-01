@@ -1,5 +1,3 @@
-import sys
-import os
 import ctypes
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
@@ -11,9 +9,14 @@ from pyrubicon.objc.runtime import Class, Foundation
 import asyncio
 import logging
 from pyrubicon.objc.eventloop import EventLoopPolicy
+# todo: exception ###########################################
+import sys
+import os
 # todo: mainThread ##########################################
 import functools
 from pyrubicon.objc.runtime import libobjc, objc_block
+
+from rbedge import pdbr
 
 ObjCClass.auto_rename = True
 
@@ -105,6 +108,7 @@ def onMainThread(func):
 # --- UINavigationController
 #############################################################
 UINavigationController = ObjCClass('UINavigationController')
+UINavigationBarAppearance = ObjCClass('UINavigationBarAppearance')
 UIBarButtonItem = ObjCClass('UIBarButtonItem')
 
 
@@ -114,12 +118,24 @@ class RootNavigationController(UINavigationController):
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print(f'- {NSStringFromClass(__class__)}: dealloc')
+    # --- (5) ###############################################
     loop.stop()
+    print('--- stop')
 
   @objc_method
   def loadView(self):
     send_super(__class__, self, 'loadView')
     print(f'{NSStringFromClass(__class__)}: loadView')
+    navigationBarAppearance = UINavigationBarAppearance.new()
+    navigationBarAppearance.configureWithDefaultBackground()
+    #navigationBarAppearance.configureWithOpaqueBackground()
+    #navigationBarAppearance.configureWithTransparentBackground()
+
+    navigationBar = self.navigationBar
+    navigationBar.standardAppearance = navigationBarAppearance
+    navigationBar.scrollEdgeAppearance = navigationBarAppearance
+    navigationBar.compactAppearance = navigationBarAppearance
+    navigationBar.compactScrollEdgeAppearance = navigationBarAppearance
 
   @objc_method
   def viewDidLoad(self):
@@ -181,7 +197,6 @@ class RootNavigationController(UINavigationController):
   @objc_method
   def doneButtonTapped_(self, sender):
     print(f'{NSStringFromClass(__class__)}: doneButtonTapped:')
-
     self.dismissViewControllerAnimated_completion_(True, None)
 
   @objc_method
@@ -280,6 +295,7 @@ UIApplication = ObjCClass('UIApplication')
 
 class App:
 
+  # --- (1) #################################################
   sharedApplication = UIApplication.sharedApplication
   __objectEnumerator = sharedApplication.connectedScenes.objectEnumerator()
   while (__windowScene := __objectEnumerator.nextObject()):
@@ -293,6 +309,7 @@ class App:
 
   def present(self):
 
+    # --- (2) ###############################################
     @onMainThread
     def present_viewController(viewController: UIViewController, style: int):
 
@@ -304,10 +321,12 @@ class App:
       self.rootViewController.presentViewController_animated_completion_(
         presentViewController, True, None)
 
+    # --- (3) ###############################################
     present_viewController(self.viewController, self.modalPresentationStyle)
     self.main_loop()
 
   def main_loop(self):
+    # --- (4) ###############################################
     loop.run_forever()
     loop.close()
 
@@ -319,6 +338,6 @@ if __name__ == '__main__':
 
   app = App(main_vc, presentation_style)
   app.present()
-
   print('--- end ---')
+  # --- (6) #################################################
 
