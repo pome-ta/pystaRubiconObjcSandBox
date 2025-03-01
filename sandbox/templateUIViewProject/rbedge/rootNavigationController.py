@@ -14,6 +14,7 @@ from .functions import NSStringFromClass
 from . import pdbr
 
 UINavigationController = ObjCClass('UINavigationController')
+UINavigationBarAppearance = ObjCClass('UINavigationBarAppearance')
 UIBarButtonItem = ObjCClass('UIBarButtonItem')
 
 
@@ -30,6 +31,19 @@ class RootNavigationController(UINavigationController):
   def loadView(self):
     send_super(__class__, self, 'loadView')
     #print(f'{NSStringFromClass(__class__)}: loadView')
+    navigationBarAppearance = UINavigationBarAppearance.new()
+    navigationBarAppearance.configureWithDefaultBackground()
+    #navigationBarAppearance.configureWithOpaqueBackground()
+    #navigationBarAppearance.configureWithTransparentBackground()
+    
+    navigationBar = self.navigationBar
+    
+
+    navigationBar.standardAppearance = navigationBarAppearance
+    navigationBar.scrollEdgeAppearance = navigationBarAppearance
+    navigationBar.compactAppearance = navigationBarAppearance
+    navigationBar.compactScrollEdgeAppearance = navigationBarAppearance
+    
 
   @objc_method
   def viewDidLoad(self):

@@ -61,7 +61,7 @@ class SfSymbolsViewController(UIViewController):
     # --- Navigation
     self.navigationItem.title = NSStringFromClass(__class__)
 
-    #self.view.backgroundColor = UIColor.systemDarkBlueColor()
+    self.view.backgroundColor = UIColor.systemDarkBlueColor()
 
     # --- Table
     sfTableView = UITableView.alloc().initWithFrame_style_(
