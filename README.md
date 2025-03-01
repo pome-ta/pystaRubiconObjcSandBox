@@ -12,3 +12,6 @@ ctypes [Release v3.6.1 · python/cpython](https://github.com/python/cpython/rele
 - `0.4.8`
 - `0.4.9`
 - `0.5.0`
+
+
+[rubicon-objc/LICENSE at main · beeware/rubicon-objc · GitHub](https://github.com/beeware/rubicon-objc/blob/main/LICENSE)
