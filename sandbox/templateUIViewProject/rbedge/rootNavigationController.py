@@ -93,33 +93,10 @@ class RootNavigationController(UINavigationController):
   @objc_method
   def navigationController_willShowViewController_animated_(
       self, navigationController, viewController, animated: bool):
-    # xxx: layout 範囲の制限
-    #extendedLayout = UIRectEdge.none
-    #viewController.setEdgesForExtendedLayout_(extendedLayout)
-    
-    #viewController.setEdgesForExtendedLayout_(0)
-
     closeButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItem(
-      UIBarButtonSystemItem.close,
-      target=navigationController,
-      action=SEL('doneButtonTapped:'))
-    # todo: view 遷移でのButton 重複を判別
-    closeButtonItem.setTag_(UIBarButtonSystemItem.close)
+      24, target=navigationController, action=SEL('doneButtonTapped:'))
 
     visibleViewController = navigationController.visibleViewController
-
     navigationItem = visibleViewController.navigationItem
-    if (rightBarButtonItems := navigationItem.rightBarButtonItems):
-      # todo: `UIViewController` で、`rightBarButtonItem` が存在していた場合、`closeButtonItem` を右端に
-      setRightBarButtonItems = [
-        closeButtonItem,
-        *[
-          item for item in rightBarButtonItems
-          if item.tag != UIBarButtonSystemItem.close
-        ],
-      ]
-      navigationItem.setRightBarButtonItems_animated_(setRightBarButtonItems,
-                                                      True)
-    else:
-      navigationItem.rightBarButtonItem = closeButtonItem
+    navigationItem.rightBarButtonItem = closeButtonItem
 
