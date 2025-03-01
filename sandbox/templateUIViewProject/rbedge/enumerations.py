@@ -62,3 +62,11 @@ class UISceneActivationState:
   foregroundInactive: int = 1
   background: int = 2
 
+
+
+# ref: [UITableViewStyle | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uitableviewstyle?language=objc)
+class UITableViewStyle:
+  # ref: [UITableView.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UITableView.rs.html#19)
+  plain: int = 0
+  grouped: int = 1
+  insetGrouped: int = 2

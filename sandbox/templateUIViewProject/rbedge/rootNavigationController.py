@@ -96,6 +96,8 @@ class RootNavigationController(UINavigationController):
     # xxx: layout 範囲の制限
     #extendedLayout = UIRectEdge.none
     #viewController.setEdgesForExtendedLayout_(extendedLayout)
+    
+    #viewController.setEdgesForExtendedLayout_(0)
 
     closeButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItem(
       UIBarButtonSystemItem.close,
