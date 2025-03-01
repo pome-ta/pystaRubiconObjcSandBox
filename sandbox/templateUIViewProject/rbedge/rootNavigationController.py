@@ -22,9 +22,9 @@ class RootNavigationController(UINavigationController):
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
-    print(f'- {NSStringFromClass(__class__)}: dealloc')
+    #print(f'- {NSStringFromClass(__class__)}: dealloc')
     loop.stop()
-    #print('--- stop')
+    print('--- stop')
 
   @objc_method
   def loadView(self):
@@ -79,7 +79,7 @@ class RootNavigationController(UINavigationController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    print(f'{NSStringFromClass(__class__)}: viewDidDisappear_')
+    #print(f'{NSStringFromClass(__class__)}: viewDidDisappear_')
 
   @objc_method
   def didReceiveMemoryWarning(self):

@@ -43,7 +43,8 @@ class SfSymbolsViewController(UIViewController):
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
-    print(f'\t - {NSStringFromClass(__class__)}: dealloc')
+    #print(f'\t - {NSStringFromClass(__class__)}: dealloc')
+    pass
 
   @objc_method
   def loadView(self):
@@ -132,7 +133,7 @@ class SfSymbolsViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
+    #print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
 
   @objc_method
   def didReceiveMemoryWarning(self):
@@ -166,7 +167,9 @@ class SfSymbolsViewController(UIViewController):
   @objc_method
   def tableView_didSelectRowAtIndexPath_(self, tableView, indexPath):
     #tableView.deselectRowAtIndexPath_animated_(indexPath, True)
-    print(self.all_items[indexPath.row])
+    select_item = self.all_items[indexPath.row]
+
+    print(f'select:\t{select_item}')
 
 
 if __name__ == '__main__':
