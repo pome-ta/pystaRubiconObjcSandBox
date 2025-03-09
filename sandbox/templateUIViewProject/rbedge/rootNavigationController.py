@@ -5,13 +5,9 @@ from pyrubicon.objc.api import objc_method
 from pyrubicon.objc.runtime import send_super, SEL
 
 from .lifeCycle import loop
-from .enumerations import (
-  UIRectEdge,
-  UIBarButtonSystemItem,
-)
+from .enumerations import UIBarButtonSystemItem
 
 from .functions import NSStringFromClass
-from . import pdbr
 
 UINavigationController = ObjCClass('UINavigationController')
 UINavigationBarAppearance = ObjCClass('UINavigationBarAppearance')
@@ -25,7 +21,7 @@ class RootNavigationController(UINavigationController):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     #print(f'- {NSStringFromClass(__class__)}: dealloc')
     loop.stop()
-    print('--- stop')
+    #print('--- stop')
 
   @objc_method
   def loadView(self):
@@ -36,11 +32,14 @@ class RootNavigationController(UINavigationController):
     #navigationBarAppearance.configureWithOpaqueBackground()
     #navigationBarAppearance.configureWithTransparentBackground()
 
+    '''
     navigationBar = self.navigationBar
     navigationBar.standardAppearance = navigationBarAppearance
     navigationBar.scrollEdgeAppearance = navigationBarAppearance
     navigationBar.compactAppearance = navigationBarAppearance
     navigationBar.compactScrollEdgeAppearance = navigationBarAppearance
+    '''
+    
 
   @objc_method
   def viewDidLoad(self):
@@ -98,14 +97,16 @@ class RootNavigationController(UINavigationController):
     print(f'{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
 
   @objc_method
-  def doneButtonTapped_(self, sender):
+  def closeButtonTapped_(self, sender):
     self.dismissViewControllerAnimated_completion_(True, None)
 
   @objc_method
   def navigationController_willShowViewController_animated_(
       self, navigationController, viewController, animated: bool):
     closeButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItem(
-      24, target=navigationController, action=SEL('doneButtonTapped:'))
+      UIBarButtonSystemItem.close,
+      target=navigationController,
+      action=SEL('closeButtonTapped:'))
 
     visibleViewController = navigationController.visibleViewController
     navigationItem = visibleViewController.navigationItem
