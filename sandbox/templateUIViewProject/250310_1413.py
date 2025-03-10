@@ -1,5 +1,5 @@
 from pyrubicon.objc.api import ObjCClass
-from pyrubicon.objc.api import objc_method
+from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 
 from rbedge.enumerations import UITableViewStyle
@@ -8,12 +8,26 @@ from rbedge import pdbr
 
 UIViewController = ObjCClass('UIViewController')
 UITableView = ObjCClass('UITableView')
+UITableViewCell = ObjCClass('UITableViewCell')
 
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 UIColor = ObjCClass('UIColor')
 
 
 class SFSymbolsViewController(UIViewController):
+
+  cell_identifier: str = objc_property()
+  all_items: list = objc_property()
+
+  @objc_method
+  def loadView(self):
+    send_super(__class__, self, 'loadView')
+    self.cell_identifier = 'customCell'
+    self.all_items = [
+      'ほげ',
+      'ふが',
+      'ぴよ',
+    ]
 
   @objc_method
   def viewDidLoad(self):
@@ -24,24 +38,27 @@ class SFSymbolsViewController(UIViewController):
       title := self.navigationItem.title) is None else title
 
     # --- Table
-    sfTableView = UITableView.alloc().initWithFrame_style_(
+    sf_tableView = UITableView.alloc().initWithFrame_style_(
       self.view.bounds, UITableViewStyle.plain)
-    sfTableView.backgroundColor = UIColor.cyanColor()
-    pdbr.state(UIColor)
+    sf_tableView.registerClass_forCellReuseIdentifier_(UITableViewCell,
+                                                       self.cell_identifier)
+    sf_tableView.dataSource = self
+
+    sf_tableView.backgroundColor = UIColor.systemCyanColor()
 
     # --- Layout
-    self.view.addSubview_(sfTableView)
-    sfTableView.translatesAutoresizingMaskIntoConstraints = False
+    self.view.addSubview_(sf_tableView)
+    sf_tableView.translatesAutoresizingMaskIntoConstraints = False
     areaLayoutGuide = self.view.safeAreaLayoutGuide
 
     NSLayoutConstraint.activateConstraints_([
-      sfTableView.centerXAnchor.constraintEqualToAnchor_(
+      sf_tableView.centerXAnchor.constraintEqualToAnchor_(
         areaLayoutGuide.centerXAnchor),
-      sfTableView.centerYAnchor.constraintEqualToAnchor_(
+      sf_tableView.centerYAnchor.constraintEqualToAnchor_(
         areaLayoutGuide.centerYAnchor),
-      sfTableView.widthAnchor.constraintEqualToAnchor_multiplier_(
+      sf_tableView.widthAnchor.constraintEqualToAnchor_multiplier_(
         areaLayoutGuide.widthAnchor, 0.5),
-      sfTableView.heightAnchor.constraintEqualToAnchor_multiplier_(
+      sf_tableView.heightAnchor.constraintEqualToAnchor_multiplier_(
         areaLayoutGuide.heightAnchor, 0.5),
     ])
 
@@ -49,6 +66,20 @@ class SFSymbolsViewController(UIViewController):
   def didReceiveMemoryWarning(self):
     send_super(__class__, self, 'didReceiveMemoryWarning')
     print(f'\t{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
+
+  # --- UITableViewDataSource
+  @objc_method
+  def tableView_numberOfRowsInSection_(self, tableView, section: int) -> int:
+    return len(self.all_items)
+
+  @objc_method
+  def tableView_cellForRowAtIndexPath_(self, tableView, indexPath):
+    cell = tableView.dequeueReusableCellWithIdentifier_forIndexPath_(
+      self.cell_identifier, indexPath)
+    content = cell.defaultContentConfiguration()
+    content.text = self.all_items[indexPath.row]
+    cell.contentConfiguration = content
+    return cell
 
 
 if __name__ == '__main__':
