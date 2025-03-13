@@ -54,6 +54,7 @@ class SFSymbolsViewController(UIViewController):
     sf_tableView.registerClass_forCellReuseIdentifier_(UITableViewCell,
                                                        self.cell_identifier)
     sf_tableView.dataSource = self
+    sf_tableView.delegate = self
 
     # --- Layout
     self.view.addSubview_(sf_tableView)
@@ -95,6 +96,14 @@ class SFSymbolsViewController(UIViewController):
     cell.contentConfiguration = content
 
     return cell
+
+  # --- UITableViewDelegate
+  @objc_method
+  def tableView_didSelectRowAtIndexPath_(self, tableView, indexPath):
+    #tableView.deselectRowAtIndexPath_animated_(indexPath, True)
+    select_item = self.all_items[indexPath.row]
+
+    print(f'select:\t{select_item}')
 
 
 if __name__ == '__main__':
