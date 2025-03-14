@@ -79,6 +79,8 @@ class SFSymbolsViewController(UIViewController):
     content = cell.defaultContentConfiguration()
     content.text = self.all_items[indexPath.row]
     cell.contentConfiguration = content
+    
+    print(type(cell))
     return cell
 
 

@@ -8,10 +8,6 @@ from rbedge.functions import NSStringFromClass
 
 UIViewController = ObjCClass('UIViewController')
 
-AVAudioEngine = ObjCClass('AVAudioEngine')
-AVAudioSourceNode = ObjCClass('AVAudioSourceNode')
-AVAudioFormat = ObjCClass('AVAudioFormat')
-
 
 class MainViewController(UIViewController):
 
