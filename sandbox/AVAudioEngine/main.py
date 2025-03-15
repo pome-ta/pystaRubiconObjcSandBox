@@ -2,9 +2,12 @@ import ctypes
 
 from pyrubicon.objc.api import ObjCClass
 from pyrubicon.objc.api import objc_method
+from pyrubicon.objc.api import NSObject
 from pyrubicon.objc.runtime import send_super
 
 from rbedge.functions import NSStringFromClass
+
+from rbedge import pdbr
 
 UIViewController = ObjCClass('UIViewController')
 
@@ -12,6 +15,20 @@ AVAudioEngine = ObjCClass('AVAudioEngine')
 AVAudioSourceNode = ObjCClass('AVAudioSourceNode')
 AVAudioFormat = ObjCClass('AVAudioFormat')
 
+
+class WaveGenerator(NSObject):
+  @objc_method
+  def dealloc(self):
+    # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
+    print(f'\t - {NSStringFromClass(__class__)}: dealloc')
+    
+  @objc_method
+  def init(self):
+    send_super(__class__, self, 'init')
+    print(f'\t{NSStringFromClass(__class__)}: init')
+    return self
+    
+  
 
 class MainViewController(UIViewController):
 
@@ -32,6 +49,9 @@ class MainViewController(UIViewController):
     #print(f'\t{NSStringFromClass(__class__)}: viewDidLoad')
     self.navigationItem.title = NSStringFromClass(__class__) if (
       title := self.navigationItem.title) is None else title
+    
+    wave_generator = WaveGenerator.new()
+    #pdbr.state(AudioEngeneWaveGenerator.new())
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
