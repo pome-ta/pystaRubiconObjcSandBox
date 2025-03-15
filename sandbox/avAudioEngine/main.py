@@ -1,7 +1,11 @@
+"""
+[【iOS】Core Audioでシンセサイザーを作る #Swift - Qiita](https://qiita.com/TokyoYoshida/items/df60ea8585a0223e868b)
+"""
+
 import ctypes
 
 from pyrubicon.objc.api import ObjCClass
-from pyrubicon.objc.api import objc_method
+from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.api import NSObject
 from pyrubicon.objc.runtime import send_super
 
@@ -16,19 +20,28 @@ AVAudioSourceNode = ObjCClass('AVAudioSourceNode')
 AVAudioFormat = ObjCClass('AVAudioFormat')
 
 
-class WaveGenerator(NSObject):
+class AudioEngeneWaveGenerator(NSObject):
+
+  audioEngine: AVAudioEngine = objc_property()
+
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print(f'\t - {NSStringFromClass(__class__)}: dealloc')
-    
+
+  
   @objc_method
   def init(self):
     send_super(__class__, self, 'init')
     print(f'\t{NSStringFromClass(__class__)}: init')
-    return self
+    audioEngine = AVAudioEngine.new()
+    mainMixer = audioEngine.mainMixerNode
     
-  
+    self.audioEngine = audioEngine
+    
+    return self
+
+
 
 class MainViewController(UIViewController):
 
@@ -49,8 +62,9 @@ class MainViewController(UIViewController):
     #print(f'\t{NSStringFromClass(__class__)}: viewDidLoad')
     self.navigationItem.title = NSStringFromClass(__class__) if (
       title := self.navigationItem.title) is None else title
+
+    wave_generator = AudioEngeneWaveGenerator.new()
     
-    wave_generator = WaveGenerator.new()
     #pdbr.state(AudioEngeneWaveGenerator.new())
 
   @objc_method
@@ -114,5 +128,4 @@ if __name__ == '__main__':
 
   app = App(main_vc, presentation_style)
   app.present()
-
 
