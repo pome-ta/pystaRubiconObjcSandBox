@@ -44,12 +44,10 @@ class Synth(NSObject):
   sampleRate: float = objc_property(float)
   deltaTime: float = objc_property(float)
 
-  
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print(f'\t - {NSStringFromClass(__class__)}: dealloc')
-  
 
   @objc_method
   def init(self):
@@ -74,7 +72,7 @@ class Synth(NSObject):
                     outputData: ctypes.c_void_p) -> OSStatus:
       #print(f'{isSilence=}, {timestamp=}, {frameCount=}, {outputData=}')
       print('t')
-      
+
       return 0
 
     sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(renderBlock)
@@ -82,11 +80,9 @@ class Synth(NSObject):
     audioEngine.connect_to_format_(sourceNode, mainMixer, inputFormat)
     audioEngine.connect_to_format_(mainMixer, outputNode, None)
     mainMixer.outputVolume = 0.5
-    
+
     # xxx: 不要？
     audioEngine.prepare()
-
-    
 
     self.audioEngine = audioEngine
     self.sampleRate = sampleRate
@@ -107,10 +103,9 @@ class Synth(NSObject):
     self.audioEngine.stop()
 
 
-
 class MainViewController(UIViewController):
-  
-  synth:Synth = objc_property()
+
+  synth: Synth = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -131,10 +126,7 @@ class MainViewController(UIViewController):
     self.navigationItem.title = NSStringFromClass(__class__) if (
       title := self.navigationItem.title) is None else title
 
-    
     self.synth.start()
-
-    #pdbr.state(AudioEngeneWaveGenerator.new())
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
