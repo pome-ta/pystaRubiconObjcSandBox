@@ -23,6 +23,21 @@ OSStatus = ctypes.c_int32
 CHANNEL = 1
 
 
+class AudioBuffer(ctypes.Structure):
+  _fields_ = [
+    ('mNumberChannels', ctypes.c_uint32),
+    ('mDataByteSize', ctypes.c_uint32),
+    ('mData', ctypes.c_void_p),
+  ]
+
+
+class AudioBufferList(ctypes.Structure):
+  _fields_ = [
+    ('mNumberBuffers', ctypes.c_uint32),
+    ('mBuffers', AudioBuffer * CHANNEL),
+  ]
+
+
 class Synth(NSObject):
 
   audioEngine: AVAudioEngine = objc_property()
@@ -46,18 +61,30 @@ class Synth(NSObject):
 
     sampleRate = format.sampleRate
     deltaTime = 1 / sampleRate
-    
+
     inputFormat = AVAudioFormat.alloc(
     ).initWithCommonFormat_sampleRate_channels_interleaved_(
       format.commonFormat, sampleRate, CHANNEL, format.isInterleaved())
 
     @Block
-    def renderBlock():
-      pass
-    
-    #sourceNode
-    
-    
+    def renderBlock(isSilence: ctypes.c_bool, timestamp: ctypes.c_void_p,
+                    frameCount: ctypes.c_uint,
+                    outputData: ctypes.c_void_p) -> OSStatus:
+      print(f'{isSilence=}, {timestamp=}, {frameCount=}, {outputData=}')
+      return 0
+
+    sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(renderBlock)
+    audioEngine.attachNode_(sourceNode)
+    audioEngine.connect_to_format_(sourceNode, mainMixer, inputFormat)
+    audioEngine.connect_to_format_(mainMixer, outputNode, None)
+    mainMixer.outputVolume = 0.5
+
+    try:
+      audioEngine.startAndReturnError_(None)
+
+    except Exception as e:
+      print(f'{e}: エラー')
+
     self.audioEngine = audioEngine
     self.sampleRate = sampleRate
     self.deltaTime = deltaTime
