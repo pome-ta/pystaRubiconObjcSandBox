@@ -4,7 +4,7 @@
 
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass
+from pyrubicon.objc.api import ObjCClass, Block
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.api import NSObject
 from pyrubicon.objc.runtime import send_super
@@ -16,31 +16,53 @@ from rbedge import pdbr
 UIViewController = ObjCClass('UIViewController')
 
 AVAudioEngine = ObjCClass('AVAudioEngine')
-AVAudioSourceNode = ObjCClass('AVAudioSourceNode')
 AVAudioFormat = ObjCClass('AVAudioFormat')
+AVAudioSourceNode = ObjCClass('AVAudioSourceNode')
+
+OSStatus = ctypes.c_int32
+CHANNEL = 1
 
 
-class AudioEngeneWaveGenerator(NSObject):
+class Synth(NSObject):
 
   audioEngine: AVAudioEngine = objc_property()
+  sampleRate: float = objc_property(float)
+  deltaTime: float = objc_property(float)
 
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print(f'\t - {NSStringFromClass(__class__)}: dealloc')
 
-  
   @objc_method
   def init(self):
     send_super(__class__, self, 'init')
-    print(f'\t{NSStringFromClass(__class__)}: init')
+    print(f'{NSStringFromClass(__class__)}: init')
     audioEngine = AVAudioEngine.new()
+
     mainMixer = audioEngine.mainMixerNode
+    outputNode = audioEngine.outputNode
+    format = outputNode.inputFormatForBus_(0)
+
+    sampleRate = format.sampleRate
+    deltaTime = 1 / sampleRate
+    
+    inputFormat = AVAudioFormat.alloc(
+    ).initWithCommonFormat_sampleRate_channels_interleaved_(
+      format.commonFormat, sampleRate, CHANNEL, format.isInterleaved())
+
+    @Block
+    def renderBlock():
+      pass
+    
+    #sourceNode
+    
     
     self.audioEngine = audioEngine
-    
-    return self
+    self.sampleRate = sampleRate
+    self.deltaTime = deltaTime
 
+    return self
 
 
 class MainViewController(UIViewController):
@@ -63,8 +85,8 @@ class MainViewController(UIViewController):
     self.navigationItem.title = NSStringFromClass(__class__) if (
       title := self.navigationItem.title) is None else title
 
-    wave_generator = AudioEngeneWaveGenerator.new()
-    
+    synth = Synth.new()
+
     #pdbr.state(AudioEngeneWaveGenerator.new())
 
   @objc_method
