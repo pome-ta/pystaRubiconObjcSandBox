@@ -71,8 +71,7 @@ class Synth(NSObject):
                     frameCount: ctypes.c_uint,
                     outputData: ctypes.c_void_p) -> OSStatus:
       #print(f'{isSilence=}, {timestamp=}, {frameCount=}, {outputData=}')
-      ablPointer = ctypes.cast(outputData, ctypes.POINTER(AudioBufferList))#.contents
-      print(ablPointer)
+      print('t')
 
       return 0
 
@@ -106,7 +105,7 @@ class Synth(NSObject):
 
 class MainViewController(UIViewController):
 
-  #synth: Synth = objc_property()
+  synth: Synth = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -118,7 +117,7 @@ class MainViewController(UIViewController):
   def loadView(self):
     send_super(__class__, self, 'loadView')
     #print(f'\t{NSStringFromClass(__class__)}: loadView')
-    #self.synth = Synth.new()
+    self.synth = Synth.new()
 
   @objc_method
   def viewDidLoad(self):
@@ -127,9 +126,7 @@ class MainViewController(UIViewController):
     self.navigationItem.title = NSStringFromClass(__class__) if (
       title := self.navigationItem.title) is None else title
 
-    #self.synth.start()
-    synth = Synth.new()
-    synth.start()
+    self.synth.start()
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -174,7 +171,7 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
-    #self.synth.stop()
+    self.synth.stop()
 
   @objc_method
   def didReceiveMemoryWarning(self):
