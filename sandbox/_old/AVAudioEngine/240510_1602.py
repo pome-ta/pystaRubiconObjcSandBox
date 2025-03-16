@@ -189,6 +189,7 @@ class WaveGenerator(NSObject):
 
       self.time = _time
       '''
+      print('t')
       return 0
 
     self.sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(

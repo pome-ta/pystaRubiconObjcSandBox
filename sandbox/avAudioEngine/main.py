@@ -44,10 +44,12 @@ class Synth(NSObject):
   sampleRate: float = objc_property(float)
   deltaTime: float = objc_property(float)
 
+  
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print(f'\t - {NSStringFromClass(__class__)}: dealloc')
+  
 
   @objc_method
   def init(self):
@@ -70,7 +72,9 @@ class Synth(NSObject):
     def renderBlock(isSilence: ctypes.c_bool, timestamp: ctypes.c_void_p,
                     frameCount: ctypes.c_uint,
                     outputData: ctypes.c_void_p) -> OSStatus:
-      print(f'{isSilence=}, {timestamp=}, {frameCount=}, {outputData=}')
+      #print(f'{isSilence=}, {timestamp=}, {frameCount=}, {outputData=}')
+      print('t')
+      
       return 0
 
     sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(renderBlock)
@@ -78,12 +82,11 @@ class Synth(NSObject):
     audioEngine.connect_to_format_(sourceNode, mainMixer, inputFormat)
     audioEngine.connect_to_format_(mainMixer, outputNode, None)
     mainMixer.outputVolume = 0.5
+    
+    # xxx: 不要？
+    audioEngine.prepare()
 
-    try:
-      audioEngine.startAndReturnError_(None)
-
-    except Exception as e:
-      print(f'{e}: エラー')
+    
 
     self.audioEngine = audioEngine
     self.sampleRate = sampleRate
@@ -91,8 +94,23 @@ class Synth(NSObject):
 
     return self
 
+  @objc_method
+  def start(self):
+    try:
+      self.audioEngine.startAndReturnError_(None)
+
+    except Exception as e:
+      print(f'{e}: エラー')
+
+  @objc_method
+  def stop(self):
+    self.audioEngine.stop()
+
+
 
 class MainViewController(UIViewController):
+  
+  synth:Synth = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -104,6 +122,7 @@ class MainViewController(UIViewController):
   def loadView(self):
     send_super(__class__, self, 'loadView')
     #print(f'\t{NSStringFromClass(__class__)}: loadView')
+    self.synth = Synth.new()
 
   @objc_method
   def viewDidLoad(self):
@@ -112,7 +131,8 @@ class MainViewController(UIViewController):
     self.navigationItem.title = NSStringFromClass(__class__) if (
       title := self.navigationItem.title) is None else title
 
-    synth = Synth.new()
+    
+    self.synth.start()
 
     #pdbr.state(AudioEngeneWaveGenerator.new())
 
@@ -159,6 +179,7 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
+    self.synth.stop()
 
   @objc_method
   def didReceiveMemoryWarning(self):
