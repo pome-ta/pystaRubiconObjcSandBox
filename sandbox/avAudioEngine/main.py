@@ -71,8 +71,10 @@ class Synth(NSObject):
                     frameCount: ctypes.c_uint,
                     outputData: ctypes.c_void_p) -> OSStatus:
       #print(f'{isSilence=}, {timestamp=}, {frameCount=}, {outputData=}')
-      ablPointer = ctypes.cast(outputData, ctypes.POINTER(AudioBufferList))#.contents
-      print(ablPointer)
+      ablPointer = ctypes.cast(outputData, ctypes.POINTER(AudioBufferList)).contents
+      #print(dir(ablPointer.mNumberBuffers))
+      #print(ablPointer.mNumberBuffers)
+      print(ablPointer.mBuffers)
 
       return 0
 
