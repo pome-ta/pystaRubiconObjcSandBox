@@ -76,17 +76,26 @@ class Synth(NSObject):
                     outputData: ctypes.c_void_p) -> OSStatus:
       ablPointer = ctypes.cast(outputData,
                                ctypes.POINTER(AudioBufferList)).contents
-      mDataPointer = ctypes.POINTER(ctypes.c_float * frameCount)
-      time = self.time
+      mData_POINTER = ctypes.POINTER(ctypes.c_float * frameCount)
+      _time = self.time
       for frame in range(frameCount):
-        sampleVal = sin(440.0 * 2.0 * pi * time)
-        time += self.deltaTime
-
-        for buffer in ablPointer.mBuffers:
-          buf = ctypes.cast(buffer.mData, mDataPointer).contents
+        sampleVal = sin(440.0 * 2.0 * pi * _time)
+        _time += self.deltaTime
+        
+        for buffer in range(ablPointer.mNumberBuffers):
+          buf = ctypes.cast(ablPointer.mBuffers[buffer].mData,
+                            ctypes.POINTER(ctypes.c_float *
+                                           frameCount)).contents
           buf[frame] = sampleVal
+          #print(frame)
+          #buf[frame] = random()
+        '''
+        for buffer in ablPointer.mBuffers:
+          buf = ctypes.cast(buffer.mData,mData_POINTER).contents
+          buf[frame] = sampleVal
+        '''
 
-      self.time = time
+      self.time = _time
       return 0
 
     sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(renderBlock)
