@@ -3,8 +3,6 @@
 """
 
 import ctypes
-from math import pi, sin
-from random import random
 
 from pyrubicon.objc.api import ObjCClass, Block
 from pyrubicon.objc.api import objc_method, objc_property
@@ -43,7 +41,6 @@ class AudioBufferList(ctypes.Structure):
 class Synth(NSObject):
 
   audioEngine: AVAudioEngine = objc_property()
-  time: float = objc_property(float)
   sampleRate: float = objc_property(float)
   deltaTime: float = objc_property(float)
 
@@ -56,7 +53,6 @@ class Synth(NSObject):
   def init(self):
     send_super(__class__, self, 'init')
     print(f'{NSStringFromClass(__class__)}: init')
-    time = 0.0
     audioEngine = AVAudioEngine.new()
 
     mainMixer = audioEngine.mainMixerNode
@@ -76,33 +72,29 @@ class Synth(NSObject):
                     outputData: ctypes.c_void_p) -> OSStatus:
       ablPointer = ctypes.cast(outputData,
                                ctypes.POINTER(AudioBufferList)).contents
-      for frame in range(frameCount):
-        sampleVal = sin(440.0 * 2.0 * pi * self.time)
-        self.time += self.deltaTime
-        for buffer in range(ablPointer.mNumberBuffers):
-          buf = ctypes.cast(ablPointer.mBuffers[buffer].mData,
-                            ctypes.POINTER(ctypes.c_float *
-                                           frameCount)).contents
-          #buf[frame] = sampleVal
-          #print(frame)
-          buf[frame] = random()
+      #print(dir(ablPointer.mNumberBuffers))
+      #print(ablPointer.mNumberBuffers)
+      #print(ablPointer.mNumberBuffers)
+      #print(ablPointer.mBuffers[0])
+      #print(ctypes.cast(ablPointer.mBuffers,ctypes.POINTER(AudioBuffer)))
+
+      for buffer in range(ablPointer.mNumberBuffers):
+        buf = ctypes.cast(ablPointer.mBuffers[buffer].mData,
+                          ctypes.POINTER(ctypes.c_float * frameCount)).contents
+        print(buf[0])
 
       return 0
 
     sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(renderBlock)
-    #sourceNode = AVAudioSourceNode.alloc().initWithFormat_renderBlock_(inputFormat, renderBlock)
     audioEngine.attachNode_(sourceNode)
     audioEngine.connect_to_format_(sourceNode, mainMixer, inputFormat)
-    #audioEngine.connect_to_format_(mainMixer, outputNode, inputFormat)
     audioEngine.connect_to_format_(mainMixer, outputNode, None)
     mainMixer.outputVolume = 0.5
-    #sourceNode.outputVolume = 0.5
 
-    # xxx: 不要？
+    # xxx: 不要?
     audioEngine.prepare()
 
     self.audioEngine = audioEngine
-    self.time = 0.0
     self.sampleRate = sampleRate
     self.deltaTime = deltaTime
 
@@ -123,7 +115,7 @@ class Synth(NSObject):
 
 class MainViewController(UIViewController):
 
-  synth: Synth = objc_property()
+  #synth: Synth = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -135,7 +127,7 @@ class MainViewController(UIViewController):
   def loadView(self):
     send_super(__class__, self, 'loadView')
     #print(f'\t{NSStringFromClass(__class__)}: loadView')
-    self.synth = Synth.new()
+    #self.synth = Synth.new()
 
   @objc_method
   def viewDidLoad(self):
@@ -144,9 +136,9 @@ class MainViewController(UIViewController):
     self.navigationItem.title = NSStringFromClass(__class__) if (
       title := self.navigationItem.title) is None else title
 
-    self.synth.start()
-    #synth = Synth.new()
-    #synth.start()
+    #self.synth.start()
+    synth = Synth.new()
+    synth.start()
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -191,7 +183,7 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
-    self.synth.stop()
+    #self.synth.stop()
 
   @objc_method
   def didReceiveMemoryWarning(self):
