@@ -74,7 +74,12 @@ class Synth(NSObject):
       ablPointer = ctypes.cast(outputData, ctypes.POINTER(AudioBufferList)).contents
       #print(dir(ablPointer.mNumberBuffers))
       #print(ablPointer.mNumberBuffers)
-      print(ablPointer.mBuffers)
+      #print(ablPointer.mNumberBuffers)
+      #print(ablPointer.mBuffers)
+      #print(ctypes.cast(ablPointer.mBuffers,ctypes.POINTER(AudioBuffer)))
+      
+      for buffer in range(ablPointer.mNumberBuffers):
+        print(buffer)
 
       return 0
 
