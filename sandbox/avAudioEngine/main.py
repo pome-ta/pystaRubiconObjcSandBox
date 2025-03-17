@@ -100,7 +100,8 @@ class Synth(NSObject):
                              ctypes.POINTER(AudioBufferList)).contents
     mDataPointer = ctypes.POINTER(ctypes.c_float * frameCount)
     
-    time = self.time
+    
+    time = self.time  # todo: `self.time` だと、音出ない
     
     for frame in range(frameCount):
       sampleVal = sin(440.0 * 2.0 * pi * time)
