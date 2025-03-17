@@ -1,6 +1,10 @@
+""""
+memo: 2ch 確認
+"""
+
 import ctypes
 from math import pi, sin
-from random import uniform
+from random import random
 
 from pyrubicon.objc.api import ObjCClass, Block
 from pyrubicon.objc.api import objc_method, objc_property
@@ -18,7 +22,7 @@ AVAudioFormat = ObjCClass('AVAudioFormat')
 AVAudioSourceNode = ObjCClass('AVAudioSourceNode')
 
 OSStatus = ctypes.c_int32
-CHANNEL = 1
+CHANNEL = 2
 
 
 class AudioBuffer(ctypes.Structure):
@@ -35,19 +39,6 @@ class AudioBufferList(ctypes.Structure):
     ('mBuffers', AudioBuffer * CHANNEL),
   ]
 
-
-# --- OSC
-amplitude: float = 1.0
-frequency: float = 440.0
-
-
-def white_noise():
-  return uniform(-1.0, 1.0)
-
-
-def sine(time):
-  wave = amplitude * sin(2.0 * pi * frequency * time)
-  return wave
 
 class Synth(NSObject):
 
@@ -102,21 +93,23 @@ class Synth(NSObject):
 
   @objc_method
   def __renderBlock(self, isSilence: ctypes.c_bool, timestamp: ctypes.c_void_p,
-                    frameCount: ctypes.c_uint,
-                    outputData: ctypes.c_void_p) -> OSStatus:
+                  frameCount: ctypes.c_uint,
+                  outputData: ctypes.c_void_p) -> OSStatus:
     ablPointer = ctypes.cast(outputData,
                              ctypes.POINTER(AudioBufferList)).contents
     mDataPointer = ctypes.POINTER(ctypes.c_float * frameCount)
-
+    
+    
     time = self.time  # todo: `self.time` だと、音出ない
-
+    
     for frame in range(frameCount):
       sampleVal = sin(440.0 * 2.0 * pi * time)
       time += self.deltaTime
 
-      for ch, buffer in enumerate(ablPointer.mBuffers):
+      for ch,buffer in enumerate(ablPointer.mBuffers):
         buf = ctypes.cast(buffer.mData, mDataPointer).contents
-        buf[frame] = sampleVal
+        
+        buf[frame] = sampleVal if ch else random()
 
     self.time = time
     return 0

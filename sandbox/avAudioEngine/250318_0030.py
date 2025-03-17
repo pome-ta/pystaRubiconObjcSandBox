@@ -1,6 +1,9 @@
+""""
+memo: simple
+"""
+
 import ctypes
 from math import pi, sin
-from random import uniform
 
 from pyrubicon.objc.api import ObjCClass, Block
 from pyrubicon.objc.api import objc_method, objc_property
@@ -35,19 +38,6 @@ class AudioBufferList(ctypes.Structure):
     ('mBuffers', AudioBuffer * CHANNEL),
   ]
 
-
-# --- OSC
-amplitude: float = 1.0
-frequency: float = 440.0
-
-
-def white_noise():
-  return uniform(-1.0, 1.0)
-
-
-def sine(time):
-  wave = amplitude * sin(2.0 * pi * frequency * time)
-  return wave
 
 class Synth(NSObject):
 
