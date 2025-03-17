@@ -1,5 +1,7 @@
 """
 [【iOS】Core Audioでシンセサイザーを作る #Swift - Qiita](https://qiita.com/TokyoYoshida/items/df60ea8585a0223e868b)
+
+memo: `self.time` をインクリメントしたい
 """
 
 import ctypes
@@ -68,26 +70,14 @@ class Synth(NSObject):
     ).initWithCommonFormat_sampleRate_channels_interleaved_(
       format.commonFormat, sampleRate, CHANNEL, format.isInterleaved())
 
-    @Block
-    def renderBlock(isSilence: ctypes.c_bool, timestamp: ctypes.c_void_p,
-                    frameCount: ctypes.c_uint,
-                    outputData: ctypes.c_void_p) -> OSStatus:
-      ablPointer = ctypes.cast(outputData,
-                               ctypes.POINTER(AudioBufferList)).contents
-      mDataPointer = ctypes.POINTER(ctypes.c_float * frameCount)
-      time = self.time
-      for frame in range(frameCount):
-        sampleVal = sin(440.0 * 2.0 * pi * time)
-        time += self.deltaTime
-
-        for buffer in ablPointer.mBuffers:
-          buf = ctypes.cast(buffer.mData, mDataPointer).contents
-          buf[frame] = sampleVal
-
-      self.time = time
-      return 0
-
-    sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(renderBlock)
+    sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(
+      Block(
+        self.__renderBlock, OSStatus, *[
+          ctypes.c_bool,
+          ctypes.c_void_p,
+          ctypes.c_uint,
+          ctypes.c_void_p,
+        ]))
     audioEngine.attachNode_(sourceNode)
     audioEngine.connect_to_format_(sourceNode, mainMixer, inputFormat)
     audioEngine.connect_to_format_(mainMixer, outputNode, None)
@@ -101,6 +91,27 @@ class Synth(NSObject):
     self.deltaTime = deltaTime
 
     return self
+
+  @objc_method
+  def __renderBlock(self, isSilence: ctypes.c_bool, timestamp: ctypes.c_void_p,
+                  frameCount: ctypes.c_uint,
+                  outputData: ctypes.c_void_p) -> OSStatus:
+    ablPointer = ctypes.cast(outputData,
+                             ctypes.POINTER(AudioBufferList)).contents
+    mDataPointer = ctypes.POINTER(ctypes.c_float * frameCount)
+    
+    time = self.time
+    
+    for frame in range(frameCount):
+      sampleVal = sin(440.0 * 2.0 * pi * time)
+      time += self.deltaTime
+
+      for buffer in ablPointer.mBuffers:
+        buf = ctypes.cast(buffer.mData, mDataPointer).contents
+        buf[frame] = sampleVal
+
+    self.time = time
+    return 0
 
   @objc_method
   def start(self):
