@@ -4,7 +4,6 @@
 
 import ctypes
 from math import pi, sin
-from random import random
 
 from pyrubicon.objc.api import ObjCClass, Block
 from pyrubicon.objc.api import objc_method, objc_property
@@ -55,8 +54,7 @@ class Synth(NSObject):
   @objc_method
   def init(self):
     send_super(__class__, self, 'init')
-    print(f'{NSStringFromClass(__class__)}: init')
-    time = 0.0
+    #print(f'{NSStringFromClass(__class__)}: init')
     audioEngine = AVAudioEngine.new()
 
     mainMixer = audioEngine.mainMixerNode
@@ -90,16 +88,12 @@ class Synth(NSObject):
       return 0
 
     sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(renderBlock)
-    #sourceNode = AVAudioSourceNode.alloc().initWithFormat_renderBlock_(inputFormat, renderBlock)
     audioEngine.attachNode_(sourceNode)
     audioEngine.connect_to_format_(sourceNode, mainMixer, inputFormat)
-    #audioEngine.connect_to_format_(mainMixer, outputNode, inputFormat)
     audioEngine.connect_to_format_(mainMixer, outputNode, None)
     mainMixer.outputVolume = 0.5
-    #sourceNode.outputVolume = 0.5
 
-    # xxx: 不要？
-    audioEngine.prepare()
+    audioEngine.prepare()  # xxx: 不要？
 
     self.audioEngine = audioEngine
     self.time = 0.0
@@ -145,8 +139,6 @@ class MainViewController(UIViewController):
       title := self.navigationItem.title) is None else title
 
     self.synth.start()
-    #synth = Synth.new()
-    #synth.start()
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -180,6 +172,7 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewWillDisappear_')
+    self.synth.stop()
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
@@ -191,7 +184,6 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
-    self.synth.stop()
 
   @objc_method
   def didReceiveMemoryWarning(self):
