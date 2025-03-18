@@ -13,7 +13,6 @@ from rbedge.functions import NSStringFromClass
 from rbedge import pdbr
 
 UIViewController = ObjCClass('UIViewController')
-UISegmentedControl = ObjCClass('UISegmentedControl')
 UISlider = ObjCClass('UISlider')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
@@ -228,10 +227,7 @@ class MainViewController(UIViewController):
     self.synth.start()
 
     # todo: あとでUISegmentedControl にする
-    wave_names = Oscillator.type_names()
-    segmentedControl = UISegmentedControl.alloc().initWithItems_(wave_names)
-    segmentedControl.addTarget_action_forControlEvents_( self, SEL('selectedSegmentDidChange:'), UIControlEvents.valueChanged)
-
+    print(Oscillator.type_names())
     slider = UISlider.new()
     slider.setContinuous_(False)
     slider.value = 0.0
@@ -242,25 +238,10 @@ class MainViewController(UIViewController):
                                               UIControlEvents.valueChanged)
 
     # --- layout
-    self.view.addSubview_(segmentedControl)
     self.view.addSubview_(slider)
-    segmentedControl.translatesAutoresizingMaskIntoConstraints = False
     slider.translatesAutoresizingMaskIntoConstraints = False
 
-    #constraintEqualToAnchor_constant_
-
     areaLayoutGuide = self.view.safeAreaLayoutGuide
-    NSLayoutConstraint.activateConstraints_([
-      segmentedControl.centerXAnchor.constraintEqualToAnchor_(
-        areaLayoutGuide.centerXAnchor),
-      segmentedControl.centerYAnchor.constraintEqualToAnchor_constant_(
-        areaLayoutGuide.centerYAnchor, -20.0),
-      segmentedControl.leadingAnchor.constraintEqualToAnchor_constant_(
-        areaLayoutGuide.leadingAnchor, 20.0),
-      segmentedControl.trailingAnchor.constraintEqualToAnchor_constant_(
-        areaLayoutGuide.trailingAnchor, -20.0),
-    ])
-
     NSLayoutConstraint.activateConstraints_([
       slider.centerXAnchor.constraintEqualToAnchor_(
         areaLayoutGuide.centerXAnchor),
@@ -322,11 +303,6 @@ class MainViewController(UIViewController):
   def didReceiveMemoryWarning(self):
     send_super(__class__, self, 'didReceiveMemoryWarning')
     print(f'\t{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
-
-  @objc_method
-  def selectedSegmentDidChange_(self, segmentedControl):
-
-    print(f'The selected segment: {segmentedControl.selectedSegmentIndex}')
 
   # MARK: - Actions
   @objc_method
