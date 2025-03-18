@@ -12,6 +12,8 @@ from rbedge.functions import NSStringFromClass
 from rbedge import pdbr
 
 UIViewController = ObjCClass('UIViewController')
+UISlider = ObjCClass('UISlider')
+NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 AVAudioEngine = ObjCClass('AVAudioEngine')
 AVAudioFormat = ObjCClass('AVAudioFormat')
@@ -49,6 +51,7 @@ def sine(time):
   wave = amplitude * sin(2.0 * pi * frequency * time)
   return wave
 
+
 class Synth(NSObject):
 
   audioEngine: AVAudioEngine = objc_property()
@@ -80,11 +83,13 @@ class Synth(NSObject):
 
     sourceNode = AVAudioSourceNode.alloc().initWithRenderBlock_(
       Block(
-        self.__renderBlock, OSStatus, *[
-          ctypes.c_bool,
-          ctypes.c_void_p,
-          ctypes.c_uint,
-          ctypes.c_void_p,
+        self.__renderBlock,
+        OSStatus,
+        *[
+          ctypes.c_bool,  # isSilence
+          ctypes.c_void_p,  # timestamp
+          ctypes.c_uint,  # frameCount
+          ctypes.c_void_p,  # outputData
         ]))
     audioEngine.attachNode_(sourceNode)
     audioEngine.connect_to_format_(sourceNode, mainMixer, inputFormat)
@@ -131,7 +136,8 @@ class Synth(NSObject):
 
   @objc_method
   def stop(self):
-    self.audioEngine.stop()
+    if self.audioEngine.isRunning():
+      self.audioEngine.stop()
 
 
 class MainViewController(UIViewController):
@@ -158,6 +164,28 @@ class MainViewController(UIViewController):
       title := self.navigationItem.title) is None else title
 
     self.synth.start()
+
+    # あとでボタンにする
+    slider = UISlider.new()
+    slider.value = 0.5
+    slider.minimumValue = 0.0
+    slider.maximumValue = 1.0
+
+    # --- layout
+    self.view.addSubview_(slider)
+    slider.translatesAutoresizingMaskIntoConstraints = False
+
+    areaLayoutGuide = self.view.safeAreaLayoutGuide
+    NSLayoutConstraint.activateConstraints_([
+      slider.centerXAnchor.constraintEqualToAnchor_(
+        areaLayoutGuide.centerXAnchor),
+      slider.centerYAnchor.constraintEqualToAnchor_(
+        areaLayoutGuide.centerYAnchor),
+      slider.leadingAnchor.constraintEqualToAnchor_constant_(
+        areaLayoutGuide.leadingAnchor, 20.0),
+      slider.trailingAnchor.constraintEqualToAnchor_constant_(
+        areaLayoutGuide.trailingAnchor, -20.0),
+    ])
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -191,6 +219,7 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewWillDisappear_')
+
     self.synth.stop()
 
   @objc_method
