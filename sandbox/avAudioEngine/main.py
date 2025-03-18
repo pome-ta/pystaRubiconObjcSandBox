@@ -5,8 +5,9 @@ from random import uniform
 from pyrubicon.objc.api import ObjCClass, Block
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.api import NSObject
-from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.runtime import send_super, SEL
 
+from rbedge.enumerations import UIControlEvents
 from rbedge.functions import NSStringFromClass
 
 from rbedge import pdbr
@@ -39,17 +40,75 @@ class AudioBufferList(ctypes.Structure):
 
 
 # --- OSC
-amplitude: float = 1.0
-frequency: float = 440.0
+# wip: rubicon のオブジェクトとして持たせたくないので、気持ち悪いclass になってる
+class Oscillator:
 
+  def __init__(self, frequency: float = 440.0):
+    self.frequency: float = frequency
+    self.amplitude: float = 1.0
+    self.wave_types = [
+      self.sine,
+      self.triangle,
+      self.sawtooth,
+      self.square,
+      self.white_noise,
+    ]
 
-def white_noise():
-  return uniform(-1.0, 1.0)
+  @classmethod
+  def type_value(cls,
+                 select_type: int,
+                 value: float,
+                 frequency: float = 440.0):
+    osc = cls(frequency)
+    wave_type = osc.wave_types[select_type]
+    return wave_type(value)
 
+  @classmethod
+  def type_name(cls, select_type: int) -> str:
+    osc = cls()
+    wave_type = osc.wave_types[select_type]
+    return wave_type.__name__
 
-def sine(time):
-  wave = amplitude * sin(2.0 * pi * frequency * time)
-  return wave
+  @classmethod
+  def type_names(cls) -> list:
+    osc = cls()
+    return [wave_type.__name__ for wave_type in osc.wave_types]
+
+  def sine(self, time) -> float:
+    wave = self.amplitude * sin(2.0 * pi * self.frequency * time)
+    return wave
+
+  def triangle(self, time) -> float:
+    period = 1.0 / self.frequency
+    currentTime = time % period
+    value = currentTime / period
+    result = 0.0
+    if value < 0.25:
+      result = value * 4
+    elif value < 0.75:
+      result = 2.0 - (value * 4.0)
+    else:
+      result = value * 4 - 4.0
+    wave = self.amplitude * result
+    return wave
+
+  def sawtooth(self, time) -> float:
+    period = 1.0 / self.frequency
+    currentTime = time % period
+    wave = self.amplitude * ((currentTime / period) * 2 - 1.0)
+    return wave
+
+  def square(self, time) -> float:
+    period = 1.0 / self.frequency
+    currentTime = time % period
+    if (currentTime / period) < 0.5:
+      wave = self.amplitude
+    else:
+      wave = -1.0 * self.amplitude
+    return wave
+
+  def white_noise(self, _) -> float:
+    return uniform(-1.0, 1.0)
 
 
 class Synth(NSObject):
@@ -58,6 +117,7 @@ class Synth(NSObject):
   time: float = objc_property(float)
   sampleRate: float = objc_property(float)
   deltaTime: float = objc_property(float)
+  signal: int = objc_property(int)
 
   @objc_method
   def dealloc(self):
@@ -102,6 +162,7 @@ class Synth(NSObject):
     self.time = 0.0
     self.sampleRate = sampleRate
     self.deltaTime = deltaTime
+    self.signal = 0
 
     return self
 
@@ -116,7 +177,7 @@ class Synth(NSObject):
     time = self.time  # todo: `self.time` だと、音出ない
 
     for frame in range(frameCount):
-      sampleVal = sin(440.0 * 2.0 * pi * time)
+      sampleVal = Oscillator.type_value(self.signal, time)
       time += self.deltaTime
 
       for ch, buffer in enumerate(ablPointer.mBuffers):
@@ -165,11 +226,16 @@ class MainViewController(UIViewController):
 
     self.synth.start()
 
-    # あとでボタンにする
+    # todo: あとでUISegmentedControl にする
+    print(Oscillator.type_names())
     slider = UISlider.new()
-    slider.value = 0.5
+    slider.setContinuous_(False)
+    slider.value = 0.0
     slider.minimumValue = 0.0
-    slider.maximumValue = 1.0
+    slider.maximumValue = 4.0
+    slider.addTarget_action_forControlEvents_(self,
+                                              SEL('sliderValueDidChange:'),
+                                              UIControlEvents.valueChanged)
 
     # --- layout
     self.view.addSubview_(slider)
@@ -237,6 +303,16 @@ class MainViewController(UIViewController):
   def didReceiveMemoryWarning(self):
     send_super(__class__, self, 'didReceiveMemoryWarning')
     print(f'\t{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
+
+  # MARK: - Actions
+  @objc_method
+  def sliderValueDidChange_(self, slider):
+    int_value = int(slider.value)
+    self.synth.signal = int_value
+    slider.value = float(int_value)
+    print(
+      f'Slider changed its value: {int_value} to {Oscillator.type_name(int_value)}'
+    )
 
 
 if __name__ == '__main__':
