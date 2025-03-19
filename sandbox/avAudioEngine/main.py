@@ -155,7 +155,7 @@ class Synth(NSObject):
     audioEngine.attachNode_(sourceNode)
     audioEngine.connect_to_format_(sourceNode, mainMixer, inputFormat)
     audioEngine.connect_to_format_(mainMixer, outputNode, None)
-    mainMixer.outputVolume = 0.5
+    mainMixer.outputVolume = 0.2
 
     audioEngine.prepare()  # xxx: 不要？
 
@@ -230,7 +230,9 @@ class MainViewController(UIViewController):
     # todo: あとでUISegmentedControl にする
     wave_names = Oscillator.type_names()
     segmentedControl = UISegmentedControl.alloc().initWithItems_(wave_names)
-    segmentedControl.addTarget_action_forControlEvents_( self, SEL('selectedSegmentDidChange:'), UIControlEvents.valueChanged)
+    segmentedControl.selectedSegmentIndex = 0
+    segmentedControl.addTarget_action_forControlEvents_(
+      self, SEL('selectedSegmentDidChange:'), UIControlEvents.valueChanged)
 
     slider = UISlider.new()
     slider.setContinuous_(False)
@@ -254,7 +256,7 @@ class MainViewController(UIViewController):
       segmentedControl.centerXAnchor.constraintEqualToAnchor_(
         areaLayoutGuide.centerXAnchor),
       segmentedControl.centerYAnchor.constraintEqualToAnchor_constant_(
-        areaLayoutGuide.centerYAnchor, -20.0),
+        areaLayoutGuide.centerYAnchor, -48.0),
       segmentedControl.leadingAnchor.constraintEqualToAnchor_constant_(
         areaLayoutGuide.leadingAnchor, 20.0),
       segmentedControl.trailingAnchor.constraintEqualToAnchor_constant_(
@@ -325,18 +327,18 @@ class MainViewController(UIViewController):
 
   @objc_method
   def selectedSegmentDidChange_(self, segmentedControl):
-
-    print(f'The selected segment: {segmentedControl.selectedSegmentIndex}')
+    self.synth.signal = segmentedControl.selectedSegmentIndex
+    #print(f'The selected segment: {segmentedControl.selectedSegmentIndex}')
 
   # MARK: - Actions
   @objc_method
   def sliderValueDidChange_(self, slider):
     int_value = int(slider.value)
+    '''
     self.synth.signal = int_value
     slider.value = float(int_value)
-    print(
-      f'Slider changed its value: {int_value} to {Oscillator.type_name(int_value)}'
-    )
+    print(f'Slider changed its value: {int_value} to {Oscillator.type_name(int_value)}')
+    '''
 
 
 if __name__ == '__main__':
