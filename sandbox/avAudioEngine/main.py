@@ -7,12 +7,17 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.api import NSObject
 from pyrubicon.objc.runtime import send_super, SEL
 
-from rbedge.enumerations import UIControlEvents
+from rbedge.enumerations import (
+  UIControlEvents,
+  UILayoutConstraintAxis,
+  UIStackViewAlignment,
+)
 from rbedge.functions import NSStringFromClass
 
 from rbedge import pdbr
 
 UIViewController = ObjCClass('UIViewController')
+UIStackView = ObjCClass('UIStackView')
 UISegmentedControl = ObjCClass('UISegmentedControl')
 UISlider = ObjCClass('UISlider')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
@@ -20,6 +25,8 @@ NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 AVAudioEngine = ObjCClass('AVAudioEngine')
 AVAudioFormat = ObjCClass('AVAudioFormat')
 AVAudioSourceNode = ObjCClass('AVAudioSourceNode')
+
+UIColor = ObjCClass('UIColor')
 
 OSStatus = ctypes.c_int32
 CHANNEL = 1
@@ -227,7 +234,7 @@ class MainViewController(UIViewController):
 
     self.synth.start()
 
-    # todo: あとでUISegmentedControl にする
+    # --- vew
     wave_names = Oscillator.type_names()
     segmentedControl = UISegmentedControl.alloc().initWithItems_(wave_names)
     segmentedControl.selectedSegmentIndex = 0
@@ -244,34 +251,43 @@ class MainViewController(UIViewController):
                                               UIControlEvents.valueChanged)
 
     # --- layout
-    self.view.addSubview_(segmentedControl)
-    self.view.addSubview_(slider)
+    stackView = UIStackView.alloc().initWithArrangedSubviews_([
+      segmentedControl,
+      slider,
+    ])
+    stackView.backgroundColor = UIColor.systemBackgroundColor()
+    stackView.axis = UILayoutConstraintAxis.vertical
+    stackView.alignment = UIStackViewAlignment.center
+    stackView.spacing = 32.0
+
+    self.view.addSubview_(stackView)
+    stackView.translatesAutoresizingMaskIntoConstraints = False
     segmentedControl.translatesAutoresizingMaskIntoConstraints = False
     slider.translatesAutoresizingMaskIntoConstraints = False
 
-    #constraintEqualToAnchor_constant_
-
     areaLayoutGuide = self.view.safeAreaLayoutGuide
+    # --- stackView
     NSLayoutConstraint.activateConstraints_([
-      segmentedControl.centerXAnchor.constraintEqualToAnchor_(
+      stackView.centerXAnchor.constraintEqualToAnchor_(
         areaLayoutGuide.centerXAnchor),
-      segmentedControl.centerYAnchor.constraintEqualToAnchor_constant_(
-        areaLayoutGuide.centerYAnchor, -48.0),
-      segmentedControl.leadingAnchor.constraintEqualToAnchor_constant_(
-        areaLayoutGuide.leadingAnchor, 20.0),
-      segmentedControl.trailingAnchor.constraintEqualToAnchor_constant_(
-        areaLayoutGuide.trailingAnchor, -20.0),
-    ])
-
-    NSLayoutConstraint.activateConstraints_([
-      slider.centerXAnchor.constraintEqualToAnchor_(
-        areaLayoutGuide.centerXAnchor),
-      slider.centerYAnchor.constraintEqualToAnchor_(
+      stackView.centerYAnchor.constraintEqualToAnchor_(
         areaLayoutGuide.centerYAnchor),
-      slider.leadingAnchor.constraintEqualToAnchor_constant_(
-        areaLayoutGuide.leadingAnchor, 20.0),
-      slider.trailingAnchor.constraintEqualToAnchor_constant_(
-        areaLayoutGuide.trailingAnchor, -20.0),
+      stackView.leadingAnchor.constraintEqualToAnchor_constant_(
+        areaLayoutGuide.leadingAnchor, 24.0),
+      stackView.trailingAnchor.constraintEqualToAnchor_constant_(
+        areaLayoutGuide.trailingAnchor, -24.0),
+    ])
+    # --- segmentedControl
+    NSLayoutConstraint.activateConstraints_([
+      segmentedControl.leadingAnchor.constraintEqualToAnchor_(
+        stackView.leadingAnchor),
+      segmentedControl.trailingAnchor.constraintEqualToAnchor_(
+        stackView.trailingAnchor),
+    ])
+    # --- slider
+    NSLayoutConstraint.activateConstraints_([
+      slider.leadingAnchor.constraintEqualToAnchor_(stackView.leadingAnchor),
+      slider.trailingAnchor.constraintEqualToAnchor_(stackView.trailingAnchor),
     ])
 
   @objc_method
@@ -306,7 +322,6 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewWillDisappear_')
-
     self.synth.stop()
 
   @objc_method
