@@ -75,6 +75,9 @@ class Oscillator(NSObject):
       'whiteNoise',
     ]
     self.waveTypes = [waveForm for waveForm in waveForms]
+    s = NSStringFromSelector(SEL(str(self.sine)))
+    print(str(s))
+    
     return self
 
   @objc_method
@@ -172,6 +175,7 @@ class Synth(Oscillator):
     self.deltaTime = deltaTime
     
     self.waveType = 0
+    #pdbr.state(self)
   
     return self
 
@@ -217,16 +221,6 @@ class Synth(Oscillator):
     if self.audioEngine.isRunning():
       self.audioEngine.stop()
 
-  '''
-  @objc_method
-  def sine(self, time: float) -> float:
-    #wave = self.amplitude * sin(2.0 * pi * self.frequency * time)
-    #wave = sin(2.0 * pi * self.frequency * time)
-    wave = sin(440.0 * 2.0 * pi * time)
-    return wave
-  '''
-
-
 class MainViewController(UIViewController):
 
   synth: Synth = objc_property()
@@ -250,10 +244,9 @@ class MainViewController(UIViewController):
     self.navigationItem.title = NSStringFromClass(__class__) if (
       title := self.navigationItem.title) is None else title
 
-    self.synth.start()
+    #self.synth.start()
 
-    # --- vew
-    #print(self.synth.osc.waveDict)
+    # --- view
     wave_names = [waveType for waveType in self.synth.waveTypes]
     segmentedControl = UISegmentedControl.alloc().initWithItems_(wave_names)
     segmentedControl.selectedSegmentIndex = 0

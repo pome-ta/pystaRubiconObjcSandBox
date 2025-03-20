@@ -56,12 +56,14 @@ def UIGraphicsBeginImageContextWithOptions(size: CGSize, opaque: bool,
   ]
   return ObjCInstance(_fnc(size, opaque, scale))
 
+
 # ref: [UIGraphicsGetImageFromCurrentImageContext | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uigraphicsgetimagefromcurrentimagecontext()?language=objc)
 def UIGraphicsGetImageFromCurrentImageContext() -> ObjCInstance:
   _fnc = UIKit.UIGraphicsGetImageFromCurrentImageContext
   _fnc.restype = objc_id
   _fnc.argtypes = []
   return ObjCInstance(_fnc())
+
 
 # ref: [UIGraphicsEndImageContext | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uigraphicsendimagecontext()?language=objc)
 def UIGraphicsEndImageContext():
