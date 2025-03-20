@@ -48,42 +48,45 @@ class AudioBufferList(ctypes.Structure):
 
 
 # --- OSC
+# wip: rubicon のオブジェクトとして持たせたくないので、気持ち悪いclass になってる
+class Oscillator:
 
-
-class Oscillator(NSObject):
-
-  frequency: float = objc_property(float)
-  amplitude: float = objc_property(float)
-  waveTypes: list = objc_property()
-
-  @objc_method
-  def dealloc(self):
-    # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
-    print(f'\t - {NSStringFromClass(__class__)}: dealloc')
-
-  @objc_method
-  def init(self):
-    send_super(__class__, self, 'init')
-    self.frequency = 440.0
-    self.amplitude = 1.0
-
-    waveForms = [
-      'sine',
-      'triangle',
-      'sawtooth',
-      'square',
-      'whiteNoise',
+  def __init__(self, frequency: float = 440.0):
+    self.frequency: float = frequency
+    self.amplitude: float = 1.0
+    self.wave_types = [
+      self.sine,
+      self.triangle,
+      self.sawtooth,
+      self.square,
+      self.white_noise,
     ]
-    self.waveTypes = [waveForm for waveForm in waveForms]
-    return self
 
-  @objc_method
-  def sine(self, time: float) -> float:
+  @classmethod
+  def type_value(cls,
+                 select_type: int,
+                 value: float,
+                 frequency: float = 440.0):
+    osc = cls(frequency)
+    wave_type = osc.wave_types[select_type]
+    return wave_type(value)
+
+  @classmethod
+  def type_name(cls, select_type: int) -> str:
+    osc = cls()
+    wave_type = osc.wave_types[select_type]
+    return wave_type.__name__
+
+  @classmethod
+  def type_names(cls) -> list:
+    osc = cls()
+    return [wave_type.__name__ for wave_type in osc.wave_types]
+
+  def sine(self, time) -> float:
     wave = self.amplitude * sin(2.0 * pi * self.frequency * time)
     return wave
 
-  @objc_method
-  def triangle(self, time: float) -> float:
+  def triangle(self, time) -> float:
     period = 1.0 / self.frequency
     currentTime = time % period
     value = currentTime / period
@@ -97,15 +100,13 @@ class Oscillator(NSObject):
     wave = self.amplitude * result
     return wave
 
-  @objc_method
-  def sawtooth(self, time: float) -> float:
+  def sawtooth(self, time) -> float:
     period = 1.0 / self.frequency
     currentTime = time % period
     wave = self.amplitude * ((currentTime / period) * 2 - 1.0)
     return wave
 
-  @objc_method
-  def square(self, time: float) -> float:
+  def square(self, time) -> float:
     period = 1.0 / self.frequency
     currentTime = time % period
     if (currentTime / period) < 0.5:
@@ -114,19 +115,17 @@ class Oscillator(NSObject):
       wave = -1.0 * self.amplitude
     return wave
 
-  @objc_method
-  def whiteNoise(self, time: float) -> float:
-    wave = uniform(-1.0, 1.0)
-    return wave
+  def white_noise(self, _) -> float:
+    return uniform(-1.0, 1.0)
 
 
-class Synth(Oscillator):
+class Synth(NSObject):
 
   audioEngine: AVAudioEngine = objc_property()
   time: float = objc_property(float)
   sampleRate: float = objc_property(float)
   deltaTime: float = objc_property(float)
-  waveType:int = objc_property(int)
+  signal: int = objc_property(int)
 
   @objc_method
   def dealloc(self):
@@ -163,16 +162,16 @@ class Synth(Oscillator):
     audioEngine.attachNode_(sourceNode)
     audioEngine.connect_to_format_(sourceNode, mainMixer, inputFormat)
     audioEngine.connect_to_format_(mainMixer, outputNode, None)
-    mainMixer.outputVolume = 0.5
+    mainMixer.outputVolume = 0.2
+
     audioEngine.prepare()  # xxx: 不要？
 
     self.audioEngine = audioEngine
     self.time = 0.0
     self.sampleRate = sampleRate
     self.deltaTime = deltaTime
-    
-    self.waveType = 0
-  
+    self.signal = 0
+
     return self
 
   @objc_method
@@ -186,15 +185,8 @@ class Synth(Oscillator):
     time = self.time  # todo: `self.time` だと、音出ない
 
     for frame in range(frameCount):
-      if self.waveType == 0:
-        sampleVal = self.sine(time)
-      elif self.waveType == 1:
-        sampleVal = self.triangle(time)
-      elif self.waveType == 2:
-        sampleVal = self.sawtooth(time)
-      
-      #sampleVal = sin(440.0 * 2.0 * pi * time)
-      #sampleVal = self.sine(time)
+      #sampleVal = Oscillator.type_value(self.signal, time)
+      sampleVal=sin(440.0 * 2.0 * pi * time)
       time += self.deltaTime
 
       for ch, buffer in enumerate(ablPointer.mBuffers):
@@ -216,15 +208,6 @@ class Synth(Oscillator):
   def stop(self):
     if self.audioEngine.isRunning():
       self.audioEngine.stop()
-
-  '''
-  @objc_method
-  def sine(self, time: float) -> float:
-    #wave = self.amplitude * sin(2.0 * pi * self.frequency * time)
-    #wave = sin(2.0 * pi * self.frequency * time)
-    wave = sin(440.0 * 2.0 * pi * time)
-    return wave
-  '''
 
 
 class MainViewController(UIViewController):
@@ -253,8 +236,7 @@ class MainViewController(UIViewController):
     self.synth.start()
 
     # --- vew
-    #print(self.synth.osc.waveDict)
-    wave_names = [waveType for waveType in self.synth.waveTypes]
+    wave_names = Oscillator.type_names()
     segmentedControl = UISegmentedControl.alloc().initWithItems_(wave_names)
     segmentedControl.selectedSegmentIndex = 0
     segmentedControl.addTarget_action_forControlEvents_(
@@ -361,10 +343,8 @@ class MainViewController(UIViewController):
 
   @objc_method
   def selectedSegmentDidChange_(self, segmentedControl):
-    #self.synth.signal = segmentedControl.selectedSegmentIndex
+    self.synth.signal = segmentedControl.selectedSegmentIndex
     #print(f'The selected segment: {segmentedControl.selectedSegmentIndex}')
-    index = segmentedControl.selectedSegmentIndex
-    self.waveType = index
 
   # MARK: - Actions
   @objc_method
