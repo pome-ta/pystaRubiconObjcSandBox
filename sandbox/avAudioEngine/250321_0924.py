@@ -1,3 +1,8 @@
+"""
+  note: なるべくwave 要素をまとめたい
+    - むりかも
+"""
+
 import ctypes
 from math import pi, sin
 from random import uniform
@@ -16,16 +21,15 @@ from rbedge.functions import NSStringFromClass
 
 from rbedge import pdbr
 
-AVAudioEngine = ObjCClass('AVAudioEngine')
-AVAudioFormat = ObjCClass('AVAudioFormat')
-AVAudioSourceNode = ObjCClass('AVAudioSourceNode')
-
 UIViewController = ObjCClass('UIViewController')
 UIStackView = ObjCClass('UIStackView')
 UISegmentedControl = ObjCClass('UISegmentedControl')
 UISlider = ObjCClass('UISlider')
-UILabel = ObjCClass('UILabel')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
+
+AVAudioEngine = ObjCClass('AVAudioEngine')
+AVAudioFormat = ObjCClass('AVAudioFormat')
+AVAudioSourceNode = ObjCClass('AVAudioSourceNode')
 
 UIColor = ObjCClass('UIColor')
 
@@ -65,15 +69,22 @@ class Oscillator(NSObject):
     send_super(__class__, self, 'init')
     self.frequency = 440.0
     self.amplitude = 1.0
+    
+    li = [self.sine]
+    print(li)
 
-    waveForms = [
-      'sine',
-      'triangle',
-      'sawtooth',
-      'square',
-      'whiteNoise',
-    ]
-    self.waveTypes = [waveForm for waveForm in waveForms]
+    waveForms = {
+      'sine': self.sine,
+      'triangle': self.triangle,
+      'sawtooth': self.sawtooth,
+      'square': self.square,
+      'whiteNoise': self.whiteNoise,
+    }
+    self.waveTypes = [{
+      'name': name,
+      'signal': signal,
+    } for name, signal in waveForms.items()]
+    
 
     return self
 
@@ -166,7 +177,7 @@ class Synth(Oscillator):
     audioEngine.connect_to_format_(sourceNode, mainMixer, inputFormat)
     audioEngine.connect_to_format_(mainMixer, outputNode, None)
     mainMixer.outputVolume = 0.5
-    audioEngine.prepare()  # xxx: 不要?
+    audioEngine.prepare()  # xxx: 不要？
 
     self.audioEngine = audioEngine
     self.time = 0.0
@@ -184,11 +195,15 @@ class Synth(Oscillator):
     ablPointer = ctypes.cast(outputData,
                              ctypes.POINTER(AudioBufferList)).contents
     mDataPointer = ctypes.POINTER(ctypes.c_float * frameCount)
-    # todo: `self.` だと、音出ないので、変数化
-    _time = self.time
+
+    _time = self.time  # todo: `self.time` だと、音出ない
     _frequency = self.frequency
     _amplitude = self.amplitude
     _waveType = self.waveType
+    _waveTypes = self.waveTypes
+
+    _signal = _waveTypes[_waveType]['signal']
+    '''
 
     if _waveType == 0:
       _signal = self.sine
@@ -202,13 +217,16 @@ class Synth(Oscillator):
       _signal = self.whiteNoise
     else:
       _signal = self.sine
+    '''
 
     for frame in range(frameCount):
       sampleVal = _signal(_time, _frequency, _amplitude)
       _time += self.deltaTime
+
       for ch, buffer in enumerate(ablPointer.mBuffers):
         buf = ctypes.cast(buffer.mData, mDataPointer).contents
         buf[frame] = sampleVal
+
     self.time = _time
     return 0
 
@@ -229,7 +247,6 @@ class Synth(Oscillator):
 class MainViewController(UIViewController):
 
   synth: Synth = objc_property()
-  label:UILabel = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -250,27 +267,23 @@ class MainViewController(UIViewController):
     self.navigationItem.title = NSStringFromClass(__class__) if (
       title := self.navigationItem.title) is None else title
 
-    self.synth.start()
+    #self.synth.start()
 
     # --- view
-    wave_names = [waveType for waveType in self.synth.waveTypes]
+    #print(self.synth.waveTypes)
+    #wave_names = [waveType['name'] for waveType in self.synth.waveTypes]
+    wave_names  = ['h']
     segmentedControl = UISegmentedControl.alloc().initWithItems_(wave_names)
     segmentedControl.selectedSegmentIndex = 0
     segmentedControl.addTarget_action_forControlEvents_(
       self, SEL('selectedSegmentDidChange:'), UIControlEvents.valueChanged)
 
-
-    value = 440.0
-    label = UILabel.new()
-    label.text = f'frequency: {value}'
-    
-    
-    
     slider = UISlider.new()
     #slider.setContinuous_(False)
+
     slider.minimumValue = 220.0
     slider.maximumValue = 880.0
-    slider.value = value
+    slider.value = 440.0
     slider.addTarget_action_forControlEvents_(self,
                                               SEL('sliderValueDidChange:'),
                                               UIControlEvents.valueChanged)
@@ -278,17 +291,15 @@ class MainViewController(UIViewController):
     # --- layout
     stackView = UIStackView.alloc().initWithArrangedSubviews_([
       segmentedControl,
-      label,
       slider,
     ])
-    #stackView.backgroundColor = UIColor.systemBackgroundColor()
+    stackView.backgroundColor = UIColor.systemBackgroundColor()
     stackView.axis = UILayoutConstraintAxis.vertical
     stackView.alignment = UIStackViewAlignment.center
     stackView.spacing = 32.0
 
     self.view.addSubview_(stackView)
     stackView.translatesAutoresizingMaskIntoConstraints = False
-    label.translatesAutoresizingMaskIntoConstraints = False
     segmentedControl.translatesAutoresizingMaskIntoConstraints = False
     slider.translatesAutoresizingMaskIntoConstraints = False
 
@@ -311,18 +322,11 @@ class MainViewController(UIViewController):
       segmentedControl.trailingAnchor.constraintEqualToAnchor_(
         stackView.trailingAnchor),
     ])
-    # --- label
-    NSLayoutConstraint.activateConstraints_([
-      label.leadingAnchor.constraintEqualToAnchor_(stackView.leadingAnchor),
-      label.trailingAnchor.constraintEqualToAnchor_(stackView.trailingAnchor),
-    ])
     # --- slider
     NSLayoutConstraint.activateConstraints_([
       slider.leadingAnchor.constraintEqualToAnchor_(stackView.leadingAnchor),
       slider.trailingAnchor.constraintEqualToAnchor_(stackView.trailingAnchor),
     ])
-    
-    self.label = label
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -376,6 +380,8 @@ class MainViewController(UIViewController):
 
   @objc_method
   def selectedSegmentDidChange_(self, segmentedControl):
+    #self.synth.signal = segmentedControl.selectedSegmentIndex
+    #print(f'The selected segment: {segmentedControl.selectedSegmentIndex}')
     index = segmentedControl.selectedSegmentIndex
     self.synth.waveType = index
 
@@ -387,9 +393,7 @@ class MainViewController(UIViewController):
     self.synth.frequency = value
     slider.value = value
     '''
-    #self.label.text = f'frequency: {slider.value}'
     self.synth.frequency = slider.value
-    
 
 
 if __name__ == '__main__':
