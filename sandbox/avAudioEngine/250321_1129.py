@@ -2,7 +2,7 @@ import ctypes
 from math import pi, sin
 from random import uniform
 
-from pyrubicon.objc.api import ObjCClass,ObjCInstance, Block
+from pyrubicon.objc.api import ObjCClass, Block
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.api import NSObject
 from pyrubicon.objc.runtime import send_super, SEL
@@ -166,15 +166,6 @@ class Synth(Oscillator):
     audioEngine.connect_to_format_(sourceNode, mainMixer, inputFormat)
     audioEngine.connect_to_format_(mainMixer, outputNode, None)
     mainMixer.outputVolume = 0.5
-  
-    _bufsize = 64 * 64  # 取得する情報量
-    mainMixer.installTapOnBus_bufferSize_format_block_(
-      0, _bufsize, inputFormat,
-      Block(self._tapBlock, None, *[
-        ctypes.c_void_p,
-        ctypes.c_void_p,
-      ]))
-      
     audioEngine.prepare()  # xxx: 不要?
 
     self.audioEngine = audioEngine
@@ -220,13 +211,6 @@ class Synth(Oscillator):
         buf[frame] = sampleVal
     self.time = _time
     return 0
-
-  @objc_method
-  def _tapBlock(self, buffer: ctypes.c_void_p, when: ctypes.c_void_p) -> None:
-    buff = ObjCInstance(buffer)
-    print(buff)
-    #print(ObjCInstance(when))
-    pass
 
   @objc_method
   def start(self):
@@ -287,6 +271,11 @@ class MainViewController(UIViewController):
     slider.addTarget(self,
                      action=SEL('sliderValueDidChange:'),
                      forControlEvents=UIControlEvents.valueChanged)
+    '''
+    slider.addTarget_action_forControlEvents_(self,
+                                              action=SEL('sliderValueDidChange:'),
+                                              UIControlEvents.valueChanged)
+    '''
     # --- layout
     stackView = UIStackView.alloc().initWithArrangedSubviews_([
       segmentedControl,
