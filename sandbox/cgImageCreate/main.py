@@ -3,6 +3,7 @@ import ctypes
 from pyrubicon.objc.api import ObjCClass
 from pyrubicon.objc.api import objc_method
 from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.types import CGSizeMake
 
 from rbedge.functions import NSStringFromClass
 
@@ -12,6 +13,7 @@ UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 UIColor = ObjCClass('UIColor')
 
+UIGraphicsImageRenderer = ObjCClass('UIGraphicsImageRenderer')
 
 class MainViewController(UIViewController):
 
@@ -25,6 +27,7 @@ class MainViewController(UIViewController):
   def loadView(self):
     send_super(__class__, self, 'loadView')
     #print(f'\t{NSStringFromClass(__class__)}: loadView')
+    #pdbr.state()
 
   @objc_method
   def viewDidLoad(self):
@@ -32,6 +35,10 @@ class MainViewController(UIViewController):
     #print(f'\t{NSStringFromClass(__class__)}: viewDidLoad')
     self.navigationItem.title = NSStringFromClass(__class__) if (
       title := self.navigationItem.title) is None else title
+      
+    _size = CGSizeMake(64,64)
+    renderer = UIGraphicsImageRenderer.alloc().initWithSize_(_size)
+    pdbr.state(renderer)
 
   @objc_method
   def didReceiveMemoryWarning(self):
