@@ -1,6 +1,6 @@
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass
+from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
 from pyrubicon.objc.api import objc_method
 from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGSizeMake
@@ -14,6 +14,8 @@ NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 UIColor = ObjCClass('UIColor')
 
 UIGraphicsImageRenderer = ObjCClass('UIGraphicsImageRenderer')
+UIImageView = ObjCClass('UIImageView')
+
 
 class MainViewController(UIViewController):
 
@@ -35,10 +37,29 @@ class MainViewController(UIViewController):
     #print(f'\t{NSStringFromClass(__class__)}: viewDidLoad')
     self.navigationItem.title = NSStringFromClass(__class__) if (
       title := self.navigationItem.title) is None else title
-      
-    _size = CGSizeMake(64,64)
+
+    _size = CGSizeMake(64, 64)
     renderer = UIGraphicsImageRenderer.alloc().initWithSize_(_size)
-    pdbr.state(renderer)
+    '''
+    def imageRendererContext(_context: ctypes.c_void_p) -> None:
+      context = ObjCInstance(_context)
+      context.fillRect_(renderer.format.bounds)
+    '''
+
+    image = renderer.imageWithActions_(
+      Block(lambda context:None, None, ctypes.c_void_p))
+    imageView = UIImageView.alloc().initWithImage_(image)
+    
+    pdbr.state(imageView)
+    
+    self.view.addSubview_(imageView)
+
+  '''
+  @objc_method
+  def imageRendererContext(self, _context:ctypes.c_void_p)->None:
+    context = ObjCInstance(_context)
+    #pdbr.state(context)
+  '''
 
   @objc_method
   def didReceiveMemoryWarning(self):

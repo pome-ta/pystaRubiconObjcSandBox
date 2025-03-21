@@ -2,7 +2,7 @@ import ctypes
 from math import pi, sin
 from random import uniform
 
-from pyrubicon.objc.api import ObjCClass,ObjCInstance, Block
+from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.api import NSObject
 from pyrubicon.objc.runtime import send_super, SEL
@@ -166,7 +166,7 @@ class Synth(Oscillator):
     audioEngine.connect_to_format_(sourceNode, mainMixer, inputFormat)
     audioEngine.connect_to_format_(mainMixer, outputNode, None)
     mainMixer.outputVolume = 0.5
-  
+
     _bufsize = 64 * 64  # 取得する情報量
     mainMixer.installTapOnBus_bufferSize_format_block_(
       0, _bufsize, inputFormat,
@@ -174,7 +174,7 @@ class Synth(Oscillator):
         ctypes.c_void_p,
         ctypes.c_void_p,
       ]))
-      
+
     audioEngine.prepare()  # xxx: 不要?
 
     self.audioEngine = audioEngine
