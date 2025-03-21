@@ -21,13 +21,13 @@ AVAudioFormat = ObjCClass('AVAudioFormat')
 AVAudioSourceNode = ObjCClass('AVAudioSourceNode')
 
 UIViewController = ObjCClass('UIViewController')
+NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
+UIColor = ObjCClass('UIColor')
+
 UIStackView = ObjCClass('UIStackView')
 UISegmentedControl = ObjCClass('UISegmentedControl')
 UISlider = ObjCClass('UISlider')
 UILabel = ObjCClass('UILabel')
-NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
-
-UIColor = ObjCClass('UIColor')
 
 OSStatus = ctypes.c_int32
 CHANNEL = 1
@@ -229,7 +229,7 @@ class Synth(Oscillator):
 class MainViewController(UIViewController):
 
   synth: Synth = objc_property()
-  label:UILabel = objc_property()
+  label: UILabel = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -259,22 +259,23 @@ class MainViewController(UIViewController):
     segmentedControl.addTarget_action_forControlEvents_(
       self, SEL('selectedSegmentDidChange:'), UIControlEvents.valueChanged)
 
-
     value = 440.0
     label = UILabel.new()
-    label.text = f'frequency: {value}'
-    
-    
-    
+    label.text = f'frequency: {value:.2f}'
+
     slider = UISlider.new()
     #slider.setContinuous_(False)
-    slider.minimumValue = 220.0
+    slider.minimumValue = 110.0
     slider.maximumValue = 880.0
     slider.value = value
+    slider.addTarget(self,
+                     action=SEL('sliderValueDidChange:'),
+                     forControlEvents=UIControlEvents.valueChanged)
+    '''
     slider.addTarget_action_forControlEvents_(self,
-                                              SEL('sliderValueDidChange:'),
+                                              action=SEL('sliderValueDidChange:'),
                                               UIControlEvents.valueChanged)
-
+    '''
     # --- layout
     stackView = UIStackView.alloc().initWithArrangedSubviews_([
       segmentedControl,
@@ -321,7 +322,7 @@ class MainViewController(UIViewController):
       slider.leadingAnchor.constraintEqualToAnchor_(stackView.leadingAnchor),
       slider.trailingAnchor.constraintEqualToAnchor_(stackView.trailingAnchor),
     ])
-    
+
     self.label = label
 
   @objc_method
@@ -387,9 +388,9 @@ class MainViewController(UIViewController):
     self.synth.frequency = value
     slider.value = value
     '''
-    #self.label.text = f'frequency: {slider.value}'
-    self.synth.frequency = slider.value
-    
+    value = int(slider.value * 100) / 100
+    self.synth.frequency = value
+    self.label.text = f'frequency: {value:.2f}'
 
 
 if __name__ == '__main__':
