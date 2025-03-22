@@ -1,8 +1,8 @@
 import ctypes
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
-from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.api import objc_method
+from pyrubicon.objc.runtime import send_super, load_library
 from pyrubicon.objc.types import CGSizeMake
 
 from rbedge.functions import (
@@ -20,13 +20,8 @@ UIColor = ObjCClass('UIColor')
 UIGraphicsImageRenderer = ObjCClass('UIGraphicsImageRenderer')
 UIImageView = ObjCClass('UIImageView')
 
-width_size: int = 8
-height_size: int = 8
-
 
 class MainViewController(UIViewController):
-
-  imageView: UIImageView = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -47,7 +42,7 @@ class MainViewController(UIViewController):
     self.navigationItem.title = NSStringFromClass(__class__) if (
       title := self.navigationItem.title) is None else title
 
-    _size = CGSizeMake(width_size, height_size)
+    _size = CGSizeMake(64, 64)
     renderer = UIGraphicsImageRenderer.alloc().initWithSize_(_size)
 
     def imageRendererContext(_context: ctypes.c_void_p) -> None:
@@ -79,17 +74,13 @@ class MainViewController(UIViewController):
     # todo: 空撃ち
     #32768:00000000
     #image = renderer.imageWithActions_(Block(lambda context:None, None, ctypes.c_void_p))
+    #pdbr.state(image)
     imageView = UIImageView.alloc().initWithImage_(image)
 
-    imageRef = CGDataProviderCopyData(
-      CGImageGetDataProvider(imageView.image.CGImage))
+    imRef = CGDataProviderCopyData(CGImageGetDataProvider(image.CGImage))
 
-    #print(f'{imageRef=}')
-    #print(imageRef)
-    #pdbr.state(imageRef)
-    #print(imageRef.bytes)
-    #print(imageRef.mutableBytes)
-    
+    #print(f'{imRef=}')
+    print(imRef)
 
     self.view.addSubview_(imageView)
     imageView.translatesAutoresizingMaskIntoConstraints = False
@@ -106,7 +97,12 @@ class MainViewController(UIViewController):
         areaLayoutGuide.trailingAnchor, -24.0),
     ])
 
-    self.imageView = imageView
+  '''
+  @objc_method
+  def imageRendererContext(self, _context:ctypes.c_void_p)->None:
+    context = ObjCInstance(_context)
+    #pdbr.state(context)
+  '''
 
   @objc_method
   def viewWillAppear_(self, animated: bool):

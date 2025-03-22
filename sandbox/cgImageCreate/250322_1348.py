@@ -1,15 +1,11 @@
 import ctypes
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
-from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.api import objc_method
+from pyrubicon.objc.runtime import send_super, load_library
 from pyrubicon.objc.types import CGSizeMake
 
-from rbedge.functions import (
-  NSStringFromClass,
-  CGImageGetDataProvider,
-  CGDataProviderCopyData,
-)
+from rbedge.functions import NSStringFromClass
 
 from rbedge import pdbr
 
@@ -19,14 +15,28 @@ UIColor = ObjCClass('UIColor')
 
 UIGraphicsImageRenderer = ObjCClass('UIGraphicsImageRenderer')
 UIImageView = ObjCClass('UIImageView')
+CIImage = ObjCClass('CIImage')
 
-width_size: int = 8
-height_size: int = 8
+CoreGraphics = load_library('CoreGraphics')
+
+
+# ref: [CGImageGetDataProvider | Apple Developer Documentation](https://developer.apple.com/documentation/coregraphics/cgimage/dataprovider?language=objc)
+def CGImageGetDataProvider(image: ctypes.c_void_p) -> ObjCInstance:
+  _function = CoreGraphics.CGImageGetDataProvider
+  _function.restype = ctypes.c_void_p
+  _function.argtypes = [ctypes.c_void_p]
+  return ObjCInstance(_function(image))
+
+
+# ref: [CGDataProviderCopyData | Apple Developer Documentation](https://developer.apple.com/documentation/coregraphics/cgdataprovider/data?language=objc)
+def CGDataProviderCopyData(provider: ObjCInstance) -> ObjCInstance:
+  _function = CoreGraphics.CGDataProviderCopyData
+  _function.restype = ctypes.c_void_p
+  _function.argtypes = [ctypes.c_void_p]
+  return ObjCInstance(_function(provider))
 
 
 class MainViewController(UIViewController):
-
-  imageView: UIImageView = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -47,48 +57,28 @@ class MainViewController(UIViewController):
     self.navigationItem.title = NSStringFromClass(__class__) if (
       title := self.navigationItem.title) is None else title
 
-    _size = CGSizeMake(width_size, height_size)
+    _size = CGSizeMake(64, 64)
     renderer = UIGraphicsImageRenderer.alloc().initWithSize_(_size)
 
     def imageRendererContext(_context: ctypes.c_void_p) -> None:
       context = ObjCInstance(_context)
-      #65536:5e5ce6ff
-      #UIColor.systemIndigoColor().setFill()
-      #32768:ffffffff
-      #UIColor.whiteColor.setFill()
-      #65536:ffff00ff
-      #UIColor.yellowColor.setFill()
-      #65536:64d2ffff
-      #UIColor.systemCyanColor().setFill()
-      #32768:00ffffff
-      #UIColor.cyanColor.setFill()
-      #32768:80ff80ff
-      #UIColor.grayColor.setFill()
-      #32768:55ff55ff
-      #UIColor.darkGrayColor.setFill()
-      #32768:aaffaaff
-      #UIColor.lightGrayColor.setFill()
-      #32768:00ff00ff
-      #UIColor.blackColor.setFill()
-
-      #32768:00ff00ff
+      #pdbr.state(context)
       context.fillRect_(renderer.format.bounds)
 
     image = renderer.imageWithActions_(
       Block(imageRendererContext, None, ctypes.c_void_p))
-    # todo: 空撃ち
-    #32768:00000000
     #image = renderer.imageWithActions_(Block(lambda context:None, None, ctypes.c_void_p))
     imageView = UIImageView.alloc().initWithImage_(image)
 
-    imageRef = CGDataProviderCopyData(
-      CGImageGetDataProvider(imageView.image.CGImage))
-
-    #print(f'{imageRef=}')
-    #print(imageRef)
-    #pdbr.state(imageRef)
-    #print(imageRef.bytes)
-    #print(imageRef.mutableBytes)
+    ciImage = CIImage.alloc().initWithImage_(imageView.image)
+    #pdbr.state(image)
+    imRef = CGDataProviderCopyData(CGImageGetDataProvider(image.CGImage))
+    ciRef = CGDataProviderCopyData(CGImageGetDataProvider(ciImage.CGImage))
+    
+    #print(f'{imRef=}')
+    #print(f'{ciRef=}')
+    print(imRef)
+    print(ciRef)
     
 
     self.view.addSubview_(imageView)
@@ -106,29 +96,12 @@ class MainViewController(UIViewController):
         areaLayoutGuide.trailingAnchor, -24.0),
     ])
 
-    self.imageView = imageView
-
+  '''
   @objc_method
-  def viewWillAppear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewWillAppear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
-    #print(f'\t{NSStringFromClass(__class__)}: viewWillAppear_')
-
-  @objc_method
-  def viewDidAppear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewDidAppear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
-    #print(f'\t{NSStringFromClass(__class__)}: viewDidAppear_')
+  def imageRendererContext(self, _context:ctypes.c_void_p)->None:
+    context = ObjCInstance(_context)
+    #pdbr.state(context)
+  '''
 
   @objc_method
   def didReceiveMemoryWarning(self):
