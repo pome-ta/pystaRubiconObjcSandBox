@@ -89,7 +89,6 @@ class MainViewController(UIViewController):
     #pdbr.state(imageRef)
     #print(imageRef.bytes)
     #print(imageRef.mutableBytes)
-    
 
     self.view.addSubview_(imageView)
     imageView.translatesAutoresizingMaskIntoConstraints = False
