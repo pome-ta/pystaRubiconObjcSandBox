@@ -2,7 +2,7 @@ import ctypes
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
 from pyrubicon.objc.api import objc_method
-from pyrubicon.objc.runtime import send_super, load_library
+from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGSizeMake
 
 from rbedge.functions import NSStringFromClass
@@ -15,25 +15,6 @@ UIColor = ObjCClass('UIColor')
 
 UIGraphicsImageRenderer = ObjCClass('UIGraphicsImageRenderer')
 UIImageView = ObjCClass('UIImageView')
-CIImage = ObjCClass('CIImage')
-
-CoreGraphics = load_library('CoreGraphics')
-
-
-# ref: [CGImageGetDataProvider | Apple Developer Documentation](https://developer.apple.com/documentation/coregraphics/cgimage/dataprovider?language=objc)
-def CGImageGetDataProvider(image: ctypes.c_void_p) -> ObjCInstance:
-  _function = CoreGraphics.CGImageGetDataProvider
-  _function.restype = ctypes.c_void_p
-  _function.argtypes = [ctypes.c_void_p]
-  return ObjCInstance(_function(image))
-
-
-# ref: [CGDataProviderCopyData | Apple Developer Documentation](https://developer.apple.com/documentation/coregraphics/cgdataprovider/data?language=objc)
-def CGDataProviderCopyData(provider: ObjCInstance) -> ObjCInstance:
-  _function = CoreGraphics.CGDataProviderCopyData
-  _function.restype = ctypes.c_void_p
-  _function.argtypes = [ctypes.c_void_p]
-  return ObjCInstance(_function(provider))
 
 
 class MainViewController(UIViewController):
@@ -59,37 +40,19 @@ class MainViewController(UIViewController):
 
     _size = CGSizeMake(64, 64)
     renderer = UIGraphicsImageRenderer.alloc().initWithSize_(_size)
-
+    '''
     def imageRendererContext(_context: ctypes.c_void_p) -> None:
       context = ObjCInstance(_context)
-      #pdbr.state(context)
       context.fillRect_(renderer.format.bounds)
+    '''
 
     image = renderer.imageWithActions_(
-      Block(imageRendererContext, None, ctypes.c_void_p))
-    #image = renderer.imageWithActions_(Block(lambda context:None, None, ctypes.c_void_p))
+      Block(lambda context:None, None, ctypes.c_void_p))
     imageView = UIImageView.alloc().initWithImage_(image)
-
-    #ciImage = CIImage.alloc().initWithImage_(imageView.image)
-    #pdbr.state(image)
-    ref = CGImageGetDataProvider(image.CGImage)
-    a = CGDataProviderCopyData(ref)
-    print(a)
-
+    
+    pdbr.state(imageView)
+    
     self.view.addSubview_(imageView)
-    imageView.translatesAutoresizingMaskIntoConstraints = False
-    areaLayoutGuide = self.view.safeAreaLayoutGuide
-    # --- imageView
-    NSLayoutConstraint.activateConstraints_([
-      imageView.centerXAnchor.constraintEqualToAnchor_(
-        areaLayoutGuide.centerXAnchor),
-      imageView.centerYAnchor.constraintEqualToAnchor_(
-        areaLayoutGuide.centerYAnchor),
-      imageView.leadingAnchor.constraintEqualToAnchor_constant_(
-        areaLayoutGuide.leadingAnchor, 24.0),
-      imageView.trailingAnchor.constraintEqualToAnchor_constant_(
-        areaLayoutGuide.trailingAnchor, -24.0),
-    ])
 
   '''
   @objc_method
