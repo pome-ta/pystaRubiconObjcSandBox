@@ -20,9 +20,8 @@ UIColor = ObjCClass('UIColor')
 UIGraphicsImageRenderer = ObjCClass('UIGraphicsImageRenderer')
 UIImageView = ObjCClass('UIImageView')
 
-width_size: int = 29
-height_size: int = 32
-
+width_size: int = 16
+height_size: int = 16
 
 
 class MainViewController(UIViewController):
@@ -60,11 +59,11 @@ class MainViewController(UIViewController):
       #32768:ffffffff
       #UIColor.whiteColor.setFill()
       #65536:ffff00ff
-      #UIColor.yellowColor.setFill()
+      UIColor.yellowColor.setFill()
       #65536:64d2ffff
       #UIColor.systemCyanColor().setFill()
       #32768:00ffffff
-      UIColor.cyanColor.setFill()
+      #UIColor.cyanColor.setFill()
       #32768:80ff80ff
       #UIColor.grayColor.setFill()
       #32768:55ff55ff
@@ -87,6 +86,50 @@ class MainViewController(UIViewController):
     #32768:00000000
     #image = renderer.imageWithActions_(Block(lambda context: None, None, ctypes.c_void_p))
     imageView = UIImageView.alloc().initWithImage_(image)
+
+    imageRef = CGDataProviderCopyData(
+      CGImageGetDataProvider(imageView.image.CGImage))
+
+    #print(f'{imageRef=}')
+
+    print(f'{imageRef=}')
+    print(imageRef)
+
+    #pdbr.state(imageRef)
+    #print(imageRef.bytes)
+    #print(imageRef.mutableBytes)
+    #print(imageRef.length)
+    # 94 : 5e
+    # 92 : 5c
+    #230 : e6
+    for i in range(int(imageRef.length / 4)):
+      '''
+      if i % 4 == 0:
+        #val = 255
+        val = 94
+      elif i % 4 == 1:
+        #val = 0
+        val = 92
+      elif i % 4 == 2:
+        #val = 128
+        val = 230
+      elif i % 4 == 3:
+        val = 255
+      '''
+
+      if i % 2 == 0:
+        continue
+      vals = [94, 92, 230, 255]
+
+      imageRef.replaceBytesInRange_withBytes_(NSRange(i * 4, 4), bytes(vals))
+    
+    '''
+    #imageRef.replaceBytesInRange_withBytes_length_(NSRange(0, 16), b'ffffff', 8)
+
+    print(imageRef)
+    print(f'{imageRef=}')
+
+    #print(imageRef)
 
     self.view.addSubview_(imageView)
 
@@ -119,39 +162,6 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewWillAppear_')
-    imageRef = CGDataProviderCopyData(
-      CGImageGetDataProvider(self.imageView.image.CGImage))
-
-    #print(f'{imageRef=}')
-
-    #print(f'{imageRef=}')
-    #print(imageRef)
-
-    #pdbr.state(imageRef)
-    #print(imageRef.bytes)
-    #print(imageRef.mutableBytes)
-    #print(imageRef.length)
-    # 94 : 5e
-    # 92 : 5c
-    #230 : e6
-    vals = [94, 92, 230, 255]  # * int(imageRef.length / 4)
-    '''
-    for i in range(int(imageRef.length / 4)):
-      if i % 2 == 0:
-        continue
-      #vals = [94, 92, 230, 255]
-
-      imageRef.replaceBytesInRange_withBytes_(NSRange(i * 4, 4), bytes(vals))
-    '''
-    #imageRef.replaceBytesInRange_withBytes_(NSRange(0, 4), bytes(vals))
-    imageRef.resetBytesInRange_(NSRange(4,24))
-    
-    #pdbr.state(imageRef)
-    #imageRef.setData_(bytes(vals * int(imageRef.length / 4)))
-
-    #print(imageRef)
-    #print(f'{imageRef=}')
-    #print(imageRef)
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
