@@ -168,6 +168,7 @@ class Synth(Oscillator):
     mainMixer.outputVolume = 0.5
 
     _bufsize = 64 * 64  # 取得する情報量
+    #17640
     mainMixer.installTapOnBus_bufferSize_format_block_(
       0, _bufsize, inputFormat,
       Block(self._tapBlock, None, *[
@@ -224,9 +225,13 @@ class Synth(Oscillator):
   @objc_method
   def _tapBlock(self, buffer: ctypes.c_void_p, when: ctypes.c_void_p) -> None:
     buff = ObjCInstance(buffer)
-    print(buff)
-    #print(ObjCInstance(when))
-    pass
+    #pdbr.state(buff)
+    #print(buff.floatChannelData)
+    #print(dir(buff.floatChannelData))
+    #print(buff.int16ChannelData.contents)
+    print(buff.floatChannelData.contents.contents)
+    #print(dir(buff.floatChannelData.contents))
+    
 
   @objc_method
   def start(self):

@@ -3,7 +3,7 @@ import ctypes
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
-from pyrubicon.objc.types import CGSizeMake
+from pyrubicon.objc.types import CGSizeMake, NSRange
 
 from rbedge.functions import (
   NSStringFromClass,
@@ -53,7 +53,7 @@ class MainViewController(UIViewController):
     def imageRendererContext(_context: ctypes.c_void_p) -> None:
       context = ObjCInstance(_context)
       #65536:5e5ce6ff
-      #UIColor.systemIndigoColor().setFill()
+      UIColor.systemIndigoColor().setFill()
       #32768:ffffffff
       #UIColor.whiteColor.setFill()
       #65536:ffff00ff
@@ -74,23 +74,54 @@ class MainViewController(UIViewController):
       #32768:00ff00ff
       context.fillRect_(renderer.format.bounds)
 
-    image = renderer.imageWithActions_(
-      Block(imageRendererContext, None, ctypes.c_void_p))
+    image = renderer.imageWithActions_(Block(imageRendererContext, None, ctypes.c_void_p))
     # todo: 空撃ち
     #32768:00000000
-    #image = renderer.imageWithActions_(Block(lambda context:None, None, ctypes.c_void_p))
+    #image = renderer.imageWithActions_(Block(lambda context: None, None, ctypes.c_void_p))
     imageView = UIImageView.alloc().initWithImage_(image)
 
     imageRef = CGDataProviderCopyData(
       CGImageGetDataProvider(imageView.image.CGImage))
 
     #print(f'{imageRef=}')
-    #print(imageRef)
+    print(imageRef)
     #pdbr.state(imageRef)
     #print(imageRef.bytes)
     #print(imageRef.mutableBytes)
+    #print(imageRef.length)
+    for i in range(imageRef.length):
+      val = 255
+      if i % 4 == 0:
+        val = 255
+      elif i % 4 == 1:
+        #val = 0
+        val = 255
+      elif i % 4 == 2:
+        #val = 128
+        val = 255
+      elif i % 4 == 3:
+        val = 255
+
+      imageRef.replaceBytesInRange_withBytes_(NSRange(i, 1), bytes([
+        val,
+      ]))
+    '''
+    imageRef.replaceBytesInRange_withBytes_(NSRange(0, 4),
+                                            bytes([
+                                              0,
+                                              0,
+                                              0,
+                                              255,
+                                            ]))
+    '''
+    #imageRef.replaceBytesInRange_withBytes_length_(NSRange(0, 16), b'ffffff', 8)
+    print(imageRef)
+    print(f'{imageRef=}')
+    #print(imageRef)
 
     self.view.addSubview_(imageView)
+    '''
+
     imageView.translatesAutoresizingMaskIntoConstraints = False
     areaLayoutGuide = self.view.safeAreaLayoutGuide
     # --- imageView
@@ -104,6 +135,7 @@ class MainViewController(UIViewController):
       imageView.trailingAnchor.constraintEqualToAnchor_constant_(
         areaLayoutGuide.trailingAnchor, -24.0),
     ])
+    '''
 
     self.imageView = imageView
 
