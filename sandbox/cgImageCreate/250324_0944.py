@@ -55,13 +55,38 @@ class MainViewController(UIViewController):
 
     def imageRendererContext(_context: ctypes.c_void_p) -> None:
       context = ObjCInstance(_context)
+      #65536:5e5ce6ff
+      #UIColor.systemIndigoColor().setFill()
+      #32768:ffffffff
+      #UIColor.whiteColor.setFill()
+      #65536:ffff00ff
+      #UIColor.yellowColor.setFill()
+      #65536:64d2ffff
+      #UIColor.systemCyanColor().setFill()
+      #32768:00ffffff
       UIColor.cyanColor.setFill()
-      # todo: 色付けないとモノクロになる
+      #32768:80ff80ff
+      #UIColor.grayColor.setFill()
+      #32768:55ff55ff
+      #UIColor.darkGrayColor.setFill()
+      #32768:aaffaaff
+      #UIColor.lightGrayColor.setFill()
+      #32768:00ff00ff
+      #UIColor.blackColor.setFill()
       UIColor.systemBackgroundColor().setFill()
-      context.fillRect_(renderer.format.bounds)
+      #pdbr.state(UIColor)
 
-    image = renderer.imageWithActions_(
-      Block(imageRendererContext, None, ctypes.c_void_p))
+      #32768:00ff00ff
+      context.fillRect_(renderer.format.bounds)
+      #pdbr.state(context.format)
+
+    #image = renderer.imageWithActions_(Block(imageRendererContext, None, ctypes.c_void_p))
+    #pdbr.state(renderer.format)
+    #print(renderer.format.preferredRange)
+    #pdbr.state(image)
+    # todo: 空撃ち
+    #32768:00000000
+    #image = renderer.imageWithActions_(Block(lambda context: None, None, ctypes.c_void_p))
     imageView = UIImageView.alloc().initWithImage_(image)
 
     self.view.addSubview_(imageView)
