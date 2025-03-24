@@ -1,5 +1,4 @@
 import ctypes
-import struct
 from math import pi, sin
 from random import uniform
 
@@ -14,7 +13,6 @@ from rbedge.enumerations import (
   UIStackViewAlignment,
 )
 from rbedge.functions import NSStringFromClass
-from rbedge.objcMainThread import onMainThread
 
 from rbedge import pdbr
 
@@ -134,8 +132,6 @@ class Synth(Oscillator):
   deltaTime: float = objc_property(float)
 
   waveType: int = objc_property(int)
-  #tapBufferDatas: list = objc_property(weak=True)
-  textView = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -175,9 +171,8 @@ class Synth(Oscillator):
     mainMixer.outputVolume = 0.5
 
     _bufsize = width_size * height_size  # 取得する情報量
-    #17640
     mainMixer.installTapOnBus_bufferSize_format_block_(
-      0, 4410, inputFormat,
+      0, _bufsize, inputFormat,
       Block(self._tapBlock, None, *[
         ctypes.c_void_p,
         ctypes.c_void_p,
@@ -191,7 +186,6 @@ class Synth(Oscillator):
     self.deltaTime = deltaTime
 
     self.waveType = 0
-    #self.tapBufferDatas = []
 
     return self
 
@@ -235,24 +229,10 @@ class Synth(Oscillator):
     buff = ObjCInstance(buffer)
     floatChannelDatas = buff.floatChannelData
     floatChannelData = floatChannelDatas[0]
-    print(when)
-    '''
-    self.tapBufferDatas = [
+
+    tapBufferDatas = [
       floatChannelData[i] for i in range(width_size * height_size)
     ]
-    '''
-    '''
-    if self.textView is not None:
-
-      @onMainThread
-      def mainThread():
-        self.textView.text = f'{floatChannelData[0]}'
-
-      #print(floatChannelData[0])
-      mainThread()
-
-    #self.tapBufferDatas = float_datas
-    '''
 
   @objc_method
   def start(self):
@@ -305,9 +285,6 @@ class MainViewController(UIViewController):
     label = UILabel.new()
     label.text = f'frequency: {value:.2f}'
 
-    textView = UILabel.new()
-    textView.text = 'hoge'
-
     slider = UISlider.new()
     #slider.setContinuous_(False)
     slider.minimumValue = 110.0
@@ -318,7 +295,6 @@ class MainViewController(UIViewController):
                      forControlEvents=UIControlEvents.valueChanged)
     # --- layout
     stackView = UIStackView.alloc().initWithArrangedSubviews_([
-      textView,
       segmentedControl,
       label,
       slider,
@@ -364,7 +340,6 @@ class MainViewController(UIViewController):
       slider.trailingAnchor.constraintEqualToAnchor_(stackView.trailingAnchor),
     ])
 
-    self.synth.textView = textView
     self.label = label
 
   @objc_method
@@ -399,7 +374,6 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewWillDisappear_')
-    #print(self.synth.tapBufferDatas)
     self.synth.stop()
 
   @objc_method
@@ -426,11 +400,6 @@ class MainViewController(UIViewController):
   # MARK: - Actions
   @objc_method
   def sliderValueDidChange_(self, slider):
-    '''
-    value = float(int(slider.value))
-    self.synth.frequency = value
-    slider.value = value
-    '''
     value = int(slider.value * 100) / 100
     self.synth.frequency = value
     self.label.text = f'frequency: {value:.2f}'

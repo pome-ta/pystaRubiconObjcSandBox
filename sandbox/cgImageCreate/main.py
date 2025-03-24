@@ -118,13 +118,15 @@ class MainViewController(UIViewController):
 
       imageRef.replaceBytesInRange_withBytes_(NSRange(i * 4, 4), bytes(vals))
     '''
+    #pdbr.state(CGImageGetDataProvider(self.imageView.image.CGImage))
     imageRef.replaceBytesInRange_withBytes_(NSRange(0, 4), bytes(vals))
     #imageRef.resetBytesInRange_(NSRange(4,24))
+    imageRef.release()
 
     #pdbr.state(imageRef)
     #imageRef.setData_(bytes(vals * int(imageRef.length / 4)))
 
-    print(imageRef)
+    #print(imageRef)
     #print(f'{imageRef=}')
     #print(imageRef)
     #print(dir(imageRef.bytes))
