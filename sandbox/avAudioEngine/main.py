@@ -177,7 +177,7 @@ class Synth(Oscillator):
     _bufsize = width_size * height_size  # 取得する情報量
     #17640
     mainMixer.installTapOnBus_bufferSize_format_block_(
-      0, _bufsize, inputFormat,
+      0, 4410, inputFormat,
       Block(self._tapBlock, None, *[
         ctypes.c_void_p,
         ctypes.c_void_p,
@@ -235,10 +235,12 @@ class Synth(Oscillator):
     buff = ObjCInstance(buffer)
     floatChannelDatas = buff.floatChannelData
     floatChannelData = floatChannelDatas[0]
+    print(when)
     '''
     self.tapBufferDatas = [
       floatChannelData[i] for i in range(width_size * height_size)
     ]
+    '''
     '''
     if self.textView is not None:
 
@@ -250,6 +252,7 @@ class Synth(Oscillator):
       mainThread()
 
     #self.tapBufferDatas = float_datas
+    '''
 
   @objc_method
   def start(self):
