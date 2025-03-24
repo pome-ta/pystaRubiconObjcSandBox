@@ -245,8 +245,6 @@ class Synth(Oscillator):
       @onMainThread
       def mainThread():
         self.textView.text = f'{floatChannelData[0]}'
-
-      #print(floatChannelData[0])
       mainThread()
 
     #self.tapBufferDatas = float_datas
