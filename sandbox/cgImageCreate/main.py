@@ -2,7 +2,7 @@ import ctypes
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
 from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super,objc_id
+from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGSizeMake, NSRange
 
 from rbedge.functions import (
@@ -22,7 +22,6 @@ UIImageView = ObjCClass('UIImageView')
 
 width_size: int = 40
 height_size: int = 24
-
 
 
 class MainViewController(UIViewController):
@@ -121,11 +120,11 @@ class MainViewController(UIViewController):
     '''
     imageRef.replaceBytesInRange_withBytes_(NSRange(0, 4), bytes(vals))
     #imageRef.resetBytesInRange_(NSRange(4,24))
-    
+
     #pdbr.state(imageRef)
     #imageRef.setData_(bytes(vals * int(imageRef.length / 4)))
 
-    #print(imageRef)
+    print(imageRef)
     #print(f'{imageRef=}')
     #print(imageRef)
     #print(dir(imageRef.bytes))
@@ -137,7 +136,6 @@ class MainViewController(UIViewController):
     print(dir(byref))
     print(byref.contents)
     '''
-    
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
