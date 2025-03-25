@@ -13,7 +13,12 @@ from rbedge.enumerations import (
   UILayoutConstraintAxis,
   UIStackViewAlignment,
 )
-from rbedge.functions import NSStringFromClass
+from rbedge.functions import (
+  NSStringFromClass,
+  CGImageGetDataProvider,
+  CGDataProviderCopyData,
+)
+from rbedge.objcMainThread import onMainThread
 from rbedge import pdbr
 
 AVAudioEngine = ObjCClass('AVAudioEngine')
@@ -23,6 +28,10 @@ AVAudioSourceNode = ObjCClass('AVAudioSourceNode')
 UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 UIColor = ObjCClass('UIColor')
+
+UIGraphicsImageRenderer = ObjCClass('UIGraphicsImageRenderer')
+UIImageView = ObjCClass('UIImageView')
+UIImage = ObjCClass('UIImage')
 
 UIStackView = ObjCClass('UIStackView')
 UISegmentedControl = ObjCClass('UISegmentedControl')
@@ -132,6 +141,8 @@ class Synth(Oscillator):
   deltaTime: float = objc_property(float)
 
   waveType: int = objc_property(int)
+  isDraw: bool = objc_property(bool)
+  visualView: UIImageView = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -186,6 +197,8 @@ class Synth(Oscillator):
     self.deltaTime = deltaTime
 
     self.waveType = 0
+    self.isDraw = True
+    self.visualView = None
 
     return self
 
@@ -226,12 +239,49 @@ class Synth(Oscillator):
 
   @objc_method
   def _tapBlock(self, buffer: ctypes.c_void_p, when: ctypes.c_void_p) -> None:
+    if self.visualView is None or not self.isDraw:
+      return
     buff = ObjCInstance(buffer)
     floatChannelDatas = buff.floatChannelData
     floatChannelData = floatChannelDatas[0]
-    print(floatChannelData[0])
 
-    #tapBufferDatas = [floatChannelData[i] for i in range(width_size * height_size)]
+    tapBufferDatas = [
+      floatChannelData[i] for i in range(width_size * height_size)
+    ]
+    '''
+    
+    image = self.visualView.image
+    imageRef = CGDataProviderCopyData(CGImageGetDataProvider(image.CGImage))
+    vals = [94, 92, 230, 255]
+    imageRef.replaceBytesInRange_withBytes_(NSRange(0, 4), bytes(vals))
+    #valImage = UIImage.alloc().initWithCGImage_(imageRef)
+    #print(valImage)
+    #pdbr.state(UIImage.new())
+    pdbr.state(imageRef)
+    '''
+    imageRef = CGDataProviderCopyData(
+      CGImageGetDataProvider(self.visualView.image.CGImage))
+    #image = UIImage.alloc().initWithData_(imageRef)
+
+    #print(imageRef)
+    #pdbr.state(self.visualView.image)
+
+    @onMainThread
+    def updateDraw():
+      '''
+      imageRef = CGDataProviderCopyData(CGImageGetDataProvider(self.visualView.image.CGImage))
+      vals = [94, 92, 230, 255]
+      imageRef.replaceBytesInRange_withBytes_(NSRange(0, 4), bytes(vals))
+      pdbr.state(self.visualView)
+      '''
+      pass
+
+    #updateDraw()
+    self.notDraw()
+
+  @objc_method
+  def notDraw(self):
+    self.isDraw = False
 
   @objc_method
   def start(self):
@@ -273,7 +323,23 @@ class MainViewController(UIViewController):
 
     self.synth.start()
 
+    _size = CGSizeMake(width_size, height_size)
+    renderer = UIGraphicsImageRenderer.alloc().initWithSize_(_size)
+
+    def imageRendererContext(_context: ctypes.c_void_p) -> None:
+      context = ObjCInstance(_context)
+      UIColor.cyanColor.setFill()
+      # todo: 色付けないとモノクロになる
+      UIColor.systemBackgroundColor().setFill()
+      context.fillRect_(renderer.format.bounds)
+
+    image = renderer.imageWithActions_(
+      Block(imageRendererContext, None, ctypes.c_void_p))
+
     # --- view
+    visualView = UIImageView.alloc().initWithImage_(image)
+    pdbr.state(visualView.image)
+
     wave_names = [waveType for waveType in self.synth.waveTypes]
     segmentedControl = UISegmentedControl.alloc().initWithItems_(wave_names)
     segmentedControl.selectedSegmentIndex = 0
@@ -304,6 +370,20 @@ class MainViewController(UIViewController):
     stackView.spacing = 32.0
 
     areaLayoutGuide = self.view.safeAreaLayoutGuide
+
+    self.view.addSubview_(visualView)
+    visualView.translatesAutoresizingMaskIntoConstraints = False
+    # --- visualView
+    NSLayoutConstraint.activateConstraints_([
+      visualView.centerXAnchor.constraintEqualToAnchor_(
+        areaLayoutGuide.centerXAnchor),
+      visualView.centerYAnchor.constraintEqualToAnchor_(
+        areaLayoutGuide.centerYAnchor),
+      visualView.widthAnchor.constraintEqualToAnchor_multiplier_(
+        areaLayoutGuide.widthAnchor, 0.5),
+      visualView.heightAnchor.constraintEqualToAnchor_multiplier_(
+        areaLayoutGuide.widthAnchor, 0.5),
+    ])
 
     self.view.addSubview_(stackView)
     stackView.translatesAutoresizingMaskIntoConstraints = False
@@ -340,6 +420,7 @@ class MainViewController(UIViewController):
       slider.trailingAnchor.constraintEqualToAnchor_(stackView.trailingAnchor),
     ])
 
+    #self.synth.visualView = visualView
     self.label = label
 
   @objc_method
@@ -395,6 +476,7 @@ class MainViewController(UIViewController):
   @objc_method
   def selectedSegmentDidChange_(self, segmentedControl):
     index = segmentedControl.selectedSegmentIndex
+    self.synth.isDraw = True
     self.synth.waveType = index
 
   # MARK: - Actions
@@ -402,6 +484,7 @@ class MainViewController(UIViewController):
   def sliderValueDidChange_(self, slider):
     value = int(slider.value * 100) / 100
     self.synth.frequency = value
+    self.synth.isDraw = True
     self.label.text = f'frequency: {value:.2f}'
 
 

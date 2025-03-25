@@ -14,6 +14,7 @@ from rbedge.enumerations import (
   UIStackViewAlignment,
 )
 from rbedge.functions import NSStringFromClass
+
 from rbedge import pdbr
 
 AVAudioEngine = ObjCClass('AVAudioEngine')
@@ -28,9 +29,6 @@ UIStackView = ObjCClass('UIStackView')
 UISegmentedControl = ObjCClass('UISegmentedControl')
 UISlider = ObjCClass('UISlider')
 UILabel = ObjCClass('UILabel')
-
-width_size: int = 40
-height_size: int = 24
 
 OSStatus = ctypes.c_int32
 CHANNEL = 1
@@ -170,14 +168,6 @@ class Synth(Oscillator):
     audioEngine.connect_to_format_(mainMixer, outputNode, None)
     mainMixer.outputVolume = 0.5
 
-    _bufsize = width_size * height_size  # 取得する情報量
-    mainMixer.installTapOnBus_bufferSize_format_block_(
-      0, _bufsize, inputFormat,
-      Block(self._tapBlock, None, *[
-        ctypes.c_void_p,
-        ctypes.c_void_p,
-      ]))
-
     audioEngine.prepare()  # xxx: 不要?
 
     self.audioEngine = audioEngine
@@ -225,15 +215,6 @@ class Synth(Oscillator):
     return 0
 
   @objc_method
-  def _tapBlock(self, buffer: ctypes.c_void_p, when: ctypes.c_void_p) -> None:
-    buff = ObjCInstance(buffer)
-    floatChannelDatas = buff.floatChannelData
-    floatChannelData = floatChannelDatas[0]
-    print(floatChannelData[0])
-
-    #tapBufferDatas = [floatChannelData[i] for i in range(width_size * height_size)]
-
-  @objc_method
   def start(self):
     try:
       self.audioEngine.startAndReturnError_(None)
@@ -273,7 +254,6 @@ class MainViewController(UIViewController):
 
     self.synth.start()
 
-    # --- view
     wave_names = [waveType for waveType in self.synth.waveTypes]
     segmentedControl = UISegmentedControl.alloc().initWithItems_(wave_names)
     segmentedControl.selectedSegmentIndex = 0
@@ -340,6 +320,7 @@ class MainViewController(UIViewController):
       slider.trailingAnchor.constraintEqualToAnchor_(stackView.trailingAnchor),
     ])
 
+    #self.synth.visualView = visualView
     self.label = label
 
   @objc_method
