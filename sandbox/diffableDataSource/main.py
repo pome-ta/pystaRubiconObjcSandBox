@@ -31,7 +31,7 @@ UICollectionViewCellRegistration = ObjCClass(
 UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
 UICollectionViewDiffableDataSource = ObjCClass(
   'UICollectionViewDiffableDataSource')
-
+NSDiffableDataSourceSnapshot = ObjCClass('NSDiffableDataSourceSnapshot')
 
 class MainViewController(UIViewController):
 
@@ -61,7 +61,7 @@ class MainViewController(UIViewController):
     self.configureHierarchy()
     self.modernDataSource = self.configureCellRegistration()
 
-    pdbr.state(self.modernDataSource)
+    
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -84,6 +84,7 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewDidAppear_')
+    self.initData()
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
@@ -95,6 +96,7 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
     # print(f'\t{NSStringFromClass(__class__)}: viewWillDisappear_')
+    
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
@@ -123,7 +125,7 @@ class MainViewController(UIViewController):
     rectZero = CGRectMake(0.0, 0.0, 0.0, 0.0)
     modernCollectionView = UICollectionView.alloc(
     ).initWithFrame_collectionViewLayout_(rectZero, layout)
-    modernCollectionView.backgroundColor = UIColor.systemDarkPurpleColor()
+    #modernCollectionView.backgroundColor = UIColor.systemDarkPurpleColor()
 
     # --- Layout
     self.view.addSubview_(modernCollectionView)
@@ -138,9 +140,9 @@ class MainViewController(UIViewController):
       modernCollectionView.centerYAnchor.constraintEqualToAnchor_(
         layoutMarginsGuide.centerYAnchor),
       modernCollectionView.widthAnchor.constraintEqualToAnchor_multiplier_(
-        layoutMarginsGuide.widthAnchor, 0.8),
+        layoutMarginsGuide.widthAnchor, 0.1),
       modernCollectionView.heightAnchor.constraintEqualToAnchor_multiplier_(
-        layoutMarginsGuide.heightAnchor, 0.8),
+        layoutMarginsGuide.heightAnchor, 0.1),
     ])
     self.modernCollectionView = modernCollectionView
 
@@ -165,13 +167,23 @@ class MainViewController(UIViewController):
       Block(
         lambda collectionView, indexPath, item: collectionView.
         dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
-          cellRegistration, indexPath, item), objc_id, *[
+          cellRegistration, ObjCInstance(indexPath), item), objc_id, *[
             objc_id,
             objc_id,
             objc_id,
           ]))
 
     return dataSource  #ObjCInstance(dataSource)
+    
+  @objc_method
+  def initData(self):
+    snapshot = NSDiffableDataSourceSnapshot.new()
+    snapshot.appendSectionsWithIdentifiers_([0,1])
+    snapshot.appendItemsWithIdentifiers_(['a'])
+    self.modernDataSource.applySnapshot_animatingDifferences_(snapshot, True)
+    pdbr.state(self.modernDataSource)
+    #pdbr.state(snapshot)
+    
 
 
 if __name__ == '__main__':
