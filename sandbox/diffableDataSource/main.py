@@ -1,4 +1,5 @@
 """ note: 再度挑戦
+[UICollectionViewでUITableViewのようなUIを実現する。ただし#available(iOS 14.0, *) #Swift - Qiita](https://qiita.com/sohichiro/items/9a3394551b8d76d2a346)
 """
 
 import ctypes
@@ -6,15 +7,28 @@ import ctypes
 from pyrubicon.objc.api import ObjCClass
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.types import CGRectMake
+
+from rbedge.enumerations import (
+  UICollectionLayoutListAppearance, )
 
 from rbedge.functions import NSStringFromClass
 from rbedge import pdbr
 
 UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
+UIColor = ObjCClass('UIColor')
+
+UICollectionView = ObjCClass('UICollectionView')
+UICollectionLayoutListConfiguration = ObjCClass(
+  'UICollectionLayoutListConfiguration')
+UICollectionViewCompositionalLayout = ObjCClass(
+  'UICollectionViewCompositionalLayout')
 
 
 class MainViewController(UIViewController):
+
+  modernCollectionView: UICollectionView = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -34,6 +48,37 @@ class MainViewController(UIViewController):
     # --- Navigation
     self.navigationItem.title = NSStringFromClass(__class__) if (
       title := self.navigationItem.title) is None else title
+
+    # --- UICollectionView setup
+    appearance = UICollectionLayoutListAppearance.plain
+    configuration = UICollectionLayoutListConfiguration.alloc(
+    ).initWithAppearance_(appearance)
+    layout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
+      configuration)
+
+    rectZero = CGRectMake(0.0, 0.0, 0.0, 0.0)
+    modernCollectionView = UICollectionView.alloc(
+    ).initWithFrame_collectionViewLayout_(rectZero, layout)
+    modernCollectionView.backgroundColor = UIColor.systemDarkPurpleColor()
+
+    # --- Layout
+    self.view.addSubview_(modernCollectionView)
+    modernCollectionView.translatesAutoresizingMaskIntoConstraints = False
+
+    layoutMarginsGuide = self.view.layoutMarginsGuide
+    safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
+
+    NSLayoutConstraint.activateConstraints_([
+      modernCollectionView.centerXAnchor.constraintEqualToAnchor_(
+        layoutMarginsGuide.centerXAnchor),
+      modernCollectionView.centerYAnchor.constraintEqualToAnchor_(
+        layoutMarginsGuide.centerYAnchor),
+      modernCollectionView.widthAnchor.constraintEqualToAnchor_multiplier_(
+        layoutMarginsGuide.widthAnchor, 0.8),
+      modernCollectionView.heightAnchor.constraintEqualToAnchor_multiplier_(
+        layoutMarginsGuide.heightAnchor, 0.8),
+    ])
+    self.modernCollectionView = modernCollectionView
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
