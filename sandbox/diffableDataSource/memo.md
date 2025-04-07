@@ -1,3 +1,11 @@
+# 📝 2025/04/07
+
+[UICollectionViewCellRegistration | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uicollectionviewcellregistration)
+
+[UICollectionViewListCell | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uicollectionviewlistcell?language=objc)
+
+引数を`id` で取るやつってあるか？
+
 # 📝 2025/01/25
 
 ## Swift 実行のdump とか

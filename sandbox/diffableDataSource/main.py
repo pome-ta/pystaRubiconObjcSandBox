@@ -1,12 +1,13 @@
 """ note: 再度挑戦
 [UICollectionViewでUITableViewのようなUIを実現する。ただし#available(iOS 14.0, *) #Swift - Qiita](https://qiita.com/sohichiro/items/9a3394551b8d76d2a346)
+[モダンなUICollectionViewでシンプルなリストレイアウト その1 〜 概要](https://zenn.dev/samekard_dev/articles/43991e9321b6c9)
 """
 
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass
+from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
 from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGRectMake
 
 from rbedge.enumerations import (
@@ -25,10 +26,17 @@ UICollectionLayoutListConfiguration = ObjCClass(
 UICollectionViewCompositionalLayout = ObjCClass(
   'UICollectionViewCompositionalLayout')
 
+UICollectionViewCellRegistration = ObjCClass(
+  'UICollectionViewCellRegistration')
+UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
+UICollectionViewDiffableDataSource = ObjCClass(
+  'UICollectionViewDiffableDataSource')
+
 
 class MainViewController(UIViewController):
 
   modernCollectionView: UICollectionView = objc_property()
+  modernDataSource: UICollectionViewDiffableDataSource = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -50,35 +58,10 @@ class MainViewController(UIViewController):
       title := self.navigationItem.title) is None else title
 
     # --- UICollectionView setup
-    appearance = UICollectionLayoutListAppearance.plain
-    configuration = UICollectionLayoutListConfiguration.alloc(
-    ).initWithAppearance_(appearance)
-    layout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
-      configuration)
+    self.configureHierarchy()
+    self.modernDataSource = self.configureCellRegistration()
 
-    rectZero = CGRectMake(0.0, 0.0, 0.0, 0.0)
-    modernCollectionView = UICollectionView.alloc(
-    ).initWithFrame_collectionViewLayout_(rectZero, layout)
-    modernCollectionView.backgroundColor = UIColor.systemDarkPurpleColor()
-
-    # --- Layout
-    self.view.addSubview_(modernCollectionView)
-    modernCollectionView.translatesAutoresizingMaskIntoConstraints = False
-
-    layoutMarginsGuide = self.view.layoutMarginsGuide
-    safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
-
-    NSLayoutConstraint.activateConstraints_([
-      modernCollectionView.centerXAnchor.constraintEqualToAnchor_(
-        layoutMarginsGuide.centerXAnchor),
-      modernCollectionView.centerYAnchor.constraintEqualToAnchor_(
-        layoutMarginsGuide.centerYAnchor),
-      modernCollectionView.widthAnchor.constraintEqualToAnchor_multiplier_(
-        layoutMarginsGuide.widthAnchor, 0.8),
-      modernCollectionView.heightAnchor.constraintEqualToAnchor_multiplier_(
-        layoutMarginsGuide.heightAnchor, 0.8),
-    ])
-    self.modernCollectionView = modernCollectionView
+    pdbr.state(self.modernDataSource)
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -128,6 +111,67 @@ class MainViewController(UIViewController):
   def didReceiveMemoryWarning(self):
     send_super(__class__, self, 'didReceiveMemoryWarning')
     print(f'{__class__}: didReceiveMemoryWarning')
+
+  @objc_method
+  def configureHierarchy(self):
+    appearance = UICollectionLayoutListAppearance.plain
+    configuration = UICollectionLayoutListConfiguration.alloc(
+    ).initWithAppearance_(appearance)
+    layout = UICollectionViewCompositionalLayout.layoutWithListConfiguration_(
+      configuration)
+
+    rectZero = CGRectMake(0.0, 0.0, 0.0, 0.0)
+    modernCollectionView = UICollectionView.alloc(
+    ).initWithFrame_collectionViewLayout_(rectZero, layout)
+    modernCollectionView.backgroundColor = UIColor.systemDarkPurpleColor()
+
+    # --- Layout
+    self.view.addSubview_(modernCollectionView)
+    modernCollectionView.translatesAutoresizingMaskIntoConstraints = False
+
+    layoutMarginsGuide = self.view.layoutMarginsGuide
+    safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
+
+    NSLayoutConstraint.activateConstraints_([
+      modernCollectionView.centerXAnchor.constraintEqualToAnchor_(
+        layoutMarginsGuide.centerXAnchor),
+      modernCollectionView.centerYAnchor.constraintEqualToAnchor_(
+        layoutMarginsGuide.centerYAnchor),
+      modernCollectionView.widthAnchor.constraintEqualToAnchor_multiplier_(
+        layoutMarginsGuide.widthAnchor, 0.8),
+      modernCollectionView.heightAnchor.constraintEqualToAnchor_multiplier_(
+        layoutMarginsGuide.heightAnchor, 0.8),
+    ])
+    self.modernCollectionView = modernCollectionView
+
+  @objc_method  # --- private
+  def configureCellRegistration(self):
+
+    def configurationHandler(cell: objc_id, indexPath: objc_id,
+                             item: objc_id) -> None:
+      print(cell)
+
+    cellRegistration = UICollectionViewCellRegistration.registrationWithCellClass_configurationHandler_(
+      UICollectionViewListCell,
+      Block(configurationHandler, None, *[
+        objc_id,
+        objc_id,
+        objc_id,
+      ]))
+
+    dataSource = UICollectionViewDiffableDataSource.alloc(
+    ).initWithCollectionView_cellProvider_(
+      self.modernCollectionView,
+      Block(
+        lambda collectionView, indexPath, item: collectionView.
+        dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
+          cellRegistration, indexPath, item), objc_id, *[
+            objc_id,
+            objc_id,
+            objc_id,
+          ]))
+
+    return dataSource  #ObjCInstance(dataSource)
 
 
 if __name__ == '__main__':
