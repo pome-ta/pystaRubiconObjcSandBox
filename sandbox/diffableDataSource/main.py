@@ -6,9 +6,10 @@
 import ctypes
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
+from pyrubicon.objc.api import NSString
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
-from pyrubicon.objc.types import CGRectMake
+from pyrubicon.objc.types import CGRectMake, NSInteger
 
 from rbedge.enumerations import (
   UICollectionLayoutListAppearance, )
@@ -165,7 +166,7 @@ class MainViewController(UIViewController):
     ).initWithCollectionView_cellProvider_(
       self.modernCollectionView,
       Block(
-        lambda collectionView, indexPath, item: collectionView.
+        lambda collectionView, indexPath, item: ObjCInstance(collectionView).
         dequeueConfiguredReusableCellWithRegistration_forIndexPath_item_(
           cellRegistration, ObjCInstance(indexPath), item), objc_id, *[
             objc_id,
@@ -178,12 +179,23 @@ class MainViewController(UIViewController):
   @objc_method
   def initData(self):
     snapshot = NSDiffableDataSourceSnapshot.new()
-    snapshot.appendSectionsWithIdentifiers_([0,1])
+    snapshot.appendSectionsWithIdentifiers_([0])
     snapshot.appendItemsWithIdentifiers_(['a'])
-    self.modernDataSource.applySnapshot_animatingDifferences_(snapshot, True)
-    pdbr.state(self.modernDataSource)
-    #pdbr.state(snapshot)
+    #self.modernDataSource.applySnapshot_animatingDifferences_(snapshot, True)
+    #pdbr.state(self.modernDataSource)
+    pdbr.state(snapshot)
+    #pdbr.state(self.modernCollectionView)
+    #print(self.modernDataSource)
     
+    #print(self.modernCollectionView)
+    
+    #pdbr.state(snapshot)
+    #validateIdentifiers
+    #sectionIdentifiers
+    #snapshot.validateIdentifiers = (NSInteger, NSString)
+    #print(snapshot.validateIdentifiers())
+    #print('---')
+    #print(snapshot.appendItemsWithIdentifiers_)
 
 
 if __name__ == '__main__':

@@ -4,6 +4,8 @@
 
 [UICollectionViewListCell | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uicollectionviewlistcell?language=objc)
 
+[NSDiffableDataSourceSnapshot | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/nsdiffabledatasourcesnapshotreference?language=objc)
+
 引数を`id` で取るやつってあるか？
 
 # 📝 2025/01/25
