@@ -1,5 +1,15 @@
 # 📝 2025/04/07
 
+## `NSObjectProtocol` ?
+
+[NSDiffableDataSourceSnapshot | UIDiffableDataSource.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UIDiffableDataSource.rs.html#31)
+
+`NSDiffableDataSourceSnapshot.alloc()initWithImpl_` 
+
+
+
+# 📝 2025/04/07
+
 [UICollectionViewCellRegistration | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uicollectionviewcellregistration)
 
 [UICollectionViewListCell | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uicollectionviewlistcell?language=objc)

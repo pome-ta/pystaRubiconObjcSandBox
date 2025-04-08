@@ -6,7 +6,7 @@
 import ctypes
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
-from pyrubicon.objc.api import NSString
+from pyrubicon.objc.api import NSObjectProtocol, NSString
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGRectMake, NSInteger
@@ -33,6 +33,11 @@ UICollectionViewListCell = ObjCClass('UICollectionViewListCell')
 UICollectionViewDiffableDataSource = ObjCClass(
   'UICollectionViewDiffableDataSource')
 NSDiffableDataSourceSnapshot = ObjCClass('NSDiffableDataSourceSnapshot')
+
+
+
+class DataSourceSnapshot(metaclass=NSObjectProtocol):
+  pass
 
 class MainViewController(UIViewController):
 
@@ -61,8 +66,6 @@ class MainViewController(UIViewController):
     # --- UICollectionView setup
     self.configureHierarchy()
     self.modernDataSource = self.configureCellRegistration()
-
-    
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -97,7 +100,6 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
     # print(f'\t{NSStringFromClass(__class__)}: viewWillDisappear_')
-    
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
@@ -175,7 +177,7 @@ class MainViewController(UIViewController):
           ]))
 
     return dataSource  #ObjCInstance(dataSource)
-    
+
   @objc_method
   def initData(self):
     snapshot = NSDiffableDataSourceSnapshot.new()
@@ -188,9 +190,9 @@ class MainViewController(UIViewController):
     #print(snapshot.state())
     #pdbr.state(self.modernCollectionView)
     #print(self.modernDataSource)
-    
+
     #print(self.modernCollectionView)
-    
+
     #pdbr.state(snapshot)
     #validateIdentifiers
     #sectionIdentifiers
@@ -198,6 +200,8 @@ class MainViewController(UIViewController):
     #print(snapshot.validateIdentifiers())
     #print('---')
     #print(snapshot.appendItemsWithIdentifiers_)
+    #pdbr.state(NSObjectProtocol)
+    #print(dir(NSObjectProtocol))
 
 
 if __name__ == '__main__':
