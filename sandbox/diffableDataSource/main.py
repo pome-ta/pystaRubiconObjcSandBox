@@ -184,6 +184,8 @@ class MainViewController(UIViewController):
     #self.modernDataSource.applySnapshot_animatingDifferences_(snapshot, True)
     #pdbr.state(self.modernDataSource)
     pdbr.state(snapshot)
+    #pdbr.state(snapshot.state())
+    #print(snapshot.state())
     #pdbr.state(self.modernCollectionView)
     #print(self.modernDataSource)
     
