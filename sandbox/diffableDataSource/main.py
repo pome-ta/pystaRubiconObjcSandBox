@@ -35,9 +35,10 @@ UICollectionViewDiffableDataSource = ObjCClass(
 NSDiffableDataSourceSnapshot = ObjCClass('NSDiffableDataSourceSnapshot')
 
 
-
+'''
 class DataSourceSnapshot(metaclass=NSObjectProtocol):
   pass
+'''
 
 class MainViewController(UIViewController):
 
