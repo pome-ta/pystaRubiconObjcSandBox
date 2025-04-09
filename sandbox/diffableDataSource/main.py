@@ -5,7 +5,7 @@
 
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block
+from pyrubicon.objc.api import ObjCClass, ObjCInstance, Block, at
 from pyrubicon.objc.api import NSObjectProtocol, NSString
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
@@ -67,6 +67,10 @@ class MainViewController(UIViewController):
     # --- UICollectionView setup
     self.configureHierarchy()
     self.modernDataSource = self.configureCellRegistration()
+    
+    #pdbr.state(self.modernDataSource.snapshot())
+    #print(self.modernDataSource.snapshot())
+    #pdbr.state(at([at('h')]))
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -181,12 +185,15 @@ class MainViewController(UIViewController):
 
   @objc_method
   def initData(self):
+    #pdbr.state(NSDiffableDataSourceSnapshot)
     snapshot = NSDiffableDataSourceSnapshot.new()
-    snapshot.appendSectionsWithIdentifiers_([0])
-    snapshot.appendItemsWithIdentifiers_(['a'])
-    #self.modernDataSource.applySnapshot_animatingDifferences_(snapshot, True)
-    #pdbr.state(self.modernDataSource)
-    pdbr.state(snapshot)
+    snapshot.appendSectionsWithIdentifiers_(at([at(0)]))
+    snapshot.appendItemsWithIdentifiers_(at([at('h')]))
+    self.modernDataSource.applySnapshot_animatingDifferences_(snapshot, True)
+    #pdbr.state(self.modernDataSource.reconfiguredItemIdentifiers())
+    #pdbr.state(snapshot)
+    #print('')
+    #print(snapshot.reconfiguredItemIdentifiers())
     #pdbr.state(snapshot.state())
     #print(snapshot.state())
     #pdbr.state(self.modernCollectionView)
