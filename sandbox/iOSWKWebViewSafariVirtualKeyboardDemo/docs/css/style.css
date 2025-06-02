@@ -1,90 +1,103 @@
 @charset "utf-8";
 
 body {
-	padding: 0;
-	font-family: 'Roboto', sans-serif;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
 }
+
 body.virtual-keyboard-shown {
-	margin-top: var(--visual-viewport-offset-top, 0px);
+  margin-top: var(--visual-viewport-offset-top, 0px);
 }
+
 #root {
-	width: 100vw;
-	height: calc(100 * var(--svh, 1svh));
-	overflow-y: scroll;
-	overflow-x: hidden;
+  width: 100vw;
+  height: calc(100 * var(--svh, 1svh));
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
+
 .virtual-keyboard-shown #root,
 #root:has(input:focus),
 #root:has([contenteditable='true']:focus) {
-	overscroll-behavior-y: contain;
-}
-header {
-	position: sticky;
-	top: 0;
-}
-footer {
-	position: sticky;
-	bottom: 0;
-}
-#editor {
-	min-height: calc(100 * var(--svh, 1svh) - 96px);
-	font-size: 24px;
-}
-#editor:has(:focus),
-.virtual-keyboard-shown #editor {
-	min-height: calc(100 * var(--svh, 1svh) - 96px + 1px);
-}
-* {
-	box-sizing: border-box;
-	margin: 0;
-}
-button {
-	font-size: 16px;
-	padding: 8px;
-	appearance: none;
-}
-header,
-footer {
-	display: flex;
-	align-items: center;
-	justify-content: stretch;
-	height: 48px;
-	width: 100%;
-	background-color: lightgray;
-}
-footer > button {
-	height: 100%;
-	flex: 1;
-}
-dialog {
-	border-style: none;
-	background-color: black;
-}
-#stickyDialog {
-	position: sticky;
-	bottom: 48px;
-	width: 100%;
-}
-#fixedDialog {
-	inset: 0;
-	top: var(--visual-viewport-offset-top, 0px);
-	bottom: calc(
-		100svh - var(--visual-viewport-offset-top, 0px) - var(--svh, 1svh) * 100
-	);
-	position: fixed;
-	margin: auto;
-	height: 150px;
-	width: 70svw;
-	overflow-y: scroll;
-	overflow-x: hidden;
-	overscroll-behavior-y: contain;
-}
-#fixedDialog > div {
-	min-height: 151px;
-	display: flex;
-	flex-direction: column;
-}
-h1 {
-	font-size: 24px;
+  overscroll-behavior-y: contain;
 }
 
+header {
+  position: sticky;
+  top: 0;
+}
+
+footer {
+  position: sticky;
+  bottom: 0;
+}
+
+#editor {
+  min-height: calc(100 * var(--svh, 1svh) - 96px);
+  font-size: 24px;
+}
+
+#editor:has(:focus),
+.virtual-keyboard-shown #editor {
+  min-height: calc(100 * var(--svh, 1svh) - 96px + 1px);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+button {
+  font-size: 16px;
+  padding: 8px;
+  appearance: none;
+}
+
+header,
+footer {
+  display: flex;
+  align-items: center;
+  justify-content: stretch;
+  height: 48px;
+  width: 100%;
+  background-color: lightgray;
+}
+
+footer>button {
+  height: 100%;
+  flex: 1;
+}
+
+dialog {
+  border-style: none;
+  background-color: black;
+}
+
+#stickyDialog {
+  position: sticky;
+  bottom: 48px;
+  width: 100%;
+}
+
+#fixedDialog {
+  inset: 0;
+  top: var(--visual-viewport-offset-top, 0px);
+  bottom: calc(100svh - var(--visual-viewport-offset-top, 0px) - var(--svh, 1svh) * 100);
+  position: fixed;
+  margin: auto;
+  height: 150px;
+  width: 70svw;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+}
+
+#fixedDialog>div {
+  min-height: 151px;
+  display: flex;
+  flex-direction: column;
+}
+
+h1 {
+  font-size: 24px;
+}
