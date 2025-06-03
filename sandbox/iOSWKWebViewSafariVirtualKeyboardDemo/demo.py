@@ -38,6 +38,9 @@ UILabel = ObjCClass('UILabel')
 UIFont = ObjCClass('UIFont')
 UIStackView = ObjCClass('UIStackView')
 
+WKContentView = ObjCClass('WKContentView')  # todo: 型
+UIButton = ObjCClass('UIButton')
+
 
 class WebViewController(UIViewController):
 
@@ -77,8 +80,9 @@ class WebViewController(UIViewController):
     send_super(__class__, self, 'loadView')
     #print(f'\t{NSStringFromClass(__class__)}: loadView')
     # --- toolbar set up
-    self.navigationController.setNavigationBarHidden_animated_(True, True)
+    #self.navigationController.setNavigationBarHidden_animated_(True, True)
     self.navigationController.setToolbarHidden_animated_(False, True)
+    
 
     closeImage = UIImage.systemImageNamed_('arrow.down.app')
     closeButtonItem = UIBarButtonItem.alloc().initWithImage(
@@ -142,6 +146,9 @@ class WebViewController(UIViewController):
     ]
 
     self.setToolbarItems_animated_(toolbarButtonItems, True)
+    #self.navigationController.navigationItem.rightBarButtonItem=refreshButtonItem
+    
+    
 
     # --- WKWebView set up
     webConfiguration = WKWebViewConfiguration.new()
@@ -188,7 +195,9 @@ class WebViewController(UIViewController):
     self.view.backgroundColor = UIColor.systemFillColor()
 
     self.loadFileIndexPath()
+    
 
+    
     # --- Layout
     self.view.addSubview_(self.wkWebView)
     self.wkWebView.translatesAutoresizingMaskIntoConstraints = False
@@ -204,6 +213,9 @@ class WebViewController(UIViewController):
       self.wkWebView.rightAnchor.constraintEqualToAnchor_(
         layoutGuide.rightAnchor),
     ])
+    
+
+    
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -215,6 +227,8 @@ class WebViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewWillAppear_')
+    
+    
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -226,6 +240,17 @@ class WebViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewDidAppear_')
+    #pdbr.state(self.navigationController.visibleViewController.navigationItem.leftBarButtonItem)
+    refreshImage = UIImage.systemImageNamed_('arrow.clockwise.circle')
+    refreshButtonItem = UIBarButtonItem.alloc().initWithImage(
+      refreshImage,
+      style=UIBarButtonItemStyle.plain,
+      target=self,
+      action=SEL('getToolbar:'))
+    #pdbr.state(self.navigationController.visibleViewController.navigationItem)
+    
+    self.navigationController.visibleViewController.navigationItem.setRightBarButtonItem_(refreshButtonItem)
+
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
@@ -380,6 +405,19 @@ class WebViewController(UIViewController):
     open_file(Path('./', dummy_path, 'Welcome3.md'), False)
     open_file(self.savePathObject, False)
 
+  # toolbarのカスタマイズしてインスタンス化
+  @objc_method
+  def getToolbar_(self, sender):
+    candidateView: WKContentView = None
+
+    for subview in self.wkWebView.scrollView.subviews():
+      if subview.isMemberOfClass_(WKContentView):
+        candidateView = subview
+        break
+    if (targetView := candidateView) is None:
+      return
+    #pdbr.state(targetView.subviews(),1)
+    pdbr.state(targetView.inputAccessoryViewForWebView.rightContentView.subviews())
 
 if __name__ == '__main__':
   from rbedge.app import App
