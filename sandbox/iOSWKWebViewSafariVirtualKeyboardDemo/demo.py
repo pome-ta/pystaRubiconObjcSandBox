@@ -144,7 +144,9 @@ class WebViewController(UIViewController):
       fixedSpaceBarButtonItem,
       closeButtonItem,
     ]
-
+    
+    
+    
     self.setToolbarItems_animated_(toolbarButtonItems, True)
     #self.navigationController.navigationItem.rightBarButtonItem=refreshButtonItem
     
@@ -419,8 +421,31 @@ class WebViewController(UIViewController):
     #pdbr.state(targetView.subviews(),1)
     #pdbr.state(targetView.inputAccessoryViewForWebView.rightContentView.subviews())
     #inputViewForWebView:none
-    #pdbr.state(targetView.inputAssistantItemForWebView)
-    print(targetView.inputAssistantItemForWebView)
+    
+    #self.setToolbarItems_animated_(targetView.inputAssistantItemForWebView.leadingBarButtonGroups, True)
+    
+    
+    
+    #items = [item for item in targetView.inputAssistantItemForWebView.leadingBarButtonGroups]
+    #self.setToolbarItems_animated_([], True)
+    leadingBarButtonGroups=targetView.inputAssistantItemForWebView.leadingBarButtonGroups.firstObject()
+    barButtonItems = leadingBarButtonGroups.barButtonItems#.mutableCopy()
+    #pdbr.state(leadingBarButtonGroups.barButtonItems)
+    #print(barButtonItems)
+    #print('---')
+    #print(leadingBarButtonGroups.barButtonItems)
+    
+    items = [item for item in barButtonItems.copy()]
+    
+    self.setToolbarItems_animated_(items, True)
+    
+    
+    
+    
+    #pdbr.state(barButtonItems)
+    #pdbr.state(targetView.inputAssistantItemForWebView.leadingBarButtonGroups)
+    #print(items)
+    #print(targetView.inputAssistantItemForWebView)
     
 if __name__ == '__main__':
   from rbedge.app import App
