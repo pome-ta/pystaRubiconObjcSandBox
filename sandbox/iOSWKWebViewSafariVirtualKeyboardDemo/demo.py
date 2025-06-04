@@ -417,8 +417,11 @@ class WebViewController(UIViewController):
     if (targetView := candidateView) is None:
       return
     #pdbr.state(targetView.subviews(),1)
-    pdbr.state(targetView.inputAccessoryViewForWebView.rightContentView.subviews())
-
+    #pdbr.state(targetView.inputAccessoryViewForWebView.rightContentView.subviews())
+    #inputViewForWebView:none
+    #pdbr.state(targetView.inputAssistantItemForWebView)
+    print(targetView.inputAssistantItemForWebView)
+    
 if __name__ == '__main__':
   from rbedge.app import App
   from rbedge.enumerations import UIModalPresentationStyle
