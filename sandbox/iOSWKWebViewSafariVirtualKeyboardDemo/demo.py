@@ -82,7 +82,6 @@ class WebViewController(UIViewController):
     # --- toolbar set up
     #self.navigationController.setNavigationBarHidden_animated_(True, True)
     self.navigationController.setToolbarHidden_animated_(False, True)
-    
 
     closeImage = UIImage.systemImageNamed_('arrow.down.app')
     closeButtonItem = UIBarButtonItem.alloc().initWithImage(
@@ -144,13 +143,8 @@ class WebViewController(UIViewController):
       fixedSpaceBarButtonItem,
       closeButtonItem,
     ]
-    
-    
-    
+
     self.setToolbarItems_animated_(toolbarButtonItems, True)
-    #self.navigationController.navigationItem.rightBarButtonItem=refreshButtonItem
-    
-    
 
     # --- WKWebView set up
     webConfiguration = WKWebViewConfiguration.new()
@@ -197,9 +191,7 @@ class WebViewController(UIViewController):
     self.view.backgroundColor = UIColor.systemFillColor()
 
     self.loadFileIndexPath()
-    
 
-    
     # --- Layout
     self.view.addSubview_(self.wkWebView)
     self.wkWebView.translatesAutoresizingMaskIntoConstraints = False
@@ -215,9 +207,6 @@ class WebViewController(UIViewController):
       self.wkWebView.rightAnchor.constraintEqualToAnchor_(
         layoutGuide.rightAnchor),
     ])
-    
-
-    
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -229,8 +218,6 @@ class WebViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewWillAppear_')
-    
-    
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -242,17 +229,15 @@ class WebViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewDidAppear_')
-    #pdbr.state(self.navigationController.visibleViewController.navigationItem.leftBarButtonItem)
+
     refreshImage = UIImage.systemImageNamed_('arrow.clockwise.circle')
     refreshButtonItem = UIBarButtonItem.alloc().initWithImage(
       refreshImage,
       style=UIBarButtonItemStyle.plain,
       target=self,
       action=SEL('getToolbar:'))
-    #pdbr.state(self.navigationController.visibleViewController.navigationItem)
-    
-    self.navigationController.visibleViewController.navigationItem.setRightBarButtonItem_(refreshButtonItem)
-
+    self.navigationController.visibleViewController.navigationItem.setRightBarButtonItem_(
+      refreshButtonItem)
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
@@ -418,35 +403,20 @@ class WebViewController(UIViewController):
         break
     if (targetView := candidateView) is None:
       return
-    #pdbr.state(targetView.subviews(),1)
-    #pdbr.state(targetView.inputAccessoryViewForWebView.rightContentView.subviews())
-    #inputViewForWebView:none
-    
-    #self.setToolbarItems_animated_(targetView.inputAssistantItemForWebView.leadingBarButtonGroups, True)
-    
-    
-    
-    #items = [item for item in targetView.inputAssistantItemForWebView.leadingBarButtonGroups]
-    #self.setToolbarItems_animated_([], True)
-    leadingBarButtonGroups=targetView.inputAssistantItemForWebView.leadingBarButtonGroups.firstObject()
-    barButtonItems = leadingBarButtonGroups.barButtonItems#.mutableCopy()
-    #pdbr.state(leadingBarButtonGroups.barButtonItems)
-    #print(barButtonItems)
-    #print('---')
-    #print(leadingBarButtonGroups.barButtonItems)
-    
-    items = [item for item in barButtonItems.copy()]
-    
-    self.setToolbarItems_animated_(items, True)
-    
-    
-    
-    
-    #pdbr.state(barButtonItems)
-    #pdbr.state(targetView.inputAssistantItemForWebView.leadingBarButtonGroups)
-    #print(items)
-    #print(targetView.inputAssistantItemForWebView)
-    
+
+    inputAccessoryViewForWebView = targetView.inputAccessoryViewForWebView
+
+    rightContentView = inputAccessoryViewForWebView.rightContentView
+
+    firstObject = rightContentView.subviews().firstObject()
+
+    button = UIButton.buttonWithType_(5)
+    #rightContentView.addSubview_(button)
+    pdbr.state(firstObject)
+
+    #pdbr.state(inputAccessoryViewForWebView.rightContentView.subviews())
+
+
 if __name__ == '__main__':
   from rbedge.app import App
   from rbedge.enumerations import UIModalPresentationStyle
@@ -457,9 +427,8 @@ if __name__ == '__main__':
   main_vc = WebViewController.alloc().initWithIndexPath_(index_path)
   _title = NSStringFromClass(WebViewController)
   main_vc.navigationItem.title = _title
-  
+
   #main_vc.setSavePathObject_(save_path)
-  
 
   presentation_style = UIModalPresentationStyle.fullScreen
   #presentation_style = UIModalPresentationStyle.pageSheet
