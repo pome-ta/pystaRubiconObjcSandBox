@@ -404,6 +404,7 @@ class WebViewController(UIViewController):
     if (targetView := candidateView) is None:
       return
 
+    '''
     inputAccessoryViewForWebView = targetView.inputAccessoryViewForWebView
 
     rightContentView = inputAccessoryViewForWebView.rightContentView
@@ -415,6 +416,9 @@ class WebViewController(UIViewController):
     pdbr.state(firstObject)
 
     #pdbr.state(inputAccessoryViewForWebView.rightContentView.subviews())
+    '''
+    inputAccessoryView = targetView.inputAccessoryView
+    pdbr.state(inputAccessoryView.subviews().objectAtIndex_(0).subviews().firstObject().items)
 
 
 if __name__ == '__main__':
