@@ -336,6 +336,7 @@ class WebViewController(UIViewController):
   @objc_method
   def reLoadWebView_(self, sender):
     self.wkWebView.reload()
+    print('reload')
     #self.wkWebView.reloadFromOrigin()
 
   @objc_method
@@ -418,7 +419,73 @@ class WebViewController(UIViewController):
     #pdbr.state(inputAccessoryViewForWebView.rightContentView.subviews())
     '''
     inputAccessoryView = targetView.inputAccessoryView
-    pdbr.state(inputAccessoryView.subviews().objectAtIndex_(0).subviews().firstObject().items)
+    #subviews =inputAccessoryView.subviews()
+    #pdbr.state(subviews)
+    
+    closeImage = UIImage.systemImageNamed_('arrow.down.app')
+    closeButtonItem = UIBarButtonItem.alloc().initWithImage(
+      closeImage,
+      style=UIBarButtonItemStyle.plain,
+      target=self.navigationController,
+      action=SEL('doneButtonTapped:'))
+
+    refreshImage = UIImage.systemImageNamed_('arrow.clockwise.circle')
+    refreshButtonItem = UIBarButtonItem.alloc().initWithImage(
+      refreshImage,
+      style=UIBarButtonItemStyle.plain,
+      target=self,
+      action=SEL('reLoadWebView:'))
+
+    saveUpdateImage = UIImage.systemImageNamed_('text.badge.checkmark.rtl')
+
+    saveUpdateButtonItem = UIBarButtonItem.alloc().initWithImage(
+      saveUpdateImage,
+      style=UIBarButtonItemStyle.plain,
+      target=self,
+      action=SEL('saveFileAction:'))
+
+    promptLabel = UILabel.new()
+    promptLabel.setTextAlignment_(NSTextAlignment.center)
+    promptLabel.setFont_(
+      UIFont.preferredFontForTextStyle_(UIFontTextStyle.headline))
+
+    titleLabel = UILabel.new()
+    titleLabel.setTextAlignment_(NSTextAlignment.center)
+    titleLabel.setFont_(
+      UIFont.preferredFontForTextStyle_(UIFontTextStyle.caption1))
+
+    stackTextView = UIStackView.alloc().initWithArrangedSubviews_([
+      titleLabel,
+      promptLabel,
+    ])
+    stackTextView.setDistribution_(UIStackViewDistribution.equalCentering)
+
+    stackTextItem = UIBarButtonItem.alloc().initWithCustomView_(stackTextView)
+    stackTextView.setAxis_(UILayoutConstraintAxis.vertical)
+
+    flexibleSpace = UIBarButtonSystemItem.flexibleSpace
+    flexibleSpaceBarButtonItem = UIBarButtonItem.alloc(
+    ).initWithBarButtonSystemItem(flexibleSpace, target=None, action=None)
+
+    fixedSpace = UIBarButtonSystemItem.fixedSpace
+    fixedSpaceBarButtonItem = UIBarButtonItem.alloc(
+    ).initWithBarButtonSystemItem(fixedSpace, target=None, action=None)
+    fixedSpaceBarButtonItem.setWidth_(16.0)
+
+    toolbarButtonItems = [
+      saveUpdateButtonItem,
+      flexibleSpaceBarButtonItem,
+      stackTextItem,
+      flexibleSpaceBarButtonItem,
+      refreshButtonItem,
+      #flexibleSpaceBarButtonItem,
+      fixedSpaceBarButtonItem,
+      closeButtonItem,
+    ]
+
+    
+    inputAccessoryView.subviews().objectAtIndex_(0).subviews().firstObject().items = toolbarButtonItems
+    #pdbr.state(inputAccessoryView.subviews().objectAtIndex_(0).subviews().firstObject().items)
 
 
 if __name__ == '__main__':
