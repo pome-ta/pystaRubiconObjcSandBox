@@ -38,10 +38,10 @@ UILabel = ObjCClass('UILabel')
 UIFont = ObjCClass('UIFont')
 UIStackView = ObjCClass('UIStackView')
 
-WKContentView = ObjCClass('WKContentView')  # todo: 型
-UIButton = ObjCClass('UIButton')
+WKContentView = ObjCClass('WKContentView')  # todo: 型確認用
+NSNotificationCenter = ObjCClass('NSNotificationCenter')
 
-
+pdbr.state(NSNotificationCenter.defaultCenter)
 class WebViewController(UIViewController):
 
   wkWebView: WKWebView = objc_property()
@@ -161,7 +161,8 @@ class WebViewController(UIViewController):
     wkWebView.navigationDelegate = self
     wkWebView.scrollView.delegate = self
     wkWebView.scrollView.bounces = True
-    wkWebView.scrollView.keyboardDismissMode = UIScrollViewKeyboardDismissMode.interactive
+    #wkWebView.scrollView.keyboardDismissMode = UIScrollViewKeyboardDismissMode.interactive
+    wkWebView.scrollView.keyboardDismissMode = UIScrollViewKeyboardDismissMode.onDragWithAccessory
 
     refreshControl = UIRefreshControl.new()
     refreshControl.addTarget_action_forControlEvents_(
@@ -404,7 +405,6 @@ class WebViewController(UIViewController):
         break
     if (targetView := candidateView) is None:
       return
-
     '''
     inputAccessoryViewForWebView = targetView.inputAccessoryViewForWebView
 
@@ -421,7 +421,7 @@ class WebViewController(UIViewController):
     inputAccessoryView = targetView.inputAccessoryView
     #subviews =inputAccessoryView.subviews()
     #pdbr.state(subviews)
-    
+
     closeImage = UIImage.systemImageNamed_('arrow.down.app')
     closeButtonItem = UIBarButtonItem.alloc().initWithImage(
       closeImage,
@@ -482,9 +482,14 @@ class WebViewController(UIViewController):
       fixedSpaceBarButtonItem,
       closeButtonItem,
     ]
+    items = inputAccessoryView.subviews().objectAtIndex_(
+      0).subviews().firstObject().items
 
-    
-    inputAccessoryView.subviews().objectAtIndex_(0).subviews().firstObject().items = toolbarButtonItems
+
+    inputAccessoryView.subviews().objectAtIndex_(
+      0).subviews().firstObject().items = []
+    inputAccessoryView.subviews().objectAtIndex_(
+      0).subviews().firstObject().items = [*items, *toolbarButtonItems]
     #pdbr.state(inputAccessoryView.subviews().objectAtIndex_(0).subviews().firstObject().items)
 
 
