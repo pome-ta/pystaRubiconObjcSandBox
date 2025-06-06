@@ -41,7 +41,7 @@ UIStackView = ObjCClass('UIStackView')
 WKContentView = ObjCClass('WKContentView')  # todo: 型確認用
 NSNotificationCenter = ObjCClass('NSNotificationCenter')
 
-pdbr.state(NSNotificationCenter.defaultCenter)
+
 class WebViewController(UIViewController):
 
   wkWebView: WKWebView = objc_property()
@@ -482,6 +482,7 @@ class WebViewController(UIViewController):
       fixedSpaceBarButtonItem,
       closeButtonItem,
     ]
+    '''
     items = inputAccessoryView.subviews().objectAtIndex_(
       0).subviews().firstObject().items
 
@@ -490,6 +491,25 @@ class WebViewController(UIViewController):
       0).subviews().firstObject().items = []
     inputAccessoryView.subviews().objectAtIndex_(
       0).subviews().firstObject().items = [*items, *toolbarButtonItems]
+    '''
+
+    toolbar = inputAccessoryView.subviews().firstObject().subviews(
+    ).firstObject()
+
+    items = toolbar.items
+    #pdbr.state(items)
+    '''
+    
+    for item in items:
+      print(item)
+      print('')
+    '''
+
+    doneButton = items.objectAtIndex_(len(items) - 1)
+
+    #pdbr.state(items.objectAtIndex_(len(items)-1))
+    inputAccessoryView.subviews().objectAtIndex_(
+      0).subviews().firstObject().items = [*toolbarButtonItems, doneButton]
     #pdbr.state(inputAccessoryView.subviews().objectAtIndex_(0).subviews().firstObject().items)
 
 

@@ -1,3 +1,25 @@
+# 📝 2025/06/06
+
+
+ボタン判明
+
+
+`inputAccessoryView.subviews().objectAtIndex_(0).subviews().firstObject().items`
+
+
+```
+<UIBarButtonItem: 0x136c92f40> target=0x11d468300 action=_previousTapped image=<UIImage:0x11d462620 symbol(system: chevron.up) {18.5, 10.5} baseline=-1.5,contentInsets={1, 2, 1, 2},alignmentRectInsets={-4, 0, -5.5, 0} config=<traits=(UserInterfaceIdiom = Phone, DisplayScale = 2, DisplayGamut = P3, HorizontalSizeClass = Compact, VerticalSizeClass = Regular, UserInterfaceStyle = Dark, UserInterfaceLayoutDirection = LTR, PreferredContentSizeCategory = XS, AccessibilityContrast = Normal)> renderingMode=automatic(template)>
+
+<UIBarButtonItem: 0x136c93100> systemItem=FixedSpace width=6.000000
+
+<UIBarButtonItem: 0x136c932c0> target=0x11d468300 action=_nextTapped image=<UIImage:0x11d4626c0 symbol(system: chevron.down) {18.5, 10.5} baseline=-0.5,contentInsets={1, 2, 1, 2},alignmentRectInsets={-5, 0, -4.5, 0} config=<traits=(UserInterfaceIdiom = Phone, DisplayScale = 2, DisplayGamut = P3, HorizontalSizeClass = Compact, VerticalSizeClass = Regular, UserInterfaceStyle = Dark, UserInterfaceLayoutDirection = LTR, PreferredContentSizeCategory = XS, AccessibilityContrast = Normal)> renderingMode=automatic(template)>
+
+<UIBarButtonItem: 0x136c93480> systemItem=FlexibleSpace
+
+<UIBarButtonItem: 0x136c93800> target=0x11d468300 action=_done systemItem=Done
+```
+
+
 # 📝 2025/06/04
 
 ## `inputAssistantItemForWebView`
