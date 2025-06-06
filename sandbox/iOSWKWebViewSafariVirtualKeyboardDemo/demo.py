@@ -40,7 +40,11 @@ UIStackView = ObjCClass('UIStackView')
 
 WKContentView = ObjCClass('WKContentView')  # todo: 型確認用
 NSNotificationCenter = ObjCClass('NSNotificationCenter')
+UIResponder = ObjCClass('UIResponder')
 
+
+#pdbr.state(NSNotificationCenter.defaultCenter)
+pdbr.state(UIResponder)
 
 class WebViewController(UIViewController):
 
