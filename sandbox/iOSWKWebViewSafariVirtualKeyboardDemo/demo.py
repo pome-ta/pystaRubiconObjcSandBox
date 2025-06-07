@@ -45,7 +45,13 @@ UIStackView = ObjCClass('UIStackView')
 
 WKContentView = ObjCClass('WKContentView')  # todo: 型確認用
 NSNotificationCenter = ObjCClass('NSNotificationCenter')
+UIDevice = ObjCClass('UIDevice')
 
+#pdbr.state(UIDevice.currentDevice.model)
+
+is_iPhone = True if UIDevice.currentDevice.model == 'iPhone' else False
+print(UIDevice.currentDevice.model)
+print(is_iPhone)
 
 class WebViewController(UIViewController):
 
@@ -195,6 +201,8 @@ class WebViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewWillAppear_')
+    if not is_iPhone:
+      return 
     notificationCenter = NSNotificationCenter.defaultCenter
 
     notificationCenter.addObserver_selector_name_object_(
@@ -237,6 +245,8 @@ class WebViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
+    if not is_iPhone:
+      return 
     notificationCenter = NSNotificationCenter.defaultCenter
     notificationCenter.removeObserver_name_object_(
       self, NSNotificationName.keyboardWillShowNotification, None)
@@ -439,27 +449,31 @@ class WebViewController(UIViewController):
       return
 
     inputAccessoryViewSubviews = None
+    '''
     try:
       inputAccessoryViewSubviews = targetView.inputAccessoryView.subviews()
     except Exception as e:
-      #print(f'-> inputAccessoryViewSubviews: {e}')
+      print(f'-> inputAccessoryViewSubviews: {e}')
       return
-
+    print(inputAccessoryViewSubviews)
+    '''
+    '''
     inputViewContentSubviews = None
     try:
       inputViewContentSubviews = inputAccessoryViewSubviews.objectAtIndex_(
         0).subviews()
     except Exception as e:
-      #print(f'-> inputViewContentSubviews: {e}')
+      print(f'-> inputViewContentSubviews: {e}')
       return
 
     toolbar = None
     try:
       toolbar = inputViewContentSubviews.objectAtIndex_(0)
     except Exception as e:
-      #print(f'-> toolbar: {e}')
+      print(f'-> toolbar: {e}')
       return
 
+    pdbr.state(toolbar)
     toolbarButtonItems = toolbar.items
     doneButton = toolbarButtonItems.objectAtIndex_(len(toolbarButtonItems) - 1)
 
@@ -467,10 +481,12 @@ class WebViewController(UIViewController):
       *self.addInputAccessoryToolbarButtonItems,
       doneButton,
     ]
+    '''
 
   @objc_method
   def keyboardWillShow_(self, notification):
-    self.addUpdateInputAccessoryViewItems()
+    #self.addUpdateInputAccessoryViewItems()
+    print('show')
 
   @objc_method
   def keyboardWillHide_(self, notification):
