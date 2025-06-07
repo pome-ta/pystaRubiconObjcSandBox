@@ -17,7 +17,17 @@ from rbedge.enumerations import (
   UIScrollViewKeyboardDismissMode,
   NSKeyValueObservingOptions,
 )
-from rbedge.globalVariables import UIFontTextStyle
+
+from rbedge.globalVariables import (
+  UIFontTextStyle,
+  NSNotificationName,
+  UIKeyboardAnimationDurationUserInfoKey,
+  UIKeyboardFrameBeginUserInfoKey,
+  UIKeyboardFrameEndUserInfoKey,
+)
+
+
+
 from rbedge.makeZero import CGRectZero
 from rbedge.functions import NSStringFromClass
 from rbedge import pdbr
@@ -40,11 +50,6 @@ UIStackView = ObjCClass('UIStackView')
 
 WKContentView = ObjCClass('WKContentView')  # todo: 型確認用
 NSNotificationCenter = ObjCClass('NSNotificationCenter')
-UIResponder = ObjCClass('UIResponder')
-
-
-#pdbr.state(NSNotificationCenter.defaultCenter)
-pdbr.state(UIResponder)
 
 class WebViewController(UIViewController):
 
@@ -223,6 +228,14 @@ class WebViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewWillAppear_')
+    notificationCenter = NSNotificationCenter.defaultCenter
+
+    notificationCenter.addObserver_selector_name_object_(
+      self, SEL('keyboardWillShow:'),
+      NSNotificationName.keyboardWillShowNotification, None)
+    notificationCenter.addObserver_selector_name_object_(
+      self, SEL('keyboardWillHide:'),
+      NSNotificationName.keyboardWillHideNotification, None)
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -266,6 +279,11 @@ class WebViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
+    notificationCenter = NSNotificationCenter.defaultCenter
+    notificationCenter.removeObserver_name_object_(
+      self, NSNotificationName.keyboardWillShowNotification, None)
+    notificationCenter.removeObserver_name_object_(
+      self, NSNotificationName.keyboardWillHideNotification, None)
 
   @objc_method
   def didReceiveMemoryWarning(self):
@@ -515,6 +533,15 @@ class WebViewController(UIViewController):
     inputAccessoryView.subviews().objectAtIndex_(
       0).subviews().firstObject().items = [*toolbarButtonItems, doneButton]
     #pdbr.state(inputAccessoryView.subviews().objectAtIndex_(0).subviews().firstObject().items)
+    
+  @objc_method
+  def keyboardWillShow_(self, notification):
+    self.getToolbar_(None)
+    
+  @objc_method
+  def keyboardWillHide_(self, notification):
+    print('hide')
+
 
 
 if __name__ == '__main__':
