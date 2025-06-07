@@ -45,13 +45,12 @@ UIStackView = ObjCClass('UIStackView')
 
 WKContentView = ObjCClass('WKContentView')  # todo: 型確認用
 NSNotificationCenter = ObjCClass('NSNotificationCenter')
+
+# xxx: iPad(mac) 挙動対策
 UIDevice = ObjCClass('UIDevice')
 
-#pdbr.state(UIDevice.currentDevice.model)
+IS_PHONE = True if UIDevice.currentDevice.model == 'iPhone' else False
 
-is_iPhone = True if UIDevice.currentDevice.model == 'iPhone' else False
-print(UIDevice.currentDevice.model)
-print(is_iPhone)
 
 class WebViewController(UIViewController):
 
@@ -93,7 +92,9 @@ class WebViewController(UIViewController):
     send_super(__class__, self, 'loadView')
     #print(f'\t{NSStringFromClass(__class__)}: loadView')
     # --- toolbar set up
-    self.navigationController.setNavigationBarHidden_animated_(True, True)
+
+    if IS_PHONE:
+      self.navigationController.setNavigationBarHidden_animated_(True, True)
     self.navigationController.setToolbarHidden_animated_(False, True)
 
     promptLabel = UILabel.new()
@@ -171,7 +172,8 @@ class WebViewController(UIViewController):
     self.titleLabel.setText_(self.navigationItem.title)
     self.titleLabel.sizeToFit()
 
-    #self.view.backgroundColor = UIColor.systemFillColor()
+    if IS_PHONE:
+      self.view.backgroundColor = UIColor.systemFillColor()
 
     self.loadFileIndexPath()
 
@@ -201,8 +203,6 @@ class WebViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewWillAppear_')
-    if not is_iPhone:
-      return 
     notificationCenter = NSNotificationCenter.defaultCenter
 
     notificationCenter.addObserver_selector_name_object_(
@@ -245,8 +245,7 @@ class WebViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
-    if not is_iPhone:
-      return 
+
     notificationCenter = NSNotificationCenter.defaultCenter
     notificationCenter.removeObserver_name_object_(
       self, NSNotificationName.keyboardWillShowNotification, None)
@@ -449,31 +448,28 @@ class WebViewController(UIViewController):
       return
 
     inputAccessoryViewSubviews = None
-    '''
+
     try:
       inputAccessoryViewSubviews = targetView.inputAccessoryView.subviews()
     except Exception as e:
-      print(f'-> inputAccessoryViewSubviews: {e}')
+      #print(f'-> inputAccessoryViewSubviews: {e}')
       return
-    print(inputAccessoryViewSubviews)
-    '''
-    '''
+
     inputViewContentSubviews = None
     try:
       inputViewContentSubviews = inputAccessoryViewSubviews.objectAtIndex_(
         0).subviews()
     except Exception as e:
-      print(f'-> inputViewContentSubviews: {e}')
+      #print(f'-> inputViewContentSubviews: {e}')
       return
 
     toolbar = None
     try:
       toolbar = inputViewContentSubviews.objectAtIndex_(0)
     except Exception as e:
-      print(f'-> toolbar: {e}')
+      #print(f'-> toolbar: {e}')
       return
 
-    pdbr.state(toolbar)
     toolbarButtonItems = toolbar.items
     doneButton = toolbarButtonItems.objectAtIndex_(len(toolbarButtonItems) - 1)
 
@@ -481,12 +477,10 @@ class WebViewController(UIViewController):
       *self.addInputAccessoryToolbarButtonItems,
       doneButton,
     ]
-    '''
 
   @objc_method
   def keyboardWillShow_(self, notification):
-    #self.addUpdateInputAccessoryViewItems()
-    print('show')
+    self.addUpdateInputAccessoryViewItems()
 
   @objc_method
   def keyboardWillHide_(self, notification):
@@ -506,8 +500,8 @@ if __name__ == '__main__':
 
   #main_vc.setSavePathObject_(save_path)
 
-  #presentation_style = UIModalPresentationStyle.fullScreen
-  presentation_style = UIModalPresentationStyle.pageSheet
+  presentation_style = UIModalPresentationStyle.fullScreen
+  #presentation_style = UIModalPresentationStyle.pageSheet
 
   app = App(main_vc, presentation_style)
   app.present()
