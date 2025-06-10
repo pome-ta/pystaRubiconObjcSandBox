@@ -17,18 +17,17 @@
       rel="stylesheet"
     />
     -->
-  <script type="module">
+  <!-- <script type="module">
     import eruda from 'https://cdn.skypack.dev/eruda';
 
     eruda.init();
-  </script>
+  </script> -->
   <script type="module" src="./js/index.js"></script>
-
   <link rel="stylesheet" href="./css/style.css">
 </head>
 
 <body>
-  <div id="root" class="scrollable">
+  <!-- <div id="root" class="scrollable">
     <header id="header">
       <h1>Safari Virtual Keyboard Demo</h1>
     </header>
@@ -90,7 +89,7 @@
         <button type="button">4</button>
       </div>
     </dialog>
-  </div>
+  </div> -->
 </body>
 
 <script>
@@ -125,53 +124,53 @@
     });
   })();
 
-  (() => {
-    const ua = window.navigator.userAgent;
-    const iOS = !!ua.match(/iPad/i) || !!ua.match(/iPhone/i);
-    if (!iOS) return;
-    if (!self.visualViewport) return;
-    let prevHeight = undefined;
-    let prevOffsetTop = undefined;
-    let timerId = undefined;
-    const scrollElem = document.getElementById("root");
-    function handleResize(e) {
-      const height = self.visualViewport.height * self.visualViewport.scale;
-      if (prevHeight !== height) {
-        prevHeight = height;
-        requestAnimationFrame(() => {
-          document.documentElement.style.setProperty(
-            "--svh",
-            height * 0.01 + "px"
-          );
-        });
-      }
-      if (prevOffsetTop !== self.visualViewport.offsetTop) {
-        if (prevOffsetTop === undefined) {
-          prevOffsetTop = self.visualViewport.offsetTop;
-        } else {
-          const scrollOffset = self.visualViewport.offsetTop - prevOffsetTop;
-          prevOffsetTop = self.visualViewport.offsetTop;
-          requestAnimationFrame(() => {
-            if (e && e.type === "resize") {
-              scrollElem.scrollBy(0, scrollOffset);
-            }
-            document.documentElement.style.setProperty(
-              "--visual-viewport-offset-top",
-              self.visualViewport.offsetTop + "px"
-            );
-          });
-        }
-      }
-      if (height + 10 < document.documentElement.clientHeight) {
-        document.body.classList.add("virtual-keyboard-shown");
-      } else {
-        document.body.classList.remove("virtual-keyboard-shown");
-      }
-    }
-    handleResize();
-    self.visualViewport.addEventListener("resize", handleResize);
-    self.visualViewport.addEventListener("scroll", handleResize);
-  })();
+  // (() => {
+  //   const ua = window.navigator.userAgent;
+  //   const iOS = !!ua.match(/iPad/i) || !!ua.match(/iPhone/i);
+  //   if (!iOS) return;
+  //   if (!self.visualViewport) return;
+  //   let prevHeight = undefined;
+  //   let prevOffsetTop = undefined;
+  //   let timerId = undefined;
+  //   const scrollElem = document.getElementById("root");
+  //   function handleResize(e) {
+  //     const height = self.visualViewport.height * self.visualViewport.scale;
+  //     if (prevHeight !== height) {
+  //       prevHeight = height;
+  //       requestAnimationFrame(() => {
+  //         document.documentElement.style.setProperty(
+  //           "--svh",
+  //           height * 0.01 + "px"
+  //         );
+  //       });
+  //     }
+  //     if (prevOffsetTop !== self.visualViewport.offsetTop) {
+  //       if (prevOffsetTop === undefined) {
+  //         prevOffsetTop = self.visualViewport.offsetTop;
+  //       } else {
+  //         const scrollOffset = self.visualViewport.offsetTop - prevOffsetTop;
+  //         prevOffsetTop = self.visualViewport.offsetTop;
+  //         requestAnimationFrame(() => {
+  //           if (e && e.type === "resize") {
+  //             scrollElem.scrollBy(0, scrollOffset);
+  //           }
+  //           document.documentElement.style.setProperty(
+  //             "--visual-viewport-offset-top",
+  //             self.visualViewport.offsetTop + "px"
+  //           );
+  //         });
+  //       }
+  //     }
+  //     if (height + 10 < document.documentElement.clientHeight) {
+  //       document.body.classList.add("virtual-keyboard-shown");
+  //     } else {
+  //       document.body.classList.remove("virtual-keyboard-shown");
+  //     }
+  //   }
+  //   handleResize();
+  //   self.visualViewport.addEventListener("resize", handleResize);
+  //   self.visualViewport.addEventListener("scroll", handleResize);
+  // })();
 </script>
 
 </html>
