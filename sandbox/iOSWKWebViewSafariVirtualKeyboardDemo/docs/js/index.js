@@ -1,3 +1,17 @@
+let prevHeight = undefined;
+let prevOffsetTop = undefined;
+let timerId = undefined;
+
+
+function handleResize() {
+
+
+
+
+  const height = window.visualViewport.height * window.visualViewport.scale;
+}
+
+
 const createRootDiv = () => {
   const element = document.createElement('div');
   element.id = 'root';
@@ -10,23 +24,51 @@ const createHeader = () => {
   const element = document.createElement('header');
   element.id = 'header';
   const h1Tag = document.createElement('h1');
+  h1Tag.style.fontSize = '2rem';
   h1Tag.textContent = 'Safari Virtual Keyboard Demo';
 
   element.appendChild(h1Tag);
-  return element;
-};
-
-const createP = (textContent) => {
-  const element = document.createElement('p');
-  element.contentEditable = 'true';
-  //console.log(element)
-  element.textContent = textContent;
+  element.style.top = '0';
   return element;
 };
 
 const createFooter = () => {
   const element = document.createElement('footer');
   element.id = 'footer';
+  element.style.bottom = '0';
+  element.style.height;
+  return element;
+};
+
+const addHeaderFooterStyle = (headerFooter) => {
+  [...headerFooter].forEach((element) => {
+    element.style.position = 'sticky';
+    element.style.display = 'flex';
+    element.style.alignItems = 'center';
+    element.style.justifyContent = 'stretch';
+    element.style.width = '100%';
+    element.style.height = '3rem';
+  });
+};
+
+const createP = (textContent) => {
+  const element = document.createElement('p');
+  element.contentEditable = 'true';
+  element.textContent = textContent;
+  return element;
+};
+
+const createButton = (id, textContent) => {
+  const element = document.createElement('button');
+  element.id = id;
+  element.style.type = 'button';
+  element.textContent = textContent;
+
+  element.style.fontSize = '1rem';
+  element.style.padding = '0.5rem';
+  element.style.appearance = 'none';
+  element.style.height = '100%';
+  element.style.flex = '1';
   return element;
 };
 
@@ -68,7 +110,17 @@ reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
 pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
 culpa qui officia deserunt mollit anim id est laborum.`;
 
+const stickyButton = createButton('stickyButton', 'Sticky');
+const fixedButton = createButton('fixedButton', 'Fixed');
+const clearButton = createButton('clearButton', 'Clear');
+
 const footer = createFooter();
+addHeaderFooterStyle([header, footer]);
+
+
+footer.appendChild(stickyButton);
+footer.appendChild(fixedButton);
+footer.appendChild(clearButton);
 
 divTag.appendChild(createP(darkred));
 divTag.appendChild(createP(darkgoldenrod));
@@ -79,55 +131,6 @@ rootDiv.appendChild(header);
 rootDiv.appendChild(mainTag);
 rootDiv.appendChild(footer);
 
-document.addEventListener('DOMContentLoaded', (e) => {
-  // console.log('hoge');
+document.addEventListener('DOMContentLoaded', () => {
   document.body.appendChild(rootDiv);
 });
-
-(() => {
-  const ua = window.navigator.userAgent;
-  const iOS = !!ua.match(/iPad/i) || !!ua.match(/iPhone/i);
-  if (!iOS) return;
-  if (!self.visualViewport) return;
-  let prevHeight = undefined;
-  let prevOffsetTop = undefined;
-  let timerId = undefined;
-  const scrollElem = document.getElementById('root');
-  function handleResize(e) {
-    const height = self.visualViewport.height * self.visualViewport.scale;
-    if (prevHeight !== height) {
-      prevHeight = height;
-      requestAnimationFrame(() => {
-        document.documentElement.style.setProperty(
-          '--svh',
-          height * 0.01 + 'px'
-        );
-      });
-    }
-    if (prevOffsetTop !== self.visualViewport.offsetTop) {
-      if (prevOffsetTop === undefined) {
-        prevOffsetTop = self.visualViewport.offsetTop;
-      } else {
-        const scrollOffset = self.visualViewport.offsetTop - prevOffsetTop;
-        prevOffsetTop = self.visualViewport.offsetTop;
-        requestAnimationFrame(() => {
-          if (e && e.type === 'resize') {
-            scrollElem.scrollBy(0, scrollOffset);
-          }
-          document.documentElement.style.setProperty(
-            '--visual-viewport-offset-top',
-            self.visualViewport.offsetTop + 'px'
-          );
-        });
-      }
-    }
-    if (height + 10 < document.documentElement.clientHeight) {
-      document.body.classList.add('virtual-keyboard-shown');
-    } else {
-      document.body.classList.remove('virtual-keyboard-shown');
-    }
-  }
-  handleResize();
-  self.visualViewport.addEventListener('resize', handleResize);
-  self.visualViewport.addEventListener('scroll', handleResize);
-})();
