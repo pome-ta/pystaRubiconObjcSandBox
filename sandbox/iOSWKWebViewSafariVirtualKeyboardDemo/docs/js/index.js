@@ -24,7 +24,7 @@ const createHeader = () => {
   const element = document.createElement('header');
   element.id = 'header';
   const h1Tag = document.createElement('h1');
-  h1Tag.style.fontSize = '2rem';
+  h1Tag.style.fontSize = '1.5rem';
   h1Tag.textContent = 'Safari Virtual Keyboard Demo';
 
   element.appendChild(h1Tag);
@@ -55,6 +55,7 @@ const createP = (textContent) => {
   const element = document.createElement('p');
   element.contentEditable = 'true';
   element.textContent = textContent;
+  element.style.fontSize = '1.1rem';
   return element;
 };
 
@@ -92,7 +93,17 @@ ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
 aliquip ex ea commodo consequat. Duis aute irure dolor in
 reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
 pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum.`;
+culpa qui officia deserunt mollit anim id est laborum.
+eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+aliquip ex ea commodo consequat. Duis aute irure dolor in
+reprehenderit in voluptate velit esse cillum dolore eu fugiat nullaeiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+aliquip ex ea commodo consequat. Duis aute irure dolor in
+reprehenderit in voluptate velit esse cillum dolore eu fugiat nullaeiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+aliquip ex ea commodo consequat. Duis aute irure dolor in
+reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla`;
 
 const darkolivegreen = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
 eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
