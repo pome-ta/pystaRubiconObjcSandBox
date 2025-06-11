@@ -1,13 +1,12 @@
+const ua = window.navigator.userAgent;
+const iOS = !!ua.match(/iPad/i) || !!ua.match(/iPhone/i);
+
 let prevHeight = undefined;
 let prevOffsetTop = undefined;
 let timerId = undefined;
 
 
 function handleResize() {
-
-
-
-
   const height = window.visualViewport.height * window.visualViewport.scale;
 }
 
@@ -85,6 +84,19 @@ const darkred = ` Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed d
  aliquip ex ea commodo consequat. Duis aute irure dolor in
  reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
  pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+ culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+ eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+ ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+ aliquip ex ea commodo consequat. Duis aute irure dolor in
+ reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+ pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+ culpa qui officia deserunt mollit anim id est laborum.
+  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+ eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+ ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+ aliquip ex ea commodo consequat. Duis aute irure dolor in
+ reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+ pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
  culpa qui officia deserunt mollit anim id est laborum.`;
 
 const darkgoldenrod = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
@@ -144,4 +156,12 @@ rootDiv.appendChild(footer);
 
 document.addEventListener('DOMContentLoaded', () => {
   document.body.appendChild(rootDiv);
+  
+  if (!iOS) {
+    return
+  }
+  
+  document.documentElement.style.setProperty(
+                "--visual-viewport-offset-top",
+                self.visualViewport.offsetTop + "px")
 });
