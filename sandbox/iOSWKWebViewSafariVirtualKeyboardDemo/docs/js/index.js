@@ -56,11 +56,11 @@ const createRootDiv = () => {
   const element = document.createElement('div');
   element.id = 'root';
   element.classList.add('scrollable');
-  element.style.width = '100vw';
-  // element.style.width = '100%';
+  // element.style.width = '100vw';
+  element.style.width = '100%';
   element.style.height = `calc(100 * var(--svh, 1svh))`;
   element.style.overflowY = 'scroll';
-  element.style.overflowX = 'hidden';
+  // element.style.overflowX = 'hidden';
 
   return element;
 };
@@ -75,6 +75,7 @@ const createHeader = () => {
   element.appendChild(h1Tag);
   // element.style.position = 'sticky';
   element.style.top = '0';
+
   return element;
 };
 
@@ -84,6 +85,8 @@ const createEditorDiv = () => {
   element.contentEditable = 'true';
   element.style.minHeight = `calc(100 * var(--svh, 1svh) - 96px)`;
   element.style.fontSize = '1.5rem';
+  element.style.width = '100%';
+
   return element;
 };
 
@@ -92,6 +95,7 @@ const createFooter = () => {
   element.id = 'footer';
   // element.style.position = 'sticky';
   element.style.bottom = '0';
+  
   return element;
 };
 
@@ -211,15 +215,15 @@ rootDiv.appendChild(footer);
 
 document.addEventListener('DOMContentLoaded', () => {
   document.body.padding = 0;
+  document.body.width = '100vw';
   document.body.appendChild(rootDiv);
-
-  const extraSheet = new CSSStyleSheet();
-  extraSheet.replaceSync(replaceSyncs.join('\n'));
-  document.adoptedStyleSheets = [extraSheet];
 
   if (!iOS) {
     return;
   }
+  const extraSheet = new CSSStyleSheet();
+  extraSheet.replaceSync(replaceSyncs.join('\n'));
+  document.adoptedStyleSheets = [extraSheet];
   handleResize();
   self.visualViewport.addEventListener('resize', handleResize);
   self.visualViewport.addEventListener('scroll', handleResize);
