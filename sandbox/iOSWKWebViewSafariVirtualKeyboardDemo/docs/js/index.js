@@ -7,14 +7,54 @@ let prevHeight = undefined;
 let prevOffsetTop = undefined;
 let timerId = undefined;
 
-function handleResize() {
+function handleResize(e) {
   const height = window.visualViewport.height * window.visualViewport.scale;
+  if (prevHeight !== height) {
+    prevHeight = height;
+    requestAnimationFrame(() => {
+      document.documentElement.style.setProperty('--svh', height * 0.01 + 'px');
+    });
+  }
+  if (prevOffsetTop !== window.visualViewport.offsetTop) {
+    if (prevOffsetTop === undefined) {
+      prevOffsetTop = window.visualViewport.offsetTop;
+    } else {
+      const scrollOffset = window.visualViewport.offsetTop - prevOffsetTop;
+      prevOffsetTop = window.visualViewport.offsetTop;
+      requestAnimationFrame(() => {
+        if (e && e.type === 'resize') {
+          document.getElementById('root').scrollBy(0, scrollOffset);
+        }
+        document.documentElement.style.setProperty(
+          '--visual-viewport-offset-top',
+          window.visualViewport.offsetTop + 'px'
+        );
+      });
+    }
+  }
+  if (height + 10 < document.documentElement.clientHeight) {
+    document.body.classList.add('virtual-keyboard-shown');
+  } else {
+    document.body.classList.remove('virtual-keyboard-shown');
+  }
+}
+
+function handleFocus(e) {
+  const isVirtualKeyboardShown = /^(?=.*virtual-keyboard-shown).*$/.test(
+    document.body.getAttribute('class')
+  );
+  const minHeight = isVirtualKeyboardShown
+    ? `calc(100 * var(--svh, 1svh) - 96px + 1px)`
+    : `calc(100 * var(--svh, 1svh) - 96px)`;
+  this.style.minHeight = minHeight;
 }
 
 const createRootDiv = () => {
   const element = document.createElement('div');
   element.id = 'root';
   element.classList.add('scrollable');
+  element.style.width = '100%';
+  element.style.height = `calc(100 * var(--svh, 1svh))`;
 
   return element;
 };
@@ -160,21 +200,45 @@ rootDiv.appendChild(header);
 rootDiv.appendChild(mainTag);
 rootDiv.appendChild(footer);
 
+// editorDiv.addEventListener('focus', (e) => {
+//   console.log('ed')
+// })
 
-editorDiv.addEventListener('focus', (e) => {
-  console.log('ed')
-})
+// editorDiv.addEventListener(
+//   'focus',
+//   (e) => {
+//     console.log('ed');
+//     console.log(e)
+//     // console.log(document.body.className)
+//     console.log(document.body.getAttribute('class'));
+//     // console.log(document.body.getAttribute('class').match(/^(?=.*virtual-keyboard-shown).*$/g));
+//     console.log(/^(?=.*virtual-keyboard-shown).*$/.test(document.body.getAttribute('class')))
+//     // console.log(document.body.getAttribute('class').match());
+//   },
+//   true
+// );
+
+// editorDiv.addEventListener(
+//   'focus',
+//   function (e) {
+//     const isVirtualKeyboardShown = /^(?=.*virtual-keyboard-shown).*$/.test(
+//       document.body.getAttribute('class')
+//     );
+//     const minHeight = isVirtualKeyboardShown
+//       ? `calc(100 * var(--svh, 1svh) - 96px + 1px)`
+//       : `calc(100 * var(--svh, 1svh) - 96px)`;
+//     this.style.minHeight = minHeight;
+//   },
+//   true
+// );
 
 document.addEventListener('DOMContentLoaded', () => {
   document.body.padding = 0;
   document.body.appendChild(rootDiv);
 
+  editorDiv.addEventListener('focus', handleFocus, true);
+
   if (!iOS) {
     return;
   }
-
-  document.documentElement.style.setProperty(
-    '--visual-viewport-offset-top',
-    window.visualViewport.offsetTop + 'px'
-  );
 });
