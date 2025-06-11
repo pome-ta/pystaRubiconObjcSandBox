@@ -34,8 +34,10 @@ function handleResize(e) {
   }
   if (height + 10 < document.documentElement.clientHeight) {
     document.body.classList.add('virtual-keyboard-shown');
+    document.body.style.marginTop = `var(--visual-viewport-offset-top, 0px)`;
   } else {
     document.body.classList.remove('virtual-keyboard-shown');
+    document.body.marginTop = 0;
   }
 }
 
@@ -53,7 +55,7 @@ const createRootDiv = () => {
   const element = document.createElement('div');
   element.id = 'root';
   element.classList.add('scrollable');
-  element.style.width = '100%';
+  element.style.width = '100vw';
   element.style.height = `calc(100 * var(--svh, 1svh))`;
 
   return element;
@@ -200,45 +202,15 @@ rootDiv.appendChild(header);
 rootDiv.appendChild(mainTag);
 rootDiv.appendChild(footer);
 
-// editorDiv.addEventListener('focus', (e) => {
-//   console.log('ed')
-// })
-
-// editorDiv.addEventListener(
-//   'focus',
-//   (e) => {
-//     console.log('ed');
-//     console.log(e)
-//     // console.log(document.body.className)
-//     console.log(document.body.getAttribute('class'));
-//     // console.log(document.body.getAttribute('class').match(/^(?=.*virtual-keyboard-shown).*$/g));
-//     console.log(/^(?=.*virtual-keyboard-shown).*$/.test(document.body.getAttribute('class')))
-//     // console.log(document.body.getAttribute('class').match());
-//   },
-//   true
-// );
-
-// editorDiv.addEventListener(
-//   'focus',
-//   function (e) {
-//     const isVirtualKeyboardShown = /^(?=.*virtual-keyboard-shown).*$/.test(
-//       document.body.getAttribute('class')
-//     );
-//     const minHeight = isVirtualKeyboardShown
-//       ? `calc(100 * var(--svh, 1svh) - 96px + 1px)`
-//       : `calc(100 * var(--svh, 1svh) - 96px)`;
-//     this.style.minHeight = minHeight;
-//   },
-//   true
-// );
-
 document.addEventListener('DOMContentLoaded', () => {
   document.body.padding = 0;
   document.body.appendChild(rootDiv);
 
-  editorDiv.addEventListener('focus', handleFocus, true);
-
   if (!iOS) {
     return;
   }
+  editorDiv.addEventListener('focus', handleFocus, true);
+  handleResize();
+  window.visualViewport.addEventListener('resize', handleResize);
+  window.visualViewport.addEventListener('scroll', handleResize);
 });
