@@ -60,6 +60,7 @@ const createRootDiv = () => {
   // element.style.width = '100%';
   element.style.height = `calc(100 * var(--svh, 1svh))`;
   element.style.overflowY = 'scroll';
+  element.style.overflowX = 'hidden';
 
   return element;
 };
