@@ -1,7 +1,20 @@
 const ua = window.navigator.userAgent;
 const iOS = !!ua.match(/iPad/i) || !!ua.match(/iPhone/i);
 
-function iOSsetup() {}
+const replaceSyncs = [
+  `body.virtual-keyboard-shown {
+    margin-top: var(--visual-viewport-offset-top, 0px);
+  }`,
+  `.virtual-keyboard-shown #root,
+    #root:has(input:focus),
+    #root:has([contenteditable="true"]:focus) {
+    overscroll-behavior-y: contain;
+  }`,
+  `#editor:has(:focus),
+    .virtual-keyboard-shown #editor {
+    min-height: calc(100 * var(--svh, 1svh) - 96px + 1px);
+  }`,
+];
 
 let prevHeight = undefined;
 let prevOffsetTop = undefined;
@@ -9,7 +22,6 @@ let timerId = undefined;
 
 function handleResize(e) {
   const height = window.visualViewport.height * window.visualViewport.scale;
-  console.log(height)
   if (prevHeight !== height) {
     prevHeight = height;
     requestAnimationFrame(() => {
@@ -24,7 +36,7 @@ function handleResize(e) {
       prevOffsetTop = window.visualViewport.offsetTop;
       requestAnimationFrame(() => {
         if (e && e.type === 'resize') {
-          document.getElementById('root').scrollBy(0, scrollOffset);
+          rootDiv.scrollBy(0, scrollOffset);
         }
         document.documentElement.style.setProperty(
           '--visual-viewport-offset-top',
@@ -35,21 +47,9 @@ function handleResize(e) {
   }
   if (height + 10 < document.documentElement.clientHeight) {
     document.body.classList.add('virtual-keyboard-shown');
-    document.body.style.marginTop = `var(--visual-viewport-offset-top, 0px)`;
   } else {
     document.body.classList.remove('virtual-keyboard-shown');
-    document.body.marginTop = 0;
   }
-}
-
-function handleFocus(e) {
-  const isVirtualKeyboardShown = /^(?=.*virtual-keyboard-shown).*$/.test(
-    document.body.getAttribute('class')
-  );
-  const minHeight = isVirtualKeyboardShown
-    ? `calc(100 * var(--svh, 1svh) - 96px + 1px)`
-    : `calc(100 * var(--svh, 1svh) - 96px)`;
-  this.style.minHeight = minHeight;
 }
 
 const createRootDiv = () => {
@@ -58,6 +58,7 @@ const createRootDiv = () => {
   element.classList.add('scrollable');
   element.style.width = '100vw';
   element.style.height = `calc(100 * var(--svh, 1svh))`;
+  element.style.overflowY = 'scroll';
 
   return element;
 };
@@ -70,7 +71,7 @@ const createHeader = () => {
   h1Tag.textContent = 'Safari Virtual Keyboard Demo';
 
   element.appendChild(h1Tag);
-  element.style.position = 'sticky';
+  // element.style.position = 'sticky';
   element.style.top = '0';
   return element;
 };
@@ -78,6 +79,7 @@ const createHeader = () => {
 const createEditorDiv = () => {
   const element = document.createElement('div');
   element.id = 'editor';
+  element.contentEditable = 'true';
   element.style.minHeight = `calc(100 * var(--svh, 1svh) - 96px)`;
   element.style.fontSize = '1.5rem';
   return element;
@@ -86,14 +88,14 @@ const createEditorDiv = () => {
 const createFooter = () => {
   const element = document.createElement('footer');
   element.id = 'footer';
-  element.style.position = 'sticky';
+  // element.style.position = 'sticky';
   element.style.bottom = '0';
   return element;
 };
 
 const addHeaderFooterStyle = (headerFooter) => {
   [...headerFooter].forEach((element) => {
-    //element.style.position = 'sticky';
+    element.style.position = 'sticky';
     element.style.display = 'flex';
     element.style.alignItems = 'center';
     element.style.justifyContent = 'stretch';
@@ -191,10 +193,6 @@ const clearButton = createButton('clearButton', 'Clear');
 const footer = createFooter();
 addHeaderFooterStyle([header, footer]);
 
-
-
-
-
 footer.appendChild(stickyButton);
 footer.appendChild(fixedButton);
 footer.appendChild(clearButton);
@@ -205,23 +203,22 @@ editorDiv.appendChild(createP(darkolivegreen));
 editorDiv.appendChild(createP(darkslateblue));
 mainTag.appendChild(editorDiv);
 
-
 rootDiv.appendChild(header);
 rootDiv.appendChild(mainTag);
 rootDiv.appendChild(footer);
-
-
 
 document.addEventListener('DOMContentLoaded', () => {
   document.body.padding = 0;
   document.body.appendChild(rootDiv);
 
+  const extraSheet = new CSSStyleSheet();
+  extraSheet.replaceSync(replaceSyncs.join('\n'));
+  document.adoptedStyleSheets = [extraSheet];
+
   if (!iOS) {
     return;
   }
-  console.log('hoge')
-  editorDiv.addEventListener('focus', handleFocus, true);
   handleResize();
-  window.visualViewport.addEventListener('resize', handleResize);
-  window.visualViewport.addEventListener('scroll', handleResize);
+  self.visualViewport.addEventListener('resize', handleResize);
+  self.visualViewport.addEventListener('scroll', handleResize);
 });
