@@ -1,15 +1,15 @@
 const ua = window.navigator.userAgent;
 const iOS = !!ua.match(/iPad/i) || !!ua.match(/iPhone/i);
 
+function iOSsetup() {}
+
 let prevHeight = undefined;
 let prevOffsetTop = undefined;
 let timerId = undefined;
 
-
 function handleResize() {
   const height = window.visualViewport.height * window.visualViewport.scale;
 }
-
 
 const createRootDiv = () => {
   const element = document.createElement('div');
@@ -28,6 +28,14 @@ const createHeader = () => {
 
   element.appendChild(h1Tag);
   element.style.top = '0';
+  return element;
+};
+
+const createEditorDiv = () => {
+  const element = document.createElement('div');
+  element.id = 'editor';
+  element.style.minHeight = `calc(100 * var(--svh, 1svh) - 96px)`;
+  element.style.fontSize = '1.5rem';
   return element;
 };
 
@@ -54,7 +62,7 @@ const createP = (textContent) => {
   const element = document.createElement('p');
   element.contentEditable = 'true';
   element.textContent = textContent;
-  element.style.fontSize = '1.1rem';
+  // element.style.fontSize = '1.1rem';
   return element;
 };
 
@@ -75,8 +83,7 @@ const createButton = (id, textContent) => {
 const rootDiv = createRootDiv();
 const header = createHeader();
 const mainTag = document.createElement('main');
-const divTag = document.createElement('div');
-divTag.id = 'editor';
+const editorDiv = createEditorDiv();
 
 const darkred = ` Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
  eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
@@ -140,28 +147,34 @@ const clearButton = createButton('clearButton', 'Clear');
 const footer = createFooter();
 addHeaderFooterStyle([header, footer]);
 
-
 footer.appendChild(stickyButton);
 footer.appendChild(fixedButton);
 footer.appendChild(clearButton);
 
-divTag.appendChild(createP(darkred));
-divTag.appendChild(createP(darkgoldenrod));
-divTag.appendChild(createP(darkolivegreen));
-divTag.appendChild(createP(darkslateblue));
-mainTag.appendChild(divTag);
+editorDiv.appendChild(createP(darkred));
+editorDiv.appendChild(createP(darkgoldenrod));
+editorDiv.appendChild(createP(darkolivegreen));
+editorDiv.appendChild(createP(darkslateblue));
+mainTag.appendChild(editorDiv);
 rootDiv.appendChild(header);
 rootDiv.appendChild(mainTag);
 rootDiv.appendChild(footer);
 
+
+editorDiv.addEventListener('focus', (e) => {
+  console.log('ed')
+})
+
 document.addEventListener('DOMContentLoaded', () => {
+  document.body.padding = 0;
   document.body.appendChild(rootDiv);
-  
+
   if (!iOS) {
-    return
+    return;
   }
-  
+
   document.documentElement.style.setProperty(
-                "--visual-viewport-offset-top",
-                self.visualViewport.offsetTop + "px")
+    '--visual-viewport-offset-top',
+    window.visualViewport.offsetTop + 'px'
+  );
 });
