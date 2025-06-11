@@ -9,6 +9,7 @@ let timerId = undefined;
 
 function handleResize(e) {
   const height = window.visualViewport.height * window.visualViewport.scale;
+  console.log(height)
   if (prevHeight !== height) {
     prevHeight = height;
     requestAnimationFrame(() => {
@@ -69,6 +70,7 @@ const createHeader = () => {
   h1Tag.textContent = 'Safari Virtual Keyboard Demo';
 
   element.appendChild(h1Tag);
+  element.style.position = 'sticky';
   element.style.top = '0';
   return element;
 };
@@ -84,14 +86,14 @@ const createEditorDiv = () => {
 const createFooter = () => {
   const element = document.createElement('footer');
   element.id = 'footer';
+  element.style.position = 'sticky';
   element.style.bottom = '0';
-  element.style.height;
   return element;
 };
 
 const addHeaderFooterStyle = (headerFooter) => {
   [...headerFooter].forEach((element) => {
-    element.style.position = 'sticky';
+    //element.style.position = 'sticky';
     element.style.display = 'flex';
     element.style.alignItems = 'center';
     element.style.justifyContent = 'stretch';
@@ -189,6 +191,10 @@ const clearButton = createButton('clearButton', 'Clear');
 const footer = createFooter();
 addHeaderFooterStyle([header, footer]);
 
+
+
+
+
 footer.appendChild(stickyButton);
 footer.appendChild(fixedButton);
 footer.appendChild(clearButton);
@@ -198,9 +204,13 @@ editorDiv.appendChild(createP(darkgoldenrod));
 editorDiv.appendChild(createP(darkolivegreen));
 editorDiv.appendChild(createP(darkslateblue));
 mainTag.appendChild(editorDiv);
+
+
 rootDiv.appendChild(header);
 rootDiv.appendChild(mainTag);
 rootDiv.appendChild(footer);
+
+
 
 document.addEventListener('DOMContentLoaded', () => {
   document.body.padding = 0;
@@ -209,6 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!iOS) {
     return;
   }
+  console.log('hoge')
   editorDiv.addEventListener('focus', handleFocus, true);
   handleResize();
   window.visualViewport.addEventListener('resize', handleResize);
