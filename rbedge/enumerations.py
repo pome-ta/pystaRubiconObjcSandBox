@@ -54,7 +54,7 @@ class UIBarButtonSystemItem(IntEnum):
 
 
 # ref: [UISceneActivationState | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uiscene/activationstate-swift.enum?language=objc)
-class UISceneActivationState:
+class UISceneActivationState(IntEnum):
   # ref: [UISceneDefinitions.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UISceneDefinitions.rs.html#12)
   unattached = -1
   foregroundActive = 0
@@ -63,7 +63,7 @@ class UISceneActivationState:
 
 
 # ref: [UITableViewStyle | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uitableviewstyle?language=objc)
-class UITableViewStyle:
+class UITableViewStyle(IntEnum):
   # ref: [UITableView.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UITableView.rs.html#19)
   plain = 0
   grouped = 1

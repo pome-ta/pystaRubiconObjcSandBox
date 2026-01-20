@@ -114,7 +114,6 @@ class RootNavigationController(UINavigationController):
       target=navigationController,
       action=SEL('doneButtonTapped:'))
     # todo: view 遷移でのButton 重複を判別
-    #leftBar
     visibleViewController = navigationController.visibleViewController
     navigationItem = visibleViewController.navigationItem
     navigationItem.leftBarButtonItem = closeButtonItem
