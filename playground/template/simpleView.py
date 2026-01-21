@@ -1,23 +1,22 @@
 top_dir_name = 'pystaRubiconObjcSandBox'
 
+# todo: ディレクトリを遡り`pyrubicon` と`rbedge` の import 準備
 if not __loader__.path[:__loader__.path.rfind('/')].endswith(top_dir_name):
   import pathlib
   import sys
 
   __cwd = pathlib.Path.cwd()
   __depth_count = str(__cwd).count('/')
-  __root_path = next((__dir for n in range(__depth_count)
-                      if (__dir := __cwd.parents[n]).name == top_dir_name),
-                     None)
-
-  sys.path.append(str(__root_path))
+  __top_path = next((__dir for n in range(__depth_count)
+                     if (__dir := __cwd.parents[n]).name == top_dir_name),
+                    None)
+  sys.path.append(str(__top_path))
 
 import ctypes
 
 from pyrubicon.objc.api import ObjCClass
-from pyrubicon.objc.api import objc_method, objc_property, objc_const
-from pyrubicon.objc.runtime import send_super, load_library
-from pyrubicon.objc.types import CGRect
+from pyrubicon.objc.api import objc_method, objc_property
+from pyrubicon.objc.runtime import send_super
 
 from rbedge.functions import NSStringFromClass
 from rbedge import pdbr
