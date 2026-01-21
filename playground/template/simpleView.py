@@ -7,9 +7,11 @@ if not __loader__.path[:__loader__.path.rfind('/')].endswith(top_dir_name):
 
   __cwd = pathlib.Path.cwd()
   __depth_count = str(__cwd).count('/')
-  __top_path = next((__dir for n in range(__depth_count)
-                     if (__dir := __cwd.parents[n]).name == top_dir_name),
-                    None)
+  __range = range(__depth_count)
+  __top_path = next(
+    (__dir
+     for n in __range if (__dir := __cwd.parents[n]).name == top_dir_name),
+    None)
   sys.path.append(str(__top_path))
 
 import ctypes
