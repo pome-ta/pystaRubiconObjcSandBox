@@ -1,18 +1,23 @@
-top_dir_name = 'pystaRubiconObjcSandBox'
+_TOP_DIR_NAME = 'pystaRubiconObjcSandBox'
+_MODULES_DIR_NAME = 'modules'
 
-# todo: ディレクトリを遡り`pyrubicon` と`rbedge` の import 準備
-if not __loader__.path[:__loader__.path.rfind('/')].endswith(top_dir_name):
+# todo: `./{_TOP_DIR_NAME}/{_MODULES_DIR_NAME}` にあるpackage のimport 準備
+if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
+    _TOP_DIR_NAME):
   import pathlib
   import sys
-
-  __cwd = pathlib.Path.cwd()
-  __depth_count = str(__cwd).count('/')
-  __range = range(__depth_count)
-  __top_path = next(
-    (__dir
-     for n in __range if (__dir := __cwd.parents[n]).name == top_dir_name),
-    None)
-  sys.path.append(str(__top_path))
+  __parents = pathlib.Path(__file__).resolve().parents
+  for path in __parents:
+    if path.name == _TOP_DIR_NAME and (__modules_path :=
+                                       path / _MODULES_DIR_NAME).exists():
+      sys.path.insert(0, str(__modules_path))
+      break
+  else:
+    import warnings
+    with warnings.catch_warnings():
+      warnings.simplefilter('always', ImportWarning)
+      __warning_message = f'./{_TOP_DIR_NAME}/{_MODULES_DIR_NAME} not found in parent directories'
+      warnings.warn(__warning_message, ImportWarning)
 
 import ctypes
 
