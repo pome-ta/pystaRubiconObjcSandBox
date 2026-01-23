@@ -28,7 +28,9 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
       warnings.warn(__warning_message, ImportWarning)
 ```
 
+### Pythonista3 設定
 
+`EXTERNAL FILES` で、`pystaRubiconObjcSandBox` を読んでおく必要あり。
 
 
 # 📝 2026/01/21
