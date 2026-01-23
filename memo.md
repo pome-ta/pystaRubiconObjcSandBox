@@ -33,6 +33,16 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
 `EXTERNAL FILES` で、`pystaRubiconObjcSandBox` を読んでおく必要あり。
 
 
+## `enumerations.py` `globalVariables.py` など
+
+一つにまとめちゃうと、無駄に`load_library` しちゃうから、
+分割を意識した方がいいのかな？
+
+- [objc2_ar_kit - Rust](https://docs.rs/objc2-ar-kit/latest/objc2_ar_kit/)
+- [objc2_scene_kit - Rust](https://docs.rs/objc2-scene-kit/latest/objc2_scene_kit/)
+
+
+
 # 📝 2026/01/21
 
 ## れあどめ整理
