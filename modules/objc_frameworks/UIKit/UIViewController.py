@@ -14,4 +14,4 @@ class UIModalPresentationStyle(IntEnum):
   overCurrentContext = 6
   popover = 7
   blurOverFullScreen = 8
- 
+

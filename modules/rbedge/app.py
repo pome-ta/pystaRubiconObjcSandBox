@@ -2,18 +2,12 @@ from typing import Union
 
 from pyrubicon.objc.api import ObjCClass
 
-from .lifeCycle import loop
-'''
-from .enumerations import (
-  UISceneActivationState,
-  UIModalPresentationStyle,
-)
-'''
-from .objcMainThread import onMainThread
-from .rootNavigationController import RootNavigationController
-
 from objc_frameworks.UIKit.UISceneDefinitions import UISceneActivationState
 from objc_frameworks.UIKit.UIViewController import UIModalPresentationStyle
+
+from .lifeCycle import loop
+from .objcMainThread import onMainThread
+from .rootNavigationController import RootNavigationController
 
 UIApplication = ObjCClass('UIApplication')
 UIViewController = ObjCClass('UIViewController')  # todo: アノテーション用
@@ -63,3 +57,4 @@ class App:
   def main_loop(self) -> None:
     loop.run_forever()
     loop.close()
+

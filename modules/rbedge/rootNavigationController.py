@@ -4,20 +4,11 @@ from pyrubicon.objc.api import ObjCClass
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, SEL
 
-from .lifeCycle import loop
-'''
-from .enumerations import (
-  UIRectEdge,
-  UIBarButtonSystemItem,
-)
-from .functions import NSStringFromClass
-'''
-
 from objc_frameworks.UIKit.UIGeometry import UIRectEdge
 from objc_frameworks.UIKit.UIBarButtonItem import UIBarButtonSystemItem
 from objc_frameworks.Foundation.NSObjCRuntime import NSStringFromClass
 
-
+from .lifeCycle import loop
 
 UINavigationController = ObjCClass('UINavigationController')
 UIBarButtonItem = ObjCClass('UIBarButtonItem')
