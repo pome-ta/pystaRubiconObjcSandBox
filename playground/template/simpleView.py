@@ -96,8 +96,8 @@ class MainViewController(UIViewController):
 
 
 if __name__ == '__main__':
-  from rbedge.app import App
-  from rbedge.enumerations import UIModalPresentationStyle
+  from rbedge.app import App, UIModalPresentationStyle
+  #from rbedge.enumerations import UIModalPresentationStyle
 
   main_vc = MainViewController.new()
 
