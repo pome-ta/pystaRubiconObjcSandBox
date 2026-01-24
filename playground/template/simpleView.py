@@ -25,7 +25,9 @@ from pyrubicon.objc.api import ObjCClass
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 
-from rbedge.functions import NSStringFromClass
+#from rbedge.functions import NSStringFromClass
+from objc_frameworks.Foundation.NSObjCRuntime import NSStringFromClass
+
 from rbedge import pdbr
 
 UIViewController = ObjCClass('UIViewController')
