@@ -1,3 +1,37 @@
+# 📝 2026/01/24
+
+## `enumerations.py` やら`globalVariables.py` やら`functions.py`
+
+[GitHub - madsmtm/objc2: Bindings to Apple frameworks in Rust](https://github.com/madsmtm/objc2)
+[GitHub - madsmtm/objc2-generated: Automatically generated code; see the `objc2` project for details.](https://github.com/madsmtm/objc2-generated)
+
+を見習って、Framework ごとにフォルダ分けしてみた
+入力が面倒だけど、整理できるから頑張るか、、、
+
+[https://x.com/pome_ta93/status/2014994520849686955?s=12](https://x.com/pome_ta93/status/2014994520849686955?s=12) 面白現象も目撃できたし
+
+### `__init__.py` での呼び出し
+
+どうしよう、まるっとまとめちゃうかな？
+ファイル名まで追っかける必要はないかしら？
+
+## rubicon サブモジュールにする？
+
+a-shell がとてもお行儀がいいので、読み込みでエラー吐くね、、、
+Pythonista3 に`setuptools_scm` が無いからなんだが、、、
+
+
+とりま、Pythonista3 実行想定でいくか、、、
+
+a-shell は、改めて考えるか、、、
+
+
+## mac 実行
+
+Pythonista3 だと大丈夫だけど、a-shell だとclose 時に落ちる、、、
+iPhone だとどうにか両方大丈夫なんだけどな、、、
+
+
 # 📝 2026/01/23
 
 ## 無理やりimport
