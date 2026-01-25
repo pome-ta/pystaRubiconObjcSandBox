@@ -65,6 +65,8 @@ class MainViewController(UIViewController):
         SCNPreferredRenderingAPIKey: SCNRenderingAPI.metal,
       })
 
+    scnView.showsStatistics = True
+
     self.view.addSubview_(scnView)
 
     # --- Layout
