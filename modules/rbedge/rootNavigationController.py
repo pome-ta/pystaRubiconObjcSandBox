@@ -4,13 +4,8 @@ from pyrubicon.objc.api import ObjCClass
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, SEL
 
-'''
-from objc_frameworks.UIKit.UIGeometry import UIRectEdge
-from objc_frameworks.UIKit.UIBarButtonItem import UIBarButtonSystemItem
-'''
 from objc_frameworks.UIKit import UIRectEdge, UIBarButtonSystemItem
-
-from objc_frameworks.Foundation.NSObjCRuntime import NSStringFromClass
+from objc_frameworks.Foundation import NSStringFromClass
 
 from .lifeCycle import loop
 

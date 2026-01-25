@@ -2,10 +2,6 @@ from typing import Union
 
 from pyrubicon.objc.api import ObjCClass
 
-'''
-from objc_frameworks.UIKit.UISceneDefinitions import UISceneActivationState
-from objc_frameworks.UIKit.UIViewController import UIModalPresentationStyle
-'''
 from objc_frameworks.UIKit import UISceneActivationState, UIModalPresentationStyle
 
 from .lifeCycle import loop

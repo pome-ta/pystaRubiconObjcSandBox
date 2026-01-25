@@ -25,7 +25,7 @@ from pyrubicon.objc.api import ObjCClass
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 
-from objc_frameworks.Foundation.NSObjCRuntime import NSStringFromClass
+from objc_frameworks.Foundation import NSStringFromClass
 
 from rbedge import pdbr
 
@@ -97,11 +97,8 @@ class MainViewController(UIViewController):
 
 
 if __name__ == '__main__':
-  from rbedge.app import App#, UIModalPresentationStyle
+  from rbedge.app import App
   from objc_frameworks.UIKit import UIModalPresentationStyle
-
-
-  #from rbedge.enumerations import UIModalPresentationStyle
 
   main_vc = MainViewController.new()
 

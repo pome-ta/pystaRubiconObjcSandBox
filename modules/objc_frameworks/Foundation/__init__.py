@@ -1,0 +1,1 @@
+from .NSObjCRuntime import NSStringFromClass
