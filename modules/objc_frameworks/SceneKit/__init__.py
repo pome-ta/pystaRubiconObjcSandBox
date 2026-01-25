@@ -1,2 +1,2 @@
 from .SCNView import SCNPreferredRenderingAPIKey
-from .SCNSceneRenderer import SCNRenderingAPI
+from .SCNSceneRenderer import SCNRenderingAPI, SCNDebugOptions

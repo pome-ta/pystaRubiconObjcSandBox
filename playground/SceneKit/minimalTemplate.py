@@ -27,18 +27,20 @@ from pyrubicon.objc.runtime import send_super
 
 from objc_frameworks.Foundation import NSStringFromClass
 from objc_frameworks.CoreGraphics import CGRectZero
-from objc_frameworks.SceneKit import (
-  SCNPreferredRenderingAPIKey,
-  SCNRenderingAPI,
-)
 
 from rbedge import pdbr
 
-# --- SceneKit
-SCNView = ObjCClass('SCNView')
-
 UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
+
+# --- SceneKit
+from objc_frameworks.SceneKit import (
+  SCNPreferredRenderingAPIKey,
+  SCNRenderingAPI,
+  SCNDebugOptions,
+)
+
+SCNView = ObjCClass('SCNView')
 
 
 class MainViewController(UIViewController):
