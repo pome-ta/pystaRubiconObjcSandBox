@@ -29,7 +29,10 @@ from pyrubicon.objc.api import objc_method, objc_property, objc_const
 from pyrubicon.objc.runtime import send_super, load_library
 from pyrubicon.objc.types import CGRect, NSUInteger
 
-from rbedge.functions import NSStringFromClass
+from objc_frameworks.Foundation import NSStringFromClass
+from objc_frameworks.CoreGraphics import CGRectZero
+
+
 from rbedge import pdbr
 
 SceneKit = load_library('SceneKit')
@@ -50,7 +53,6 @@ UIViewController = ObjCClass('UIViewController')
 UIColor = ObjCClass('UIColor')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
-CGRectZero = CGRect.in_dll(load_library('CoreGraphics'), 'CGRectZero')
 
 SCNPreferredRenderingAPIKey = str(
   objc_const(SceneKit, 'SCNPreferredRenderingAPIKey'))
@@ -368,7 +370,7 @@ class MainViewController(UIViewController):
 
 if __name__ == '__main__':
   from rbedge.app import App
-  from rbedge.enumerations import UIModalPresentationStyle
+  from objc_frameworks.UIKit import UIModalPresentationStyle
 
   main_vc = MainViewController.new()
 
