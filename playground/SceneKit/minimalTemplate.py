@@ -26,9 +26,13 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 
 from objc_frameworks.Foundation import NSStringFromClass
+from objc_frameworks.CoreGraphics import CGRectZero
+from objc_frameworks.SceneKit import (
+  SCNPreferredRenderingAPIKey,
+  SCNRenderingAPI,
+)
 
 from rbedge import pdbr
-
 
 # --- SceneKit
 SCNView = ObjCClass('SCNView')
@@ -38,7 +42,7 @@ NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 
 class MainViewController(UIViewController):
-  
+
   scnView: SCNView = objc_property()
 
   @objc_method
@@ -55,6 +59,28 @@ class MainViewController(UIViewController):
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     self.navigationItem.title = NSStringFromClass(__class__)
+
+    scnView = SCNView.alloc().initWithFrame_options_(
+      CGRectZero, {
+        SCNPreferredRenderingAPIKey: SCNRenderingAPI.metal,
+      })
+
+    self.view.addSubview_(scnView)
+
+    # --- Layout
+    scnView.translatesAutoresizingMaskIntoConstraints = False
+    safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
+
+    NSLayoutConstraint.activateConstraints_([
+      scnView.centerXAnchor.constraintEqualToAnchor_(
+        safeAreaLayoutGuide.centerXAnchor),
+      scnView.centerYAnchor.constraintEqualToAnchor_(
+        safeAreaLayoutGuide.centerYAnchor),
+      scnView.widthAnchor.constraintEqualToAnchor_multiplier_(
+        safeAreaLayoutGuide.widthAnchor, 1.0),
+      scnView.heightAnchor.constraintEqualToAnchor_multiplier_(
+        safeAreaLayoutGuide.heightAnchor, 1.0),
+    ])
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -113,5 +139,4 @@ if __name__ == '__main__':
 
   app = App(main_vc, presentation_style)
   app.present()
-
 
