@@ -21,7 +21,7 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
 
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass
+from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 
@@ -32,6 +32,7 @@ from rbedge import pdbr
 
 UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
+UIColor = ObjCClass('UIColor')
 
 # --- SceneKit
 from objc_frameworks.SceneKit import (
@@ -41,6 +42,52 @@ from objc_frameworks.SceneKit import (
 )
 
 SCNView = ObjCClass('SCNView')
+SCNScene = ObjCClass('SCNScene')
+
+SCNNode = ObjCClass('SCNNode')
+SCNSphere = ObjCClass('SCNSphere')
+SCNLight = ObjCClass('SCNLight')
+SCNCamera = ObjCClass('SCNCamera')
+SCNAction = ObjCClass('SCNAction')
+
+class GameScene:
+
+  SCNScene_CLASS: SCNScene = SCNScene
+
+  @classmethod
+  def new(cls) -> ObjCInstance:
+    scene = cls.SCNScene_CLASS.scene()
+    return cls._build(scene)
+
+  @staticmethod
+  def _build(scene: ObjCInstance) -> ObjCInstance:
+    rootNodeAddChildNode_ = scene.rootNode.addChildNode_
+    
+    # --- SCNSphere
+    sphere = SCNSphere.sphereWithRadius_(2.0)
+    sphereNode = SCNNode.nodeWithGeometry_(sphere)
+    
+    sphereNode = SCNNode.nodeWithGeometry_(sphere)
+    sphereNode.runAction_(
+      SCNAction.repeatActionForever_(
+        SCNAction.rotateByX_y_z_duration_(0.0, 0.2, 0.1, 0.3)))
+    rootNodeAddChildNode_(sphereNode)
+    rootNodeAddChildNode_(sphereNode)
+
+    # --- SCNLight
+    lightNode = SCNNode.node()
+    lightNode.light = SCNLight.light()
+
+    lightNode.position = (0.0, 10.0, 10.0)
+    rootNodeAddChildNode_(lightNode)
+
+    # --- SCNCamera
+    cameraNode = SCNNode.node()
+    cameraNode.camera = SCNCamera.camera()
+    cameraNode.position = (0.0, 0.0, 10.0)
+    rootNodeAddChildNode_(cameraNode)
+
+    return scene
 
 
 class MainViewController(UIViewController):
@@ -62,12 +109,18 @@ class MainViewController(UIViewController):
     send_super(__class__, self, 'viewDidLoad')
     self.navigationItem.title = NSStringFromClass(__class__)
 
+    
     scnView = SCNView.alloc().initWithFrame_options_(
       CGRectZero, {
         SCNPreferredRenderingAPIKey: SCNRenderingAPI.metal,
       })
-
+    scnView.backgroundColor = UIColor.systemBlackColor()
+    scnView.scene = GameScene.new()
+    
+    debugOptions = SCNDebugOptions.showBoundingBoxes | SCNDebugOptions.showCameras
+    scnView.debugOptions = debugOptions
     scnView.showsStatistics = True
+    scnView.allowsCameraControl = True
 
     self.view.addSubview_(scnView)
 
