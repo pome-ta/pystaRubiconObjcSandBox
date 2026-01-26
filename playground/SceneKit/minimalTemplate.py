@@ -50,6 +50,7 @@ SCNLight = ObjCClass('SCNLight')
 SCNCamera = ObjCClass('SCNCamera')
 SCNAction = ObjCClass('SCNAction')
 
+
 class GameScene:
 
   SCNScene_CLASS: SCNScene = SCNScene
@@ -62,16 +63,16 @@ class GameScene:
   @staticmethod
   def _build(scene: ObjCInstance) -> ObjCInstance:
     rootNodeAddChildNode_ = scene.rootNode.addChildNode_
-    
+
     # --- SCNSphere
     sphere = SCNSphere.sphereWithRadius_(2.0)
     sphereNode = SCNNode.nodeWithGeometry_(sphere)
-    
+
     sphereNode = SCNNode.nodeWithGeometry_(sphere)
     sphereNode.runAction_(
       SCNAction.repeatActionForever_(
         SCNAction.rotateByX_y_z_duration_(0.0, 0.2, 0.1, 0.3)))
-    rootNodeAddChildNode_(sphereNode)
+
     rootNodeAddChildNode_(sphereNode)
 
     # --- SCNLight
@@ -109,14 +110,13 @@ class MainViewController(UIViewController):
     send_super(__class__, self, 'viewDidLoad')
     self.navigationItem.title = NSStringFromClass(__class__)
 
-    
     scnView = SCNView.alloc().initWithFrame_options_(
       CGRectZero, {
         SCNPreferredRenderingAPIKey: SCNRenderingAPI.metal,
       })
     scnView.backgroundColor = UIColor.systemBlackColor()
     scnView.scene = GameScene.new()
-    
+
     debugOptions = SCNDebugOptions.showBoundingBoxes | SCNDebugOptions.showCameras
     scnView.debugOptions = debugOptions
     scnView.showsStatistics = True

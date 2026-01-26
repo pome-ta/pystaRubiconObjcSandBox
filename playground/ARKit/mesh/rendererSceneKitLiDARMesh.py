@@ -31,7 +31,12 @@ from pyrubicon.objc.types import CGRect, NSUInteger
 
 from objc_frameworks.Foundation import NSStringFromClass
 from objc_frameworks.CoreGraphics import CGRectZero
-
+# --- SceneKit
+from objc_frameworks.SceneKit import (
+  SCNPreferredRenderingAPIKey,
+  SCNRenderingAPI,
+  SCNDebugOptions,
+)
 
 from rbedge import pdbr
 
