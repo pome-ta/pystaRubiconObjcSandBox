@@ -22,12 +22,10 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
       warnings.warn(__warning_message, ImportWarning)
 
 import ctypes
-from enum import IntEnum, IntFlag
 
 from pyrubicon.objc.api import ObjCClass
-from pyrubicon.objc.api import objc_method, objc_property, objc_const
-from pyrubicon.objc.runtime import send_super, load_library
-from pyrubicon.objc.types import CGRect, NSUInteger
+from pyrubicon.objc.api import objc_method, objc_property
+from pyrubicon.objc.runtime import send_super
 
 from objc_frameworks.Foundation import NSStringFromClass
 from objc_frameworks.CoreGraphics import CGRectZero
