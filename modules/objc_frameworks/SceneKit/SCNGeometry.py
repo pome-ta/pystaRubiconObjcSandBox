@@ -1,3 +1,5 @@
+from enum import IntEnum, IntFlag
+
 from .constants import _get_const
 
 
@@ -18,4 +20,5 @@ class SCNGeometryPrimitiveType(IntEnum):
   triangleStrip = 1
   line = 2
   point = 3
-  polygon = 4‎
+  polygon = 4
+

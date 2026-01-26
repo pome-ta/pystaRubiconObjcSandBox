@@ -31,22 +31,23 @@ from pyrubicon.objc.types import CGRect, NSUInteger
 
 from objc_frameworks.Foundation import NSStringFromClass
 from objc_frameworks.CoreGraphics import CGRectZero
+
+from rbedge import pdbr
+
+UIViewController = ObjCClass('UIViewController')
+UIColor = ObjCClass('UIColor')
+NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
+
 # --- SceneKit
 from objc_frameworks.SceneKit import (
   SCNPreferredRenderingAPIKey,
   SCNRenderingAPI,
   SCNDebugOptions,
+  SCNLightingModel,
+  SCNFillMode,
+  SCNGeometrySourceSemantic,
+  SCNGeometryPrimitiveType,
 )
-
-from rbedge import pdbr
-
-SceneKit = load_library('SceneKit')
-ARKit = load_library('ARKit')
-
-ARSCNView = ObjCClass('ARSCNView')
-ARCoachingOverlayView = ObjCClass('ARCoachingOverlayView')
-ARWorldTrackingConfiguration = ObjCClass('ARWorldTrackingConfiguration')
-ARMeshAnchor = ObjCClass('ARMeshAnchor')
 
 SCNGeometrySource = ObjCClass('SCNGeometrySource')
 SCNGeometryElement = ObjCClass('SCNGeometryElement')
@@ -54,96 +55,20 @@ SCNGeometry = ObjCClass('SCNGeometry')
 SCNMaterial = ObjCClass('SCNMaterial')
 SCNNode = ObjCClass('SCNNode')
 
-UIViewController = ObjCClass('UIViewController')
-UIColor = ObjCClass('UIColor')
-NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
+# --- ARKit
+from objc_frameworks.ARKit import (
+  showFeaturePoints,
+  showWorldOrigin,
+  ARCoachingGoal,
+  ARSceneReconstruction,
+  ARFrameSemantics,
+  AREnvironmentTexturing,
+)
 
-
-SCNPreferredRenderingAPIKey = str(
-  objc_const(SceneKit, 'SCNPreferredRenderingAPIKey'))
-
-
-class SCNRenderingAPI(IntEnum):
-  metal = 0
-  openGLES2 = 1
-
-
-#showFeaturePoints
-ARSCNDebugOptionShowFeaturePoints_ulong = NSUInteger.in_dll(
-  ARKit, 'ARSCNDebugOptionShowFeaturePoints')
-
-#showWorldOrigin
-ARSCNDebugOptionShowWorldOrigin_ulong = NSUInteger.in_dll(
-  ARKit, 'ARSCNDebugOptionShowWorldOrigin')
-
-
-class SCNDebugOptions(IntFlag):
-  none = 0
-  showPhysicsShapes = 1 << 0
-  showBoundingBoxes = 1 << 1
-  showLightInfluences = 1 << 2
-  showLightExtents = 1 << 3
-  showPhysicsFields = 1 << 4
-  showWireframe = 1 << 5
-  renderAsWireframe = 1 << 6
-  showSkeletons = 1 << 7
-  showCreases = 1 << 8
-  showConstraints = 1 << 9
-  showCameras = 1 << 10
-  showFeaturePoints = ARSCNDebugOptionShowFeaturePoints_ulong.value
-  showWorldOrigin = ARSCNDebugOptionShowWorldOrigin_ulong.value
-
-
-class ARCoachingGoal(IntEnum):
-  tracking = 0
-  horizontalPlane = 1
-  verticalPlane = 2
-  anyPlane = 3
-  geoTracking = 4
-
-
-# ref: [ARConfiguration.rs - source](https://docs.rs/objc2-ar-kit/latest/src/objc2_ar_kit/generated/ARConfiguration.rs.html#158-170)
-class ARSceneReconstruction(IntFlag):
-  none = 0
-  mesh = 1 << 0
-  meshWithClassification = (1 << 1) | (1 << 0)
-
-
-class SCNGeometrySourceSemantic:
-  vertex = str(objc_const(SceneKit, 'SCNGeometrySourceSemanticVertex'))
-  normal = str(objc_const(SceneKit, 'SCNGeometrySourceSemanticNormal'))
-  texcoord = str(objc_const(SceneKit, 'SCNGeometrySourceSemanticTexcoord'))
-
-
-class SCNGeometryPrimitiveType(IntEnum):
-  triangles = 0
-  triangleStrip = 1
-  line = 2
-  point = 3
-
-
-class SCNFillMode(IntEnum):
-  fill = 0
-  lines = 1
-
-
-# ref: [ARFrameSemantics | Apple Developer Documentation](https://developer.apple.com/documentation/arkit/arconfiguration/framesemantics-swift.struct?language=objc)
-class ARFrameSemantics(IntFlag):
-  # ref: [ARConfiguration.rs - source](https://docs.rs/objc2-ar-kit/latest/src/objc2_ar_kit/generated/ARConfiguration.rs.html#25-73)
-  none = 0
-  personSegmentation = 1 << 0
-  personSegmentationWithDepth = (1 << 1) | (1 << 0)
-  bodyDetection = 1 << 2
-  sceneDepth = 1 << 3
-  smoothedSceneDepth = 1 << 4
-
-
-# ref: [AREnvironmentTexturing | Apple Developer Documentation](https://developer.apple.com/documentation/arkit/arworldtrackingconfiguration/environmenttexturing-swift.enum?language=objc)
-class AREnvironmentTexturing(IntEnum):
-  # ref: [ARConfiguration.rs - source](https://docs.rs/objc2-ar-kit/latest/src/objc2_ar_kit/generated/ARConfiguration.rs.html#126-137)
-  none = 0
-  manual = 1
-  automatic = 2
+ARSCNView = ObjCClass('ARSCNView')
+ARCoachingOverlayView = ObjCClass('ARCoachingOverlayView')
+ARWorldTrackingConfiguration = ObjCClass('ARWorldTrackingConfiguration')
+ARMeshAnchor = ObjCClass('ARMeshAnchor')
 
 
 # xxx: 謎class になっちゃった、、、
@@ -219,7 +144,7 @@ class MainViewController(UIViewController):
     # MARK: - ARSCNViewDelegate
     scnView.setDelegate_(self)
 
-    debugOptions = SCNDebugOptions.showFeaturePoints | SCNDebugOptions.showWorldOrigin
+    debugOptions = showFeaturePoints | showWorldOrigin
     scnView.setDebugOptions_(debugOptions)
     scnView.setShowsStatistics_(True)
 
