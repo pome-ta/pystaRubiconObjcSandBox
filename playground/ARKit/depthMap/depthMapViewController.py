@@ -22,7 +22,7 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
 
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass
+from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 
@@ -34,9 +34,11 @@ from rbedge import pdbr
 UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
+UIApplication = ObjCClass('UIApplication')
 CIImage = ObjCClass('CIImage')
 
-#pdbr.state(CIImage)
+#pdbr.state(UIApplication.sharedApplication.windows[0].windowScene.interfaceOrientation)
+#print(UIApplication.sharedApplication.windows[0].windowScene.interfaceOrientation)
 
 # --- SceneKit
 from objc_frameworks.SceneKit import (
@@ -60,6 +62,7 @@ ARWorldTrackingConfiguration = ObjCClass('ARWorldTrackingConfiguration')
 class DepthMapViewController(UIViewController):
 
   arscnView: ARSCNView = objc_property()
+  orientation: int = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -115,6 +118,11 @@ class DepthMapViewController(UIViewController):
                  ctypes.c_bool,
                ])
 
+    if not isinstance(
+        orientation := UIApplication.sharedApplication.windows[0].windowScene.
+        interfaceOrientation, int):
+      raise TypeError(f'expected int, got {type(orientation).__name__}')
+
     configuration = ARWorldTrackingConfiguration.new()
     configuration.environmentTexturing = AREnvironmentTexturing.automatic
 
@@ -122,6 +130,7 @@ class DepthMapViewController(UIViewController):
     if ARWorldTrackingConfiguration.supportsFrameSemantics_(frameSemantics):
       configuration.frameSemantics = frameSemantics
 
+    self.orientation = orientation
     self.arscnView.session.delegate = self
     self.arscnView.session.runWithConfiguration_(configuration)
 
@@ -135,6 +144,8 @@ class DepthMapViewController(UIViewController):
                  ctypes.c_bool,
                ])
 
+    pdbr.state(NSLayoutConstraint)
+  
   @objc_method
   def viewWillDisappear_(self, animated: bool):
     send_super(__class__,
@@ -164,25 +175,28 @@ class DepthMapViewController(UIViewController):
   # MARK: - ARSessionDelegate
   @objc_method
   def session_didUpdateFrame_(self, session, frame):
+
     #print('didUpdateFrame')
     #pdbr.state(session.currentFrame.sceneDepth.depthMap)
     #print(session.currentFrame)
     if not (pixelBuffer := session.currentFrame.sceneDepth.depthMap):
-      return 
-    #print(pixelBuffer())
+      return
+    #print(dir(pixelBuffer))
+    #print(ObjCInstance(pixelBuffer))
+    pdbr.state(ObjCInstance(pixelBuffer))
     #print('')
-    #ciImage = CIImage.alloc().initWithCVPixelBuffer_(pixelBuffer)
-    ciImage = CIImage.imageWithCVPixelBuffer_(pixelBuffer)
+    #ciImage = CIImage.alloc().initWithCVPixelBuffer_(ObjCInstance(pixelBuffer))
+    #ciImage = CIImage.imageWithCVPixelBuffer_(ObjCInstance(pixelBuffer))
     #imageWithCVPixelBuffer_
     #print(ciImage)
-    print(ciImage.debugDescription)
+    #print(ciImage.debugDescription)
     #print('__')
-    
-    
+
     #pdbr.state(session.currentFrame.sceneDepth.depthMap)
     #print(pixelBuffer)
     #print(session.currentFrame)
     pass
+
 
 '''
 extension ARFrame {
@@ -192,8 +206,6 @@ extension ARFrame {
         return UIImage(ciImage: screenTransformed(ciImage: ciImage, orientation: orientation, viewPort: viewPort))
     }
 '''
-
-
 
 if __name__ == '__main__':
   from rbedge.app import App
