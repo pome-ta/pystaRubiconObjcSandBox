@@ -36,6 +36,10 @@ NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 UIApplication = ObjCClass('UIApplication')
 CIImage = ObjCClass('CIImage')
+CIContext = ObjCClass('CIContext')
+UIImage = ObjCClass('UIImage')
+UIImageView = ObjCClass('UIImageView')
+
 
 #pdbr.state(UIApplication.sharedApplication.windows[0].windowScene.interfaceOrientation)
 #print(UIApplication.sharedApplication.windows[0].windowScene.interfaceOrientation)
@@ -63,6 +67,7 @@ class DepthMapViewController(UIViewController):
 
   arscnView: ARSCNView = objc_property()
   orientation: int = objc_property()
+  countBool: bool = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -107,6 +112,7 @@ class DepthMapViewController(UIViewController):
     ])
 
     self.arscnView = arscnView
+    self.countBool = True
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -175,6 +181,8 @@ class DepthMapViewController(UIViewController):
   # MARK: - ARSessionDelegate
   @objc_method
   def session_didUpdateFrame_(self, session, frame):
+    if not self.countBool:
+      return 
 
     #print('didUpdateFrame')
     #pdbr.state(session.currentFrame.sceneDepth.depthMap)
@@ -183,9 +191,8 @@ class DepthMapViewController(UIViewController):
       return
     #print(dir(pixelBuffer))
     #print(ObjCInstance(pixelBuffer))
-    pdbr.state(ObjCInstance(pixelBuffer))
-    #print('')
-    #ciImage = CIImage.alloc().initWithCVPixelBuffer_(ObjCInstance(pixelBuffer))
+    
+    ciImage = CIImage.alloc().initWithCVPixelBuffer_(pixelBuffer)
     #ciImage = CIImage.imageWithCVPixelBuffer_(ObjCInstance(pixelBuffer))
     #imageWithCVPixelBuffer_
     #print(ciImage)
@@ -195,7 +202,19 @@ class DepthMapViewController(UIViewController):
     #pdbr.state(session.currentFrame.sceneDepth.depthMap)
     #print(pixelBuffer)
     #print(session.currentFrame)
-    pass
+    #uiImage = UIImage.imageWithCGImage_(ciImage)
+    #pdbr.state(ciImage.extent)
+    #print(ciImage.extent)
+    
+    cgImage = CIContext.new().createCGImage_fromRect_(ciImage, ciImage.extent)
+    uiImage = UIImage.imageWithCGImage_(cgImage)
+    imageView = UIImageView.imageViewWithImage_(uiImage)
+    
+    #pdbr.state(imageView)
+    self.view.addSubview_(imageView)
+    
+    self.countBool = False
+    
 
 
 '''
