@@ -118,6 +118,7 @@ class DepthMapViewController(UIViewController):
                  ctypes.c_bool,
                ])
 
+    # wip: 評価して出す。いまは固定
     if not isinstance(
         orientation := UIApplication.sharedApplication.windows[0].windowScene.
         interfaceOrientation, int):
@@ -130,6 +131,7 @@ class DepthMapViewController(UIViewController):
     if ARWorldTrackingConfiguration.supportsFrameSemantics_(frameSemantics):
       configuration.frameSemantics = frameSemantics
 
+    print(orientation)
     self.orientation = orientation
     self.arscnView.session.delegate = self
     self.arscnView.session.runWithConfiguration_(configuration)
@@ -173,6 +175,10 @@ class DepthMapViewController(UIViewController):
   # MARK: - ARSessionDelegate
   @objc_method
   def session_didUpdateFrame_(self, session, frame):
+
+    if len(self.view.subviews()) > 2:
+      return
+    print(len(self.view.subviews()))
     if not (pixelBuffer := session.currentFrame.sceneDepth.depthMap):
       return
     ciImage = CIImage.alloc().initWithCVPixelBuffer_(pixelBuffer)
@@ -195,6 +201,16 @@ class DepthMapViewController(UIViewController):
       imageView.heightAnchor.constraintEqualToAnchor_multiplier_(
         safeAreaLayoutGuide.heightAnchor, 1.0),
       '''
+
+  @property
+  #@objc_method
+  def orientation(self) -> int:
+
+    if not isinstance(
+        orientation := UIApplication.sharedApplication.windows[0].windowScene.
+        interfaceOrientation, int):
+      raise TypeError(f'expected int, got {type(orientation).__name__}')
+    return orientation
 
 
 if __name__ == '__main__':
