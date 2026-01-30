@@ -27,7 +27,7 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 
 from objc_frameworks.Foundation import NSStringFromClass
-from objc_frameworks.CoreGraphics import CGRectZero
+from objc_frameworks.CoreGraphics import CGRectZero, CGAffineTransformMakeScale
 
 from rbedge import pdbr
 
@@ -197,6 +197,7 @@ class DepthMapViewController(UIViewController):
     uiImage = UIImage.imageWithCGImage_(cgImage)
 
     self.imageView.image = uiImage
+
 
 if __name__ == '__main__':
   from rbedge.app import App
