@@ -30,6 +30,10 @@ class CGAffineTransform(ctypes.Structure):
     return f'a={self.a}, b={self.b}, c={self.c}, d={self.d}, tx={self.tx}, ty={self.ty}'
 
 
+CGAffineTransformIdentity = CGAffineTransform.in_dll(
+  CoreGraphics, 'CGAffineTransformIdentity')
+
+
 def CGAffineTransformMakeScale(sx: CGFloat, sy: CGFloat) -> CGAffineTransform:
   _function = CoreGraphics.CGAffineTransformMakeScale
   _function.restype = CGAffineTransform

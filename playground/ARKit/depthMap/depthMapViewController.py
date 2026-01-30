@@ -27,7 +27,11 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 
 from objc_frameworks.Foundation import NSStringFromClass
-from objc_frameworks.CoreGraphics import CGRectZero, CGAffineTransformMakeScale
+from objc_frameworks.CoreGraphics import CGRectZero
+from objc_frameworks.CoreGraphics import (
+  CGAffineTransformIdentity,
+  CGAffineTransformMakeScale,
+)
 
 from rbedge import pdbr
 
