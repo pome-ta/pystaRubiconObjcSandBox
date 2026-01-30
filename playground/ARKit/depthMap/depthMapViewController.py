@@ -211,7 +211,6 @@ class DepthMapViewController(UIViewController):
     viewPortSize = viewPort.size
     captureSize = ciImage.extent.size
     # --- func screenTransform(orientation: UIInterfaceOrientation, viewPortSize: CGSize, captureSize: CGSize)
-    #pdbr.state(ciImage)
     if self.framePick:
       return
     self.framePick = True
