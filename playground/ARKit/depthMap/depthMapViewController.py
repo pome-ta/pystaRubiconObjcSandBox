@@ -22,7 +22,7 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
 
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass, ObjCInstance
+from pyrubicon.objc.api import ObjCClass
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 
