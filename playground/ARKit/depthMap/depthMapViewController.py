@@ -66,8 +66,10 @@ ARWorldTrackingConfiguration = ObjCClass('ARWorldTrackingConfiguration')
 class DepthMapViewController(UIViewController):
 
   arscnView: ARSCNView = objc_property()
-  orientation: int = objc_property()
   imageView: UIImageView = objc_property()
+  orientation: int  # = objc_property()
+
+  framePick: bool  # = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -126,6 +128,7 @@ class DepthMapViewController(UIViewController):
 
     self.arscnView = arscnView
     self.imageView = imageView
+    self.framePick = False
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -138,6 +141,7 @@ class DepthMapViewController(UIViewController):
                ])
 
     # wip: 評価して出す。いまは固定
+
     if not isinstance(
         orientation := UIApplication.sharedApplication.windows[0].windowScene.
         interfaceOrientation, int):
@@ -193,14 +197,38 @@ class DepthMapViewController(UIViewController):
   # MARK: - ARSessionDelegate
   @objc_method
   def session_didUpdateFrame_(self, session, frame):
-
+    # --- func depthMapTransformedImage(orientation: UIInterfaceOrientation, viewPort: CGRect) -> UIImage?
+    '''
     if not (pixelBuffer := session.currentFrame.sceneDepth.depthMap):
       return
+    '''
+    if not (pixelBuffer := frame.sceneDepth.depthMap):
+      return
     ciImage = CIImage.alloc().initWithCVPixelBuffer_(pixelBuffer)
+    viewPort = self.imageView.bounds
+    # --- func screenTransformed(ciImage: CIImage, orientation: UIInterfaceOrientation, viewPort: CGRect)
+
+    viewPortSize = viewPort.size
+    captureSize = ciImage.extent.size
+    # --- func screenTransform(orientation: UIInterfaceOrientation, viewPortSize: CGSize, captureSize: CGSize)
+    #pdbr.state(ciImage)
+    if self.framePick:
+      return
+    self.framePick = True
+    #height
+    #width
+
+    normalizeTransform = CGAffineTransformMakeScale(1.0 / captureSize.width,
+                                                    1.0 / captureSize.height)
+
+    #flipTransform =
+    #print(captureSize.width)
+    #print(type(captureSize.width))
+    print(normalizeTransform)
     cgImage = CIContext.new().createCGImage_fromRect_(ciImage, ciImage.extent)
     uiImage = UIImage.imageWithCGImage_(cgImage)
 
-    self.imageView.image = uiImage
+    #self.imageView.image = uiImage
 
 
 if __name__ == '__main__':
