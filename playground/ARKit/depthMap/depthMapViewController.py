@@ -32,6 +32,9 @@ from objc_frameworks.CoreGraphics import (
   CGAffineTransformIdentity,
   CGAffineTransformMakeScale,
 )
+from objc_frameworks.UIKit import UIInterfaceOrientation
+
+print(UIInterfaceOrientationIsPortrait(1))
 
 from rbedge import pdbr
 
@@ -223,7 +226,7 @@ class DepthMapViewController(UIViewController):
     #flipTransform =
     #print(captureSize.width)
     #print(type(captureSize.width))
-    print(normalizeTransform)
+    #print(normalizeTransform)
     cgImage = CIContext.new().createCGImage_fromRect_(ciImage, ciImage.extent)
     uiImage = UIImage.imageWithCGImage_(cgImage)
 
