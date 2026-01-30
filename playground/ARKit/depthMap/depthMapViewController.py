@@ -63,6 +63,7 @@ class DepthMapViewController(UIViewController):
 
   arscnView: ARSCNView = objc_property()
   orientation: int = objc_property()
+  imageView: UIImageView = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -88,13 +89,15 @@ class DepthMapViewController(UIViewController):
     arscnView.debugOptions = debugOptions
     arscnView.showsStatistics = True
 
+    imageView = UIImageView.new()
+
     self.view.addSubview_(arscnView)
+    self.view.addSubview_(imageView)
 
     # --- Layout
-    arscnView.translatesAutoresizingMaskIntoConstraints = False
-
     safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
 
+    arscnView.translatesAutoresizingMaskIntoConstraints = False
     NSLayoutConstraint.activateConstraints_([
       arscnView.centerXAnchor.constraintEqualToAnchor_(
         safeAreaLayoutGuide.centerXAnchor),
@@ -106,7 +109,19 @@ class DepthMapViewController(UIViewController):
         safeAreaLayoutGuide.heightAnchor, 1.0),
     ])
 
+    imageView.translatesAutoresizingMaskIntoConstraints = False
+    NSLayoutConstraint.activateConstraints_([
+      imageView.leadingAnchor.constraintEqualToAnchor_constant_(
+        self.view.leadingAnchor, 50.0),
+      imageView.trailingAnchor.constraintEqualToAnchor_constant_(
+        self.view.trailingAnchor, -50.0),
+      imageView.heightAnchor.constraintEqualToConstant_(700.0),  # 定数
+      imageView.centerYAnchor.constraintEqualToAnchor_(
+        self.view.centerYAnchor),
+    ])
+
     self.arscnView = arscnView
+    self.imageView = imageView
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -131,7 +146,6 @@ class DepthMapViewController(UIViewController):
     if ARWorldTrackingConfiguration.supportsFrameSemantics_(frameSemantics):
       configuration.frameSemantics = frameSemantics
 
-    print(orientation)
     self.orientation = orientation
     self.arscnView.session.delegate = self
     self.arscnView.session.runWithConfiguration_(configuration)
@@ -176,42 +190,13 @@ class DepthMapViewController(UIViewController):
   @objc_method
   def session_didUpdateFrame_(self, session, frame):
 
-    if len(self.view.subviews()) > 2:
-      return
-    print(len(self.view.subviews()))
     if not (pixelBuffer := session.currentFrame.sceneDepth.depthMap):
       return
     ciImage = CIImage.alloc().initWithCVPixelBuffer_(pixelBuffer)
     cgImage = CIContext.new().createCGImage_fromRect_(ciImage, ciImage.extent)
     uiImage = UIImage.imageWithCGImage_(cgImage)
-    imageView = UIImageView.imageViewWithImage_(uiImage)
-    self.view.addSubview_(imageView)
 
-    imageView.translatesAutoresizingMaskIntoConstraints = False
-
-    safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
-
-    NSLayoutConstraint.activateConstraints_([
-      imageView.centerYAnchor.constraintEqualToAnchor_(
-        safeAreaLayoutGuide.centerYAnchor),
-    ])
-    '''
-      imageView.widthAnchor.constraintEqualToAnchor_multiplier_(
-        safeAreaLayoutGuide.widthAnchor, 1.0),
-      imageView.heightAnchor.constraintEqualToAnchor_multiplier_(
-        safeAreaLayoutGuide.heightAnchor, 1.0),
-      '''
-
-  @property
-  #@objc_method
-  def orientation(self) -> int:
-
-    if not isinstance(
-        orientation := UIApplication.sharedApplication.windows[0].windowScene.
-        interfaceOrientation, int):
-      raise TypeError(f'expected int, got {type(orientation).__name__}')
-    return orientation
-
+    self.imageView.image = uiImage
 
 if __name__ == '__main__':
   from rbedge.app import App
