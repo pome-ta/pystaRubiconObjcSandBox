@@ -1,7 +1,5 @@
 from enum import IntEnum
 
-#from .constants import UIKit
-
 
 class UIDeviceOrientation(IntEnum):
   #[doc(alias = "UIDeviceOrientationUnknown")]
