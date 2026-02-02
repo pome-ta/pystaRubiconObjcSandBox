@@ -41,8 +41,6 @@ from rbedge import pdbr
 UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
-
-
 UIApplication = ObjCClass('UIApplication')
 CIImage = ObjCClass('CIImage')
 CIContext = ObjCClass('CIContext')
@@ -133,7 +131,6 @@ class DepthMapViewController(UIViewController):
     self.arscnView = arscnView
     self.imageView = imageView
 
-
   @objc_method
   def viewWillAppear_(self, animated: bool):
     send_super(__class__,
@@ -144,7 +141,6 @@ class DepthMapViewController(UIViewController):
                  ctypes.c_bool,
                ])
 
-    # wip: 評価して出す。いまは固定
     if not isinstance(
         orientation := UIApplication.sharedApplication.windows[0].windowScene.
         interfaceOrientation, int):
@@ -211,21 +207,22 @@ class DepthMapViewController(UIViewController):
     window = self.view.window()
     interfaceOrientation = window.windowScene.interfaceOrientation
     self.orientation = interfaceOrientation
-    
-    
-    
-    
-    #pdbr.state(self.view.window().windowScene)
-
 
   # MARK: - ARSessionDelegate
   @objc_method
   def session_didUpdateFrame_(self, session, frame):
     # --- func depthMapTransformedImage(orientation: UIInterfaceOrientation, viewPort: CGRect) -> UIImage?
     #AttributeError
+    '''
     if not (pixelBuffer := frame.sceneDepth.depthMap):
       # xxx: `pixelBuffer := session.currentFrame.sceneDepth.depthMap`
       return
+    '''
+    try:
+      pixelBuffer = frame.sceneDepth.depthMap
+    except Exception as e:
+      print(f'session_didUpdateFrame_: {e}')
+      return 
     ciImage = CIImage.alloc().initWithCVPixelBuffer_(pixelBuffer)
     viewPort = self.imageView.bounds
     # --- func screenTransformed(ciImage: CIImage, orientation: UIInterfaceOrientation, viewPort: CGRect)
