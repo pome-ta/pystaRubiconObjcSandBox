@@ -22,7 +22,7 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
 
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass
+from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 
@@ -40,6 +40,8 @@ from rbedge import pdbr
 
 UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
+
+
 
 UIApplication = ObjCClass('UIApplication')
 CIImage = ObjCClass('CIImage')
@@ -85,6 +87,7 @@ class DepthMapViewController(UIViewController):
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
+
     self.navigationItem.title = NSStringFromClass(__class__)
 
     arscnView = ARSCNView.alloc().initWithFrame_options_(
@@ -129,7 +132,7 @@ class DepthMapViewController(UIViewController):
 
     self.arscnView = arscnView
     self.imageView = imageView
-    self.framePick = False
+
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -194,10 +197,32 @@ class DepthMapViewController(UIViewController):
     send_super(__class__, self, 'didReceiveMemoryWarning')
     print(f'\t{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
 
+  @objc_method
+  def traitCollectionDidChange_(self,
+                                previousTraitCollection_ptr: ctypes.c_void_p):
+    send_super(__class__,
+               self,
+               'traitCollectionDidChange:',
+               previousTraitCollection_ptr,
+               argtypes=[
+                 ctypes.c_void_p,
+               ])
+    #previousTraitCollection = ObjCInstance(previousTraitCollection_ptr)
+    window = self.view.window()
+    interfaceOrientation = window.windowScene.interfaceOrientation
+    self.orientation = interfaceOrientation
+    
+    
+    
+    
+    #pdbr.state(self.view.window().windowScene)
+
+
   # MARK: - ARSessionDelegate
   @objc_method
   def session_didUpdateFrame_(self, session, frame):
     # --- func depthMapTransformedImage(orientation: UIInterfaceOrientation, viewPort: CGRect) -> UIImage?
+    #AttributeError
     if not (pixelBuffer := frame.sceneDepth.depthMap):
       # xxx: `pixelBuffer := session.currentFrame.sceneDepth.depthMap`
       return

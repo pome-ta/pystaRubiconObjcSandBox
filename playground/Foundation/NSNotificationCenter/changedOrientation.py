@@ -65,6 +65,7 @@ class ChangedOrientationViewController(UIViewController):
                  ctypes.c_bool,
                ])
     print('--- viewWillAppear')
+    # ?: `[[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];`
     notificationCenter = NSNotificationCenter.defaultCenter
     notificationCenter.addObserver_selector_name_object_(
       self, SEL('didRotate:'), UIDeviceOrientationDidChangeNotification, None)
