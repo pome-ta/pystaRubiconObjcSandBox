@@ -144,7 +144,6 @@ class DepthMapViewController(UIViewController):
                ])
 
     # wip: 評価して出す。いまは固定
-
     if not isinstance(
         orientation := UIApplication.sharedApplication.windows[0].windowScene.
         interfaceOrientation, int):
@@ -216,7 +215,7 @@ class DepthMapViewController(UIViewController):
     # --- func screenTransform(orientation: UIInterfaceOrientation, viewPortSize: CGSize, captureSize: CGSize)
     if self.framePick:
       return
-    self.framePick = True
+    #self.framePick = True
     #height
     #width
 
@@ -225,21 +224,28 @@ class DepthMapViewController(UIViewController):
     flipTransform = CGAffineTransformTranslate(
       CGAffineTransformMakeScale(-1.0, -1.0), -1.0, -1.0
     ) if UIInterfaceOrientation.portrait == self.orientation else CGAffineTransformIdentity
-
-    #print(normalizeTransform)
-
-    #displayTransformForOrientation_viewportSize_
-
     displayTransform = frame.displayTransformForOrientation_viewportSize_(
       self.orientation, viewPortSize)
+    toViewPortTransform = CGAffineTransformMakeScale(viewPortSize.width,
+                                                     viewPortSize.height)
 
-    #pdbr.state(displayTransform)
-    print(displayTransform)
+    screenTransform = CGAffineTransformConcat(
+      CGAffineTransformConcat(
+        CGAffineTransformConcat(normalizeTransform, flipTransform),
+        displayTransform), toViewPortTransform)
+
+    ciImageScreenTransformed = ciImage.imageByApplyingTransform_(
+      screenTransform).imageByCroppingToRect_(viewPort)
+    '''
 
     cgImage = CIContext.new().createCGImage_fromRect_(ciImage, ciImage.extent)
     uiImage = UIImage.imageWithCGImage_(cgImage)
+    '''
 
-    #self.imageView.image = uiImage
+    #imageWithCIImage_
+    uiImage = UIImage.imageWithCIImage_(ciImageScreenTransformed)
+
+    self.imageView.image = uiImage
 
 
 if __name__ == '__main__':
