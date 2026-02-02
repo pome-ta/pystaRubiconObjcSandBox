@@ -53,6 +53,7 @@ class ChangedOrientationViewController(UIViewController):
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     self.navigationItem.title = NSStringFromClass(__class__)
+    print('--- viewDidLoad')
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -63,6 +64,10 @@ class ChangedOrientationViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
+    print('--- viewWillAppear')
+    notificationCenter = NSNotificationCenter.defaultCenter
+    notificationCenter.addObserver_selector_name_object_(
+      self, SEL('didRotate:'), UIDeviceOrientationDidChangeNotification, None)
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -73,6 +78,7 @@ class ChangedOrientationViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
+    print('--- viewDidAppear')
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
@@ -83,6 +89,7 @@ class ChangedOrientationViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
+    print('--- viewWillDisappear')
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
@@ -93,11 +100,23 @@ class ChangedOrientationViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
+    print('--- viewDidDisappear')
+    notificationCenter = NSNotificationCenter.defaultCenter
+    notificationCenter.removeObserver_name_object_(
+      self, UIDeviceOrientationDidChangeNotification, None)
 
   @objc_method
   def didReceiveMemoryWarning(self):
     send_super(__class__, self, 'didReceiveMemoryWarning')
     print(f'\t{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
+
+  # MARK: - orientation Event Notifications
+  # --- private method
+  @objc_method
+  def didRotate_(self, notification):
+    print('--- didRotate')
+    #pdbr.state(notification)
+    print(notification)
 
 
 if __name__ == '__main__':
