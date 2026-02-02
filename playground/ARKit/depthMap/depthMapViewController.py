@@ -72,8 +72,6 @@ class DepthMapViewController(UIViewController):
   imageView: UIImageView = objc_property()
   orientation: int  # = objc_property()
 
-  framePick: bool  # = objc_property()
-
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
@@ -200,11 +198,8 @@ class DepthMapViewController(UIViewController):
   @objc_method
   def session_didUpdateFrame_(self, session, frame):
     # --- func depthMapTransformedImage(orientation: UIInterfaceOrientation, viewPort: CGRect) -> UIImage?
-    '''
-    if not (pixelBuffer := session.currentFrame.sceneDepth.depthMap):
-      return
-    '''
     if not (pixelBuffer := frame.sceneDepth.depthMap):
+      # xxx: `pixelBuffer := session.currentFrame.sceneDepth.depthMap`
       return
     ciImage = CIImage.alloc().initWithCVPixelBuffer_(pixelBuffer)
     viewPort = self.imageView.bounds
@@ -213,11 +208,6 @@ class DepthMapViewController(UIViewController):
     viewPortSize = viewPort.size
     captureSize = ciImage.extent.size
     # --- func screenTransform(orientation: UIInterfaceOrientation, viewPortSize: CGSize, captureSize: CGSize)
-    if self.framePick:
-      return
-    #self.framePick = True
-    #height
-    #width
 
     normalizeTransform = CGAffineTransformMakeScale(1.0 / captureSize.width,
                                                     1.0 / captureSize.height)
@@ -236,13 +226,6 @@ class DepthMapViewController(UIViewController):
 
     ciImageScreenTransformed = ciImage.imageByApplyingTransform_(
       screenTransform).imageByCroppingToRect_(viewPort)
-    '''
-
-    cgImage = CIContext.new().createCGImage_fromRect_(ciImage, ciImage.extent)
-    uiImage = UIImage.imageWithCGImage_(cgImage)
-    '''
-
-    #imageWithCIImage_
     uiImage = UIImage.imageWithCIImage_(ciImageScreenTransformed)
 
     self.imageView.image = uiImage
