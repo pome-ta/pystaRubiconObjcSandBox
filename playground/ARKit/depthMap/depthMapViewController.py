@@ -221,13 +221,10 @@ class DepthMapViewController(UIViewController):
 
     normalizeTransform = CGAffineTransformMakeScale(1.0 / captureSize.width,
                                                     1.0 / captureSize.height)
+    flipTransform = CGAffineTransformTranslate(
+      CGAffineTransformMakeScale(-1.0, -1.0), -1.0, -1.0
+    ) if UIInterfaceOrientation.portrait == self.orientation else CGAffineTransformIdentity
 
-    #print(UIInterfaceOrientation.portrait == self.orientation)
-
-    flipTransform = CGAffineTransformTranslate(CGAffineTransformMakeScale(-1.0, -1.0), -1.0, -1.0)
-    print(flipTransform)
-    #print(captureSize.width)
-    #print(type(captureSize.width))
     #print(normalizeTransform)
     cgImage = CIContext.new().createCGImage_fromRect_(ciImage, ciImage.extent)
     uiImage = UIImage.imageWithCGImage_(cgImage)
