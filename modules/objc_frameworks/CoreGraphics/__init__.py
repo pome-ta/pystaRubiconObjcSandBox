@@ -1,4 +1,7 @@
 from .CGGeometry import CGRectZero
 from .CGAffineTransform import (
-  CGAffineTransformIdentity,CGAffineTransformMakeScale, )
+  CGAffineTransformIdentity,
+  CGAffineTransformMakeScale,
+  CGAffineTransformTranslate,
+)
 

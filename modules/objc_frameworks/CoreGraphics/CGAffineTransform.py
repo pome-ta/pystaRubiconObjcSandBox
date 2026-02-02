@@ -43,3 +43,15 @@ def CGAffineTransformMakeScale(sx: CGFloat, sy: CGFloat) -> CGAffineTransform:
   ]
   return _function(sx, sy)
 
+
+def CGAffineTransformTranslate(t: CGAffineTransform, sx: CGFloat,
+                           sy: CGFloat) -> CGAffineTransform:
+  _function = CoreGraphics.CGAffineTransformTranslate
+  _function.restype = CGAffineTransform
+  _function.argtypes = [
+    CGAffineTransform,
+    CGFloat,
+    CGFloat,
+  ]
+  return _function(t, sx, sy)
+

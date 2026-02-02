@@ -32,6 +32,7 @@ class UIInterfaceOrientation(IntEnum):
 
 
 '''
+# wip: 拾えない？
 def UIInterfaceOrientationIsPortrait(
     orientation: UIInterfaceOrientation) -> bool:
   pass
