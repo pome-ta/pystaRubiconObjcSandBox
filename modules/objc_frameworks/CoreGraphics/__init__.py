@@ -3,5 +3,6 @@ from .CGAffineTransform import (
   CGAffineTransformIdentity,
   CGAffineTransformMakeScale,
   CGAffineTransformTranslate,
+  CGAffineTransformConcat,
 )
 

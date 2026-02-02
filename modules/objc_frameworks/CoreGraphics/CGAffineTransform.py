@@ -44,8 +44,13 @@ def CGAffineTransformMakeScale(sx: CGFloat, sy: CGFloat) -> CGAffineTransform:
   return _function(sx, sy)
 
 
+# CGAffineTransformMake
+# CGAffineTransformMakeRotation
+# CGAffineTransformMakeTranslation
+
+
 def CGAffineTransformTranslate(t: CGAffineTransform, sx: CGFloat,
-                           sy: CGFloat) -> CGAffineTransform:
+                               sy: CGFloat) -> CGAffineTransform:
   _function = CoreGraphics.CGAffineTransformTranslate
   _function.restype = CGAffineTransform
   _function.argtypes = [
@@ -54,4 +59,20 @@ def CGAffineTransformTranslate(t: CGAffineTransform, sx: CGFloat,
     CGFloat,
   ]
   return _function(t, sx, sy)
+
+
+# CGAffineTransformScale
+# CGAffineTransformRotate
+# CGAffineTransformInvert
+
+
+def CGAffineTransformConcat(t1: CGAffineTransform,
+                            t2: CGAffineTransform) -> CGAffineTransform:
+  _function = CoreGraphics.CGAffineTransformConcat
+  _function.restype = CGAffineTransform
+  _function.argtypes = [
+    CGAffineTransform,
+    CGAffineTransform,
+  ]
+  return _function(t1, t2)
 

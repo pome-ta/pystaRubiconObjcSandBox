@@ -32,6 +32,7 @@ from objc_frameworks.CoreGraphics import (
   CGAffineTransformIdentity,
   CGAffineTransformMakeScale,
   CGAffineTransformTranslate,
+  CGAffineTransformConcat,
 )
 from objc_frameworks.UIKit import UIInterfaceOrientation
 
@@ -226,6 +227,15 @@ class DepthMapViewController(UIViewController):
     ) if UIInterfaceOrientation.portrait == self.orientation else CGAffineTransformIdentity
 
     #print(normalizeTransform)
+
+    #displayTransformForOrientation_viewportSize_
+
+    displayTransform = frame.displayTransformForOrientation_viewportSize_(
+      self.orientation, viewPortSize)
+
+    #pdbr.state(displayTransform)
+    print(displayTransform)
+
     cgImage = CIContext.new().createCGImage_fromRect_(ciImage, ciImage.extent)
     uiImage = UIImage.imageWithCGImage_(cgImage)
 
