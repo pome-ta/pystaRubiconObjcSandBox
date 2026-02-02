@@ -118,6 +118,7 @@ class DepthMapViewController(UIViewController):
     ])
 
     imageView.translatesAutoresizingMaskIntoConstraints = False
+    '''
     NSLayoutConstraint.activateConstraints_([
       imageView.leadingAnchor.constraintEqualToAnchor_constant_(
         self.view.leadingAnchor, 50.0),
@@ -126,6 +127,18 @@ class DepthMapViewController(UIViewController):
       imageView.heightAnchor.constraintEqualToConstant_(700.0),  # 定数
       imageView.centerYAnchor.constraintEqualToAnchor_(
         self.view.centerYAnchor),
+    ])
+    '''
+
+    NSLayoutConstraint.activateConstraints_([
+      imageView.centerXAnchor.constraintEqualToAnchor_(
+        self.view.centerXAnchor),
+      imageView.centerYAnchor.constraintEqualToAnchor_(
+        self.view.centerYAnchor),
+      imageView.widthAnchor.constraintEqualToAnchor_multiplier_(
+        self.view.widthAnchor, 0.4),
+      imageView.heightAnchor.constraintEqualToAnchor_multiplier_(
+        self.view.heightAnchor, 0.4),
     ])
 
     self.arscnView = arscnView
@@ -212,19 +225,16 @@ class DepthMapViewController(UIViewController):
   @objc_method
   def session_didUpdateFrame_(self, session, frame):
     # --- func depthMapTransformedImage(orientation: UIInterfaceOrientation, viewPort: CGRect) -> UIImage?
-    #AttributeError
-    '''
-    if not (pixelBuffer := frame.sceneDepth.depthMap):
-      # xxx: `pixelBuffer := session.currentFrame.sceneDepth.depthMap`
-      return
-    '''
     try:
+      # xxx: `pixelBuffer = session.currentFrame.sceneDepth.depthMap`
       pixelBuffer = frame.sceneDepth.depthMap
     except Exception as e:
       print(f'session_didUpdateFrame_: {e}')
-      return 
+      return
+
     ciImage = CIImage.alloc().initWithCVPixelBuffer_(pixelBuffer)
     viewPort = self.imageView.bounds
+
     # --- func screenTransformed(ciImage: CIImage, orientation: UIInterfaceOrientation, viewPort: CGRect)
 
     viewPortSize = viewPort.size
