@@ -118,27 +118,16 @@ class DepthMapViewController(UIViewController):
     ])
 
     imageView.translatesAutoresizingMaskIntoConstraints = False
-    '''
-    NSLayoutConstraint.activateConstraints_([
-      imageView.leadingAnchor.constraintEqualToAnchor_constant_(
-        self.view.leadingAnchor, 50.0),
-      imageView.trailingAnchor.constraintEqualToAnchor_constant_(
-        self.view.trailingAnchor, -50.0),
-      imageView.heightAnchor.constraintEqualToConstant_(700.0),  # 定数
-      imageView.centerYAnchor.constraintEqualToAnchor_(
-        self.view.centerYAnchor),
-    ])
-    '''
 
     NSLayoutConstraint.activateConstraints_([
-      imageView.centerXAnchor.constraintEqualToAnchor_(
-        self.view.centerXAnchor),
-      imageView.centerYAnchor.constraintEqualToAnchor_(
-        self.view.centerYAnchor),
-      imageView.widthAnchor.constraintEqualToAnchor_multiplier_(
-        self.view.widthAnchor, 0.4),
-      imageView.heightAnchor.constraintEqualToAnchor_multiplier_(
-        self.view.heightAnchor, 0.4),
+      imageView.leadingAnchor.constraintEqualToAnchor_constant_(
+        safeAreaLayoutGuide.leadingAnchor, 48.0),
+      imageView.trailingAnchor.constraintEqualToAnchor_constant_(
+        safeAreaLayoutGuide.trailingAnchor, -48.0),
+      imageView.topAnchor.constraintEqualToAnchor_constant_(
+        safeAreaLayoutGuide.topAnchor, 48.0),
+      imageView.bottomAnchor.constraintEqualToAnchor_constant_(
+        safeAreaLayoutGuide.bottomAnchor, -48.0),
     ])
 
     self.arscnView = arscnView
@@ -229,7 +218,7 @@ class DepthMapViewController(UIViewController):
       # xxx: `pixelBuffer = session.currentFrame.sceneDepth.depthMap`
       pixelBuffer = frame.sceneDepth.depthMap
     except Exception as e:
-      print(f'session_didUpdateFrame_: {e}')
+      #print(f'session_didUpdateFrame_: {e}')
       return
 
     ciImage = CIImage.alloc().initWithCVPixelBuffer_(pixelBuffer)
