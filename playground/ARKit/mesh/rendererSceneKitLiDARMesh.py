@@ -138,6 +138,7 @@ class MainViewController(UIViewController):
       CGRectZero, {
         SCNPreferredRenderingAPIKey: SCNRenderingAPI.metal,
       })
+    #scnView.scene.background.contents = UIColor.blackColor
 
     # MARK: - ARSCNViewDelegate
     scnView.setDelegate_(self)
