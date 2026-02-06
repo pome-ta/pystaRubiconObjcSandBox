@@ -1,3 +1,16 @@
 # Beginning Metal
 
 [Beginning Metal | Kodeco](https://www.kodeco.com/3537-beginning-metal)
+
+
+## 02. Getting Started
+
+[Beginning Metal, Episode 2: Getting Started | Kodeco](https://www.kodeco.com/3537-beginning-metal/lessons/2)
+
+
+
+## 過去事例
+
+[beginningMetal at main · pome-ta/pystaMetalStudy · GitHub](https://github.com/pome-ta/pystaMetalStudy/tree/main/src/beginningMetal) は、`objc_util`
+
+rubicon で実装。再学習。
