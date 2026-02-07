@@ -38,12 +38,9 @@ from pyrubicon.objc.api import objc_const, ObjCInstance
 from objc_frameworks.CoreGraphics import CGRectZero
 
 Metal = load_library('Metal')
-#MetalKit = load_library('MetalKit')
+
 
 MTKView = ObjCClass('MTKView')
-MTLRenderPassColorAttachmentDescriptor = ObjCClass('MTLRenderPassColorAttachmentDescriptor')
-
-#pdbr.state(MTLRenderPassColorAttachmentDescriptor)
 
 
 def MTLCreateSystemDefaultDevice() -> ObjCInstance:
