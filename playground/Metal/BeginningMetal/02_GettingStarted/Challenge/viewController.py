@@ -33,11 +33,10 @@ UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 # --- Metal
-from pyrubicon.objc.api import ObjCProtocol
-from pyrubicon.objc.types import CGSize
-
 from objc_frameworks.CoreGraphics import CGRectZero
 from objc_frameworks.Metal import MTLCreateSystemDefaultDevice, MTLClearColorMake
+
+from renderer import Renderer
 
 MTKView = ObjCClass('MTKView')
 
@@ -49,7 +48,7 @@ class Colors:
 class MainViewController(UIViewController):
 
   metalView: MTKView = objc_property()
-  commandQueue: ObjCProtocol = objc_property()
+  renderer: Renderer = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -71,8 +70,9 @@ class MainViewController(UIViewController):
     metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
     metalView.clearColor = Colors.wenderlichGreen
 
-    metalView.delegate = self
-    commandQueue = device.newCommandQueue()
+    renderer = Renderer.alloc().initWithDevice_(device)
+
+    metalView.delegate = renderer
 
     metalView.enableSetNeedsDisplay = True
     metalView.setNeedsDisplay()
@@ -95,7 +95,7 @@ class MainViewController(UIViewController):
     ])
 
     self.metalView = metalView
-    self.commandQueue = commandQueue
+    self.renderer = renderer
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -141,24 +141,6 @@ class MainViewController(UIViewController):
   def didReceiveMemoryWarning(self):
     send_super(__class__, self, 'didReceiveMemoryWarning')
     print(f'	{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
-
-  # --- MTKViewDelegate
-  @objc_method
-  def mtkView_drawableSizeWillChange_(self, view, size: CGSize):
-    pass
-
-  @objc_method
-  def drawInMTKView_(self, view):
-    if not ((drawable := view.currentDrawable) and
-            (descriptor := view.currentRenderPassDescriptor)):
-      return
-
-    commandBuffer = self.commandQueue.commandBuffer()
-    commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
-      descriptor)
-    commandEncoder.endEncoding()
-    commandBuffer.presentDrawable_(drawable)
-    commandBuffer.commit()
 
 
 if __name__ == '__main__':
