@@ -32,13 +32,14 @@ from rbedge import pdbr
 UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
+from enum import Enum
+
 from pyrubicon.objc.runtime import load_library
 from pyrubicon.objc.api import objc_const, ObjCInstance
 
 from objc_frameworks.CoreGraphics import CGRectZero
 
 Metal = load_library('Metal')
-
 
 MTKView = ObjCClass('MTKView')
 
@@ -49,23 +50,37 @@ def MTLCreateSystemDefaultDevice() -> ObjCInstance:
   return ObjCInstance(_function())
 
 
-'''
+from pyrubicon.objc.types import __LP64__, with_preferred_encoding
+
+_MTLClearColorEncoding = b'{MTLClearColor=dddd}'
+
+
+@with_preferred_encoding(_MTLClearColorEncoding)
+class MTLClearColor(ctypes.Structure):
+
+  _fields_ = [
+    ('red', ctypes.c_double),
+    ('green', ctypes.c_double),
+    ('blue', ctypes.c_double),
+    ('alpha', ctypes.c_double),
+  ]
+
+  def __repr__(self):
+    return f'<MTLClearColor({self.red}, {self.green}, {self.blue}, {self.alpha})>'
+
+  def __str__(self):
+    return f'red={self.red}, green={self.green}, blue={self.blue}, alpha={self.alpha}'
+
 
 def MTLClearColorMake(red: ctypes.c_double, green: ctypes.c_double,
-                      blue: ctypes.c_double, alpha: ctypes.c_double):
-  _function = MetalKit.MTLClearColorMake
-  _function.restype = ctypes.c_void_p
-  _function.argtypes = [
-    ctypes.c_double,
-    ctypes.c_double,
-    ctypes.c_double,
-    ctypes.c_double,
-  ]
-  return ObjCInstance(_function(red,green,blue,alpha))
+                      blue: ctypes.c_double,
+                      alpha: ctypes.c_double) -> MTLClearColor:
+  return MTLClearColor(red, green, blue, alpha)
 
 
-print(MTLClearColorMake(1,1,1,1))
-'''
+class Colors(Enum):
+  wenderlichGreen = MTLClearColorMake(0.0, 0.4, 0.21, 1.0)
+
 
 class MainViewController(UIViewController):
 
@@ -89,9 +104,8 @@ class MainViewController(UIViewController):
     device = MTLCreateSystemDefaultDevice()
     metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
     
-    #pdbr.state(metalView.clearColor)
-    print(metalView.clearColor)
-    print(dir(metalView.clearColor))
+    #metalView.clearColor = Colors.wenderlichGreen
+    metalView.clearColor = (0.0, 0.4, 0.21, 1.0)
 
     self.view.addSubview_(metalView)
 
