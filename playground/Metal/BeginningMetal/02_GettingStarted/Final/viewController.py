@@ -35,13 +35,14 @@ NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 from enum import Enum
 
 from pyrubicon.objc.runtime import load_library
-from pyrubicon.objc.api import objc_const, ObjCInstance, NSObject
+from pyrubicon.objc.api import objc_const, ObjCInstance, ObjCProtocol, NSObject
 
 from objc_frameworks.CoreGraphics import CGRectZero
 
 Metal = load_library('Metal')
 
 MTKView = ObjCClass('MTKView')
+#MTKViewDelegate = ObjCProtocol('MTKViewDelegate')
 
 
 def MTLCreateSystemDefaultDevice() -> ObjCInstance:
@@ -84,9 +85,12 @@ class Colors(Enum):
   wenderlichGreen = MTLClearColorMake(0.0, 0.4, 0.21, 1.0)
 '''
 
-
+'''
+class MainViewController(UIViewController, protocols=[
+    MTKViewDelegate,
+]):
+'''
 class MainViewController(UIViewController):
-
   metalView: MTKView = objc_property()
   commandQueue: NSObject = objc_property()
 
@@ -188,17 +192,14 @@ class MainViewController(UIViewController):
 
   # --- MTKViewDelegate
   @objc_method
+  def mtkView_drawableSizeWillChange_(self, view, size):
+    pass
+
+  @objc_method
   def drawInMTKView_(self, view):
     print('y')
-    #pass
-    drawable = view.currentDrawable()
-    rpd = view.currentRenderPassDescriptor()
-    commandBuffer = self.commandQueue.commandBuffer()
-    commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(rpd)
+    pass
 
-    commandEncoder.endEncoding()
-    commandBuffer.presentDrawable_(drawable)
-    commandBuffer.commit()
 
 if __name__ == '__main__':
   from rbedge.app import App
