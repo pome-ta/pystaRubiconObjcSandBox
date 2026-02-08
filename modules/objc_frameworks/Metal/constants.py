@@ -1,9 +1,9 @@
 from pyrubicon.objc.api import objc_const, ObjCInstance
 from pyrubicon.objc.runtime import load_library
 
-UIKit = load_library('UIKit')
+Metal = load_library('Metal')
 
 
 def _get_const(global_variable_name) -> ObjCInstance:
-  return objc_const(UIKit, global_variable_name)
+  return objc_const(Metal, global_variable_name)
 
