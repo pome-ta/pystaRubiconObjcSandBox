@@ -32,68 +32,18 @@ from rbedge import pdbr
 UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
-from enum import Enum
-
-from pyrubicon.objc.runtime import load_library
-from pyrubicon.objc.api import objc_const, ObjCInstance, ObjCProtocol, NSObject
-
+# --- Metal
+from pyrubicon.objc.api import ObjCProtocol
 from pyrubicon.objc.types import CGSize
 
 from objc_frameworks.CoreGraphics import CGRectZero
-
-Metal = load_library('Metal')
+from objc_frameworks.Metal import MTLCreateSystemDefaultDevice, MTLClearColorMake
 
 MTKView = ObjCClass('MTKView')
-#MTKViewDelegate = ObjCProtocol('MTKViewDelegate')
 
 
-def MTLCreateSystemDefaultDevice() -> ObjCInstance:
-  _function = Metal.MTLCreateSystemDefaultDevice
-  _function.restype = ctypes.c_void_p
-  return ObjCInstance(_function())
-
-
-from pyrubicon.objc.types import __LP64__, with_preferred_encoding
-
-_MTLClearColorEncoding = b'{MTLClearColor=dddd}'
-
-@with_preferred_encoding(_MTLClearColorEncoding)
-class MTLClearColor(ctypes.Structure):
-
-  _fields_ = [
-    ('red', ctypes.c_double),
-    ('green', ctypes.c_double),
-    ('blue', ctypes.c_double),
-    ('alpha', ctypes.c_double),
-  ]
-
-  def __repr__(self):
-    return f'<MTLClearColor({self.red}, {self.green}, {self.blue}, {self.alpha})>'
-
-  def __str__(self):
-    return f'red={self.red}, green={self.green}, blue={self.blue}, alpha={self.alpha}'
-
-
-def MTLClearColorMake(red: ctypes.c_double, green: ctypes.c_double,
-                      blue: ctypes.c_double,
-                      alpha: ctypes.c_double) -> MTLClearColor:
-  return MTLClearColor(red, green, blue, alpha)
-
-
-#cc = (MTLClearColorMake(0.0, 0.4, 0.21, 1.0))
-
-
-class Colors(Enum):
+class Colors:
   wenderlichGreen = MTLClearColorMake(0.0, 0.4, 0.21, 1.0)
-
-
-
-
-'''
-class MainViewController(UIViewController, protocols=[
-    MTKViewDelegate,
-]):
-'''
 
 
 class MainViewController(UIViewController):
@@ -117,22 +67,15 @@ class MainViewController(UIViewController):
     self.navigationItem.title = NSStringFromClass(__class__)
 
     device = MTLCreateSystemDefaultDevice()
-    metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
 
-    #metalView.clearColor = Colors.wenderlichGreen
-    #metalView.clearColor = (0.0, 0.4, 0.21, 1.0)
-    #print(metalView.clearColor)
-    #print(Colors.wenderlichGreen)
-    metalView.clearColor = MTLClearColorMake(0.0, 0.4, 0.21, 1.0)
-    #metalView.setClearColor_((0.0, 0.4, 0.21, 1.0))
-    #pdbr.state(metalView)
-    #print(metalView.clearColor)
+    metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
+    metalView.clearColor = Colors.wenderlichGreen
 
     metalView.delegate = self
     commandQueue = device.newCommandQueue()
+
     metalView.enableSetNeedsDisplay = True
     metalView.setNeedsDisplay()
-    #pdbr.state(metalView)
 
     self.view.addSubview_(metalView)
 
@@ -211,7 +154,8 @@ class MainViewController(UIViewController):
       return
 
     commandBuffer = self.commandQueue.commandBuffer()
-    commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(descriptor)
+    commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
+      descriptor)
     commandEncoder.endEncoding()
     commandBuffer.presentDrawable_(drawable)
     commandBuffer.commit()
