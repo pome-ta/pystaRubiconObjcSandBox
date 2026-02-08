@@ -34,7 +34,7 @@ NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 from enum import Enum
 
-from pyrubicon.objc.runtime import load_library
+from pyrubicon.objc.runtime import load_library, NSObject
 from pyrubicon.objc.api import objc_const, ObjCInstance
 
 from objc_frameworks.CoreGraphics import CGRectZero
@@ -53,8 +53,7 @@ def MTLCreateSystemDefaultDevice() -> ObjCInstance:
 from pyrubicon.objc.types import __LP64__, with_preferred_encoding
 
 _MTLClearColorEncoding = b'{MTLClearColor=dddd}'
-
-
+'''
 @with_preferred_encoding(_MTLClearColorEncoding)
 class MTLClearColor(ctypes.Structure):
 
@@ -78,13 +77,18 @@ def MTLClearColorMake(red: ctypes.c_double, green: ctypes.c_double,
   return MTLClearColor(red, green, blue, alpha)
 
 
+cc = (MTLClearColorMake(0.0, 0.4, 0.21, 1.0))
+
+
 class Colors(Enum):
   wenderlichGreen = MTLClearColorMake(0.0, 0.4, 0.21, 1.0)
+'''
 
 
 class MainViewController(UIViewController):
 
   metalView: MTKView = objc_property()
+  commandQueue: NSObject = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -103,9 +107,19 @@ class MainViewController(UIViewController):
 
     device = MTLCreateSystemDefaultDevice()
     metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
-    
+
     #metalView.clearColor = Colors.wenderlichGreen
-    metalView.clearColor = (0.0, 0.4, 0.21, 1.0)
+    #metalView.clearColor = (0.0, 0.4, 0.21, 1.0)
+    #print(metalView.clearColor)
+    #print(Colors.wenderlichGreen)
+    #metalView.clearColor = MTLClearColorMake(0.0, 0.4, 0.21, 1.0)
+    #metalView.setClearColor_((0.0, 0.4, 0.21, 1.0))
+    #pdbr.state(metalView)
+    #print(metalView.clearColor)
+
+    #metalView.delegate = self
+    commandQueue = device.newCommandQueue()
+    pdbr.state(commandQueue)
 
     self.view.addSubview_(metalView)
 
@@ -170,6 +184,12 @@ class MainViewController(UIViewController):
   def didReceiveMemoryWarning(self):
     send_super(__class__, self, 'didReceiveMemoryWarning')
     print(f'	{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
+
+  # --- MTKViewDelegate
+  @objc_method
+  def drawInMTKView_(self, view: ctypes.c_void_p):
+    print('y')
+    pass
 
 
 if __name__ == '__main__':
