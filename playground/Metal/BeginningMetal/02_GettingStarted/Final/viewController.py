@@ -37,6 +37,8 @@ from enum import Enum
 from pyrubicon.objc.runtime import load_library
 from pyrubicon.objc.api import objc_const, ObjCInstance, ObjCProtocol, NSObject
 
+from pyrubicon.objc.types import CGSize
+
 from objc_frameworks.CoreGraphics import CGRectZero
 
 Metal = load_library('Metal')
@@ -54,7 +56,7 @@ def MTLCreateSystemDefaultDevice() -> ObjCInstance:
 from pyrubicon.objc.types import __LP64__, with_preferred_encoding
 
 _MTLClearColorEncoding = b'{MTLClearColor=dddd}'
-'''
+
 @with_preferred_encoding(_MTLClearColorEncoding)
 class MTLClearColor(ctypes.Structure):
 
@@ -78,21 +80,26 @@ def MTLClearColorMake(red: ctypes.c_double, green: ctypes.c_double,
   return MTLClearColor(red, green, blue, alpha)
 
 
-cc = (MTLClearColorMake(0.0, 0.4, 0.21, 1.0))
+#cc = (MTLClearColorMake(0.0, 0.4, 0.21, 1.0))
 
 
 class Colors(Enum):
   wenderlichGreen = MTLClearColorMake(0.0, 0.4, 0.21, 1.0)
-'''
+
+
+
 
 '''
 class MainViewController(UIViewController, protocols=[
     MTKViewDelegate,
 ]):
 '''
+
+
 class MainViewController(UIViewController):
+
   metalView: MTKView = objc_property()
-  commandQueue: NSObject = objc_property()
+  commandQueue: ObjCProtocol = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -116,14 +123,16 @@ class MainViewController(UIViewController):
     #metalView.clearColor = (0.0, 0.4, 0.21, 1.0)
     #print(metalView.clearColor)
     #print(Colors.wenderlichGreen)
-    #metalView.clearColor = MTLClearColorMake(0.0, 0.4, 0.21, 1.0)
+    metalView.clearColor = MTLClearColorMake(0.0, 0.4, 0.21, 1.0)
     #metalView.setClearColor_((0.0, 0.4, 0.21, 1.0))
     #pdbr.state(metalView)
     #print(metalView.clearColor)
 
     metalView.delegate = self
     commandQueue = device.newCommandQueue()
-    #pdbr.state(commandQueue)
+    metalView.enableSetNeedsDisplay = True
+    metalView.setNeedsDisplay()
+    #pdbr.state(metalView)
 
     self.view.addSubview_(metalView)
 
@@ -192,13 +201,20 @@ class MainViewController(UIViewController):
 
   # --- MTKViewDelegate
   @objc_method
-  def mtkView_drawableSizeWillChange_(self, view, size):
+  def mtkView_drawableSizeWillChange_(self, view, size: CGSize):
     pass
 
   @objc_method
   def drawInMTKView_(self, view):
-    print('y')
-    pass
+    if not ((drawable := view.currentDrawable) and
+            (descriptor := view.currentRenderPassDescriptor)):
+      return
+
+    commandBuffer = self.commandQueue.commandBuffer()
+    commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(descriptor)
+    commandEncoder.endEncoding()
+    commandBuffer.presentDrawable_(drawable)
+    commandBuffer.commit()
 
 
 if __name__ == '__main__':
