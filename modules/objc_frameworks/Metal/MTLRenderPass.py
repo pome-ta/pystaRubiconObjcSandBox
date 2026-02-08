@@ -1,6 +1,6 @@
 import ctypes
 '''
-from pyrubicon.objc.types import with_preferred_encoding
+from pyrubicon.objc.types import with_encoding,with_preferred_encoding
 
 _MTLClearColorEncoding = b'{MTLClearColor=dddd}'
 
