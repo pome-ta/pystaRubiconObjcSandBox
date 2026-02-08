@@ -34,8 +34,8 @@ NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 from enum import Enum
 
-from pyrubicon.objc.runtime import load_library, NSObject
-from pyrubicon.objc.api import objc_const, ObjCInstance
+from pyrubicon.objc.runtime import load_library
+from pyrubicon.objc.api import objc_const, ObjCInstance, NSObject
 
 from objc_frameworks.CoreGraphics import CGRectZero
 
@@ -117,9 +117,9 @@ class MainViewController(UIViewController):
     #pdbr.state(metalView)
     #print(metalView.clearColor)
 
-    #metalView.delegate = self
+    metalView.delegate = self
     commandQueue = device.newCommandQueue()
-    pdbr.state(commandQueue)
+    #pdbr.state(commandQueue)
 
     self.view.addSubview_(metalView)
 
@@ -139,6 +139,7 @@ class MainViewController(UIViewController):
     ])
 
     self.metalView = metalView
+    self.commandQueue = commandQueue
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -187,10 +188,17 @@ class MainViewController(UIViewController):
 
   # --- MTKViewDelegate
   @objc_method
-  def drawInMTKView_(self, view: ctypes.c_void_p):
+  def drawInMTKView_(self, view):
     print('y')
-    pass
+    #pass
+    drawable = view.currentDrawable()
+    rpd = view.currentRenderPassDescriptor()
+    commandBuffer = self.commandQueue.commandBuffer()
+    commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(rpd)
 
+    commandEncoder.endEncoding()
+    commandBuffer.presentDrawable_(drawable)
+    commandBuffer.commit()
 
 if __name__ == '__main__':
   from rbedge.app import App
