@@ -42,6 +42,7 @@ class Renderer(NSObject):
     -1.0, -1.0,  0.0,  # 2
      1.0, -1.0,  0.0,  # 3
   )  # yapf: disable
+  vertexBuffer: 'MTLBuffer' = objc_property()
 
   @objc_method
   def initWithDevice_(self, device):
@@ -50,6 +51,11 @@ class Renderer(NSObject):
     self.commandQueue = device.newCommandQueue()
 
     return self
+
+  # --- private
+  @objc_method
+  def buildModel(self):
+    pass
 
   # --- MTKViewDelegate
   @objc_method
