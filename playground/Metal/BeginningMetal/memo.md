@@ -3,6 +3,10 @@
 [Beginning Metal | Kodeco](https://www.kodeco.com/3537-beginning-metal)
 
 
+## 03. Triangles
+
+[Beginning Metal, Episode 3: Triangles | Kodeco](https://www.kodeco.com/3537-beginning-metal/lessons/3)
+
 ## 02. Getting Started
 
 [Beginning Metal, Episode 2: Getting Started | Kodeco](https://www.kodeco.com/3537-beginning-metal/lessons/2)
