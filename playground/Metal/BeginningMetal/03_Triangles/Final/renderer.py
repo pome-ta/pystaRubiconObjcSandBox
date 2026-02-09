@@ -27,6 +27,8 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGSize
 
+from objc_frameworks.Metal import MTLResourceOptions
+
 err_ptr = ctypes.c_void_p()
 
 shader_path = Path('./Shader.metal')
@@ -49,12 +51,21 @@ class Renderer(NSObject):
     send_super(__class__, self, 'init')
     self.device = device
     self.commandQueue = device.newCommandQueue()
+    self.buildModel()
 
     return self
 
   # --- private
   @objc_method
   def buildModel(self):
+    '''
+    vertexBuffer = self.device.newBufferWithBytes_length_options_(
+      self.vertices, ctypes.sizeof(self.vertices),
+      MTLResourceOptions.storageModeShared)
+    
+    self.vertexBuffer = vertexBuffer
+    '''
+    print(MTLResourceOptions.storageModeShared)
     pass
 
   # --- MTKViewDelegate
