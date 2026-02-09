@@ -48,8 +48,8 @@ class Colors:
 
 class MainViewController(UIViewController):
 
-  metalView: MTKView = objc_property()
-  commandQueue: ObjCProtocol = objc_property()
+  metalView: MTKView
+  commandQueue: 'MTLCommandQueue'
 
   @objc_method
   def dealloc(self):
