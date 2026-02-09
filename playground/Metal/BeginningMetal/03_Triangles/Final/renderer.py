@@ -39,11 +39,7 @@ class Renderer(NSObject):
 
   device: 'MTLDevice' = objc_property()
   commandQueue: 'MTLCommandQueue' = objc_property()
-  vertices: '[Float]' = (ctypes.c_float * 9)(
-     0.0,  1.0,  0.0,  # 1
-    -1.0, -1.0,  0.0,  # 2
-     1.0, -1.0,  0.0,  # 3
-  )  # yapf: disable
+  vertices: '[Float]'
   vertexBuffer: 'MTLBuffer' = objc_property()
 
   @objc_method
@@ -51,6 +47,11 @@ class Renderer(NSObject):
     send_super(__class__, self, 'init')
     self.device = device
     self.commandQueue = device.newCommandQueue()
+    self.vertices = (ctypes.c_float * 9)(
+       0.0,  1.0,  0.0,  # 1
+      -1.0, -1.0,  0.0,  # 2
+       1.0, -1.0,  0.0,  # 3
+    )  # yapf: disable
     self.buildModel()
 
     return self
@@ -58,15 +59,14 @@ class Renderer(NSObject):
   # --- private
   @objc_method
   def buildModel(self):
-    '''
+    
     vertexBuffer = self.device.newBufferWithBytes_length_options_(
       self.vertices, ctypes.sizeof(self.vertices),
       MTLResourceOptions.storageModeShared)
     
     self.vertexBuffer = vertexBuffer
-    '''
-    print(MTLResourceOptions.storageModeShared)
-    pass
+    print(vertexBuffer)
+    
 
   # --- MTKViewDelegate
   @objc_method
