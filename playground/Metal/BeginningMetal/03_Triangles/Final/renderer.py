@@ -27,16 +27,14 @@ from pyrubicon.objc.api import objc_method
 from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGSize
 
-from objc_frameworks.Metal import MTLResourceOptions, MTLPixelFormat
+from rbedge import pdbr
 
+from objc_frameworks.Metal import MTLResourceOptions, MTLPixelFormat
 
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
 MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 
-
-
 shader_path = Path('./Shader.metal')
-
 
 
 class Renderer(NSObject):
@@ -44,7 +42,8 @@ class Renderer(NSObject):
   device: 'MTLDevice'
   commandQueue: 'MTLCommandQueue'
   vertices: '[Float]'
-  vertexBuffer: 'MTLBuffer'
+  pipelineState: 'MTLRenderPipelineState?'
+  vertexBuffer: 'MTLBuffer?'
 
   @objc_method
   def initWithDevice_(self, device):
@@ -57,6 +56,7 @@ class Renderer(NSObject):
        1.0, -1.0,  0.0,  # 3
     )  # yapf: disable
     self.buildModel()
+    self.buildPipelineState()
 
     return self
 
@@ -69,20 +69,24 @@ class Renderer(NSObject):
       MTLResourceOptions.storageModeShared)
 
     self.vertexBuffer = vertexBuffer
-    print(vertexBuffer)
 
   @objc_method
   def buildPipelineState(self):
     source = shader_path.read_text('utf-8')
     options = MTLCompileOptions.new()
-    self.device.newLibraryWithSource_options_error_(source, options, None)
-    
+
+    library = self.device.newLibraryWithSource_options_error_(
+      source, options, None)
+
     vertexFunction = library.newFunctionWithName_('vertex_shader')
     fragmentFunction = library.newFunctionWithName_('fragment_shader')
 
-    
-    
-  
+    pipelineDescriptor = MTLRenderPipelineDescriptor.new()
+    pipelineDescriptor.vertexFunction = vertexFunction
+    pipelineDescriptor.fragmentFunction = fragmentFunction
+    pdbr.state(pipelineDescriptor)
+    #print(pipelineDescriptor)
+
   # --- MTKViewDelegate
   @objc_method
   def mtkView_drawableSizeWillChange_(self, view, size: CGSize):
@@ -100,4 +104,10 @@ class Renderer(NSObject):
     commandEncoder.endEncoding()
     commandBuffer.presentDrawable_(drawable)
     commandBuffer.commit()
+
+
+if __name__ == '__main__':
+  from objc_frameworks.Metal import MTLCreateSystemDefaultDevice
+
+  renderer = Renderer.alloc().initWithDevice_(MTLCreateSystemDefaultDevice())
 
