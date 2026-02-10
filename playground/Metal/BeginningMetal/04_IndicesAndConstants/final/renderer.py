@@ -65,7 +65,7 @@ class Renderer(NSObject):
     send_super(__class__, self, 'init')
     self.device = device
     self.commandQueue = device.newCommandQueue()
-    self.vertices = (ctypes.c_float * (6 * 3))(
+    self.vertices = (ctypes.c_float * (3 * 6))(
       # todo: 本当は`1.0` だが、`0.8` として反映確認
       -0.8,  0.8,  0.0,  # v0
       -0.8, -0.8,  0.0,  # v1

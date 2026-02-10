@@ -50,7 +50,7 @@ class Renderer(NSObject):
     send_super(__class__, self, 'init')
     self.device = device
     self.commandQueue = device.newCommandQueue()
-    self.vertices = (ctypes.c_float * 9)(
+    self.vertices = (ctypes.c_float * (3 * 3))(
        0.0,  1.0,  0.0,  # 1
       -1.0, -1.0,  0.0,  # 2
        1.0, -1.0,  0.0,  # 3
