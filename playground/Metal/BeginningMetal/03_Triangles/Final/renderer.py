@@ -29,7 +29,7 @@ from pyrubicon.objc.types import CGSize
 
 from rbedge import pdbr
 
-from objc_frameworks.Metal import MTLResourceOptions, MTLPixelFormat
+from objc_frameworks.Metal import MTLResourceOptions, MTLPixelFormat, MTLPrimitiveType
 
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
 MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
@@ -84,8 +84,17 @@ class Renderer(NSObject):
     pipelineDescriptor = MTLRenderPipelineDescriptor.new()
     pipelineDescriptor.vertexFunction = vertexFunction
     pipelineDescriptor.fragmentFunction = fragmentFunction
-    pdbr.state(pipelineDescriptor)
-    #print(pipelineDescriptor)
+    pipelineDescriptor.colorAttachments.objectAtIndexedSubscript_(
+      0).pixelFormat = MTLPixelFormat.bgra8Unorm
+
+    pipelineState = None
+    try:
+      pipelineState = self.device.newRenderPipelineStateWithDescriptor_error_(
+        pipelineDescriptor, None)
+    except Exception as e:
+      print(f'pipelineState error: {e}')
+
+    self.pipelineState = pipelineState
 
   # --- MTKViewDelegate
   @objc_method
@@ -95,12 +104,19 @@ class Renderer(NSObject):
   @objc_method
   def drawInMTKView_(self, view):
     if not ((drawable := view.currentDrawable) and
+            (pipelineState := self.pipelineState) and
             (descriptor := view.currentRenderPassDescriptor)):
       return
 
     commandBuffer = self.commandQueue.commandBuffer()
+
     commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
       descriptor)
+    commandEncoder.setRenderPipelineState_(pipelineState)
+    commandEncoder.setVertexBuffer_offset_atIndex_(self.vertexBuffer, 0, 0)
+    commandEncoder.drawPrimitives_vertexStart_vertexCount_(
+      MTLPrimitiveType.triangle, 0, self.vertices.__len__())
+
     commandEncoder.endEncoding()
     commandBuffer.presentDrawable_(drawable)
     commandBuffer.commit()
