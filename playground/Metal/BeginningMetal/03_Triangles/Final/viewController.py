@@ -22,7 +22,7 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
 import ctypes
 
 from pyrubicon.objc.api import ObjCClass
-from pyrubicon.objc.api import objc_method, objc_property
+from pyrubicon.objc.api import objc_method
 from pyrubicon.objc.runtime import send_super
 
 from objc_frameworks.Foundation import NSStringFromClass
@@ -47,8 +47,8 @@ class Colors:
 
 class MainViewController(UIViewController):
 
-  metalView: MTKView = objc_property()
-  renderer: Renderer = objc_property()
+  metalView: MTKView
+  renderer: Renderer
 
   @objc_method
   def dealloc(self):

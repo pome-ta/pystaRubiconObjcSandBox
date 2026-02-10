@@ -22,25 +22,29 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
 import ctypes
 from pathlib import Path
 
-from pyrubicon.objc.api import NSObject
-from pyrubicon.objc.api import objc_method, objc_property
+from pyrubicon.objc.api import ObjCClass, NSObject
+from pyrubicon.objc.api import objc_method
 from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGSize
 
-from objc_frameworks.Metal import MTLResourceOptions
+from objc_frameworks.Metal import MTLResourceOptions, MTLPixelFormat
 
-err_ptr = ctypes.c_void_p()
+
+MTLCompileOptions = ObjCClass('MTLCompileOptions')
+MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
+
+
 
 shader_path = Path('./Shader.metal')
-#source = shader_path.read_text('utf-8')
+
 
 
 class Renderer(NSObject):
 
-  device: 'MTLDevice' = objc_property()
-  commandQueue: 'MTLCommandQueue' = objc_property()
+  device: 'MTLDevice'
+  commandQueue: 'MTLCommandQueue'
   vertices: '[Float]'
-  vertexBuffer: 'MTLBuffer' = objc_property()
+  vertexBuffer: 'MTLBuffer'
 
   @objc_method
   def initWithDevice_(self, device):
@@ -59,15 +63,26 @@ class Renderer(NSObject):
   # --- private
   @objc_method
   def buildModel(self):
-    
+
     vertexBuffer = self.device.newBufferWithBytes_length_options_(
       self.vertices, ctypes.sizeof(self.vertices),
       MTLResourceOptions.storageModeShared)
-    
+
     self.vertexBuffer = vertexBuffer
     print(vertexBuffer)
-    
 
+  @objc_method
+  def buildPipelineState(self):
+    source = shader_path.read_text('utf-8')
+    options = MTLCompileOptions.new()
+    self.device.newLibraryWithSource_options_error_(source, options, None)
+    
+    vertexFunction = library.newFunctionWithName_('vertex_shader')
+    fragmentFunction = library.newFunctionWithName_('fragment_shader')
+
+    
+    
+  
   # --- MTKViewDelegate
   @objc_method
   def mtkView_drawableSizeWillChange_(self, view, size: CGSize):
