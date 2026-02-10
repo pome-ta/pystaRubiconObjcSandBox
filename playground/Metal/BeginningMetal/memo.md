@@ -3,6 +3,11 @@
 [Beginning Metal | Kodeco](https://www.kodeco.com/3537-beginning-metal)
 
 
+## 04. Indices and Constants
+
+[Beginning Metal, Episode 4: Indices and Constants | Kodeco](https://www.kodeco.com/3537-beginning-metal/lessons/4)
+
+
 ## 03. Triangles
 
 [Beginning Metal, Episode 3: Triangles | Kodeco](https://www.kodeco.com/3537-beginning-metal/lessons/3)
