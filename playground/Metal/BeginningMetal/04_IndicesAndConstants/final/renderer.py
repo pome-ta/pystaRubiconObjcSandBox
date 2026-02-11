@@ -21,6 +21,7 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
 
 import ctypes
 from pathlib import Path
+from math import sin
 
 from pyrubicon.objc.api import ObjCClass, NSObject
 from pyrubicon.objc.api import objc_method
@@ -29,27 +30,23 @@ from pyrubicon.objc.types import CGSize
 
 from rbedge import pdbr
 
-from objc_frameworks.Metal import MTLResourceOptions, MTLPixelFormat, MTLPrimitiveType
+from objc_frameworks.Metal import (
+  MTLResourceOptions,
+  MTLPixelFormat,
+  MTLPrimitiveType,
+  MTLIndexType,
+)
 
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
 MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 
 shader_path = Path('./Shader.metal')
-'''
-   v0                v3
-(-1, 1)--( 0, 1)--( 1, 1)
-   |  \               |
-   |    \             |
-   |      \           |
-   |        \         |
-(-1, 0)  ( 0, 0)  ( 1, 0)
-   |          \       |
-   |            \     |
-   |              \   |
-   |                \ |
-(-1,-1)--( 0,-1)--( 1,-1)
-   v1                v2
-'''
+
+
+class Constants(ctypes.Structure):
+  _fields_ = [
+    ('animateBy', ctypes.c_float),
+  ]
 
 
 class Renderer(NSObject):
@@ -57,23 +54,31 @@ class Renderer(NSObject):
   device: 'MTLDevice'
   commandQueue: 'MTLCommandQueue'
   vertices: '[Float]'
+  indices: '[UInt16]'
   pipelineState: 'MTLRenderPipelineState?'
   vertexBuffer: 'MTLBuffer?'
+  indexBuffer: 'MTLBuffer?'
+  constants: Constants
+  time: float
 
   @objc_method
   def initWithDevice_(self, device):
     send_super(__class__, self, 'init')
     self.device = device
     self.commandQueue = device.newCommandQueue()
-    self.vertices = (ctypes.c_float * (3 * 6))(
-      # todo: 本当は`1.0` だが、`0.8` として反映確認
-      -0.8,  0.8,  0.0,  # v0
-      -0.8, -0.8,  0.0,  # v1
-       0.8, -0.8,  0.0,  # v2
-       0.8, -0.8,  0.0,  # v2
-       0.8,  0.8,  0.0,  # v3
-      -0.8,  0.8,  0.0,  # v0
+    self.vertices = (ctypes.c_float * (4 * 3))(
+      -1.0,  1.0,  0.0,  # v0
+      -1.0, -1.0,  0.0,  # v1
+       1.0, -1.0,  0.0,  # v2
+       1.0,  1.0,  0.0,  # v3
     )  # yapf: disable
+    self.indices = (ctypes.c_int16 * (2 * 3))(
+      0, 1, 2,
+      2, 3, 0,
+    )  # yapf: disable
+    self.constants = Constants()
+    self.time = 0.0
+
     self.buildModel()
     self.buildPipelineState()
 
@@ -82,12 +87,15 @@ class Renderer(NSObject):
   # --- private
   @objc_method
   def buildModel(self):
-
     vertexBuffer = self.device.newBufferWithBytes_length_options_(
       self.vertices, ctypes.sizeof(self.vertices),
       MTLResourceOptions.storageModeShared)
+    indexBuffer = self.device.newBufferWithBytes_length_options_(
+      self.indices, ctypes.sizeof(self.indices),
+      MTLResourceOptions.storageModeShared)
 
     self.vertexBuffer = vertexBuffer
+    self.indexBuffer = indexBuffer
 
   @objc_method
   def buildPipelineState(self):
@@ -124,8 +132,13 @@ class Renderer(NSObject):
   def drawInMTKView_(self, view):
     if not ((drawable := view.currentDrawable) and
             (pipelineState := self.pipelineState) and
+            (indexBuffer := self.indexBuffer) and
             (descriptor := view.currentRenderPassDescriptor)):
       return
+
+    self.time += 1 / view.preferredFramesPerSecond
+    animateBy = abs(sin(self.time) / 2 + 0.5)
+    self.constants.animateBy = animateBy
 
     commandBuffer = self.commandQueue.commandBuffer()
 
@@ -133,8 +146,12 @@ class Renderer(NSObject):
       descriptor)
     commandEncoder.setRenderPipelineState_(pipelineState)
     commandEncoder.setVertexBuffer_offset_atIndex_(self.vertexBuffer, 0, 0)
-    commandEncoder.drawPrimitives_vertexStart_vertexCount_(
-      MTLPrimitiveType.triangle, 0, self.vertices.__len__())
+    commandEncoder.setVertexBytes_length_atIndex_(
+      ctypes.byref(self.constants), ctypes.sizeof(self.constants), 1)
+
+    commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
+      MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
+      self.indexBuffer, 0)
 
     commandEncoder.endEncoding()
     commandBuffer.presentDrawable_(drawable)
