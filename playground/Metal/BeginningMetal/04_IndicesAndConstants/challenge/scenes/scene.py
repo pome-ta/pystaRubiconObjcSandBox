@@ -27,13 +27,8 @@ try:
   from nodes import Node
 except ModuleNotFoundError:
   # todo: package のimport 準備してる想定
-
   sys.path.append(str(__parents[1]))
-  #sys.path.insert(0,__parents[1])
-  #print(sys.path)
   from nodes import Node
-
-print('ぷに')
 
 
 class Scene(Node):
