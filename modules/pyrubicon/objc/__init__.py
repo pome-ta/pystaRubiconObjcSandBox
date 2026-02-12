@@ -1,7 +1,7 @@
 try:
     # Read version from SCM metadata
     # This will only exist in a development environment
-    from setuptools_scm import get_version
+    from _setuptools_scm import get_version
 
     # Excluded from coverage because a pure test environment (such as the one
     # used by tox in CI) won't have setuptools_scm

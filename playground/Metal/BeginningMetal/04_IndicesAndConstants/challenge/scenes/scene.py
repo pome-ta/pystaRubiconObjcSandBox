@@ -26,8 +26,14 @@ from pyrubicon.objc.types import CGSize
 try:
   from nodes import Node
 except ModuleNotFoundError:
-  # todo: package のimport 準備してる想定
-  sys.path.append(str(__parents[1]))
+  try:
+    # todo: package のimport 準備してる想定
+    sys.path.append(str(__parents[1]))
+  except NameError:
+    import pathlib
+    import sys
+    sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
+
   from nodes import Node
 
 

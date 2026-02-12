@@ -35,18 +35,19 @@ MTLCompileOptions = ObjCClass('MTLCompileOptions')
 MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 
 shader_path = Path('./Shader.metal')
+
 '''
    v0                v3
 (-1, 1)--( 0, 1)--( 1, 1)
-   |  \               |
-   |    \             |
-   |      \           |
-   |        \         |
+   |                  |
+   |                  |
+   |                  |
+   |                  |
 (-1, 0)  ( 0, 0)  ( 1, 0)
-   |          \       |
-   |            \     |
-   |              \   |
-   |                \ |
+   |                  |
+   |                  |
+   |                  |
+   |                  |
 (-1,-1)--( 0,-1)--( 1,-1)
    v1                v2
 '''

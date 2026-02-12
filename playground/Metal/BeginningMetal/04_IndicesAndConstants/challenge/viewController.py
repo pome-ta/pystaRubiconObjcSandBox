@@ -37,7 +37,7 @@ from objc_frameworks.CoreGraphics import CGRectZero
 from objc_frameworks.Metal import MTLCreateSystemDefaultDevice, MTLClearColorMake
 
 from renderer import Renderer
-from scenes import Scene
+from scenes import GameScene
 
 
 MTKView = ObjCClass('MTKView')
