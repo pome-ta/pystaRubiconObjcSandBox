@@ -1,0 +1,52 @@
+_TOP_DIR_NAME = 'pystaRubiconObjcSandBox'
+_MODULES_DIR_NAME = 'modules'
+
+# todo: `./{_TOP_DIR_NAME}/{_MODULES_DIR_NAME}` にあるpackage のimport 準備
+if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
+    _TOP_DIR_NAME):
+  import pathlib
+  import sys
+  __parents = pathlib.Path(__file__).resolve().parents
+  for path in __parents:
+    if path.name == _TOP_DIR_NAME and (__modules_path :=
+                                       path / _MODULES_DIR_NAME).exists():
+      sys.path.insert(0, str(__modules_path))
+      break
+  else:
+    import warnings
+    with warnings.catch_warnings():
+      warnings.simplefilter('always', ImportWarning)
+      __warning_message = f'./{_TOP_DIR_NAME}/{_MODULES_DIR_NAME} not found in parent directories'
+      warnings.warn(__warning_message, ImportWarning)
+
+from pyrubicon.objc.api import NSObject
+from pyrubicon.objc.api import objc_method
+from pyrubicon.objc.runtime import send_super
+
+
+class Node(NSObject):
+  name: str
+  children: ['Node']
+
+  @objc_method
+  def init(self):
+    send_super(__class__, self, 'init')
+
+    self.name = 'Untitled'
+    self.children = []
+
+    return self
+
+  @objc_method
+  def addChildNode_(self, childNode):
+    self.children.append(childNode)
+
+  @objc_method
+  def renderCommandEncoder_deltaTime_(self, commandEncoder, deltaTime):
+    for child in self.children:
+      child.renderCommandEncoder_deltaTime_(commandEncoder, deltaTime)
+
+
+if __name__ == '__main__':
+  pass
+
