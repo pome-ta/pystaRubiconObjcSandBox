@@ -26,6 +26,7 @@ class App:
     viewController: UIViewController,
     modalPresentationStyle: Union[UIModalPresentationStyle,
                                   int] = UIModalPresentationStyle.pageSheet):
+
     self.viewController = viewController
     # xxx: style 指定を力技で確認
     _automatic = UIModalPresentationStyle.automatic  # -2
@@ -54,6 +55,8 @@ class App:
     self.main_loop()
 
   def main_loop(self) -> None:
-    loop.run_forever()
-    loop.close()
+    try:
+      loop.run_forever()
+    finally:
+      loop.close()
 
