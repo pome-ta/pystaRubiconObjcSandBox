@@ -9,9 +9,9 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
   import pathlib
   import sys
   __parents = pathlib.Path(__file__).resolve().parents
-  for path in __parents:
-    if path.name == _TOP_DIR_NAME and (__modules_path :=
-                                       path / _MODULES_DIR_NAME).exists():
+  for __dir_path in __parents:
+    if __dir_path.name == _TOP_DIR_NAME and (__modules_path := __dir_path /
+                                             _MODULES_DIR_NAME).exists():
       sys.path.insert(0, str(__modules_path))
       break
   else:
