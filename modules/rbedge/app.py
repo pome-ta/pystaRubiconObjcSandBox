@@ -14,13 +14,6 @@ UIViewController = ObjCClass('UIViewController')  # todo: アノテーション�
 
 class App:
 
-  sharedApplication = UIApplication.sharedApplication
-  __objectEnumerator = sharedApplication.connectedScenes.objectEnumerator()
-  while (__windowScene := __objectEnumerator.nextObject()):
-    if __windowScene.activationState == 0:
-      break
-  rootViewController = __windowScene.keyWindow.rootViewController
-
   def __init__(
     self,
     viewController: UIViewController,
@@ -36,6 +29,19 @@ class App:
     self.modalPresentationStyle = modalPresentationStyle if isinstance(
       modalPresentationStyle, int
     ) and _automatic <= modalPresentationStyle <= _blurOverFullScreen else _pageSheet
+    
+    self.set_rootViewController()
+
+  def set_rootViewController(self) -> None:
+
+    sharedApplication = UIApplication.sharedApplication
+    __objectEnumerator = sharedApplication.connectedScenes.objectEnumerator()
+    while (__windowScene := __objectEnumerator.nextObject()):
+      #print(__windowScene)
+      if __windowScene.activationState == 0:
+        break
+    rootViewController = __windowScene.keyWindow.rootViewController
+    self.rootViewController = rootViewController
 
   def present(self) -> None:
 
@@ -55,6 +61,7 @@ class App:
     self.main_loop()
 
   def main_loop(self) -> None:
+
     try:
       loop.run_forever()
     finally:
