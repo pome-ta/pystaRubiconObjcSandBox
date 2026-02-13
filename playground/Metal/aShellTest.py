@@ -21,7 +21,7 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
 
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass
+from pyrubicon.objc.api import ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 
@@ -40,12 +40,14 @@ from objc_frameworks.CoreGraphics import CGRectZero
 from objc_frameworks.Metal import MTLCreateSystemDefaultDevice, MTLClearColorMake
 
 MTKView = ObjCClass('MTKView')
+MTKViewDelegate = ObjCProtocol('MTKViewDelegate')
 
 
 class Colors:
   wenderlichGreen = MTLClearColorMake(0.0, 0.4, 0.21, 1.0)
 
 
+#class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
 class MainViewController(UIViewController):
   metalView: MTKView
   commandQueue: 'MTLCommandQueue'
@@ -73,8 +75,12 @@ class MainViewController(UIViewController):
     metalView.delegate = self
     commandQueue = device.newCommandQueue()
 
+    print('v')
+    '''
+    metalView.setPaused_(True)
     metalView.enableSetNeedsDisplay = True
     metalView.setNeedsDisplay()
+    '''
 
     self.view.addSubview_(metalView)
 
@@ -135,6 +141,7 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
+    self.metalView.delegate = None
 
   @objc_method
   def didReceiveMemoryWarning(self):
@@ -148,6 +155,7 @@ class MainViewController(UIViewController):
 
   @objc_method
   def drawInMTKView_(self, view):
+    print('d')
     if not ((drawable := view.currentDrawable) and
             (descriptor := view.currentRenderPassDescriptor)):
       return
@@ -159,10 +167,21 @@ class MainViewController(UIViewController):
     commandBuffer.presentDrawable_(drawable)
     commandBuffer.commit()
 
+def main():
+  main_vc = MainViewController.new()
+
+  presentation_style = UIModalPresentationStyle.fullScreen
+  #presentation_style = UIModalPresentationStyle.pageSheet
+
+  app = App(main_vc, presentation_style)
+  app.present()
+
+
 
 if __name__ == '__main__':
   from rbedge.app import App
   from objc_frameworks.UIKit import UIModalPresentationStyle
+  '''
 
   main_vc = MainViewController.new()
 
@@ -171,4 +190,6 @@ if __name__ == '__main__':
 
   app = App(main_vc, presentation_style)
   app.present()
+  '''
+  main()
 

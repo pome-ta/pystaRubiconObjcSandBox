@@ -74,9 +74,6 @@ class MainViewController(UIViewController):
 
     metalView.delegate = renderer
 
-    #metalView.enableSetNeedsDisplay = True
-    #metalView.setNeedsDisplay()
-
     self.view.addSubview_(metalView)
 
     # --- Layout

@@ -111,7 +111,7 @@ class RootNavigationController(UINavigationController):
 
     closeButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItem(
       UIBarButtonSystemItem.close,
-      target=self,
+      target=navigationController,
       action=SEL('doneButtonTapped:'))
 
     # todo: view 遷移でのButton 重複を判別

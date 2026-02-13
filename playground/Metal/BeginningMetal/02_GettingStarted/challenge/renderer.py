@@ -48,7 +48,6 @@ class Renderer(NSObject):
     if not ((drawable := view.currentDrawable) and
             (descriptor := view.currentRenderPassDescriptor)):
       return
-
     commandBuffer = self.commandQueue.commandBuffer()
     commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
       descriptor)
