@@ -20,6 +20,7 @@ class App:
     modalPresentationStyle: Union[UIModalPresentationStyle,
                                   int] = UIModalPresentationStyle.pageSheet):
 
+    print('init')
     self.viewController = viewController
     # xxx: style 指定を力技で確認
     _automatic = UIModalPresentationStyle.automatic  # -2
@@ -44,6 +45,7 @@ class App:
     self.rootViewController = rootViewController
 
   def present(self) -> None:
+    print('present')
 
     @onMainThread
     def present_viewController(viewController: UIViewController,
@@ -63,7 +65,11 @@ class App:
   def main_loop(self) -> None:
 
     try:
+      print('s: run')
       loop.run_forever()
+      print('e: run')
     finally:
+      print('s: close')
       loop.close()
+      print('e: close')
 

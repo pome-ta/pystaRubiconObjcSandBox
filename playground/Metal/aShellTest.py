@@ -55,16 +55,18 @@ class MainViewController(UIViewController):
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
-    #print(f'	 - {NSStringFromClass(__class__)}: dealloc')
+    print(f'	 - {NSStringFromClass(__class__)}: dealloc')
     pass
 
   @objc_method
   def loadView(self):
     send_super(__class__, self, 'loadView')
-
+    print(f'    - {NSStringFromClass(__class__)}: loadView')
+    
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
+    print(f'    - {NSStringFromClass(__class__)}: viewDidLoad')
     self.navigationItem.title = NSStringFromClass(__class__)
 
     device = MTLCreateSystemDefaultDevice()
@@ -133,6 +135,7 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
     self.metalView.setPaused_(True)
+    print(f'    - {NSStringFromClass(__class__)}: viewWillDisappear_')
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
@@ -144,6 +147,7 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
     self.metalView.delegate = None
+    print(f'    - {NSStringFromClass(__class__)}: viewDidDisappear_')
 
   @objc_method
   def didReceiveMemoryWarning(self):
@@ -174,11 +178,14 @@ if __name__ == '__main__':
   from rbedge.app import App
   from objc_frameworks.UIKit import UIModalPresentationStyle
 
+  print('--- --- start')
   main_vc = MainViewController.new()
 
   presentation_style = UIModalPresentationStyle.fullScreen
   #presentation_style = UIModalPresentationStyle.pageSheet
 
   app = App(main_vc, presentation_style)
+  print('main')
   app.present()
+  print('main.present')
 

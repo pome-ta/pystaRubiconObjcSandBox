@@ -20,13 +20,14 @@ class RootNavigationController(UINavigationController):
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
-    #print(f'- {NSStringFromClass(__class__)}: dealloc')
+    print(f'- {NSStringFromClass(__class__)}: dealloc')
     loop.stop()
+    print('stop')
 
   @objc_method
   def loadView(self):
     send_super(__class__, self, 'loadView')
-    #print(f'{NSStringFromClass(__class__)}: loadView')
+    print(f'{NSStringFromClass(__class__)}: loadView')
 
     navigationBarAppearance = UINavigationBarAppearance.new()
     navigationBarAppearance.configureWithDefaultBackground()
@@ -84,7 +85,7 @@ class RootNavigationController(UINavigationController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #print(f'{NSStringFromClass(__class__)}: viewWillDisappear_')
+    print(f'{NSStringFromClass(__class__)}: viewWillDisappear_')
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
@@ -95,7 +96,7 @@ class RootNavigationController(UINavigationController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #print(f'{NSStringFromClass(__class__)}: viewDidDisappear_')
+    print(f'{NSStringFromClass(__class__)}: viewDidDisappear_')
 
   @objc_method
   def didReceiveMemoryWarning(self):
