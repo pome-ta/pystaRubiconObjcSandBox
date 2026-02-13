@@ -34,7 +34,7 @@ class App:
     self.set_rootViewController()
 
   def set_rootViewController(self) -> None:
-
+    print('s: set_rootViewController')
     sharedApplication = UIApplication.sharedApplication
     __objectEnumerator = sharedApplication.connectedScenes.objectEnumerator()
     while (__windowScene := __objectEnumerator.nextObject()):
@@ -43,6 +43,7 @@ class App:
         break
     rootViewController = __windowScene.keyWindow.rootViewController
     self.rootViewController = rootViewController
+    print('e: set_rootViewController')
 
   def present(self) -> None:
     print('present')
@@ -65,11 +66,14 @@ class App:
   def main_loop(self) -> None:
 
     try:
-      print('s: run')
+      print('app s: run')
       loop.run_forever()
-      print('e: run')
+      print('app e: run')
+    
+    except Exception as e:
+      print(f'Exception: {e}')
     finally:
-      print('s: close')
+      print('app s: close')
       loop.close()
-      print('e: close')
+      print('app e: close')
 
