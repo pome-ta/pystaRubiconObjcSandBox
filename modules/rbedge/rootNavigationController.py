@@ -35,6 +35,8 @@ class RootNavigationController(UINavigationController):
     self.navigationBar.scrollEdgeAppearance = navigationBarAppearance
     self.navigationBar.compactAppearance = navigationBarAppearance
     self.navigationBar.compactScrollEdgeAppearance = navigationBarAppearance
+    
+    '''
 
     toolbarAppearance = UIToolbarAppearance.new()
     toolbarAppearance.configureWithDefaultBackground()
@@ -43,6 +45,7 @@ class RootNavigationController(UINavigationController):
     self.toolbar.scrollEdgeAppearance = toolbarAppearance
     self.toolbar.compactAppearance = toolbarAppearance
     self.toolbar.compactScrollEdgeAppearance = toolbarAppearance
+    '''
 
   @objc_method
   def viewDidLoad(self):
