@@ -51,6 +51,7 @@ class Colors:
 class MainViewController(UIViewController):
   metalView: MTKView
   commandQueue: 'MTLCommandQueue'
+  device: 'MTLCreateSystemDefaultDevice'
 
   @objc_method
   def dealloc(self):
@@ -103,6 +104,7 @@ class MainViewController(UIViewController):
 
     self.metalView = metalView
     self.commandQueue = commandQueue
+    self.device = device
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -146,7 +148,9 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    self.metalView.delegate = None
+    self.metalView = None
+    #self.metalView.device = None
+    #pdbr.state(self.metalView)
     print(f'    - {NSStringFromClass(__class__)}: viewDidDisappear_')
 
   @objc_method
@@ -188,4 +192,5 @@ if __name__ == '__main__':
   print('main')
   app.present()
   print('main.present')
+  print('### ### ###')
 

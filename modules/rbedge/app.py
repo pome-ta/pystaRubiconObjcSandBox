@@ -8,6 +8,8 @@ from .lifeCycle import loop
 from .objcMainThread import onMainThread
 from .rootNavigationController import RootNavigationController
 
+from rbedge import pdbr
+
 UIApplication = ObjCClass('UIApplication')
 UIViewController = ObjCClass('UIViewController')  # todo: アノテーション用
 
@@ -37,8 +39,9 @@ class App:
     print('s: set_rootViewController')
     sharedApplication = UIApplication.sharedApplication
     __objectEnumerator = sharedApplication.connectedScenes.objectEnumerator()
+    #pdbr.state(__objectEnumerator)
     while (__windowScene := __objectEnumerator.nextObject()):
-      #print(__windowScene)
+      print(__windowScene)
       if __windowScene.activationState == 0:
         break
     rootViewController = __windowScene.keyWindow.rootViewController
