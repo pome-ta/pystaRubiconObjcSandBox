@@ -33,6 +33,10 @@ UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 # --- Metal
+from pyrubicon.objc.runtime import load_library
+
+Metal = load_library('Metal')
+
 from pyrubicon.objc.api import ObjCProtocol
 from pyrubicon.objc.types import CGSize
 
