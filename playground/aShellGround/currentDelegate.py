@@ -27,16 +27,18 @@ UIApplication = ObjCClass('UIApplication')
 
 sharedApplication = UIApplication.sharedApplication
 #pdbr.state(sharedApplication.connectedScenes.allObjects())
+#pdbr.state(sharedApplication)
 
 
-#print(sharedApplication.connectedScenes.count)
+pdbr.state(sharedApplication.connectedScenes.allObjects()[0].windows[0])
+#rootViewController
 
 for scene in sharedApplication.connectedScenes.allObjects():
   #session = scene.session
   #pdbr.state(session.persistentIdentifier)
   #print(session.persistentIdentifier)
+  #pdbr.state(scene.windows[0])
   #pdbr.state(scene)
-  pdbr.state(scene)
   delegate = scene.delegate
   #delegate.resignFirstResponder()
   #resignFirstResponder

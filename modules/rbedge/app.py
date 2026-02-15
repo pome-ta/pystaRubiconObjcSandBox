@@ -16,6 +16,18 @@ UIViewController = ObjCClass('UIViewController')  # todo: アノテーション�
 
 class App:
 
+  sharedApplication = UIApplication.sharedApplication
+  #rootViewController = sharedApplication.connectedScenes.allObjects()[0].windows[0].rootViewController
+
+  #print(rootViewController)
+  '''
+  __objectEnumerator = sharedApplication.connectedScenes.objectEnumerator()
+  while (__windowScene := __objectEnumerator.nextObject()):
+    if __windowScene.activationState == 0:
+      break
+  rootViewController = __windowScene.keyWindow.rootViewController
+  '''
+
   def __init__(
     self,
     viewController: UIViewController,
@@ -23,6 +35,14 @@ class App:
                                   int] = UIModalPresentationStyle.pageSheet):
 
     print('init')
+
+    @onMainThread
+    def get_rootViewController():
+      self.rootViewController = self.sharedApplication.connectedScenes.allObjects(
+      )[0].windows[0].rootViewController
+
+    get_rootViewController()
+    pdbr.state(self.rootViewController)
     self.viewController = viewController
     # xxx: style 指定を力技で確認
     _automatic = UIModalPresentationStyle.automatic  # -2
@@ -32,9 +52,10 @@ class App:
     self.modalPresentationStyle = modalPresentationStyle if isinstance(
       modalPresentationStyle, int
     ) and _automatic <= modalPresentationStyle <= _blurOverFullScreen else _pageSheet
-    
-    self.set_rootViewController()
 
+    #self.set_rootViewController()
+
+  '''
   def set_rootViewController(self) -> None:
     print('s: set_rootViewController')
     sharedApplication = UIApplication.sharedApplication
@@ -47,6 +68,7 @@ class App:
     rootViewController = __windowScene.keyWindow.rootViewController
     self.rootViewController = rootViewController
     print('e: set_rootViewController')
+  '''
 
   def present(self) -> None:
     print('present')
@@ -72,7 +94,7 @@ class App:
       print('app s: run')
       loop.run_forever()
       print('app e: run')
-    
+
     except Exception as e:
       print(f'Exception: {e}')
     finally:
