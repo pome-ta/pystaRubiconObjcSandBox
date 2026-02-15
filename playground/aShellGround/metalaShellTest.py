@@ -51,6 +51,7 @@ from objc_frameworks.Metal import (
 )
 
 Metal = load_library('Metal')
+MetalKit = load_library('MetalKit')
 MTKView = ObjCClass('MTKView')
 
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
@@ -110,8 +111,8 @@ class MainViewController(UIViewController):
     commandQueue = device.newCommandQueue()
 
     #metalView.setPaused_(True)
-    metalView.enableSetNeedsDisplay = True
-    metalView.setNeedsDisplay()
+    #metalView.enableSetNeedsDisplay = True
+    #metalView.setNeedsDisplay()
 
     self.view.addSubview_(metalView)
 
@@ -159,13 +160,19 @@ class MainViewController(UIViewController):
   # --- private
   @objc_method
   def buildModel(self):
+    '''
     vertexBuffer = self.device.newBufferWithBytes_length_options_(
       self.vertices, ctypes.sizeof(self.vertices),
       MTLResourceOptions.storageModeShared)
     indexBuffer = self.device.newBufferWithBytes_length_options_(
       self.indices, ctypes.sizeof(self.indices),
       MTLResourceOptions.storageModeShared)
-
+    '''
+    
+    vertexBuffer = self.device.newBufferWithBytes_length_options_(
+      self.vertices, ctypes.sizeof(self.vertices), 0)
+    indexBuffer = self.device.newBufferWithBytes_length_options_(
+      self.indices, ctypes.sizeof(self.indices), 0)
     self.vertexBuffer = vertexBuffer
     self.indexBuffer = indexBuffer
 
@@ -175,7 +182,7 @@ class MainViewController(UIViewController):
     options = MTLCompileOptions.new()
 
     library = self.device.newLibraryWithSource_options_error_(
-      source, options, None)
+      source, None, None)
 
     vertexFunction = library.newFunctionWithName_('vertex_shader')
     fragmentFunction = library.newFunctionWithName_('fragment_shader')
@@ -254,6 +261,7 @@ class MainViewController(UIViewController):
 
   @objc_method
   def drawInMTKView_(self, view):
+    pass
     '''
     with autoreleasepool():
       if not ((drawable := view.currentDrawable) and
@@ -267,7 +275,7 @@ class MainViewController(UIViewController):
       commandBuffer.presentDrawable_(drawable)
       commandBuffer.commit()
     '''
-
+    '''
     with autoreleasepool():
       if not ((drawable := view.currentDrawable) and
               (pipelineState := self.pipelineState) and
@@ -292,8 +300,9 @@ class MainViewController(UIViewController):
         self.indexBuffer, 0)
 
       commandEncoder.endEncoding()
-      commandBuffer.presentDrawable_(drawable)
-      commandBuffer.commit()
+      #commandBuffer.presentDrawable_(drawable)
+      #commandBuffer.commit()
+    '''
 
 
 if __name__ == '__main__':

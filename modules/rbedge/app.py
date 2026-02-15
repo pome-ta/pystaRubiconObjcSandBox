@@ -42,7 +42,8 @@ class App:
       )[0].windows[0].rootViewController
 
     get_rootViewController()
-    pdbr.state(self.rootViewController)
+    #pdbr.state(self.rootViewController)
+    print(self.rootViewController)
     self.viewController = viewController
     # xxx: style 指定を力技で確認
     _automatic = UIModalPresentationStyle.automatic  # -2
