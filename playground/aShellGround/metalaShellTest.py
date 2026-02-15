@@ -109,9 +109,9 @@ class MainViewController(UIViewController):
     metalView.delegate = self
     commandQueue = device.newCommandQueue()
 
-    metalView.setPaused_(True)
-    metalView.enableSetNeedsDisplay = False
-    #metalView.setNeedsDisplay()
+    #metalView.setPaused_(True)
+    metalView.enableSetNeedsDisplay = True
+    metalView.setNeedsDisplay()
 
     self.view.addSubview_(metalView)
 
@@ -214,7 +214,7 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    self.metalView.setPaused_(False)
+    #self.metalView.setPaused_(False)
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):

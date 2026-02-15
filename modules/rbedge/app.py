@@ -36,7 +36,7 @@ class App:
 
     print('init')
 
-    @onMainThread
+    #@onMainThread
     def get_rootViewController():
       self.rootViewController = self.sharedApplication.connectedScenes.allObjects(
       )[0].windows[0].rootViewController
