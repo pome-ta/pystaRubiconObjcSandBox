@@ -35,7 +35,7 @@ NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 # --- Metal
 from pyrubicon.objc.runtime import load_library
 
-#Metal = load_library('Metal')
+Metal = load_library('Metal')
 
 from pyrubicon.objc.api import ObjCProtocol
 from pyrubicon.objc.types import CGSize
@@ -55,7 +55,7 @@ class Colors:
 class MainViewController(UIViewController):
   metalView: MTKView
   commandQueue: 'MTLCommandQueue'
-  #device: 'MTLCreateSystemDefaultDevice'
+  device: 'MTLCreateSystemDefaultDevice'
 
   @objc_method
   def dealloc(self):
@@ -67,7 +67,7 @@ class MainViewController(UIViewController):
   def loadView(self):
     send_super(__class__, self, 'loadView')
     print(f'    - {NSStringFromClass(__class__)}: loadView')
-
+    
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
@@ -82,9 +82,12 @@ class MainViewController(UIViewController):
     metalView.delegate = self
     commandQueue = device.newCommandQueue()
 
-    #metalView.setPaused_(True)
-    #metalView.enableSetNeedsDisplay = False
+    print('v')
+    
+    metalView.setPaused_(True)
+    metalView.enableSetNeedsDisplay = False
     #metalView.setNeedsDisplay()
+    
 
     self.view.addSubview_(metalView)
 
@@ -105,7 +108,7 @@ class MainViewController(UIViewController):
 
     self.metalView = metalView
     self.commandQueue = commandQueue
-    #self.device = device
+    self.device = device
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -126,7 +129,7 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #self.metalView.setPaused_(False)
+    self.metalView.setPaused_(False)
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
@@ -137,7 +140,7 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #self.metalView.setPaused_(True)
+    self.metalView.setPaused_(True)
     print(f'    - {NSStringFromClass(__class__)}: viewWillDisappear_')
 
   @objc_method
@@ -149,7 +152,7 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #self.metalView = None
+    self.metalView = None
     #self.metalView.device = None
     #pdbr.state(self.metalView)
     print(f'    - {NSStringFromClass(__class__)}: viewDidDisappear_')
@@ -166,7 +169,6 @@ class MainViewController(UIViewController):
 
   @objc_method
   def drawInMTKView_(self, view):
-    '''
     with autoreleasepool():
       if not ((drawable := view.currentDrawable) and
               (descriptor := view.currentRenderPassDescriptor)):
@@ -178,17 +180,6 @@ class MainViewController(UIViewController):
       commandEncoder.endEncoding()
       commandBuffer.presentDrawable_(drawable)
       commandBuffer.commit()
-    '''
-    if not ((drawable := view.currentDrawable) and
-            (descriptor := view.currentRenderPassDescriptor)):
-      return
-
-    commandBuffer = self.commandQueue.commandBuffer()
-    commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
-      descriptor)
-    commandEncoder.endEncoding()
-    commandBuffer.presentDrawable_(drawable)
-    commandBuffer.commit()
 
 
 if __name__ == '__main__':

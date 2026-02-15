@@ -19,6 +19,7 @@ except RuntimeError as e:
 
 # loop.set_debug(True)
 '''
+'''
 import asyncio
 from pyrubicon.objc.eventloop import RubiconEventLoop, EventLoopPolicy
 
@@ -30,6 +31,7 @@ print('try s: loop')
 loop = RubiconEventLoop()
 asyncio.set_event_loop(loop)
 print('try e: loop')
+'''
 '''
 try:
   print('try s: loop')
@@ -45,7 +47,6 @@ except RuntimeError as e:
 # loop.set_debug(True)
 '''
 
-'''
 import asyncio
 #import logging
 
@@ -63,8 +64,4 @@ asyncio.set_event_loop_policy(EventLoopPolicy())
 loop = asyncio.new_event_loop()
 #loop.set_debug(True)
 print('flat e: loop')
-'''
-
-
-
 
