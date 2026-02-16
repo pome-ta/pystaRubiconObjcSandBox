@@ -34,6 +34,57 @@ from rbedge import pdbr
 UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
+from pyrubicon.objc.api import Block, ObjCInstance
+from pyrubicon.objc.runtime import libobjc, objc_block, objc_id
+
+dispatch_time_t = ctypes.c_uint64
+
+# DISPATCH_TIME_FOREVER (~0ull)
+DISPATCH_TIME_FOREVER = dispatch_time_t(2**64 - 1)  # ~0ull
+DISPATCH_TIME_NOW = dispatch_time_t(0)
+
+
+def dispatch_semaphore_create(value: int) -> ObjCInstance:
+  _function = libobjc.dispatch_semaphore_create
+  if not _function.argtypes:
+    _function.restype = objc_id
+    _function.argtypes = [
+      ctypes.c_long,
+    ]
+
+  _ptr = _function(value)
+  if _ptr is None:
+    return None
+  return ObjCInstance(_ptr)
+
+
+def dispatch_semaphore_wait(dsema: ObjCInstance, timeout: int = None) -> int:
+  _function = libobjc.dispatch_semaphore_wait
+
+  if not _function.argtypes:
+    _function.restype = ctypes.c_long
+    _function.argtypes = [
+      objc_id,
+      ctypes.c_uint64,
+    ]
+
+  t = DISPATCH_TIME_FOREVER if timeout is None else timeout
+
+  return _function(dsema, t)
+
+
+def dispatch_semaphore_signal(dsema: ObjCInstance) -> int:
+  _function = libobjc.dispatch_semaphore_signal
+
+  if not _function.argtypes:
+    _function.restype = ctypes.c_long
+    _function.argtypes = [
+      objc_id,
+    ]
+
+  return _function(dsema)
+
+
 # --- Metal
 
 from pyrubicon.objc.api import ObjCProtocol
@@ -84,6 +135,7 @@ class MainViewController(UIViewController):
   indexBuffer: 'MTLBuffer?'
   constants: Constants
   time: float
+  semaphore: ObjCInstance
 
   @objc_method
   def dealloc(self):
@@ -134,6 +186,7 @@ class MainViewController(UIViewController):
     self.metalView = metalView
     self.commandQueue = commandQueue
     self.device = device
+    self.semaphore = dispatch_semaphore_create(3)
 
     self.renderer()
 
@@ -168,7 +221,7 @@ class MainViewController(UIViewController):
       self.indices, ctypes.sizeof(self.indices),
       MTLResourceOptions.storageModeShared)
     '''
-    
+
     vertexBuffer = self.device.newBufferWithBytes_length_options_(
       self.vertices, ctypes.sizeof(self.vertices), 0)
     indexBuffer = self.device.newBufferWithBytes_length_options_(
@@ -193,7 +246,6 @@ class MainViewController(UIViewController):
     pipelineDescriptor.colorAttachments.objectAtIndexedSubscript_(
       0).pixelFormat = MTLPixelFormat.bgra8Unorm
 
-    
     pipelineState = None
     try:
       pipelineState = self.device.newRenderPipelineStateWithDescriptor_error_(
@@ -262,12 +314,22 @@ class MainViewController(UIViewController):
 
   @objc_method
   def drawInMTKView_(self, view):
+    dispatch_semaphore_wait(self.semaphore, DISPATCH_TIME_FOREVER)
 
-    
     with autoreleasepool():
       if not ((drawable := view.currentDrawable) and
               (descriptor := view.currentRenderPassDescriptor)):
+        dispatch_semaphore_signal(self.semaphore)
         return
+    
+      commandBuffer = self.commandQueue.commandBuffer()
+      def completion_handler(buffer):
+        dispatch_semaphore_signal(self.semaphore)
+
+      # Block(関数, 戻り値, 引数...)
+      handler_block = Block(completion_handler, None, objc_id)
+      commandBuffer.addCompletedHandler_(handler_block)
+    
     '''
       commandBuffer = self.commandQueue.commandBuffer()
       commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
