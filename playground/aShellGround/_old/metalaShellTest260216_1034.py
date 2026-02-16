@@ -262,13 +262,13 @@ class MainViewController(UIViewController):
 
   @objc_method
   def drawInMTKView_(self, view):
-
-    
+    pass
+    '''
     with autoreleasepool():
       if not ((drawable := view.currentDrawable) and
               (descriptor := view.currentRenderPassDescriptor)):
         return
-    '''
+  
       commandBuffer = self.commandQueue.commandBuffer()
       commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
         descriptor)

@@ -37,13 +37,9 @@ class App:
     print('init')
 
     #@onMainThread
-    def get_rootViewController():
-      self.rootViewController = self.sharedApplication.connectedScenes.allObjects(
-      )[0].windows[0].rootViewController
 
-    get_rootViewController()
     #pdbr.state(self.rootViewController)
-    print(self.rootViewController)
+
     self.viewController = viewController
     # xxx: style 指定を力技で確認
     _automatic = UIModalPresentationStyle.automatic  # -2
@@ -73,6 +69,10 @@ class App:
 
   def present(self) -> None:
     print('present')
+    def get_rootViewController():
+      self.rootViewController = self.sharedApplication.connectedScenes.allObjects(
+      )[0].windows[0].rootViewController
+
 
     @onMainThread
     def present_viewController(viewController: UIViewController,
@@ -82,6 +82,7 @@ class App:
       ).initWithRootViewController_(viewController)
 
       presentViewController.setModalPresentationStyle_(style)
+      get_rootViewController()
 
       self.rootViewController.presentViewController_animated_completion_(
         presentViewController, True, None)
