@@ -36,9 +36,7 @@ class App:
 
     print('init')
 
-    #@onMainThread
 
-    #pdbr.state(self.rootViewController)
 
     self.viewController = viewController
     # xxx: style 指定を力技で確認
@@ -50,9 +48,9 @@ class App:
       modalPresentationStyle, int
     ) and _automatic <= modalPresentationStyle <= _blurOverFullScreen else _pageSheet
 
-    #self.set_rootViewController()
+    self.set_rootViewController()
 
-  '''
+  
   def set_rootViewController(self) -> None:
     print('s: set_rootViewController')
     sharedApplication = UIApplication.sharedApplication
@@ -65,14 +63,15 @@ class App:
     rootViewController = __windowScene.keyWindow.rootViewController
     self.rootViewController = rootViewController
     print('e: set_rootViewController')
-  '''
+  
 
   def present(self) -> None:
     print('present')
+    '''
     def get_rootViewController():
       self.rootViewController = self.sharedApplication.connectedScenes.allObjects(
       )[0].windows[0].rootViewController
-
+    '''
 
     @onMainThread(sync=False)
     def present_viewController(viewController: UIViewController,
@@ -82,7 +81,7 @@ class App:
       ).initWithRootViewController_(viewController)
 
       presentViewController.setModalPresentationStyle_(style)
-      get_rootViewController()
+
 
       self.rootViewController.presentViewController_animated_completion_(
         presentViewController, True, None)
