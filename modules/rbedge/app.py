@@ -74,7 +74,7 @@ class App:
       )[0].windows[0].rootViewController
 
 
-    @onMainThread
+    @onMainThread(sync=False)
     def present_viewController(viewController: UIViewController,
                                style: int) -> None:
 

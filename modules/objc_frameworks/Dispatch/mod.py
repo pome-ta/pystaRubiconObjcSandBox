@@ -22,8 +22,6 @@ def dispatch_get_main_queue():
   return ObjCInstance(ctypes.cast(ctypes.byref(_dispatch_main_q), objc_id))
 
 
-def dispatch_async(queue, block)
-
 def dispatch_semaphore_create(value: int) -> ObjCInstance:
   _function = libobjc.dispatch_semaphore_create
   if not _function.argtypes:

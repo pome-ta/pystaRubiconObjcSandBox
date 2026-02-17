@@ -28,6 +28,7 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, autoreleasepool
 
 from objc_frameworks.Foundation import NSStringFromClass
+from rbedge.objcMainThread import onMainThread
 
 from rbedge import pdbr
 
@@ -148,11 +149,12 @@ class MainViewController(UIViewController):
     send_super(__class__, self, 'loadView')
     print(f'    - {NSStringFromClass(__class__)}: loadView')
 
+  @onMainThread
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     print(f'    - {NSStringFromClass(__class__)}: viewDidLoad')
-    self.navigationItem.title = NSStringFromClass(__class__)
+    #self.navigationItem.title = NSStringFromClass(__class__)
 
     device = MTLCreateSystemDefaultDevice()
 
@@ -264,6 +266,7 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
+    self.navigationItem.title = NSStringFromClass(__class__)
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
