@@ -6,14 +6,6 @@ from pyrubicon.objc.runtime import libobjc, objc_block, objc_id
 from objc_frameworks.Dispatch import dispatch_get_main_queue
 
 NSThread = ObjCClass('NSThread')
-'''
-
-libobjc.dispatch_async.restype = None
-libobjc.dispatch_async.argtypes = [
-  objc_id,
-  objc_block,
-]
-'''
 
 
 # --- Sync / Async ---
@@ -29,7 +21,7 @@ def _dispatch_call(func_name, queue, block_obj):
 
 
 def onMainThread(func=None, *, sync=True):
-
+  print('onMainThread')
   if func is None:
     return functools.partial(onMainThread, sync=sync)
 

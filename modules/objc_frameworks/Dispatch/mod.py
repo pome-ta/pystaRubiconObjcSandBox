@@ -46,7 +46,7 @@ def dispatch_semaphore_wait(dsema: ObjCInstance, timeout: int = None) -> int:
       ctypes.c_uint64,
     ]
 
-  t = DISPATCH_TIME_FOREVER if timeout is None else ctypes.c_uint64(timeout)
+  t = DISPATCH_TIME_FOREVER if timeout is None else timeout
 
   return _function(dsema, t)
 

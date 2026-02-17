@@ -16,18 +16,6 @@ UIViewController = ObjCClass('UIViewController')  # todo: アノテーション�
 
 class App:
 
-  sharedApplication = UIApplication.sharedApplication
-  #rootViewController = sharedApplication.connectedScenes.allObjects()[0].windows[0].rootViewController
-
-  #print(rootViewController)
-  '''
-  __objectEnumerator = sharedApplication.connectedScenes.objectEnumerator()
-  while (__windowScene := __objectEnumerator.nextObject()):
-    if __windowScene.activationState == 0:
-      break
-  rootViewController = __windowScene.keyWindow.rootViewController
-  '''
-
   def __init__(
     self,
     viewController: UIViewController,
@@ -35,8 +23,6 @@ class App:
                                   int] = UIModalPresentationStyle.pageSheet):
 
     print('init')
-
-
 
     self.viewController = viewController
     # xxx: style 指定を力技で確認
@@ -50,28 +36,21 @@ class App:
 
     self.set_rootViewController()
 
-  
   def set_rootViewController(self) -> None:
     print('s: set_rootViewController')
     sharedApplication = UIApplication.sharedApplication
-    __objectEnumerator = sharedApplication.connectedScenes.objectEnumerator()
-    #pdbr.state(__objectEnumerator)
-    while (__windowScene := __objectEnumerator.nextObject()):
-      print(__windowScene)
-      if __windowScene.activationState == 0:
+    objectEnumerator = sharedApplication.connectedScenes.objectEnumerator()
+
+    while (windowScene := objectEnumerator.nextObject()):
+
+      if windowScene.activationState == 0:
         break
-    rootViewController = __windowScene.keyWindow.rootViewController
+    rootViewController = windowScene.keyWindow.rootViewController
     self.rootViewController = rootViewController
     print('e: set_rootViewController')
-  
 
   def present(self) -> None:
     print('present')
-    '''
-    def get_rootViewController():
-      self.rootViewController = self.sharedApplication.connectedScenes.allObjects(
-      )[0].windows[0].rootViewController
-    '''
 
     @onMainThread(sync=False)
     def present_viewController(viewController: UIViewController,
@@ -81,7 +60,6 @@ class App:
       ).initWithRootViewController_(viewController)
 
       presentViewController.setModalPresentationStyle_(style)
-
 
       self.rootViewController.presentViewController_animated_completion_(
         presentViewController, True, None)

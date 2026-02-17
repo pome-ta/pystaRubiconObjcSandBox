@@ -23,21 +23,73 @@ import ctypes
 from pathlib import Path
 from math import sin
 
-from pyrubicon.objc.api import ObjCClass
+from pyrubicon.objc.api import ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.runtime import send_super, autoreleasepool
 
 from objc_frameworks.Foundation import NSStringFromClass
+from rbedge.objcMainThread import onMainThread
 
 from rbedge import pdbr
 
 UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
+from pyrubicon.objc.api import Block, ObjCInstance
+from pyrubicon.objc.runtime import libobjc, objc_block, objc_id
+
+dispatch_time_t = ctypes.c_uint64
+
+# DISPATCH_TIME_FOREVER (~0ull)
+DISPATCH_TIME_FOREVER = dispatch_time_t(2**64 - 1)  # ~0ull
+DISPATCH_TIME_NOW = dispatch_time_t(0)
+
+
+def dispatch_semaphore_create(value: int) -> ObjCInstance:
+  _function = libobjc.dispatch_semaphore_create
+  if not _function.argtypes:
+    _function.restype = objc_id
+    _function.argtypes = [
+      ctypes.c_long,
+    ]
+
+  _ptr = _function(value)
+  if _ptr is None:
+    return None
+  return ObjCInstance(_ptr)
+
+
+def dispatch_semaphore_wait(dsema: ObjCInstance, timeout: int = None) -> int:
+  _function = libobjc.dispatch_semaphore_wait
+
+  if not _function.argtypes:
+    _function.restype = ctypes.c_long
+    _function.argtypes = [
+      objc_id,
+      ctypes.c_uint64,
+    ]
+
+  t = DISPATCH_TIME_FOREVER if timeout is None else timeout
+
+  return _function(dsema, t)
+
+
+def dispatch_semaphore_signal(dsema: ObjCInstance) -> int:
+  _function = libobjc.dispatch_semaphore_signal
+
+  if not _function.argtypes:
+    _function.restype = ctypes.c_long
+    _function.argtypes = [
+      objc_id,
+    ]
+
+  return _function(dsema)
+
+
 # --- Metal
 
-from pyrubicon.objc.api import Block, ObjCInstance, ObjCProtocol
-from pyrubicon.objc.runtime import autoreleasepool, objc_id, load_library
+from pyrubicon.objc.api import ObjCProtocol
+from pyrubicon.objc.runtime import load_library
 from pyrubicon.objc.types import CGSize
 
 from objc_frameworks.CoreGraphics import CGRectZero
@@ -49,24 +101,15 @@ from objc_frameworks.Metal import (
   MTLPrimitiveType,
   MTLIndexType,
 )
-from objc_frameworks.Dispatch import (
-  dispatch_semaphore_create,
-  dispatch_semaphore_wait,
-  dispatch_semaphore_signal,
-  DISPATCH_TIME_FOREVER,
-)
 
-from rbedge.objcMainThread import onMainThread
-
-#Metal = load_library('Metal')
-#MetalKit = load_library('MetalKit')
-
+Metal = load_library('Metal')
+MetalKit = load_library('MetalKit')
 MTKView = ObjCClass('MTKView')
 
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
 MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 
-#MTKViewDelegate = ObjCProtocol('MTKViewDelegate')
+MTKViewDelegate = ObjCProtocol('MTKViewDelegate')
 
 shader_path = Path('./Shader.metal')
 
@@ -106,57 +149,49 @@ class MainViewController(UIViewController):
     send_super(__class__, self, 'loadView')
     print(f'    - {NSStringFromClass(__class__)}: loadView')
 
+  @onMainThread
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     print(f'    - {NSStringFromClass(__class__)}: viewDidLoad')
     #self.navigationItem.title = NSStringFromClass(__class__)
 
-    @onMainThread  #(sync=False)
-    def metalViewDidLoad(this):
+    device = MTLCreateSystemDefaultDevice()
 
-      #self.navigationItem.title = NSStringFromClass(__class__)
+    metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
+    metalView.clearColor = Colors.wenderlichGreen
 
-      device = MTLCreateSystemDefaultDevice()
+    metalView.delegate = self
+    commandQueue = device.newCommandQueue()
 
-      metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
-      metalView.clearColor = Colors.wenderlichGreen
+    #metalView.setPaused_(True)
+    #metalView.enableSetNeedsDisplay = True
+    #metalView.setNeedsDisplay()
 
-      metalView.delegate = this
-      commandQueue = device.newCommandQueue()
+    self.view.addSubview_(metalView)
 
-      #metalView.setPaused_(True)
-      #metalView.enableSetNeedsDisplay = True
-      #metalView.setNeedsDisplay()
+    # --- Layout
+    safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
 
-      this.view.addSubview_(metalView)
+    metalView.translatesAutoresizingMaskIntoConstraints = False
+    NSLayoutConstraint.activateConstraints_([
+      metalView.centerXAnchor.constraintEqualToAnchor_(
+        safeAreaLayoutGuide.centerXAnchor),
+      metalView.centerYAnchor.constraintEqualToAnchor_(
+        safeAreaLayoutGuide.centerYAnchor),
+      metalView.widthAnchor.constraintEqualToAnchor_multiplier_(
+        safeAreaLayoutGuide.widthAnchor, 0.5),
+      metalView.heightAnchor.constraintEqualToAnchor_multiplier_(
+        safeAreaLayoutGuide.heightAnchor, 0.5),
+    ])
 
-      # --- Layout
-      safeAreaLayoutGuide = this.view.safeAreaLayoutGuide
+    self.metalView = metalView
+    self.commandQueue = commandQueue
+    self.device = device
+    self.semaphore = dispatch_semaphore_create(3)
 
-      metalView.translatesAutoresizingMaskIntoConstraints = False
-      NSLayoutConstraint.activateConstraints_([
-        metalView.centerXAnchor.constraintEqualToAnchor_(
-          safeAreaLayoutGuide.centerXAnchor),
-        metalView.centerYAnchor.constraintEqualToAnchor_(
-          safeAreaLayoutGuide.centerYAnchor),
-        metalView.widthAnchor.constraintEqualToAnchor_multiplier_(
-          safeAreaLayoutGuide.widthAnchor, 0.5),
-        metalView.heightAnchor.constraintEqualToAnchor_multiplier_(
-          safeAreaLayoutGuide.heightAnchor, 0.5),
-      ])
+    self.renderer()
 
-      this.metalView = metalView
-      this.commandQueue = commandQueue
-      this.device = device
-      this.semaphore = dispatch_semaphore_create(3)
-
-      this.renderer()
-      return this
-
-    self = metalViewDidLoad(self)
-
-  #@onMainThread(sync=False)
   @objc_method
   def renderer(self):
     self.vertices = (ctypes.c_float * (4 * 3))(
@@ -173,23 +208,20 @@ class MainViewController(UIViewController):
     self.time = 0.0
 
     self.buildModel()
-    self.buildPipelineState()
+    #self.buildPipelineState()
 
     return self
 
   # --- private
   @objc_method
   def buildModel(self):
-
+    '''
     vertexBuffer = self.device.newBufferWithBytes_length_options_(
       self.vertices, ctypes.sizeof(self.vertices),
       MTLResourceOptions.storageModeShared)
     indexBuffer = self.device.newBufferWithBytes_length_options_(
       self.indices, ctypes.sizeof(self.indices),
       MTLResourceOptions.storageModeShared)
-
-    self.vertexBuffer = vertexBuffer
-    self.indexBuffer = indexBuffer
     '''
 
     vertexBuffer = self.device.newBufferWithBytes_length_options_(
@@ -198,7 +230,6 @@ class MainViewController(UIViewController):
       self.indices, ctypes.sizeof(self.indices), 0)
     self.vertexBuffer = vertexBuffer
     self.indexBuffer = indexBuffer
-    '''
 
   @objc_method
   def buildPipelineState(self):
@@ -235,7 +266,6 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    print(f'    - {NSStringFromClass(__class__)}: viewWillAppear_')
     self.navigationItem.title = NSStringFromClass(__class__)
 
   @objc_method
@@ -287,26 +317,37 @@ class MainViewController(UIViewController):
 
   @objc_method
   def drawInMTKView_(self, view):
-    print('d')
     dispatch_semaphore_wait(self.semaphore, DISPATCH_TIME_FOREVER)
 
     with autoreleasepool():
       if not ((drawable := view.currentDrawable) and
-              (pipelineState := self.pipelineState) and
-              (indexBuffer := self.indexBuffer) and
               (descriptor := view.currentRenderPassDescriptor)):
         dispatch_semaphore_signal(self.semaphore)
-
         return
+    
       commandBuffer = self.commandQueue.commandBuffer()
-
       def completion_handler(buffer):
         dispatch_semaphore_signal(self.semaphore)
 
       # Block(関数, 戻り値, 引数...)
       handler_block = Block(completion_handler, None, objc_id)
       commandBuffer.addCompletedHandler_(handler_block)
-
+    
+    '''
+      commandBuffer = self.commandQueue.commandBuffer()
+      commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
+        descriptor)
+      commandEncoder.endEncoding()
+      commandBuffer.presentDrawable_(drawable)
+      commandBuffer.commit()
+    '''
+    '''
+    with autoreleasepool():
+      if not ((drawable := view.currentDrawable) and
+              (pipelineState := self.pipelineState) and
+              (indexBuffer := self.indexBuffer) and
+              (descriptor := view.currentRenderPassDescriptor)):
+        return
       self.time += 1 / view.preferredFramesPerSecond
       animateBy = abs(sin(self.time) / 2 + 0.5)
       self.constants.animateBy = animateBy
@@ -325,8 +366,9 @@ class MainViewController(UIViewController):
         self.indexBuffer, 0)
 
       commandEncoder.endEncoding()
-      commandBuffer.presentDrawable_(drawable)
-      commandBuffer.commit()
+      #commandBuffer.presentDrawable_(drawable)
+      #commandBuffer.commit()
+    '''
 
 
 if __name__ == '__main__':

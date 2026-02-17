@@ -51,7 +51,7 @@ class RootNavigationController(UINavigationController):
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
-    #print(f'{NSStringFromClass(__class__)}: viewDidLoad')
+    print(f'{NSStringFromClass(__class__)}: viewDidLoad')
     self.delegate = self
 
   @objc_method
@@ -63,7 +63,7 @@ class RootNavigationController(UINavigationController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #print(f'{NSStringFromClass(__class__)}: viewWillAppear_')
+    print(f'{NSStringFromClass(__class__)}: viewWillAppear_')
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -74,7 +74,7 @@ class RootNavigationController(UINavigationController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #print(f'{NSStringFromClass(__class__)}: viewDidAppear_')
+    print(f'{NSStringFromClass(__class__)}: viewDidAppear_')
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
