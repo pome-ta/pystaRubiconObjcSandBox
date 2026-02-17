@@ -37,7 +37,7 @@ NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 # --- Metal
 
 from pyrubicon.objc.api import Block, ObjCInstance, ObjCProtocol
-from pyrubicon.objc.runtime import autoreleasepool, objc_id, load_library
+from pyrubicon.objc.runtime import autoreleasepool, objc_id, load_library, SEL
 from pyrubicon.objc.types import CGSize
 
 from objc_frameworks.CoreGraphics import CGRectZero
@@ -111,50 +111,51 @@ class MainViewController(UIViewController):
     send_super(__class__, self, 'viewDidLoad')
     print(f'    - {NSStringFromClass(__class__)}: viewDidLoad')
     #self.navigationItem.title = NSStringFromClass(__class__)
+    self.performSelectorOnMainThread_withObject_waitUntilDone_(
+      SEL('metalViewDidLoad:'), None, False)
+    #pdbr.state(self)
 
-    @onMainThread  #(sync=False)
-    def metalViewDidLoad(this):
+  #@onMainThread  #(sync=False)
+  @objc_method
+  def metalViewDidLoad_(self, dmy):
 
-      #self.navigationItem.title = NSStringFromClass(__class__)
+    #self.navigationItem.title = NSStringFromClass(__class__)
 
-      device = MTLCreateSystemDefaultDevice()
+    device = MTLCreateSystemDefaultDevice()
 
-      metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
-      metalView.clearColor = Colors.wenderlichGreen
+    metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
+    metalView.clearColor = Colors.wenderlichGreen
 
-      metalView.delegate = this
-      commandQueue = device.newCommandQueue()
+    metalView.delegate = self
+    commandQueue = device.newCommandQueue()
 
-      #metalView.setPaused_(True)
-      #metalView.enableSetNeedsDisplay = True
-      #metalView.setNeedsDisplay()
+    #metalView.setPaused_(True)
+    #metalView.enableSetNeedsDisplay = True
+    #metalView.setNeedsDisplay()
 
-      this.view.addSubview_(metalView)
+    self.view.addSubview_(metalView)
 
-      # --- Layout
-      safeAreaLayoutGuide = this.view.safeAreaLayoutGuide
+    # --- Layout
+    safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
 
-      metalView.translatesAutoresizingMaskIntoConstraints = False
-      NSLayoutConstraint.activateConstraints_([
-        metalView.centerXAnchor.constraintEqualToAnchor_(
-          safeAreaLayoutGuide.centerXAnchor),
-        metalView.centerYAnchor.constraintEqualToAnchor_(
-          safeAreaLayoutGuide.centerYAnchor),
-        metalView.widthAnchor.constraintEqualToAnchor_multiplier_(
-          safeAreaLayoutGuide.widthAnchor, 0.5),
-        metalView.heightAnchor.constraintEqualToAnchor_multiplier_(
-          safeAreaLayoutGuide.heightAnchor, 0.5),
-      ])
+    metalView.translatesAutoresizingMaskIntoConstraints = False
+    NSLayoutConstraint.activateConstraints_([
+      metalView.centerXAnchor.constraintEqualToAnchor_(
+        safeAreaLayoutGuide.centerXAnchor),
+      metalView.centerYAnchor.constraintEqualToAnchor_(
+        safeAreaLayoutGuide.centerYAnchor),
+      metalView.widthAnchor.constraintEqualToAnchor_multiplier_(
+        safeAreaLayoutGuide.widthAnchor, 0.5),
+      metalView.heightAnchor.constraintEqualToAnchor_multiplier_(
+        safeAreaLayoutGuide.heightAnchor, 0.5),
+    ])
 
-      this.metalView = metalView
-      this.commandQueue = commandQueue
-      this.device = device
-      this.semaphore = dispatch_semaphore_create(3)
+    self.metalView = metalView
+    self.commandQueue = commandQueue
+    self.device = device
+    self.semaphore = dispatch_semaphore_create(3)
 
-      this.renderer()
-      return this
-
-    self = metalViewDidLoad(self)
+    self.renderer()
 
   #@onMainThread(sync=False)
   @objc_method

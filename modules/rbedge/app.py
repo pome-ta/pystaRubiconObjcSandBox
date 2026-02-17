@@ -52,7 +52,7 @@ class App:
   def present(self) -> None:
     print('present')
 
-    @onMainThread(sync=False)
+    @onMainThread#(sync=False)
     def present_viewController(viewController: UIViewController,
                                style: int) -> None:
 
