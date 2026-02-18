@@ -85,7 +85,7 @@ class Constants(ctypes.Structure):
 class MainViewController(UIViewController):
   metalView: MTKView = objc_property()
   commandQueue: 'MTLCommandQueue' = objc_property()
-  device: 'MTLCreateSystemDefaultDevice' = objc_property(weak=True)
+  device: 'MTLCreateSystemDefaultDevice' = objc_property()
   vertices: '[Float]'
   indices: '[UInt16]'
   pipelineState: 'MTLRenderPipelineState?'
@@ -112,7 +112,7 @@ class MainViewController(UIViewController):
     print(f'    - {NSStringFromClass(__class__)}: viewDidLoad')
     #self.navigationItem.title = NSStringFromClass(__class__)
     self.performSelectorOnMainThread_withObject_waitUntilDone_(
-      SEL('metalViewDidLoad:'), None, True)
+      SEL('metalViewDidLoad:'), None, False)
     #pdbr.state(self)
 
   #@onMainThread  #(sync=False)
@@ -126,10 +126,10 @@ class MainViewController(UIViewController):
     metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
     metalView.clearColor = Colors.wenderlichGreen
 
-    #metalView.delegate = self
+    metalView.delegate = self
     commandQueue = device.newCommandQueue()
 
-    #metalView.setPaused_(True)
+    metalView.setPaused_(True)
     #metalView.enableSetNeedsDisplay = True
     #metalView.setNeedsDisplay()
 
@@ -153,7 +153,7 @@ class MainViewController(UIViewController):
     self.metalView = metalView
     self.commandQueue = commandQueue
     self.device = device
-    #self.semaphore = dispatch_semaphore_create(3)
+    self.semaphore = dispatch_semaphore_create(3)
 
     self.renderer()
 
@@ -238,7 +238,6 @@ class MainViewController(UIViewController):
                ])
     print(f'    - {NSStringFromClass(__class__)}: viewWillAppear_')
     self.navigationItem.title = NSStringFromClass(__class__)
-    self.metalView.delegate = self
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -290,24 +289,24 @@ class MainViewController(UIViewController):
   @objc_method
   def drawInMTKView_(self, view):
     print('d')
-    #dispatch_semaphore_wait(self.semaphore, DISPATCH_TIME_FOREVER)
+    dispatch_semaphore_wait(self.semaphore, DISPATCH_TIME_FOREVER)
 
     with autoreleasepool():
       if not ((drawable := view.currentDrawable) and
               (pipelineState := self.pipelineState) and
               (indexBuffer := self.indexBuffer) and
               (descriptor := view.currentRenderPassDescriptor)):
-        #dispatch_semaphore_signal(self.semaphore)
+        dispatch_semaphore_signal(self.semaphore)
 
         return
       commandBuffer = self.commandQueue.commandBuffer()
-      
+
       def completion_handler(buffer):
         dispatch_semaphore_signal(self.semaphore)
 
       # Block(関数, 戻り値, 引数...)
       handler_block = Block(completion_handler, None, objc_id)
-      #commandBuffer.addCompletedHandler_(handler_block)
+      commandBuffer.addCompletedHandler_(handler_block)
 
       self.time += 1 / view.preferredFramesPerSecond
       animateBy = abs(sin(self.time) / 2 + 0.5)
