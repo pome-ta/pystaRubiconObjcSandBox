@@ -15,7 +15,7 @@ def _dispatch_call(func_name, queue, block_obj):
     _function.restype = None
     _function.argtypes = [
       objc_id,
-      objc_id,
+      objc_block,
     ]
   _function(queue, block_obj)
 
@@ -27,6 +27,7 @@ def onMainThread(func=None, *, sync=True):
 
   @functools.wraps(func)
   def wrapper(*args, **kwargs):
+    print('___ wrapper')
     if NSThread.isMainThread:
       return func(*args, **kwargs)
 

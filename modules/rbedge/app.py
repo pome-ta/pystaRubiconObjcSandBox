@@ -22,7 +22,7 @@ class App:
     modalPresentationStyle: Union[UIModalPresentationStyle,
                                   int] = UIModalPresentationStyle.pageSheet):
 
-    print('init')
+    print('app.init')
 
     self.viewController = viewController
     # xxx: style 指定を力技で確認
@@ -39,7 +39,7 @@ class App:
   def set_rootViewController(self) -> None:
     print('s: set_rootViewController')
     sharedApplication = UIApplication.sharedApplication
-    print(sharedApplication)
+    #print(sharedApplication)
     objectEnumerator = sharedApplication.connectedScenes.objectEnumerator()
 
     while (windowScene := objectEnumerator.nextObject()):
@@ -51,12 +51,13 @@ class App:
     print('e: set_rootViewController')
 
   def present(self) -> None:
-    print('present')
+    print('app.present')
 
     @onMainThread#(sync=False)
     def present_viewController(viewController: UIViewController,
                                style: int) -> None:
 
+      print('# @onMainThread')
       presentViewController = RootNavigationController.alloc(
       ).initWithRootViewController_(viewController)
 
