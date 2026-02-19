@@ -20,6 +20,7 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
       warnings.warn(__warning_message, ImportWarning)
 
 import ctypes
+from pathlib import Path
 
 from pyrubicon.objc.api import ObjCClass
 from pyrubicon.objc.api import objc_method, objc_property
@@ -33,6 +34,7 @@ UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 # --- Metal
+from pyrubicon.objc.api import NSArray
 from pyrubicon.objc.types import CGSize
 
 from objc_frameworks.CoreGraphics import CGRectZero
@@ -47,6 +49,10 @@ from objc_frameworks.Metal import (
 )
 
 MTKView = ObjCClass('MTKView')
+MTLCompileOptions = ObjCClass('MTLCompileOptions')
+MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
+
+shader_path = Path('./Shader.metal')
 
 
 class Colors:
@@ -54,9 +60,12 @@ class Colors:
 
 
 class MainViewController(UIViewController):
-  
+
   metalView: MTKView = objc_property()
   commandQueue: 'MTLCommandQueue' = objc_property()
+  vertices: '[Float]'  = objc_property(object)
+  pipelineState: 'MTLRenderPipelineState?' = objc_property()
+  vertexBuffer: 'MTLBuffer?' = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -78,13 +87,13 @@ class MainViewController(UIViewController):
     device = MTLCreateSystemDefaultDevice()
     metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
     metalView.clearColor = Colors.wenderlichGreen
-    
+
     metalView.delegate = self
     commandQueue = device.newCommandQueue()
-    
+
     #metalView.setPaused_(True)
-    #metalView.enableSetNeedsDisplay = True
-    #metalView.setNeedsDisplay()
+    metalView.enableSetNeedsDisplay = True
+    metalView.setNeedsDisplay()
 
     self.view.addSubview_(metalView)
 
@@ -102,9 +111,57 @@ class MainViewController(UIViewController):
       metalView.heightAnchor.constraintEqualToAnchor_multiplier_(
         safeAreaLayoutGuide.heightAnchor, 0.5),
     ])
-    
+
     self.metalView = metalView
     self.commandQueue = commandQueue
+
+    
+    vertices = (ctypes.c_float * (3 * 3))(
+       0.0,  1.0,  0.0,  # 1
+      -1.0, -1.0,  0.0,  # 2
+       1.0, -1.0,  0.0,  # 3
+    )  # yapf: disable
+    
+    
+    self.vertices = vertices
+    self.buildModel()
+    self.buildPipelineState()
+
+  # --- private
+  @objc_method
+  def buildModel(self):
+
+    vertexBuffer = self.metalView.device.newBufferWithBytes_length_options_(
+      self.vertices, ctypes.sizeof(self.vertices),
+      MTLResourceOptions.storageModeShared)
+
+    self.vertexBuffer = vertexBuffer
+
+  @objc_method
+  def buildPipelineState(self):
+    source = shader_path.read_text('utf-8')
+    options = MTLCompileOptions.new()
+
+    library = self.metalView.device.newLibraryWithSource_options_error_(
+      source, options, None)
+
+    vertexFunction = library.newFunctionWithName_('vertex_shader')
+    fragmentFunction = library.newFunctionWithName_('fragment_shader')
+
+    pipelineDescriptor = MTLRenderPipelineDescriptor.new()
+    pipelineDescriptor.vertexFunction = vertexFunction
+    pipelineDescriptor.fragmentFunction = fragmentFunction
+    pipelineDescriptor.colorAttachments.objectAtIndexedSubscript_(
+      0).pixelFormat = MTLPixelFormat.bgra8Unorm
+
+    pipelineState = None
+    try:
+      pipelineState = self.metalView.device.newRenderPipelineStateWithDescriptor_error_(
+        pipelineDescriptor, None)
+    except Exception as e:
+      print(f'pipelineState error: {e}')
+
+    self.pipelineState = pipelineState
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -128,7 +185,7 @@ class MainViewController(UIViewController):
                ])
     #self.metalView.setPaused_(False)
     print(f'    - {NSStringFromClass(__class__)}: viewDidAppear_')
-    
+
   @objc_method
   def viewWillDisappear_(self, animated: bool):
     send_super(__class__,
@@ -167,12 +224,19 @@ class MainViewController(UIViewController):
   def drawInMTKView_(self, view):
     print('d')
     if not ((drawable := view.currentDrawable) and
+            (pipelineState := self.pipelineState) and
             (descriptor := view.currentRenderPassDescriptor)):
       return
 
     commandBuffer = self.commandQueue.commandBuffer()
+
     commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
       descriptor)
+    commandEncoder.setRenderPipelineState_(pipelineState)
+    commandEncoder.setVertexBuffer_offset_atIndex_(self.vertexBuffer, 0, 0)
+    commandEncoder.drawPrimitives_vertexStart_vertexCount_(
+      MTLPrimitiveType.triangle, 0, self.vertices.__len__())
+
     commandEncoder.endEncoding()
     commandBuffer.presentDrawable_(drawable)
     commandBuffer.commit()
