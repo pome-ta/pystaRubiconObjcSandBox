@@ -82,7 +82,7 @@ class MainViewController(UIViewController):
     metalView.delegate = self
     commandQueue = device.newCommandQueue()
     
-    metalView.setPaused_(True)
+    #metalView.setPaused_(True)
     #metalView.enableSetNeedsDisplay = True
     #metalView.setNeedsDisplay()
 
@@ -126,7 +126,7 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    self.metalView.setPaused_(False)
+    #self.metalView.setPaused_(False)
     print(f'    - {NSStringFromClass(__class__)}: viewDidAppear_')
     
   @objc_method
@@ -139,7 +139,7 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
     print(f'    - {NSStringFromClass(__class__)}: viewWillDisappear_')
-    self.metalView.setPaused_(True)
+    #self.metalView.setPaused_(True)
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
@@ -166,6 +166,16 @@ class MainViewController(UIViewController):
   @objc_method
   def drawInMTKView_(self, view):
     print('d')
+    if not ((drawable := view.currentDrawable) and
+            (descriptor := view.currentRenderPassDescriptor)):
+      return
+
+    commandBuffer = self.commandQueue.commandBuffer()
+    commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
+      descriptor)
+    commandEncoder.endEncoding()
+    commandBuffer.presentDrawable_(drawable)
+    commandBuffer.commit()
 
 
 if __name__ == '__main__':
