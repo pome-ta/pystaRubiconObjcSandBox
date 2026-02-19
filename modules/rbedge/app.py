@@ -39,7 +39,6 @@ class App:
   def set_rootViewController(self) -> None:
     print('s: set_rootViewController')
     sharedApplication = UIApplication.sharedApplication
-    #print(sharedApplication)
     objectEnumerator = sharedApplication.connectedScenes.objectEnumerator()
 
     while (windowScene := objectEnumerator.nextObject()):
@@ -53,7 +52,7 @@ class App:
   def present(self) -> None:
     print('app.present')
 
-    @onMainThread#(sync=False)
+    @onMainThread  #(sync=False)
     def present_viewController(viewController: UIViewController,
                                style: int) -> None:
 

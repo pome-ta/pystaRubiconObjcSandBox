@@ -49,7 +49,13 @@ from objc_frameworks.Metal import (
 MTKView = ObjCClass('MTKView')
 
 
+class Colors:
+  wenderlichGreen = MTLClearColorMake(0.0, 0.4, 0.21, 1.0)
+
+
 class MainViewController(UIViewController):
+  
+  metalView: MTKView
 
   @objc_method
   def dealloc(self):
@@ -70,7 +76,13 @@ class MainViewController(UIViewController):
 
     device = MTLCreateSystemDefaultDevice()
     metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
+    metalView.clearColor = Colors.wenderlichGreen
+    
     metalView.delegate = self
+    
+    metalView.setPaused_(True)
+    #metalView.enableSetNeedsDisplay = True
+    #metalView.setNeedsDisplay()
 
     self.view.addSubview_(metalView)
 
@@ -88,6 +100,8 @@ class MainViewController(UIViewController):
       metalView.heightAnchor.constraintEqualToAnchor_multiplier_(
         safeAreaLayoutGuide.heightAnchor, 0.5),
     ])
+    
+    self.metalView = metalView
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -109,7 +123,9 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
+    self.metalView.setPaused_(False)
     print(f'    - {NSStringFromClass(__class__)}: viewDidAppear_')
+    
   @objc_method
   def viewWillDisappear_(self, animated: bool):
     send_super(__class__,
@@ -120,6 +136,7 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
     print(f'    - {NSStringFromClass(__class__)}: viewWillDisappear_')
+    self.metalView.setPaused_(True)
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
@@ -131,7 +148,7 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
 
-    #print(f'    - {NSStringFromClass(__class__)}: viewDidDisappear_')
+    print(f'    - {NSStringFromClass(__class__)}: viewDidDisappear_')
 
   @objc_method
   def didReceiveMemoryWarning(self):
@@ -141,7 +158,7 @@ class MainViewController(UIViewController):
   # --- MTKViewDelegate
   @objc_method
   def mtkView_drawableSizeWillChange_(self, view, size: CGSize):
-    pass
+    print('      - mtkView_drawableSizeWillChange_')
 
   @objc_method
   def drawInMTKView_(self, view):
