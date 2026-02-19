@@ -55,7 +55,8 @@ class Colors:
 
 class MainViewController(UIViewController):
   
-  metalView: MTKView
+  metalView: MTKView = objc_property()
+  commandQueue: 'MTLCommandQueue' = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -79,6 +80,7 @@ class MainViewController(UIViewController):
     metalView.clearColor = Colors.wenderlichGreen
     
     metalView.delegate = self
+    commandQueue = device.newCommandQueue()
     
     metalView.setPaused_(True)
     #metalView.enableSetNeedsDisplay = True
@@ -102,6 +104,7 @@ class MainViewController(UIViewController):
     ])
     
     self.metalView = metalView
+    self.commandQueue = commandQueue
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
