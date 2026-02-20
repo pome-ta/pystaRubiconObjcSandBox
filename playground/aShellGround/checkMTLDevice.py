@@ -109,7 +109,7 @@ class MainViewController(UIViewController):
     #metalView.delegate = self
     commandQueue = device.newCommandQueue()
 
-    metalView.setPaused_(True)
+    #metalView.setPaused_(True)
     #metalView.enableSetNeedsDisplay = True
     #metalView.setNeedsDisplay()
 
@@ -195,7 +195,7 @@ class MainViewController(UIViewController):
     print(f'    - {NSStringFromClass(__class__)}: viewWillAppear_')
     #self.metalView.enableSetNeedsDisplay = False
     self.metalView.delegate = self
-    self.metalView.setPaused_(False)
+    #self.metalView.setPaused_(False)
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
