@@ -198,7 +198,7 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
     print(f'    - {NSStringFromClass(__class__)}: viewWillDisappear_')
-    self.metalView.setPaused_(True)
+    #self.metalView.setPaused_(True)
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
