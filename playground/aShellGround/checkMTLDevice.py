@@ -52,7 +52,7 @@ MTKView = ObjCClass('MTKView')
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
 MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 
-shader_path = Path(Path(__file__).parent,'Shader.metal')
+shader_path = Path(Path(__file__).parent, 'Shader.metal')
 
 shader_source = '''#include <metal_stdlib>
 using namespace metal;
@@ -68,13 +68,13 @@ fragment half4 fragment_shader() {
 }
 '''
 #shader_code = shader_path.read_text('utf-8')
-print(str((Path(__file__).resolve())))
-print('')
-print(str(shader_path.resolve()))
 
 
 class Colors:
   wenderlichGreen = MTLClearColorMake(0.0, 0.4, 0.21, 1.0)
+
+
+VertexArrayType = (ctypes.c_float * (3 * 3))
 
 
 class MainViewController(UIViewController):
@@ -132,18 +132,23 @@ class MainViewController(UIViewController):
 
     self.metalView = metalView
     self.commandQueue = commandQueue
-
-
+    '''
     vertices = (ctypes.c_float * (3 * 3))(
        0.0,  1.0,  0.0,  # 1
       -1.0, -1.0,  0.0,  # 2
        1.0, -1.0,  0.0,  # 3
     )  # yapf: disable
-
+    '''
+    vertices = VertexArrayType(
+       0.0,  1.0,  0.0,  # 1
+      -1.0, -1.0,  0.0,  # 2
+       1.0, -1.0,  0.0,  # 3
+    )  # yapf: disable
 
     self.vertices = vertices
     self.buildModel()
     self.buildPipelineState()
+    metalView.delegate = self
 
   # --- private
   @objc_method
@@ -194,7 +199,7 @@ class MainViewController(UIViewController):
                ])
     print(f'    - {NSStringFromClass(__class__)}: viewWillAppear_')
     #self.metalView.enableSetNeedsDisplay = False
-    self.metalView.delegate = self
+    #self.metalView.delegate = self
     #self.metalView.setPaused_(False)
 
   @objc_method
