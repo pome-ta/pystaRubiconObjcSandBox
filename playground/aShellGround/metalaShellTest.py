@@ -35,7 +35,7 @@ UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 # --- Metal
-from pyrubicon.objc.types import CGSize
+from pyrubicon.objc.types import CGSize, CGFloat
 
 from objc_frameworks.CoreGraphics import CGRectZero
 from objc_frameworks.Metal import (
@@ -74,7 +74,7 @@ class MainViewController(UIViewController):
   vertexBuffer: 'MTLBuffer?' = objc_property()
   indexBuffer: 'MTLBuffer?' = objc_property()
   constants: Constants = objc_property(object)
-  time: float = objc_property(object)
+  time: float = objc_property(CGFloat)
 
   @objc_method
   def dealloc(self):
