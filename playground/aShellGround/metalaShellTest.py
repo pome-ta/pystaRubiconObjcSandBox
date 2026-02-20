@@ -99,6 +99,8 @@ class MainViewController(UIViewController):
 
     commandQueue = device.newCommandQueue()
 
+    metalView.delegate = self
+
     #metalView.setPaused_(True)
     #metalView.enableSetNeedsDisplay = True
     #metalView.setNeedsDisplay()
@@ -136,10 +138,9 @@ class MainViewController(UIViewController):
 
     self.constants = Constants()
     self.time = 0.0
-
+    #metalView.delegate = self
     self.buildModel()
     self.buildPipelineState()
-    metalView.delegate = self
 
   # --- private
   @objc_method
