@@ -21,7 +21,6 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
 
 import ctypes
 from pathlib import Path
-from math import sin
 
 from pyrubicon.objc.api import ObjCClass
 from pyrubicon.objc.api import objc_method, objc_property
@@ -35,9 +34,6 @@ UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 # --- Metal
-
-from pyrubicon.objc.api import Block, ObjCInstance, ObjCProtocol
-from pyrubicon.objc.runtime import autoreleasepool, objc_id, load_library, SEL
 from pyrubicon.objc.types import CGSize
 
 from objc_frameworks.CoreGraphics import CGRectZero
@@ -49,51 +45,30 @@ from objc_frameworks.Metal import (
   MTLPrimitiveType,
   MTLIndexType,
 )
-from objc_frameworks.Dispatch import (
-  dispatch_semaphore_create,
-  dispatch_semaphore_wait,
-  dispatch_semaphore_signal,
-  DISPATCH_TIME_FOREVER,
-)
-
-from rbedge.objcMainThread import onMainThread
-
-#Metal = load_library('Metal')
-#MetalKit = load_library('MetalKit')
 
 MTKView = ObjCClass('MTKView')
-
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
 MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 
-#MTKViewDelegate = ObjCProtocol('MTKViewDelegate')
+shader_path = Path(Path(__file__).parent, 'Shader.metal')
 
-shader_path = Path('./Shader.metal')
+
 
 
 class Colors:
   wenderlichGreen = MTLClearColorMake(0.0, 0.4, 0.21, 1.0)
 
 
-class Constants(ctypes.Structure):
-  _fields_ = [
-    ('animateBy', ctypes.c_float),
-  ]
 
 
-#class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
+
 class MainViewController(UIViewController):
+
   metalView: MTKView = objc_property()
   commandQueue: 'MTLCommandQueue' = objc_property()
-  device: 'MTLCreateSystemDefaultDevice' = objc_property(weak=True)
-  vertices: '[Float]'
-  indices: '[UInt16]'
-  pipelineState: 'MTLRenderPipelineState?'
-  vertexBuffer: 'MTLBuffer?'
-  indexBuffer: 'MTLBuffer?'
-  constants: Constants
-  time: float
-  semaphore: ObjCInstance
+  vertices: '[Float]' = objc_property(object)
+  pipelineState: 'MTLRenderPipelineState?' = objc_property()
+  vertexBuffer: 'MTLBuffer?' = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -110,23 +85,13 @@ class MainViewController(UIViewController):
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     print(f'    - {NSStringFromClass(__class__)}: viewDidLoad')
-    #self.navigationItem.title = NSStringFromClass(__class__)
-    self.performSelectorOnMainThread_withObject_waitUntilDone_(
-      SEL('metalViewDidLoad:'), None, True)
-    #pdbr.state(self)
-
-  #@onMainThread  #(sync=False)
-  @objc_method
-  def metalViewDidLoad_(self, dmy):
-
-    #self.navigationItem.title = NSStringFromClass(__class__)
+    self.navigationItem.title = NSStringFromClass(__class__)
 
     device = MTLCreateSystemDefaultDevice()
-
     metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
     metalView.clearColor = Colors.wenderlichGreen
 
-    #metalView.delegate = self
+
     commandQueue = device.newCommandQueue()
 
     #metalView.setPaused_(True)
@@ -152,62 +117,40 @@ class MainViewController(UIViewController):
 
     self.metalView = metalView
     self.commandQueue = commandQueue
-    self.device = device
-    #self.semaphore = dispatch_semaphore_create(3)
-
-    self.renderer()
-
-  #@onMainThread(sync=False)
-  @objc_method
-  def renderer(self):
-    self.vertices = (ctypes.c_float * (4 * 3))(
-      -1.0,  1.0,  0.0,  # v0
-      -1.0, -1.0,  0.0,  # v1
-       1.0, -1.0,  0.0,  # v2
-       1.0,  1.0,  0.0,  # v3
+    
+    vertices = (ctypes.c_float * (3 * 3))(
+       0.0,  1.0,  0.0,  # 1
+      -1.0, -1.0,  0.0,  # 2
+       1.0, -1.0,  0.0,  # 3
     )  # yapf: disable
-    self.indices = (ctypes.c_int16 * (2 * 3))(
-      0, 1, 2,
-      2, 3, 0,
-    )  # yapf: disable
-    self.constants = Constants()
-    self.time = 0.0
+    
 
+    self.vertices = vertices
     self.buildModel()
     self.buildPipelineState()
+    metalView.delegate = self
+    
 
-    return self
 
   # --- private
   @objc_method
   def buildModel(self):
 
-    vertexBuffer = self.device.newBufferWithBytes_length_options_(
+    vertexBuffer = self.metalView.device.newBufferWithBytes_length_options_(
       self.vertices, ctypes.sizeof(self.vertices),
       MTLResourceOptions.storageModeShared)
-    indexBuffer = self.device.newBufferWithBytes_length_options_(
-      self.indices, ctypes.sizeof(self.indices),
-      MTLResourceOptions.storageModeShared)
 
     self.vertexBuffer = vertexBuffer
-    self.indexBuffer = indexBuffer
-    '''
-
-    vertexBuffer = self.device.newBufferWithBytes_length_options_(
-      self.vertices, ctypes.sizeof(self.vertices), 0)
-    indexBuffer = self.device.newBufferWithBytes_length_options_(
-      self.indices, ctypes.sizeof(self.indices), 0)
-    self.vertexBuffer = vertexBuffer
-    self.indexBuffer = indexBuffer
-    '''
 
   @objc_method
   def buildPipelineState(self):
     source = shader_path.read_text('utf-8')
+    #source = shader_source
+    #source = shader_code
     options = MTLCompileOptions.new()
 
-    library = self.device.newLibraryWithSource_options_error_(
-      source, None, None)
+    library = self.metalView.device.newLibraryWithSource_options_error_(
+      source, options, None)
 
     vertexFunction = library.newFunctionWithName_('vertex_shader')
     fragmentFunction = library.newFunctionWithName_('fragment_shader')
@@ -220,7 +163,7 @@ class MainViewController(UIViewController):
 
     pipelineState = None
     try:
-      pipelineState = self.device.newRenderPipelineStateWithDescriptor_error_(
+      pipelineState = self.metalView.device.newRenderPipelineStateWithDescriptor_error_(
         pipelineDescriptor, None)
     except Exception as e:
       print(f'pipelineState error: {e}')
@@ -237,8 +180,9 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
     print(f'    - {NSStringFromClass(__class__)}: viewWillAppear_')
-    self.navigationItem.title = NSStringFromClass(__class__)
-    self.metalView.delegate = self
+    #self.metalView.enableSetNeedsDisplay = False
+    #self.metalView.delegate = self
+    #self.metalView.setPaused_(False)
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -250,6 +194,7 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
     #self.metalView.setPaused_(False)
+    print(f'    - {NSStringFromClass(__class__)}: viewDidAppear_')
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
@@ -260,8 +205,8 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #self.metalView.setPaused_(True)
     print(f'    - {NSStringFromClass(__class__)}: viewWillDisappear_')
+    #self.metalView.setPaused_(True)
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
@@ -272,9 +217,7 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #self.metalView = None
-    #self.metalView.device = None
-    #pdbr.state(self.metalView)
+
     print(f'    - {NSStringFromClass(__class__)}: viewDidDisappear_')
 
   @objc_method
@@ -285,65 +228,39 @@ class MainViewController(UIViewController):
   # --- MTKViewDelegate
   @objc_method
   def mtkView_drawableSizeWillChange_(self, view, size: CGSize):
-    pass
+    print('      - mtkView_drawableSizeWillChange_')
 
   @objc_method
   def drawInMTKView_(self, view):
     print('d')
-    #dispatch_semaphore_wait(self.semaphore, DISPATCH_TIME_FOREVER)
+    if not ((drawable := view.currentDrawable) and
+            (pipelineState := self.pipelineState) and
+            (descriptor := view.currentRenderPassDescriptor)):
+      return
 
-    with autoreleasepool():
-      if not ((drawable := view.currentDrawable) and
-              (pipelineState := self.pipelineState) and
-              (indexBuffer := self.indexBuffer) and
-              (descriptor := view.currentRenderPassDescriptor)):
-        #dispatch_semaphore_signal(self.semaphore)
+    commandBuffer = self.commandQueue.commandBuffer()
 
-        return
-      commandBuffer = self.commandQueue.commandBuffer()
-      
-      def completion_handler(buffer):
-        dispatch_semaphore_signal(self.semaphore)
+    commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
+      descriptor)
+    commandEncoder.setRenderPipelineState_(pipelineState)
+    commandEncoder.setVertexBuffer_offset_atIndex_(self.vertexBuffer, 0, 0)
+    commandEncoder.drawPrimitives_vertexStart_vertexCount_(MTLPrimitiveType.triangle, 0, self.vertices.__len__())
+    #commandEncoder.drawPrimitives_vertexStart_vertexCount_(MTLPrimitiveType.triangle, 0, 3)
 
-      # Block(関数, 戻り値, 引数...)
-      handler_block = Block(completion_handler, None, objc_id)
-      #commandBuffer.addCompletedHandler_(handler_block)
-
-      self.time += 1 / view.preferredFramesPerSecond
-      animateBy = abs(sin(self.time) / 2 + 0.5)
-      self.constants.animateBy = animateBy
-
-      commandBuffer = self.commandQueue.commandBuffer()
-
-      commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
-        descriptor)
-      commandEncoder.setRenderPipelineState_(pipelineState)
-      commandEncoder.setVertexBuffer_offset_atIndex_(self.vertexBuffer, 0, 0)
-      commandEncoder.setVertexBytes_length_atIndex_(
-        ctypes.byref(self.constants), ctypes.sizeof(self.constants), 1)
-
-      commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
-        MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
-        self.indexBuffer, 0)
-
-      commandEncoder.endEncoding()
-      commandBuffer.presentDrawable_(drawable)
-      commandBuffer.commit()
+    commandEncoder.endEncoding()
+    commandBuffer.presentDrawable_(drawable)
+    commandBuffer.commit()
 
 
 if __name__ == '__main__':
   from rbedge.app import App
   from objc_frameworks.UIKit import UIModalPresentationStyle
 
-  print('--- --- start')
   main_vc = MainViewController.new()
 
   presentation_style = UIModalPresentationStyle.fullScreen
   #presentation_style = UIModalPresentationStyle.pageSheet
 
   app = App(main_vc, presentation_style)
-  print('main')
   app.present()
-  print('main.present')
-  print('### ### ###')
 
