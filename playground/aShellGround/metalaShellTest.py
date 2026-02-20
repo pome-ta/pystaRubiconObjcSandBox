@@ -21,6 +21,7 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
 
 import ctypes
 from pathlib import Path
+from math import sin
 
 from pyrubicon.objc.api import ObjCClass
 from pyrubicon.objc.api import objc_method, objc_property
@@ -57,13 +58,23 @@ class Colors:
   wenderlichGreen = MTLClearColorMake(0.0, 0.4, 0.21, 1.0)
 
 
+class Constants(ctypes.Structure):
+  _fields_ = [
+    ('animateBy', ctypes.c_float),
+  ]
+
+
 class MainViewController(UIViewController):
 
   metalView: MTKView = objc_property()
   commandQueue: 'MTLCommandQueue' = objc_property()
   vertices: '[Float]' = objc_property(object)
+  indices: '[UInt16]' = objc_property(object)
   pipelineState: 'MTLRenderPipelineState?' = objc_property()
   vertexBuffer: 'MTLBuffer?' = objc_property()
+  indexBuffer: 'MTLBuffer?' = objc_property()
+  constants: Constants = objc_property(object)
+  time: float = objc_property(object)
 
   @objc_method
   def dealloc(self):
@@ -112,14 +123,20 @@ class MainViewController(UIViewController):
     self.metalView = metalView
     self.commandQueue = commandQueue
 
-    vertices = (ctypes.c_float * (3 * 3))(
-       0.0,  1.0,  0.0,  # 1
-      -1.0, -1.0,  0.0,  # 2
-       1.0, -1.0,  0.0,  # 3
+    self.vertices = (ctypes.c_float * (4 * 3))(
+      -1.0,  1.0,  0.0,  # v0
+      -1.0, -1.0,  0.0,  # v1
+       1.0, -1.0,  0.0,  # v2
+       1.0,  1.0,  0.0,  # v3
+    )  # yapf: disable
+    self.indices = (ctypes.c_int16 * (2 * 3))(
+      0, 1, 2,
+      2, 3, 0,
     )  # yapf: disable
 
+    self.constants = Constants()
+    self.time = 0.0
 
-    self.vertices = vertices
     self.buildModel()
     self.buildPipelineState()
     metalView.delegate = self
@@ -131,14 +148,16 @@ class MainViewController(UIViewController):
     vertexBuffer = self.metalView.device.newBufferWithBytes_length_options_(
       self.vertices, ctypes.sizeof(self.vertices),
       MTLResourceOptions.storageModeShared)
+    indexBuffer = self.metalView.device.newBufferWithBytes_length_options_(
+      self.indices, ctypes.sizeof(self.indices),
+      MTLResourceOptions.storageModeShared)
 
     self.vertexBuffer = vertexBuffer
+    self.indexBuffer = indexBuffer
 
   @objc_method
   def buildPipelineState(self):
     source = shader_path.read_text('utf-8')
-    #source = shader_source
-    #source = shader_code
     options = MTLCompileOptions.new()
 
     library = self.metalView.device.newLibraryWithSource_options_error_(
@@ -224,11 +243,15 @@ class MainViewController(UIViewController):
 
   @objc_method
   def drawInMTKView_(self, view):
-    print('d')
     if not ((drawable := view.currentDrawable) and
             (pipelineState := self.pipelineState) and
+            (indexBuffer := self.indexBuffer) and
             (descriptor := view.currentRenderPassDescriptor)):
       return
+
+    self.time += 1 / view.preferredFramesPerSecond
+    animateBy = abs(sin(self.time) / 2 + 0.5)
+    self.constants.animateBy = animateBy
 
     commandBuffer = self.commandQueue.commandBuffer()
 
@@ -236,9 +259,12 @@ class MainViewController(UIViewController):
       descriptor)
     commandEncoder.setRenderPipelineState_(pipelineState)
     commandEncoder.setVertexBuffer_offset_atIndex_(self.vertexBuffer, 0, 0)
-    commandEncoder.drawPrimitives_vertexStart_vertexCount_(
-      MTLPrimitiveType.triangle, 0, self.vertices.__len__())
-    #commandEncoder.drawPrimitives_vertexStart_vertexCount_(MTLPrimitiveType.triangle, 0, 3)
+    commandEncoder.setVertexBytes_length_atIndex_(
+      ctypes.byref(self.constants), ctypes.sizeof(self.constants), 1)
+
+    commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
+      MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
+      self.indexBuffer, 0)
 
     commandEncoder.endEncoding()
     commandBuffer.presentDrawable_(drawable)
