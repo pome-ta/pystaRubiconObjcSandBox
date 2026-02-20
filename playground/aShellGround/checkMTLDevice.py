@@ -52,7 +52,25 @@ MTKView = ObjCClass('MTKView')
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
 MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 
-shader_path = Path('./Shader.metal')
+shader_path = Path(Path(__file__).parent,'Shader.metal')
+
+shader_source = '''#include <metal_stdlib>
+using namespace metal;
+
+
+vertex float4 vertex_shader(const device packed_float3 *vertices [[ buffer(0) ]],
+                            uint vertexId [[ vertex_id ]]) {
+  return float4(vertices[vertexId], 1);
+}
+
+fragment half4 fragment_shader() {
+  return half4(1, 0, 0, 1);
+}
+'''
+#shader_code = shader_path.read_text('utf-8')
+print(str((Path(__file__).resolve())))
+print('')
+print(str(shader_path.resolve()))
 
 
 class Colors:
@@ -63,7 +81,7 @@ class MainViewController(UIViewController):
 
   metalView: MTKView = objc_property()
   commandQueue: 'MTLCommandQueue' = objc_property()
-  vertices: '[Float]'  = objc_property(object)
+  vertices: '[Float]' = objc_property(object)
   pipelineState: 'MTLRenderPipelineState?' = objc_property()
   vertexBuffer: 'MTLBuffer?' = objc_property()
 
@@ -88,12 +106,12 @@ class MainViewController(UIViewController):
     metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
     metalView.clearColor = Colors.wenderlichGreen
 
-    metalView.delegate = self
+    #metalView.delegate = self
     commandQueue = device.newCommandQueue()
 
-    #metalView.setPaused_(True)
-    metalView.enableSetNeedsDisplay = True
-    metalView.setNeedsDisplay()
+    metalView.setPaused_(True)
+    #metalView.enableSetNeedsDisplay = True
+    #metalView.setNeedsDisplay()
 
     self.view.addSubview_(metalView)
 
@@ -115,14 +133,14 @@ class MainViewController(UIViewController):
     self.metalView = metalView
     self.commandQueue = commandQueue
 
-    
+
     vertices = (ctypes.c_float * (3 * 3))(
        0.0,  1.0,  0.0,  # 1
       -1.0, -1.0,  0.0,  # 2
        1.0, -1.0,  0.0,  # 3
     )  # yapf: disable
-    
-    
+
+
     self.vertices = vertices
     self.buildModel()
     self.buildPipelineState()
@@ -140,6 +158,8 @@ class MainViewController(UIViewController):
   @objc_method
   def buildPipelineState(self):
     source = shader_path.read_text('utf-8')
+    #source = shader_source
+    #source = shader_code
     options = MTLCompileOptions.new()
 
     library = self.metalView.device.newLibraryWithSource_options_error_(
@@ -173,6 +193,9 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
     print(f'    - {NSStringFromClass(__class__)}: viewWillAppear_')
+    #self.metalView.enableSetNeedsDisplay = False
+    self.metalView.delegate = self
+    self.metalView.setPaused_(False)
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
