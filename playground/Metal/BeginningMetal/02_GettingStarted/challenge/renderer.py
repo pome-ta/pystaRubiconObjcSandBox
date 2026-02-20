@@ -20,15 +20,15 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
       warnings.warn(__warning_message, ImportWarning)
 
 from pyrubicon.objc.api import NSObject
-from pyrubicon.objc.api import objc_method
+from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGSize
 
 
 class Renderer(NSObject):
 
-  device: 'MTLDevice'
-  commandQueue: 'MTLCommandQueue'
+  device: 'MTLDevice' = objc_property()
+  commandQueue: 'MTLCommandQueue' = objc_property()
 
   @objc_method
   def initWithDevice_(self, device):
