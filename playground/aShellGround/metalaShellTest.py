@@ -79,18 +79,18 @@ class MainViewController(UIViewController):
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
-    print(f'	 - {NSStringFromClass(__class__)}: dealloc')
+    #print(f'	 - {NSStringFromClass(__class__)}: dealloc')
     pass
 
   @objc_method
   def loadView(self):
     send_super(__class__, self, 'loadView')
-    print(f'    - {NSStringFromClass(__class__)}: loadView')
+    #print(f'    - {NSStringFromClass(__class__)}: loadView')
 
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
-    print(f'    - {NSStringFromClass(__class__)}: viewDidLoad')
+    #print(f'    - {NSStringFromClass(__class__)}: viewDidLoad')
     self.navigationItem.title = NSStringFromClass(__class__)
 
     device = MTLCreateSystemDefaultDevice()
@@ -106,21 +106,6 @@ class MainViewController(UIViewController):
     #metalView.setNeedsDisplay()
 
     self.view.addSubview_(metalView)
-
-    # --- Layout
-    safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
-
-    metalView.translatesAutoresizingMaskIntoConstraints = False
-    NSLayoutConstraint.activateConstraints_([
-      metalView.centerXAnchor.constraintEqualToAnchor_(
-        safeAreaLayoutGuide.centerXAnchor),
-      metalView.centerYAnchor.constraintEqualToAnchor_(
-        safeAreaLayoutGuide.centerYAnchor),
-      metalView.widthAnchor.constraintEqualToAnchor_multiplier_(
-        safeAreaLayoutGuide.widthAnchor, 0.5),
-      metalView.heightAnchor.constraintEqualToAnchor_multiplier_(
-        safeAreaLayoutGuide.heightAnchor, 0.5),
-    ])
 
     self.metalView = metalView
     self.commandQueue = commandQueue
@@ -138,11 +123,29 @@ class MainViewController(UIViewController):
 
     self.constants = Constants()
     self.time = 0.0
-    #metalView.delegate = self
+
     self.buildModel()
     self.buildPipelineState()
 
+    self.setupLayoutConstraint()
+
   # --- private
+  @objc_method
+  def setupLayoutConstraint(self):
+    safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
+
+    self.metalView.translatesAutoresizingMaskIntoConstraints = False
+    NSLayoutConstraint.activateConstraints_([
+      self.metalView.centerXAnchor.constraintEqualToAnchor_(
+        safeAreaLayoutGuide.centerXAnchor),
+      self.metalView.centerYAnchor.constraintEqualToAnchor_(
+        safeAreaLayoutGuide.centerYAnchor),
+      self.metalView.widthAnchor.constraintEqualToAnchor_multiplier_(
+        safeAreaLayoutGuide.widthAnchor, 0.5),
+      self.metalView.heightAnchor.constraintEqualToAnchor_multiplier_(
+        safeAreaLayoutGuide.heightAnchor, 0.5),
+    ])
+
   @objc_method
   def buildModel(self):
 
@@ -191,10 +194,7 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    print(f'    - {NSStringFromClass(__class__)}: viewWillAppear_')
-    #self.metalView.enableSetNeedsDisplay = False
-    #self.metalView.delegate = self
-    #self.metalView.setPaused_(False)
+    #print(f'    - {NSStringFromClass(__class__)}: viewWillAppear_')
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -205,8 +205,7 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #self.metalView.setPaused_(False)
-    print(f'    - {NSStringFromClass(__class__)}: viewDidAppear_')
+    #print(f'    - {NSStringFromClass(__class__)}: viewDidAppear_')
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
@@ -217,7 +216,7 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    print(f'    - {NSStringFromClass(__class__)}: viewWillDisappear_')
+    #print(f'    - {NSStringFromClass(__class__)}: viewWillDisappear_')
     self.metalView.setPaused_(True)
 
   @objc_method
@@ -229,8 +228,7 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-
-    print(f'    - {NSStringFromClass(__class__)}: viewDidDisappear_')
+    #print(f'    - {NSStringFromClass(__class__)}: viewDidDisappear_')
 
   @objc_method
   def didReceiveMemoryWarning(self):
@@ -240,7 +238,8 @@ class MainViewController(UIViewController):
   # --- MTKViewDelegate
   @objc_method
   def mtkView_drawableSizeWillChange_(self, view, size: CGSize):
-    print('      - mtkView_drawableSizeWillChange_')
+    #print('      - mtkView_drawableSizeWillChange_')
+    pass
 
   @objc_method
   def drawInMTKView_(self, view):

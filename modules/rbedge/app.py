@@ -21,9 +21,6 @@ class App:
     viewController: UIViewController,
     modalPresentationStyle: Union[UIModalPresentationStyle,
                                   int] = UIModalPresentationStyle.pageSheet):
-
-    print('app.init')
-
     self.viewController = viewController
     # xxx: style 指定を力技で確認
     _automatic = UIModalPresentationStyle.automatic  # -2
@@ -37,7 +34,6 @@ class App:
     self.set_rootViewController()
 
   def set_rootViewController(self) -> None:
-    print('s: set_rootViewController')
     sharedApplication = UIApplication.sharedApplication
     objectEnumerator = sharedApplication.connectedScenes.objectEnumerator()
 
@@ -47,16 +43,13 @@ class App:
         break
     rootViewController = windowScene.keyWindow.rootViewController
     self.rootViewController = rootViewController
-    print('e: set_rootViewController')
 
   def present(self) -> None:
-    print('app.present')
 
     @onMainThread(sync=False)
     def present_viewController(viewController: UIViewController,
                                style: int) -> None:
 
-      print('# @onMainThread')
       presentViewController = RootNavigationController.alloc(
       ).initWithRootViewController_(viewController)
 
@@ -69,16 +62,10 @@ class App:
     self.main_loop()
 
   def main_loop(self) -> None:
-
     try:
-      print('app s: run')
       loop.run_forever()
-      print('app e: run')
-
     except Exception as e:
-      print(f'Exception: {e}')
+      loop.stop()
     finally:
-      print('app s: close')
       loop.close()
-      print('app e: close')
 

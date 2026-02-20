@@ -20,9 +20,8 @@ class RootNavigationController(UINavigationController):
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
-    print(f'- {NSStringFromClass(__class__)}: dealloc')
+    #print(f'- {NSStringFromClass(__class__)}: dealloc')
     loop.stop()
-    print('stop')
 
   @objc_method
   def loadView(self):
@@ -36,7 +35,6 @@ class RootNavigationController(UINavigationController):
     self.navigationBar.scrollEdgeAppearance = navigationBarAppearance
     self.navigationBar.compactAppearance = navigationBarAppearance
     self.navigationBar.compactScrollEdgeAppearance = navigationBarAppearance
-    
     '''
 
     toolbarAppearance = UIToolbarAppearance.new()

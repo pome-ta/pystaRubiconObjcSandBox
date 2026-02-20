@@ -21,13 +21,11 @@ def _dispatch_call(func_name, queue, block_obj):
 
 
 def onMainThread(func=None, *, sync=True):
-  print('onMainThread')
   if func is None:
     return functools.partial(onMainThread, sync=sync)
 
   @functools.wraps(func)
   def wrapper(*args, **kwargs):
-    print('___ wrapper')
     if NSThread.isMainThread:
       return func(*args, **kwargs)
 
@@ -41,11 +39,9 @@ def onMainThread(func=None, *, sync=True):
     block = Block(task, None)
 
     if sync:
-      print('--- Sync')
       _dispatch_call('dispatch_sync', queue, block)
       return results[0] if results else None
     else:
-      print('--- Async')
       _dispatch_call('dispatch_async', queue, block)
       return None  # asyncは戻り値なし
 
