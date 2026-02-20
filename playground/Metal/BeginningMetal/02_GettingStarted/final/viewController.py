@@ -33,11 +33,13 @@ UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 # --- Metal
-from pyrubicon.objc.api import ObjCProtocol
 from pyrubicon.objc.types import CGSize
 
 from objc_frameworks.CoreGraphics import CGRectZero
-from objc_frameworks.Metal import MTLCreateSystemDefaultDevice, MTLClearColorMake
+from objc_frameworks.Metal import (
+  MTLCreateSystemDefaultDevice,
+  MTLClearColorMake,
+)
 
 MTKView = ObjCClass('MTKView')
 
@@ -47,8 +49,9 @@ class Colors:
 
 
 class MainViewController(UIViewController):
-  metalView: MTKView
-  commandQueue: 'MTLCommandQueue'
+
+  metalView: MTKView = objc_property()
+  commandQueue: 'MTLCommandQueue' = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -78,23 +81,10 @@ class MainViewController(UIViewController):
 
     self.view.addSubview_(metalView)
 
-    # --- Layout
-    safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
-
-    metalView.translatesAutoresizingMaskIntoConstraints = False
-    NSLayoutConstraint.activateConstraints_([
-      metalView.centerXAnchor.constraintEqualToAnchor_(
-        safeAreaLayoutGuide.centerXAnchor),
-      metalView.centerYAnchor.constraintEqualToAnchor_(
-        safeAreaLayoutGuide.centerYAnchor),
-      metalView.widthAnchor.constraintEqualToAnchor_multiplier_(
-        safeAreaLayoutGuide.widthAnchor, 0.5),
-      metalView.heightAnchor.constraintEqualToAnchor_multiplier_(
-        safeAreaLayoutGuide.heightAnchor, 0.5),
-    ])
-
     self.metalView = metalView
     self.commandQueue = commandQueue
+
+    self.setupLayoutConstraint()
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -158,6 +148,23 @@ class MainViewController(UIViewController):
     commandEncoder.endEncoding()
     commandBuffer.presentDrawable_(drawable)
     commandBuffer.commit()
+
+  # --- private
+  @objc_method
+  def setupLayoutConstraint(self):
+    safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
+
+    self.metalView.translatesAutoresizingMaskIntoConstraints = False
+    NSLayoutConstraint.activateConstraints_([
+      self.metalView.centerXAnchor.constraintEqualToAnchor_(
+        safeAreaLayoutGuide.centerXAnchor),
+      self.metalView.centerYAnchor.constraintEqualToAnchor_(
+        safeAreaLayoutGuide.centerYAnchor),
+      self.metalView.widthAnchor.constraintEqualToAnchor_multiplier_(
+        safeAreaLayoutGuide.widthAnchor, 0.5),
+      self.metalView.heightAnchor.constraintEqualToAnchor_multiplier_(
+        safeAreaLayoutGuide.heightAnchor, 0.5),
+    ])
 
 
 if __name__ == '__main__':
