@@ -35,7 +35,6 @@ UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 # --- Metal
-from pyrubicon.objc.runtime import autoreleasepool, objc_id
 from pyrubicon.objc.types import CGSize, CGFloat
 
 from objc_frameworks.CoreGraphics import CGRectZero
@@ -244,33 +243,32 @@ class MainViewController(UIViewController):
 
   @objc_method
   def drawInMTKView_(self, view):
-    with autoreleasepool():
-      if not ((drawable := view.currentDrawable) and
-              (pipelineState := self.pipelineState) and
-              (indexBuffer := self.indexBuffer) and
-              (descriptor := view.currentRenderPassDescriptor)):
-        return
-  
-      self.time += 1 / view.preferredFramesPerSecond
-      animateBy = abs(sin(self.time) / 2 + 0.5)
-      self.constants.animateBy = animateBy
-  
-      commandBuffer = self.commandQueue.commandBuffer()
-  
-      commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
-        descriptor)
-      commandEncoder.setRenderPipelineState_(pipelineState)
-      commandEncoder.setVertexBuffer_offset_atIndex_(self.vertexBuffer, 0, 0)
-      commandEncoder.setVertexBytes_length_atIndex_(
-        ctypes.byref(self.constants), ctypes.sizeof(self.constants), 1)
-  
-      commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
-        MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
-        self.indexBuffer, 0)
-  
-      commandEncoder.endEncoding()
-      commandBuffer.presentDrawable_(drawable)
-      commandBuffer.commit()
+    if not ((drawable := view.currentDrawable) and
+            (pipelineState := self.pipelineState) and
+            (indexBuffer := self.indexBuffer) and
+            (descriptor := view.currentRenderPassDescriptor)):
+      return
+
+    self.time += 1 / view.preferredFramesPerSecond
+    animateBy = abs(sin(self.time) / 2 + 0.5)
+    self.constants.animateBy = animateBy
+
+    commandBuffer = self.commandQueue.commandBuffer()
+
+    commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
+      descriptor)
+    commandEncoder.setRenderPipelineState_(pipelineState)
+    commandEncoder.setVertexBuffer_offset_atIndex_(self.vertexBuffer, 0, 0)
+    commandEncoder.setVertexBytes_length_atIndex_(
+      ctypes.byref(self.constants), ctypes.sizeof(self.constants), 1)
+
+    commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
+      MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
+      self.indexBuffer, 0)
+
+    commandEncoder.endEncoding()
+    commandBuffer.presentDrawable_(drawable)
+    commandBuffer.commit()
 
 
 if __name__ == '__main__':
