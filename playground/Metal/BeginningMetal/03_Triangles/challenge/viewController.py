@@ -22,7 +22,7 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
 import ctypes
 
 from pyrubicon.objc.api import ObjCClass
-from pyrubicon.objc.api import objc_method
+from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 
 from objc_frameworks.Foundation import NSStringFromClass
@@ -34,7 +34,10 @@ NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 # --- Metal
 from objc_frameworks.CoreGraphics import CGRectZero
-from objc_frameworks.Metal import MTLCreateSystemDefaultDevice, MTLClearColorMake
+from objc_frameworks.Metal import (
+  MTLCreateSystemDefaultDevice,
+  MTLClearColorMake,
+)
 
 from renderer import Renderer
 
@@ -47,8 +50,8 @@ class Colors:
 
 class MainViewController(UIViewController):
 
-  metalView: MTKView
-  renderer: Renderer
+  metalView: MTKView = objc_property()
+  renderer: Renderer = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -67,35 +70,17 @@ class MainViewController(UIViewController):
 
     device = MTLCreateSystemDefaultDevice()
 
-    metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
-    metalView.clearColor = Colors.wenderlichGreen
-
     renderer = Renderer.alloc().initWithDevice_(device)
 
+    metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
+    metalView.clearColor = Colors.wenderlichGreen
     metalView.delegate = renderer
-
-    #metalView.enableSetNeedsDisplay = True
-    #metalView.setNeedsDisplay()
 
     self.view.addSubview_(metalView)
 
-    # --- Layout
-    safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
-
-    metalView.translatesAutoresizingMaskIntoConstraints = False
-    NSLayoutConstraint.activateConstraints_([
-      metalView.centerXAnchor.constraintEqualToAnchor_(
-        safeAreaLayoutGuide.centerXAnchor),
-      metalView.centerYAnchor.constraintEqualToAnchor_(
-        safeAreaLayoutGuide.centerYAnchor),
-      metalView.widthAnchor.constraintEqualToAnchor_multiplier_(
-        safeAreaLayoutGuide.widthAnchor, 0.8),
-      metalView.heightAnchor.constraintEqualToAnchor_multiplier_(
-        safeAreaLayoutGuide.heightAnchor, 0.8),
-    ])
-
     self.metalView = metalView
     self.renderer = renderer
+    self.setupLayoutConstraint()
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -141,6 +126,23 @@ class MainViewController(UIViewController):
   def didReceiveMemoryWarning(self):
     send_super(__class__, self, 'didReceiveMemoryWarning')
     print(f'	{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
+
+  # --- private
+  @objc_method
+  def setupLayoutConstraint(self):
+    safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
+
+    self.metalView.translatesAutoresizingMaskIntoConstraints = False
+    NSLayoutConstraint.activateConstraints_([
+      self.metalView.centerXAnchor.constraintEqualToAnchor_(
+        safeAreaLayoutGuide.centerXAnchor),
+      self.metalView.centerYAnchor.constraintEqualToAnchor_(
+        safeAreaLayoutGuide.centerYAnchor),
+      self.metalView.widthAnchor.constraintEqualToAnchor_multiplier_(
+        safeAreaLayoutGuide.widthAnchor, 0.5),
+      self.metalView.heightAnchor.constraintEqualToAnchor_multiplier_(
+        safeAreaLayoutGuide.heightAnchor, 0.5),
+    ])
 
 
 if __name__ == '__main__':

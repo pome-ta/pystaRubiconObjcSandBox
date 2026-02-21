@@ -23,18 +23,22 @@ import ctypes
 from pathlib import Path
 
 from pyrubicon.objc.api import ObjCClass, NSObject
-from pyrubicon.objc.api import objc_method
+from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGSize
 
 from rbedge import pdbr
 
-from objc_frameworks.Metal import MTLResourceOptions, MTLPixelFormat, MTLPrimitiveType
+from objc_frameworks.Metal import (
+  MTLResourceOptions,
+  MTLPixelFormat,
+  MTLPrimitiveType,
+)
 
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
 MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 
-shader_path = Path('./Shader.metal')
+shader_path = Path(__file__).parent / 'Shader.metal'
 '''
    v0                v3
 (-1, 1)--( 0, 1)--( 1, 1)
@@ -54,11 +58,11 @@ shader_path = Path('./Shader.metal')
 
 class Renderer(NSObject):
 
-  device: 'MTLDevice'
-  commandQueue: 'MTLCommandQueue'
-  vertices: '[Float]'
-  pipelineState: 'MTLRenderPipelineState?'
-  vertexBuffer: 'MTLBuffer?'
+  device: 'MTLDevice' = objc_property()
+  commandQueue: 'MTLCommandQueue' = objc_property()
+  vertices: '[Float]' = objc_property(object)
+  pipelineState: 'MTLRenderPipelineState?' = objc_property()
+  vertexBuffer: 'MTLBuffer?' = objc_property()
 
   @objc_method
   def initWithDevice_(self, device):

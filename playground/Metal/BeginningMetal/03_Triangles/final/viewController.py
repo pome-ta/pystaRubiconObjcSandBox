@@ -70,11 +70,10 @@ class MainViewController(UIViewController):
 
     device = MTLCreateSystemDefaultDevice()
 
-    metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
-    metalView.clearColor = Colors.wenderlichGreen
-
     renderer = Renderer.alloc().initWithDevice_(device)
 
+    metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
+    metalView.clearColor = Colors.wenderlichGreen
     metalView.delegate = renderer
 
     metalView.enableSetNeedsDisplay = True
