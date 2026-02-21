@@ -24,9 +24,9 @@ from pathlib import Path
 from math import sin
 
 from pyrubicon.objc.api import ObjCClass, NSObject
-from pyrubicon.objc.api import objc_method
+from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
-from pyrubicon.objc.types import CGSize
+from pyrubicon.objc.types import CGSize, CGFloat
 
 from rbedge import pdbr
 
@@ -40,7 +40,7 @@ from objc_frameworks.Metal import (
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
 MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 
-shader_path = Path('./Shader.metal')
+shader_path = Path(__file__).parent / 'Shader.metal'
 
 
 class Constants(ctypes.Structure):
@@ -51,15 +51,15 @@ class Constants(ctypes.Structure):
 
 class Renderer(NSObject):
 
-  device: 'MTLDevice'
-  commandQueue: 'MTLCommandQueue'
-  vertices: '[Float]'
-  indices: '[UInt16]'
-  pipelineState: 'MTLRenderPipelineState?'
-  vertexBuffer: 'MTLBuffer?'
-  indexBuffer: 'MTLBuffer?'
-  constants: Constants
-  time: float
+  device: 'MTLDevice' = objc_property()
+  commandQueue: 'MTLCommandQueue' = objc_property()
+  vertices: '[Float]' = objc_property(object)
+  indices: '[UInt16]' = objc_property(object)
+  pipelineState: 'MTLRenderPipelineState?' = objc_property()
+  vertexBuffer: 'MTLBuffer?' = objc_property()
+  indexBuffer: 'MTLBuffer?' = objc_property()
+  constants: Constants = objc_property(object)
+  time: CGFloat = objc_property(CGFloat)
 
   @objc_method
   def initWithDevice_(self, device):
