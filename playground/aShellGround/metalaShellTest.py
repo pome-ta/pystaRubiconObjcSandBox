@@ -60,7 +60,7 @@ MTKView = ObjCClass('MTKView')
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
 MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 
-shader_path = Path(Path(__file__).parent, 'Shader.metal')
+shader_path = Path(__file__).parent / 'Shader.metal'
 
 
 class Colors:
@@ -255,7 +255,7 @@ class MainViewController(UIViewController):
   @objc_method
   def drawInMTKView_(self, view):
     dispatch_semaphore_wait(self.semaphore, DISPATCH_TIME_FOREVER)
-    
+
     with autoreleasepool():
       if not ((drawable := view.currentDrawable) and
               (pipelineState := self.pipelineState) and
@@ -263,31 +263,31 @@ class MainViewController(UIViewController):
               (descriptor := view.currentRenderPassDescriptor)):
         dispatch_semaphore_signal(self.semaphore)
         return
-  
+
       self.time += 1 / view.preferredFramesPerSecond
       animateBy = abs(sin(self.time) / 2 + 0.5)
       self.constants.animateBy = animateBy
-  
 
       commandBuffer = self.commandQueue.commandBuffer()
+
       def completion_handler(buffer):
         dispatch_semaphore_signal(self.semaphore)
 
       # Block(関数, 戻り値, 引数...)
       handler_block = Block(completion_handler, None, objc_id)
       commandBuffer.addCompletedHandler_(handler_block)
-  
+
       commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
         descriptor)
       commandEncoder.setRenderPipelineState_(pipelineState)
       commandEncoder.setVertexBuffer_offset_atIndex_(self.vertexBuffer, 0, 0)
       commandEncoder.setVertexBytes_length_atIndex_(
         ctypes.byref(self.constants), ctypes.sizeof(self.constants), 1)
-  
+
       commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
         MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
         self.indexBuffer, 0)
-  
+
       commandEncoder.endEncoding()
       commandBuffer.presentDrawable_(drawable)
       commandBuffer.commit()
