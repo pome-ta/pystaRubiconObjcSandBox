@@ -24,12 +24,10 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGFloat
 
-from rbedge import pdbr
-
 
 class Node(NSObject):
+
   name: str = objc_property(object)
-  #children: ['Node'] = objc_property(object, weak=True)
   children: ['Node'] = objc_property(object)
 
   @objc_method
@@ -48,11 +46,8 @@ class Node(NSObject):
   @objc_method
   def renderCommandEncoder_deltaTime_(self, commandEncoder,
                                       deltaTime: CGFloat):
-
-    [
+    for child in self.children:
       child.renderCommandEncoder_deltaTime_(commandEncoder, deltaTime)
-      for child in self.children
-    ]
 
 
 if __name__ == '__main__':

@@ -45,6 +45,7 @@ class Scene(Node):
   @objc_method
   def initWithDevice_size_(self, device, size: CGSize):
     send_super(__class__, self, 'init')
+
     self.device = device
     self.size = size
 

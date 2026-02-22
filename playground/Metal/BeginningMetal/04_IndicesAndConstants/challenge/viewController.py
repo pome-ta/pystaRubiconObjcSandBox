@@ -72,14 +72,12 @@ class MainViewController(UIViewController):
     device = MTLCreateSystemDefaultDevice()
 
     renderer = Renderer.alloc().initWithDevice_(device)
-    renderer.scene = GameScene.alloc().initWithDevice_size_(device, self.view.bounds.size)
+    renderer.scene = GameScene.alloc().initWithDevice_size_(
+      device, self.view.bounds.size)
 
     metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
     metalView.clearColor = Colors.wenderlichGreen
     metalView.delegate = renderer
-    
-    #metalView.enableSetNeedsDisplay = True
-    #metalView.setNeedsDisplay()
 
     self.view.addSubview_(metalView)
 

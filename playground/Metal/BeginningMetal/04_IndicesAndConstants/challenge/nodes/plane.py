@@ -28,7 +28,6 @@ from pyrubicon.objc.types import CGFloat
 
 from objc_frameworks.Metal import (
   MTLResourceOptions,
-  MTLPixelFormat,
   MTLPrimitiveType,
   MTLIndexType,
 )
@@ -54,6 +53,7 @@ class Plane(Node):
   @objc_method
   def initWithDevice_(self, device):
     send_super(__class__, self, 'init')
+
     self.vertices = (ctypes.c_float * (4 * 3))(
       -1.0,  1.0,  0.0,  # v0
       -1.0, -1.0,  0.0,  # v1
@@ -87,7 +87,6 @@ class Plane(Node):
   @objc_method
   def renderCommandEncoder_deltaTime_(self, commandEncoder,
                                       deltaTime: CGFloat):
-
     send_super(__class__,
                self,
                'renderCommandEncoder:deltaTime:',

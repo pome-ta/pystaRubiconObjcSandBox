@@ -33,7 +33,6 @@ from nodes import Plane
 
 class GameScene(Scene):
 
-  #quad: Plane = objc_property(weak=True)
   quad: Plane = objc_property()
 
   @objc_method
