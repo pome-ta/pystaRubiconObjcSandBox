@@ -49,6 +49,7 @@ class Renderer(NSObject):
 
   device: 'MTLDevice' = objc_property()
   commandQueue: 'MTLCommandQueue' = objc_property()
+  #scene: Scene = objc_property(weak=True)
   scene: Scene = objc_property()
   pipelineState: 'MTLRenderPipelineState?' = objc_property()
 
@@ -63,7 +64,6 @@ class Renderer(NSObject):
     return self
 
   # --- private
-
   @objc_method
   def buildPipelineState(self):
     source = shader_path.read_text('utf-8')
@@ -102,11 +102,25 @@ class Renderer(NSObject):
             (descriptor := view.currentRenderPassDescriptor)):
       return
 
+    print('d')
     commandBuffer = self.commandQueue.commandBuffer()
-    commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
-      descriptor)
+    commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(descriptor)
     commandEncoder.setRenderPipelineState_(pipelineState)
+    
+    deltaTime = 1 / view.preferredFramesPerSecond
+    
+    pdbr.state(self.scene)
+    
+    self.scene.renderCommandEncoder_deltaTime_(commandEncoder, deltaTime)
+    
+    
+    commandEncoder.endEncoding()
+    commandBuffer.presentDrawable_(drawable)
+    commandBuffer.commit()
+    
+    
 
+    '''
     deltaTime = 1 / Float(view.preferredFramesPerSecond)
 
     try:
@@ -118,6 +132,7 @@ class Renderer(NSObject):
     commandEncoder.endEncoding()
     commandBuffer.presentDrawable_(drawable)
     commandBuffer.commit()
+    '''
 
 
 '''

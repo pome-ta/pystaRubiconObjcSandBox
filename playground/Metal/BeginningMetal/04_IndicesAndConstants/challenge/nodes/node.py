@@ -23,11 +23,13 @@ from pyrubicon.objc.api import NSObject
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 
+from rbedge import pdbr
+
 
 class Node(NSObject):
   name: str = objc_property(object)
-  children: ['Node'] = objc_property(object, weak=True)
-  #children: ['Node'] = objc_property(object)
+  #children: ['Node'] = objc_property(object, weak=True)
+  children: ['Node'] = objc_property(object)
 
   @objc_method
   def init(self):
@@ -40,15 +42,17 @@ class Node(NSObject):
 
   @objc_method
   def addChildNode_(self, childNode):
-    print('addChildNode_')
     self.children.append(childNode)
-    #print('addChildNode_')
-    #print(childNode)
 
   @objc_method
   def renderCommandEncoder_deltaTime_(self, commandEncoder, deltaTime):
+
     for child in self.children:
-      child.renderCommandEncoder_deltaTime_(commandEncoder, deltaTime)
+      print('Node: child')
+      #pdbr.state(child)
+      
+      #child.renderCommandEncoder_deltaTime_(commandEncoder, deltaTime)
+      
 
 
 if __name__ == '__main__':

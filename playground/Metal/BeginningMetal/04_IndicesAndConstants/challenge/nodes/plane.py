@@ -28,13 +28,12 @@ from pyrubicon.objc.types import CGFloat
 
 from objc_frameworks.Metal import (
   MTLResourceOptions,
+  MTLPixelFormat,
   MTLPrimitiveType,
   MTLIndexType,
 )
 
 from .node import Node
-
-print('Plane')
 
 
 class Constants(ctypes.Structure):
@@ -55,8 +54,6 @@ class Plane(Node):
   @objc_method
   def initWithDevice_(self, device):
     send_super(__class__, self, 'init')
-
-
     self.vertices = (ctypes.c_float * (4 * 3))(
       -1.0,  1.0,  0.0,  # v0
       -1.0, -1.0,  0.0,  # v1
@@ -89,6 +86,8 @@ class Plane(Node):
 
   @objc_method
   def renderCommandEncoder_deltaTime_(self, commandEncoder, deltaTime):
+    
+    '''
     send_super(__class__,
                self,
                'renderCommandEncoder:deltaTime:',
@@ -98,10 +97,17 @@ class Plane(Node):
                  objc_id,
                  CGFloat,
                ])
+    
 
+    '''
+    print('renderCommandEncoder')
+    '''
     if not self.indexBuffer:
       return
 
+    
+    print('renderCommandEncoder')
+  
     self.time += deltaTime
     animateBy = abs(sin(self.time) / 2 + 0.5)
     self.constants.animateBy = animateBy
@@ -112,6 +118,7 @@ class Plane(Node):
     commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
       MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
       self.indexBuffer, 0)
+    '''
 
 
 if __name__ == '__main__':

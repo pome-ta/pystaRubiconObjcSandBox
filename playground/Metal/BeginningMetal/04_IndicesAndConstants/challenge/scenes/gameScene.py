@@ -33,8 +33,8 @@ from nodes import Plane
 
 class GameScene(Scene):
 
-  quad: Plane = objc_property(weak=True)
-  #quad: Plane = objc_property()
+  #quad: Plane = objc_property(weak=True)
+  quad: Plane = objc_property()
 
   @objc_method
   def initWithDevice_size_(self, device, size: CGSize):
@@ -47,12 +47,9 @@ class GameScene(Scene):
                  objc_id,
                  CGSize,
                ])
-    print('plne')
+
     self.quad = Plane.alloc().initWithDevice_(device)
-    #self.children.append(self.quad)
     self.addChildNode_(self.quad)
-    #print(self.addChildNode_)
-    #print('GameScene')
 
     return self
 
