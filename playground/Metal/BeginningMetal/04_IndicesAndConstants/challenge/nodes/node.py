@@ -20,13 +20,13 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
       warnings.warn(__warning_message, ImportWarning)
 
 from pyrubicon.objc.api import NSObject
-from pyrubicon.objc.api import objc_method
+from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 
 
 class Node(NSObject):
-  name: str
-  children: ['Node']
+  name: str = objc_property(object)
+  children: ['Node'] = objc_property(object)
 
   @objc_method
   def init(self):

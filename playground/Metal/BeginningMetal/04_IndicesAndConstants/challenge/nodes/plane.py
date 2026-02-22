@@ -19,16 +19,41 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
       __warning_message = f'./{_TOP_DIR_NAME}/{_MODULES_DIR_NAME} not found in parent directories'
       warnings.warn(__warning_message, ImportWarning)
 
+import ctypes
 
-from pyrubicon.objc.api import objc_method
+from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.types import CGSize, CGFloat
 
-#from node
-
-class Plane:
-  pass
+from .node import Node
+print('Plane')
 
 
+class Constants(ctypes.Structure):
+  _fields_ = [
+    ('animateBy', ctypes.c_float),
+  ]
+
+class Plane(Node):
+  
+  vertices: '[Float]' = objc_property(object)
+  indices: '[UInt16]' = objc_property(object)
+  vertexBuffer: 'MTLBuffer?' = objc_property()
+  indexBuffer: 'MTLBuffer?' = objc_property()
+  time: CGFloat = objc_property(CGFloat)
+  constants: Constants = objc_property(object)
+
+
+  @objc_method
+  def initWithDevice_(self, device):
+    send_super(__class__, self, 'init')
+    
+    return self
+  # --- private
+  @objc_method
+  def buildBuffersDevice_(self, device):
+    pass
+  
 if __name__ == '__main__':
   pass
 

@@ -19,7 +19,7 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
       __warning_message = f'./{_TOP_DIR_NAME}/{_MODULES_DIR_NAME} not found in parent directories'
       warnings.warn(__warning_message, ImportWarning)
 
-from pyrubicon.objc.api import objc_method
+from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGSize
 
@@ -38,8 +38,8 @@ except ModuleNotFoundError:
 
 
 class Scene(Node):
-  device: 'MTLDevice'
-  size: CGSize
+  device: 'MTLDevice' = objc_property()
+  size: CGSize = objc_property(CGSize)
 
   @objc_method
   def initWithDevice_size_(self, device, size: CGSize):
