@@ -26,7 +26,8 @@ from pyrubicon.objc.runtime import send_super
 
 class Node(NSObject):
   name: str = objc_property(object)
-  children: ['Node'] = objc_property(object)
+  children: ['Node'] = objc_property(object, weak=True)
+  #children: ['Node'] = objc_property(object)
 
   @objc_method
   def init(self):
@@ -39,7 +40,10 @@ class Node(NSObject):
 
   @objc_method
   def addChildNode_(self, childNode):
+    print('addChildNode_')
     self.children.append(childNode)
+    #print('addChildNode_')
+    #print(childNode)
 
   @objc_method
   def renderCommandEncoder_deltaTime_(self, commandEncoder, deltaTime):

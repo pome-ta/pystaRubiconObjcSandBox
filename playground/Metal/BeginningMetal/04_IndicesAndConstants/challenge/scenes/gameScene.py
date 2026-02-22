@@ -20,7 +20,7 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
       warnings.warn(__warning_message, ImportWarning)
 
 from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGSize
 
 # todo: Pythonista3 の`scene.Scene` ではない
@@ -30,8 +30,31 @@ else:
   from .scene import Scene
 from nodes import Plane
 
+
 class GameScene(Scene):
-  pass
+
+  quad: Plane = objc_property(weak=True)
+  #quad: Plane = objc_property()
+
+  @objc_method
+  def initWithDevice_size_(self, device, size: CGSize):
+    send_super(__class__,
+               self,
+               'initWithDevice:size:',
+               device,
+               size,
+               argtypes=[
+                 objc_id,
+                 CGSize,
+               ])
+    print('plne')
+    self.quad = Plane.alloc().initWithDevice_(device)
+    #self.children.append(self.quad)
+    self.addChildNode_(self.quad)
+    #print(self.addChildNode_)
+    #print('GameScene')
+
+    return self
 
 
 if __name__ == '__main__':

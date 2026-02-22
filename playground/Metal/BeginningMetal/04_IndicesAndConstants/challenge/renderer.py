@@ -37,12 +37,90 @@ from objc_frameworks.Metal import (
   MTLIndexType,
 )
 
+from scenes import Scene
+
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
 MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 
 shader_path = Path(__file__).parent / 'Shader.metal'
 
 
+class Renderer(NSObject):
+
+  device: 'MTLDevice' = objc_property()
+  commandQueue: 'MTLCommandQueue' = objc_property()
+  scene: Scene = objc_property()
+  pipelineState: 'MTLRenderPipelineState?' = objc_property()
+
+  @objc_method
+  def initWithDevice_(self, device):
+    send_super(__class__, self, 'init')
+    self.device = device
+    self.commandQueue = device.newCommandQueue()
+
+    self.buildPipelineState()
+
+    return self
+
+  # --- private
+
+  @objc_method
+  def buildPipelineState(self):
+    source = shader_path.read_text('utf-8')
+    options = MTLCompileOptions.new()
+
+    library = self.device.newLibraryWithSource_options_error_(
+      source, options, None)
+
+    vertexFunction = library.newFunctionWithName_('vertex_shader')
+    fragmentFunction = library.newFunctionWithName_('fragment_shader')
+
+    pipelineDescriptor = MTLRenderPipelineDescriptor.new()
+    pipelineDescriptor.vertexFunction = vertexFunction
+    pipelineDescriptor.fragmentFunction = fragmentFunction
+    pipelineDescriptor.colorAttachments.objectAtIndexedSubscript_(
+      0).pixelFormat = MTLPixelFormat.bgra8Unorm
+
+    pipelineState = None
+    try:
+      pipelineState = self.device.newRenderPipelineStateWithDescriptor_error_(
+        pipelineDescriptor, None)
+    except Exception as e:
+      print(f'pipelineState error: {e}')
+
+    self.pipelineState = pipelineState
+
+  # --- MTKViewDelegate
+  @objc_method
+  def mtkView_drawableSizeWillChange_(self, view, size: CGSize):
+    pass
+
+  @objc_method
+  def drawInMTKView_(self, view):
+    if not ((drawable := view.currentDrawable) and
+            (pipelineState := self.pipelineState) and
+            (descriptor := view.currentRenderPassDescriptor)):
+      return
+
+    commandBuffer = self.commandQueue.commandBuffer()
+    commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
+      descriptor)
+    commandEncoder.setRenderPipelineState_(pipelineState)
+
+    deltaTime = 1 / Float(view.preferredFramesPerSecond)
+
+    try:
+      self.scene.renderCommandEncoder_deltaTime_(commandEncoder, deltaTime)
+    except Exception as e:
+      print(e)
+      return
+
+    commandEncoder.endEncoding()
+    commandBuffer.presentDrawable_(drawable)
+    commandBuffer.commit()
+
+
+'''
 class Constants(ctypes.Structure):
   _fields_ = [
     ('animateBy', ctypes.c_float),
@@ -156,7 +234,7 @@ class Renderer(NSObject):
     commandEncoder.endEncoding()
     commandBuffer.presentDrawable_(drawable)
     commandBuffer.commit()
-
+'''
 
 if __name__ == '__main__':
   from objc_frameworks.Metal import MTLCreateSystemDefaultDevice

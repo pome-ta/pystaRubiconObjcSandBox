@@ -38,6 +38,7 @@ except ModuleNotFoundError:
 
 
 class Scene(Node):
+  
   device: 'MTLDevice' = objc_property()
   size: CGSize = objc_property(CGSize)
 
