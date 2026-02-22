@@ -22,6 +22,7 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
 from pyrubicon.objc.api import NSObject
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.types import CGFloat
 
 from rbedge import pdbr
 
@@ -45,14 +46,13 @@ class Node(NSObject):
     self.children.append(childNode)
 
   @objc_method
-  def renderCommandEncoder_deltaTime_(self, commandEncoder, deltaTime):
+  def renderCommandEncoder_deltaTime_(self, commandEncoder,
+                                      deltaTime: CGFloat):
 
-    for child in self.children:
-      print('Node: child')
-      #pdbr.state(child)
-      
-      #child.renderCommandEncoder_deltaTime_(commandEncoder, deltaTime)
-      
+    [
+      child.renderCommandEncoder_deltaTime_(commandEncoder, deltaTime)
+      for child in self.children
+    ]
 
 
 if __name__ == '__main__':

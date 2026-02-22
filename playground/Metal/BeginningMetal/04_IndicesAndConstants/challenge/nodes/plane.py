@@ -85,9 +85,9 @@ class Plane(Node):
     self.indexBuffer = indexBuffer
 
   @objc_method
-  def renderCommandEncoder_deltaTime_(self, commandEncoder, deltaTime):
-    
-    '''
+  def renderCommandEncoder_deltaTime_(self, commandEncoder,
+                                      deltaTime: CGFloat):
+
     send_super(__class__,
                self,
                'renderCommandEncoder:deltaTime:',
@@ -97,17 +97,10 @@ class Plane(Node):
                  objc_id,
                  CGFloat,
                ])
-    
 
-    '''
-    print('renderCommandEncoder')
-    '''
     if not self.indexBuffer:
       return
 
-    
-    print('renderCommandEncoder')
-  
     self.time += deltaTime
     animateBy = abs(sin(self.time) / 2 + 0.5)
     self.constants.animateBy = animateBy
@@ -118,7 +111,6 @@ class Plane(Node):
     commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
       MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
       self.indexBuffer, 0)
-    '''
 
 
 if __name__ == '__main__':

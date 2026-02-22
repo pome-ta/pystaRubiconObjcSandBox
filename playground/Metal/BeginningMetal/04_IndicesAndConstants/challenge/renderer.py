@@ -102,14 +102,14 @@ class Renderer(NSObject):
             (descriptor := view.currentRenderPassDescriptor)):
       return
 
-    print('d')
+
     commandBuffer = self.commandQueue.commandBuffer()
     commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(descriptor)
     commandEncoder.setRenderPipelineState_(pipelineState)
     
     deltaTime = 1 / view.preferredFramesPerSecond
     
-    pdbr.state(self.scene)
+    #pdbr.state(self.scene)
     
     self.scene.renderCommandEncoder_deltaTime_(commandEncoder, deltaTime)
     
