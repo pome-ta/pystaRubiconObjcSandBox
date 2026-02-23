@@ -39,7 +39,7 @@ class Plane(Node):
   @objc_method
   def initWithDevice_(self, device):
     send_super(__class__, self, 'init')
-
+    '''
     vvertices = Vertices((
       Vertex(  # v0
         position=(-1.0,  1.0,  0.0),
@@ -57,6 +57,17 @@ class Plane(Node):
         position=( 1.0,  1.0,  0.0),
         color   =( 1.0,  0.0,  1.0,  1.0),
       ),
+    ))  # yapf: disable
+    '''
+    vvertices = Vertices((
+      Vertex(  # v0
+        position=(-1.0,  1.0,  0.0), color=(1.0, 0.0, 0.0, 1.0)),
+      Vertex(  # v1
+        position=(-1.0, -1.0,  0.0), color=(0.0, 1.0, 0.0, 1.0)),
+      Vertex(  # v2
+        position=( 1.0, -1.0,  0.0), color=(0.0, 0.0, 1.0, 1.0)),
+      Vertex(  # v3
+        position=( 1.0,  1.0,  0.0), color=(1.0, 0.0, 1.0, 1.0)),
     ))  # yapf: disable
     print(vvertices)
 
