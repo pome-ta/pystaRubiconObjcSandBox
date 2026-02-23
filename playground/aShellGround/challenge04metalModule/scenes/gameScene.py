@@ -28,7 +28,3 @@ class GameScene(Scene):
 
     return self
 
-
-if __name__ == '__main__':
-  pass
-

@@ -90,7 +90,3 @@ class Plane(Node):
       MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
       self.indexBuffer, 0)
 
-
-if __name__ == '__main__':
-  pass
-

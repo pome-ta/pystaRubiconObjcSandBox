@@ -28,7 +28,3 @@ class Node(NSObject):
     for child in self.children:
       child.renderCommandEncoder_deltaTime_(commandEncoder, deltaTime)
 
-
-if __name__ == '__main__':
-  pass
-

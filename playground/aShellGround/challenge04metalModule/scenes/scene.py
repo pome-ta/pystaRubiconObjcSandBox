@@ -19,7 +19,3 @@ class Scene(Node):
 
     return self
 
-
-if __name__ == '__main__':
-  pass
-
