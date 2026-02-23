@@ -28,12 +28,14 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGSize, CGFloat
 
-from objc_frameworks.Metal import MTLPixelFormat
+from objc_frameworks.Metal import MTLPixelFormat, MTLVertexFormat
 
 from scenes import Scene
+from simdTypes import Vertex
 
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
 MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
+MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
 
 shader_path = Path(__file__).parent / 'Shader.metal'
 

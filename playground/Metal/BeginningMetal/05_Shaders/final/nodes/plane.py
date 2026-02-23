@@ -69,7 +69,7 @@ class Plane(Node):
       Vertex(  # v3
         position=( 1.0,  1.0,  0.0), color=(1.0, 0.0, 1.0, 1.0)),
     ))  # yapf: disable
-    print(vvertices)
+
 
     self.vertices = (ctypes.c_float * (4 * 3))(
       -1.0,  1.0,  0.0,  # v0
@@ -96,7 +96,8 @@ class Plane(Node):
       self.vertices, ctypes.sizeof(self.vertices),
       MTLResourceOptions.storageModeShared)
     indexBuffer = device.newBufferWithBytes_length_options_(
-      self.indices, ctypes.sizeof(self.indices),
+      self.indices,
+      self.indices.__len__() * ctypes.sizeof(self.indices),
       MTLResourceOptions.storageModeShared)
 
     self.vertexBuffer = vertexBuffer
