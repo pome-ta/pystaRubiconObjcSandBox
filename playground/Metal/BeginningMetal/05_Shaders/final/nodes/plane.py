@@ -32,17 +32,20 @@ from objc_frameworks.Metal import (
   MTLIndexType,
 )
 
-from .node import Node
+try:
+  from .node import Node
+  from .simdTypes import Vertex
+except ImportError:
+  try:
+    # todo: package のimport 準備してる想定
+    sys.path.append(str(__parents[1]))
+  except NameError:
+    import pathlib
+    import sys
+    sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
-Position = (ctypes.c_float * 3)
-Color = (ctypes.c_float * 4)
-
-
-class Vertex(ctypes.Structure):
-  _fields_ = [
-    ('position', Position),
-    ('color', Color),
-  ]
+  from node import Node
+  from simdTypes import Vertex
 
 
 class Vertices(ctypes.Structure):
@@ -56,7 +59,6 @@ class Constants(ctypes.Structure):
     ('animateBy', ctypes.c_float),
   ]
 
-p
 
 class Plane(Node):
 
