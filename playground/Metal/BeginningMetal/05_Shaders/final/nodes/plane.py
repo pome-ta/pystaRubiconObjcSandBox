@@ -1,24 +1,3 @@
-_TOP_DIR_NAME = 'pystaRubiconObjcSandBox'
-_MODULES_DIR_NAME = 'modules'
-
-# todo: `./{_TOP_DIR_NAME}/{_MODULES_DIR_NAME}` にあるpackage のimport 準備
-if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
-    _TOP_DIR_NAME):
-  import pathlib
-  import sys
-  __parents = pathlib.Path(__file__).resolve().parents
-  for __dir_path in __parents:
-    if __dir_path.name == _TOP_DIR_NAME and (__modules_path := __dir_path /
-                                             _MODULES_DIR_NAME).exists():
-      sys.path.insert(0, str(__modules_path))
-      break
-  else:
-    import warnings
-    with warnings.catch_warnings():
-      warnings.simplefilter('always', ImportWarning)
-      __warning_message = f'./{_TOP_DIR_NAME}/{_MODULES_DIR_NAME} not found in parent directories'
-      warnings.warn(__warning_message, ImportWarning)
-
 import ctypes
 from math import sin
 
@@ -32,28 +11,11 @@ from objc_frameworks.Metal import (
   MTLIndexType,
 )
 
-try:
-  from .node import Node
-  from .simdTypes import Vertex
-except ImportError:
-  try:
-    # todo: package のimport 準備してる想定
-    sys.path.append(str(__parents[1]))
-  except NameError:
-    import pathlib
-    import sys
-    sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
-
-  from node import Node
-  from simdTypes import Vertex
+from .node import Node
+from simdTypes import Vertex
 
 
-class Vertices(ctypes.Structure):
-  _fields_ = [
-    ('vertex', Vertex * 4),
-  ]
-
-
+print(Vertex)
 class Constants(ctypes.Structure):
   _fields_ = [
     ('animateBy', ctypes.c_float),
@@ -129,8 +91,4 @@ class Plane(Node):
     commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
       MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
       self.indexBuffer, 0)
-
-
-if __name__ == '__main__':
-  pass
 
