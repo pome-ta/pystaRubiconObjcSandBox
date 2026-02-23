@@ -15,7 +15,12 @@ from .node import Node
 from simdTypes import Vertex
 
 
-print(Vertex)
+class Vertices(ctypes.Structure):
+  _fields_ = [
+    ('vertex', Vertex * 4),
+  ]
+
+
 class Constants(ctypes.Structure):
   _fields_ = [
     ('animateBy', ctypes.c_float),
@@ -24,7 +29,7 @@ class Constants(ctypes.Structure):
 
 class Plane(Node):
 
-  vertices: '[Float]' = objc_property(object)
+  vertices: '[Vertices]' = objc_property(object)
   indices: '[UInt16]' = objc_property(object)
   vertexBuffer: 'MTLBuffer?' = objc_property()
   indexBuffer: 'MTLBuffer?' = objc_property()
@@ -35,12 +40,33 @@ class Plane(Node):
   def initWithDevice_(self, device):
     send_super(__class__, self, 'init')
 
+    vvertices = Vertices((
+      Vertex(  # v0
+        position=(-1.0,  1.0,  0.0),
+        color   =( 1.0,  0.0,  0.0,  1.0),
+      ),
+      Vertex(  # v1
+        position=(-1.0, -1.0,  0.0),
+        color   =( 0.0,  1.0,  0.0,  1.0),
+      ),
+      Vertex(  # v2
+        position=( 1.0, -1.0,  0.0),
+        color   =( 0.0,  0.0,  1.0,  1.0),
+      ),
+      Vertex(  # v3
+        position=( 1.0,  1.0,  0.0),
+        color   =( 1.0,  0.0,  1.0,  1.0),
+      ),
+    ))  # yapf: disable
+    print(vvertices)
+
     self.vertices = (ctypes.c_float * (4 * 3))(
       -1.0,  1.0,  0.0,  # v0
       -1.0, -1.0,  0.0,  # v1
        1.0, -1.0,  0.0,  # v2
        1.0,  1.0,  0.0,  # v3
     )  # yapf: disable
+
     self.indices = (ctypes.c_int16 * (2 * 3))(
       0, 1, 2,
       2, 3, 0,
