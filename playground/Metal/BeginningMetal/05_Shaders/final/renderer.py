@@ -76,6 +76,14 @@ class Renderer(NSObject):
     pipelineDescriptor.colorAttachments.objectAtIndexedSubscript_(
       0).pixelFormat = MTLPixelFormat.bgra8Unorm
 
+    
+    for i in range(1):
+      attribute = pipelineDescriptor.colorAttachments.objectAtIndexedSubscript_(i)
+      print(attribute)
+    vertexDescriptor = MTLVertexDescriptor.new()
+    
+    #vertexDescriptor.colorAttachments.objectAtIndexedSubscript_(0)
+    
     pipelineState = None
     try:
       pipelineState = self.device.newRenderPipelineStateWithDescriptor_error_(

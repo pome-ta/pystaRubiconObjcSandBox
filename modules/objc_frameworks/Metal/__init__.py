@@ -5,3 +5,4 @@ from .MTLPixelFormat import MTLPixelFormat
 from .MTLRenderCommandEncoder import MTLPrimitiveType
 from .MTLArgument import MTLIndexType
 from .MTLVertexDescriptor import MTLVertexFormat
+
