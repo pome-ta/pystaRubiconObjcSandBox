@@ -31,7 +31,7 @@ from pyrubicon.objc.types import CGSize, CGFloat
 from objc_frameworks.Metal import MTLPixelFormat, MTLVertexFormat
 
 from scenes import Scene
-from simdTypes import Vertex
+from simdTypes import Vertex, Position, Color
 
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
 MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
@@ -80,17 +80,23 @@ class Renderer(NSObject):
     # todo: `objectAtIndexedSubscript_` 長いので配列処理
     for idx, attribute in enumerate([
         vertexDescriptor.attributes.objectAtIndexedSubscript_(i)
-        for i in range(3)
+        for i in range(2)
     ]):
       if idx == 0:
         attribute.format = MTLVertexFormat.float3
         attribute.offset = 0
         attribute.bufferIndex = 0
       elif idx == 1:
-        pass
-      elif idx == 2:
-        pass
+        attribute.format = MTLVertexFormat.float4
+        attribute.offset = ctypes.sizeof(Position)
+        attribute.bufferIndex = 0
+      
+    vertexDescriptor.layouts.objectAtIndexedSubscript_(0).stride = ctypes.sizeof(Vertex)
+    #pdbr.state(pipelineDescriptor)
+    
+    pipelineDescriptor.vertexDescriptor = vertexDescriptor
 
+    
     pipelineState = None
     try:
       pipelineState = self.device.newRenderPipelineStateWithDescriptor_error_(
