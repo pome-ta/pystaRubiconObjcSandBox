@@ -82,14 +82,19 @@ class Renderer(NSObject):
         vertexDescriptor.attributes.objectAtIndexedSubscript_(i)
         for i in range(2)
     ]):
-      if idx == 0:
-        attribute.format = MTLVertexFormat.float3
-        attribute.offset = 0
-        attribute.bufferIndex = 0
-      elif idx == 1:
-        attribute.format = MTLVertexFormat.float4
-        attribute.offset = ctypes.sizeof(Position)
-        attribute.bufferIndex = 0
+      match idx:
+        case 0:
+          attribute.format = MTLVertexFormat.float3
+          attribute.offset = 0
+          attribute.bufferIndex = 0
+        case 1:
+          attribute.format = MTLVertexFormat.float4
+          attribute.offset = ctypes.sizeof(Position)
+          attribute.bufferIndex = 0
+        case _:
+          import logging
+          error = IndexError(f'{idx=}: list index out of range')
+          logging.warning(f'{type(error).__name__} -> {error}')
 
     vertexDescriptor.layouts.objectAtIndexedSubscript_(
       0).stride = ctypes.sizeof(Vertex)
