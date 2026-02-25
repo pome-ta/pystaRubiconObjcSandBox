@@ -76,14 +76,21 @@ class Renderer(NSObject):
     pipelineDescriptor.colorAttachments.objectAtIndexedSubscript_(
       0).pixelFormat = MTLPixelFormat.bgra8Unorm
 
-    
-    for i in range(1):
-      attribute = pipelineDescriptor.colorAttachments.objectAtIndexedSubscript_(i)
-      print(attribute)
     vertexDescriptor = MTLVertexDescriptor.new()
-    
-    #vertexDescriptor.colorAttachments.objectAtIndexedSubscript_(0)
-    
+    # todo: `objectAtIndexedSubscript_` 長いので配列処理
+    for idx, attribute in enumerate([
+        vertexDescriptor.attributes.objectAtIndexedSubscript_(i)
+        for i in range(3)
+    ]):
+      if idx == 0:
+        attribute.format = MTLVertexFormat.float3
+        attribute.offset = 0
+        attribute.bufferIndex = 0
+      elif idx == 1:
+        pass
+      elif idx == 2:
+        pass
+
     pipelineState = None
     try:
       pipelineState = self.device.newRenderPipelineStateWithDescriptor_error_(
@@ -124,6 +131,7 @@ class Renderer(NSObject):
 
 if __name__ == '__main__':
   from objc_frameworks.Metal import MTLCreateSystemDefaultDevice
+  from rbedge import pdbr
 
   renderer = Renderer.alloc().initWithDevice_(MTLCreateSystemDefaultDevice())
 
