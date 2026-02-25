@@ -90,13 +90,13 @@ class Renderer(NSObject):
         attribute.format = MTLVertexFormat.float4
         attribute.offset = ctypes.sizeof(Position)
         attribute.bufferIndex = 0
-      
-    vertexDescriptor.layouts.objectAtIndexedSubscript_(0).stride = ctypes.sizeof(Vertex)
+
+    vertexDescriptor.layouts.objectAtIndexedSubscript_(
+      0).stride = ctypes.sizeof(Vertex)
     #pdbr.state(pipelineDescriptor)
-    
+
     pipelineDescriptor.vertexDescriptor = vertexDescriptor
 
-    
     pipelineState = None
     try:
       pipelineState = self.device.newRenderPipelineStateWithDescriptor_error_(

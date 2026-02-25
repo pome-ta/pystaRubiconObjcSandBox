@@ -51,19 +51,11 @@ class Plane(Node):
         position=( 1.0,  1.0,  0.0), color=(1.0, 0.0, 1.0, 1.0)),
     ))  # yapf: disable
 
-    '''
-    self.vertices = (ctypes.c_float * (4 * 3))(
-      -1.0,  1.0,  0.0,  # v0
-      -1.0, -1.0,  0.0,  # v1
-       1.0, -1.0,  0.0,  # v2
-       1.0,  1.0,  0.0,  # v3
-    )  # yapf: disable
-    '''
-
     self.indices = (ctypes.c_int16 * (2 * 3))(
       0, 1, 2,
       2, 3, 0,
     )  # yapf: disable
+
     self.time = 0.0
     self.constants = Constants()
 
@@ -75,8 +67,7 @@ class Plane(Node):
   @objc_method
   def buildBuffersDevice_(self, device):
     vertexBuffer = device.newBufferWithBytes_length_options_(
-      self.vertices,
-      ctypes.sizeof(self.vertices),
+      ctypes.byref(self.vertices), ctypes.sizeof(self.vertices),
       MTLResourceOptions.storageModeShared)
     indexBuffer = device.newBufferWithBytes_length_options_(
       self.indices,
