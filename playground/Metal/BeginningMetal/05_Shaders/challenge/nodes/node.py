@@ -1,0 +1,30 @@
+from pyrubicon.objc.api import NSObject
+from pyrubicon.objc.api import objc_method, objc_property
+from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.types import CGFloat
+
+
+class Node(NSObject):
+
+  name: str = objc_property(object)
+  children: ['Node'] = objc_property(object)
+
+  @objc_method
+  def init(self):
+    send_super(__class__, self, 'init')
+
+    self.name = 'Untitled'
+    self.children = []
+
+    return self
+
+  @objc_method
+  def addChildNode_(self, childNode):
+    self.children.append(childNode)
+
+  @objc_method
+  def renderCommandEncoder_deltaTime_(self, commandEncoder,
+                                      deltaTime: CGFloat):
+    for child in self.children:
+      child.renderCommandEncoder_deltaTime_(commandEncoder, deltaTime)
+

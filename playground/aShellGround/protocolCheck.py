@@ -33,12 +33,14 @@ from objc_frameworks.Metal import (
   MTLPrimitiveType,
   MTLIndexType,
   MTLPixelFormat,
+  MTLVertexFormat,
 )
 
 from rbedge import pdbr
 
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
 MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
+MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
 
 shader_path = Path(__file__).parent / 'Shader.metal'
 
@@ -129,7 +131,7 @@ class Renderable(metaclass=ObjCProtocol):
     '''
 
 
-class Plane(Node):
+class Plane(Node, protocols=[Renderable]):
 
   vertices: '[Vertices]' = objc_property(object)
   indices: '[UInt16]' = objc_property(object)
@@ -161,9 +163,69 @@ class Plane(Node):
     self.time = 0.0
     self.constants = Constants()
 
+    # Renderable
+    self.fragmentFunctionName = 'fragment_shader'
+    self.vertexFunctionName = 'vertex_shader'
+    vertexDescriptor = MTLVertexDescriptor.new()
+    # todo: `objectAtIndexedSubscript_` 長いので配列処理
+    for idx, attribute in enumerate([
+        vertexDescriptor.attributes.objectAtIndexedSubscript_(i)
+        for i in range(2)
+    ]):
+      match idx:
+        case 0:
+          attribute.format = MTLVertexFormat.float3
+          attribute.offset = 0
+          attribute.bufferIndex = 0
+        case 1:
+          attribute.format = MTLVertexFormat.float4
+          attribute.offset = ctypes.sizeof(Position)
+          attribute.bufferIndex = 0
+        case _:
+          import logging
+          error = IndexError(f'{idx=}: list index out of range')
+          logging.warning(f'{type(error).__name__} -> {error}')
+    
+    vertexDescriptor.layouts.objectAtIndexedSubscript_(
+      0).stride = ctypes.sizeof(Vertex)
+    self.vertexDescriptor = vertexDescriptor
+    
+    
     self.buildBuffersDevice_(device)
+    self.pipelineState = self.buildPipelineStateWithDevice_(device)
 
     return self
+
+
+  @objc_method
+  def buildPipelineStateWithDevice_(self, device):
+    
+    source = shader_path.read_text('utf-8')
+    options = MTLCompileOptions.new()
+
+    library = device.newLibraryWithSource_options_error_(
+      source, options, None)
+
+    vertexFunction = library.newFunctionWithName_(self.vertexFunctionName)
+    fragmentFunction = library.newFunctionWithName_(self.fragmentFunctionName)
+
+    pipelineDescriptor = MTLRenderPipelineDescriptor.new()
+    pipelineDescriptor.vertexFunction = vertexFunction
+    pipelineDescriptor.fragmentFunction = fragmentFunction
+    pipelineDescriptor.colorAttachments.objectAtIndexedSubscript_(
+      0).pixelFormat = MTLPixelFormat.bgra8Unorm
+      
+    pipelineDescriptor.vertexDescriptor = self.vertexDescriptor
+
+    pipelineState = None
+    try:
+      pipelineState = self.device.newRenderPipelineStateWithDescriptor_error_(
+        pipelineDescriptor, None)
+    except Exception as e:
+      print(f'pipelineState error: {e}')
+    
+    return pipelineState
+    
 
   # --- private
   @objc_method
