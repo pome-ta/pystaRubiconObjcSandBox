@@ -20,9 +20,10 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
       warnings.warn(__warning_message, ImportWarning)
 
 import ctypes
+from pathlib import Path
 from math import sin
 
-from pyrubicon.objc.api import NSObject, ObjCProtocol
+from pyrubicon.objc.api import NSObject, ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGFloat
@@ -31,9 +32,15 @@ from objc_frameworks.Metal import (
   MTLResourceOptions,
   MTLPrimitiveType,
   MTLIndexType,
+  MTLPixelFormat,
 )
 
 from rbedge import pdbr
+
+MTLCompileOptions = ObjCClass('MTLCompileOptions')
+MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
+
+shader_path = Path(__file__).parent / 'Shader.metal'
 
 Position = (ctypes.c_float * 3)
 Color = (ctypes.c_float * 4)
@@ -83,8 +90,44 @@ class Node(NSObject):
       child.renderCommandEncoder_deltaTime_(commandEncoder, deltaTime)
 
 
-class Renderer(metaclass=ObjCProtocol):
-  pass
+class Renderable(metaclass=ObjCProtocol):
+
+  pipelineState: 'MTLRenderPipelineState!' = objc_property()
+  vertexFunctionName: str = objc_property(object)
+  fragmentFunctionName: str = objc_property(object)
+  vertexDescriptor: 'MTLVertexDescriptor' = objc_property()
+
+  @objc_method
+  def buildPipelineStateWithDevice_(self, device):
+    ...
+    '''
+    source = shader_path.read_text('utf-8')
+    options = MTLCompileOptions.new()
+
+    library = device.newLibraryWithSource_options_error_(
+      source, options, None)
+
+    vertexFunction = library.newFunctionWithName_(self.vertexFunctionName)
+    fragmentFunction = library.newFunctionWithName_(self.fragmentFunctionName)
+
+    pipelineDescriptor = MTLRenderPipelineDescriptor.new()
+    pipelineDescriptor.vertexFunction = vertexFunction
+    pipelineDescriptor.fragmentFunction = fragmentFunction
+    pipelineDescriptor.colorAttachments.objectAtIndexedSubscript_(
+      0).pixelFormat = MTLPixelFormat.bgra8Unorm
+      
+    pipelineDescriptor.vertexDescriptor = self.vertexDescriptor
+
+    pipelineState = None
+    try:
+      pipelineState = self.device.newRenderPipelineStateWithDescriptor_error_(
+        pipelineDescriptor, None)
+    except Exception as e:
+      print(f'pipelineState error: {e}')
+    
+    return pipelineState
+    '''
+
 
 class Plane(Node):
 
@@ -166,10 +209,8 @@ class Plane(Node):
 
 if __name__ == '__main__':
   from objc_frameworks.Metal import MTLCreateSystemDefaultDevice
-  
-  
+
   DEVICE = MTLCreateSystemDefaultDevice()
   quad = Plane.alloc().initWithDevice_(DEVICE)
   pdbr.state(quad)
-  
 
