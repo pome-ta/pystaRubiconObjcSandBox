@@ -101,8 +101,7 @@ class Renderable(metaclass=ObjCProtocol):
 
   @objc_method
   def buildPipelineStateWithDevice_(self, device):
-    ...
-    '''
+    #...
     source = shader_path.read_text('utf-8')
     options = MTLCompileOptions.new()
 
@@ -128,7 +127,7 @@ class Renderable(metaclass=ObjCProtocol):
       print(f'pipelineState error: {e}')
     
     return pipelineState
-    '''
+    
 
 
 class Plane(Node, protocols=[Renderable]):
@@ -192,14 +191,16 @@ class Plane(Node, protocols=[Renderable]):
     
     
     self.buildBuffersDevice_(device)
-    self.pipelineState = self.buildPipelineStateWithDevice_(device)
+    #self.pipelineState = self.buildPipelineStateWithDevice_(device)
+    self.buildPipelineStateWithDevice_(device)
 
     return self
 
-
+  
   @objc_method
   def buildPipelineStateWithDevice_(self, device):
-    
+    send_super(__class__, self, 'init')
+    '''
     source = shader_path.read_text('utf-8')
     options = MTLCompileOptions.new()
 
@@ -225,6 +226,7 @@ class Plane(Node, protocols=[Renderable]):
       print(f'pipelineState error: {e}')
     
     return pipelineState
+    '''
     
 
   # --- private

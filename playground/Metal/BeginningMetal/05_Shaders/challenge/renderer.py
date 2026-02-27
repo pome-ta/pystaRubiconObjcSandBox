@@ -20,10 +20,9 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
       warnings.warn(__warning_message, ImportWarning)
 
 import ctypes
-from pathlib import Path
 from math import sin
 
-from pyrubicon.objc.api import ObjCClass, NSObject
+from pyrubicon.objc.api import ObjCClass, ObjCProtocol, NSObject
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGSize, CGFloat
@@ -37,15 +36,19 @@ MTLCompileOptions = ObjCClass('MTLCompileOptions')
 MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
 
+MTKViewDelegate = ObjCProtocol('MTKViewDelegate')
+
 shader_path = Path(__file__).parent / 'Shader.metal'
 
 
-class Renderer(NSObject):
+class Renderer(NSObject, protocols=[
+    MTKViewDelegate,
+]):
 
   device: 'MTLDevice' = objc_property()
   commandQueue: 'MTLCommandQueue' = objc_property()
   scene: Scene = objc_property()
-  pipelineState: 'MTLRenderPipelineState?' = objc_property()
+
 
   @objc_method
   def initWithDevice_(self, device):
@@ -54,62 +57,7 @@ class Renderer(NSObject):
     self.device = device
     self.commandQueue = device.newCommandQueue()
 
-    self.buildPipelineState()
-
     return self
-
-  # --- private
-  @objc_method
-  def buildPipelineState(self):
-    source = shader_path.read_text('utf-8')
-    options = MTLCompileOptions.new()
-
-    library = self.device.newLibraryWithSource_options_error_(
-      source, options, None)
-
-    vertexFunction = library.newFunctionWithName_('vertex_shader')
-    fragmentFunction = library.newFunctionWithName_('fragment_shader')
-
-    pipelineDescriptor = MTLRenderPipelineDescriptor.new()
-    pipelineDescriptor.vertexFunction = vertexFunction
-    pipelineDescriptor.fragmentFunction = fragmentFunction
-    pipelineDescriptor.colorAttachments.objectAtIndexedSubscript_(
-      0).pixelFormat = MTLPixelFormat.bgra8Unorm
-
-    vertexDescriptor = MTLVertexDescriptor.new()
-    # todo: `objectAtIndexedSubscript_` 長いので配列処理
-    for idx, attribute in enumerate([
-        vertexDescriptor.attributes.objectAtIndexedSubscript_(i)
-        for i in range(2)
-    ]):
-      match idx:
-        case 0:
-          attribute.format = MTLVertexFormat.float3
-          attribute.offset = 0
-          attribute.bufferIndex = 0
-        case 1:
-          attribute.format = MTLVertexFormat.float4
-          attribute.offset = ctypes.sizeof(Position)
-          attribute.bufferIndex = 0
-        case _:
-          import logging
-          error = IndexError(f'{idx=}: list index out of range')
-          logging.warning(f'{type(error).__name__} -> {error}')
-
-    vertexDescriptor.layouts.objectAtIndexedSubscript_(
-      0).stride = ctypes.sizeof(Vertex)
-    #pdbr.state(pipelineDescriptor)
-
-    pipelineDescriptor.vertexDescriptor = vertexDescriptor
-
-    pipelineState = None
-    try:
-      pipelineState = self.device.newRenderPipelineStateWithDescriptor_error_(
-        pipelineDescriptor, None)
-    except Exception as e:
-      print(f'pipelineState error: {e}')
-
-    self.pipelineState = pipelineState
 
   # --- MTKViewDelegate
   @objc_method

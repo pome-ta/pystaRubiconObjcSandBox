@@ -1,6 +1,8 @@
 import ctypes
+from pathlib import Path
 from math import sin
 
+from pyrubicon.objc.api import ObjCClass
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGFloat
@@ -9,10 +11,16 @@ from objc_frameworks.Metal import (
   MTLResourceOptions,
   MTLPrimitiveType,
   MTLIndexType,
+  MTLVertexFormat,
 )
 
+from rbedge import pdbr
+
+MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
+
 from .node import Node
-from simdTypes import Vertex
+from .renderable import Renderable
+from simdTypes import Vertex, Position
 
 
 class Vertices(ctypes.Structure):
@@ -26,8 +34,10 @@ class Constants(ctypes.Structure):
     ('animateBy', ctypes.c_float),
   ]
 
+shader_path = Path(__file__).parent / 'Shader.metal'
 
-class Plane(Node):
+class Plane(Node, protocols=[Renderable,]):
+  #class Plane(Node):
 
   vertices: '[Vertices]' = objc_property(object)
   indices: '[UInt16]' = objc_property(object)
@@ -35,6 +45,11 @@ class Plane(Node):
   indexBuffer: 'MTLBuffer?' = objc_property()
   time: CGFloat = objc_property(CGFloat)
   constants: Constants = objc_property(object)
+  # Renderable
+  pipelineState: 'MTLRenderPipelineState!' = objc_property()
+  vertexFunctionName: str = objc_property(object)
+  fragmentFunctionName: str = objc_property(object)
+  vertexDescriptor: 'MTLVertexDescriptor' = objc_property()
 
   @objc_method
   def initWithDevice_(self, device):
@@ -59,9 +74,67 @@ class Plane(Node):
     self.time = 0.0
     self.constants = Constants()
 
+    # Renderable
+    self.fragmentFunctionName = 'fragment_shader'
+    self.vertexFunctionName = 'vertex_shader'
+
+    vertexDescriptor = MTLVertexDescriptor.new()
+    # todo: `objectAtIndexedSubscript_` 長いので配列処理
+    for idx, attribute in enumerate([
+        vertexDescriptor.attributes.objectAtIndexedSubscript_(i)
+        for i in range(2)
+    ]):
+      match idx:
+        case 0:
+          attribute.format = MTLVertexFormat.float3
+          attribute.offset = 0
+          attribute.bufferIndex = 0
+        case 1:
+          attribute.format = MTLVertexFormat.float4
+          attribute.offset = ctypes.sizeof(Position)
+          attribute.bufferIndex = 0
+        case _:
+          import logging
+          error = IndexError(f'{idx=}: list index out of range')
+          logging.warning(f'{type(error).__name__} -> {error}')
+
+    vertexDescriptor.layouts.objectAtIndexedSubscript_(
+      0).stride = ctypes.sizeof(Vertex)
+    self.vertexDescriptor = vertexDescriptor
+
     self.buildBuffersDevice_(device)
+    self.pipelineState = self.buildPipelineStateWithDevice_(device)
+
 
     return self
+
+  @objc_method
+  def buildPipelineStateWithDevice_(self, device):
+    source = shader_path.read_text('utf-8')
+    options = MTLCompileOptions.new()
+
+    library = device.newLibraryWithSource_options_error_(
+      source, options, None)
+
+    vertexFunction = library.newFunctionWithName_(self.vertexFunctionName)
+    fragmentFunction = library.newFunctionWithName_(self.fragmentFunctionName)
+
+    pipelineDescriptor = MTLRenderPipelineDescriptor.new()
+    pipelineDescriptor.vertexFunction = vertexFunction
+    pipelineDescriptor.fragmentFunction = fragmentFunction
+    pipelineDescriptor.colorAttachments.objectAtIndexedSubscript_(
+      0).pixelFormat = MTLPixelFormat.bgra8Unorm
+      
+    pipelineDescriptor.vertexDescriptor = self.vertexDescriptor
+
+    pipelineState = None
+    try:
+      pipelineState = self.device.newRenderPipelineStateWithDescriptor_error_(
+        pipelineDescriptor, None)
+    except Exception as e:
+      print(f'pipelineState error: {e}')
+    
+    return pipelineState
 
   # --- private
   @objc_method
