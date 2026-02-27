@@ -1,5 +1,6 @@
-from pyrubicon.objc.api import ObjCProtocol
+from pyrubicon.objc.api import ObjCProtocol, ObjCInstance
 from pyrubicon.objc.api import objc_method, objc_property
+
 
 class Renderable(metaclass=ObjCProtocol):
 
@@ -9,6 +10,6 @@ class Renderable(metaclass=ObjCProtocol):
   vertexDescriptor: 'MTLVertexDescriptor' = objc_property()
 
   @objc_method
-  def buildPipelineStateWithDevice_(self, device):
+  def buildPipelineStateWithDevice_(self, device) -> ObjCInstance:
     ...
-    
+

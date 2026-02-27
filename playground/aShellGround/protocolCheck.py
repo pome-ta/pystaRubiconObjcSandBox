@@ -23,7 +23,7 @@ import ctypes
 from pathlib import Path
 from math import sin
 
-from pyrubicon.objc.api import NSObject, ObjCClass, ObjCProtocol
+from pyrubicon.objc.api import NSObject, ObjCClass, ObjCProtocol, ObjCInstance
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGFloat
@@ -43,6 +43,8 @@ MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
 
 shader_path = Path(__file__).parent / 'Shader.metal'
+
+print(Path(__file__).parents[0])
 
 Position = (ctypes.c_float * 3)
 Color = (ctypes.c_float * 4)
@@ -100,7 +102,7 @@ class Renderable(metaclass=ObjCProtocol):
   vertexDescriptor: 'MTLVertexDescriptor' = objc_property()
 
   @objc_method
-  def buildPipelineStateWithDevice_(self, device):
+  def buildPipelineStateWithDevice_(self, device) -> ObjCInstance:
     #...
     source = shader_path.read_text('utf-8')
     options = MTLCompileOptions.new()
@@ -276,5 +278,5 @@ if __name__ == '__main__':
 
   DEVICE = MTLCreateSystemDefaultDevice()
   quad = Plane.alloc().initWithDevice_(DEVICE)
-  pdbr.state(quad)
+  #pdbr.state(quad)
 

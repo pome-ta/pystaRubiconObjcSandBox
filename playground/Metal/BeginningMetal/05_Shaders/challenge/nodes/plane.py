@@ -2,7 +2,7 @@ import ctypes
 from pathlib import Path
 from math import sin
 
-from pyrubicon.objc.api import ObjCClass
+from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGFloat
@@ -14,9 +14,9 @@ from objc_frameworks.Metal import (
   MTLVertexFormat,
 )
 
-from rbedge import pdbr
-
 MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
+MTLCompileOptions = ObjCClass('MTLCompileOptions')
+MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 
 from .node import Node
 from .renderable import Renderable
@@ -34,10 +34,13 @@ class Constants(ctypes.Structure):
     ('animateBy', ctypes.c_float),
   ]
 
-shader_path = Path(__file__).parent / 'Shader.metal'
 
-class Plane(Node, protocols=[Renderable,]):
-  #class Plane(Node):
+shader_path = Path(__file__).parents[1] / 'Shader.metal'
+
+
+class Plane(Node, protocols=[
+    Renderable,
+]):
 
   vertices: '[Vertices]' = objc_property(object)
   indices: '[UInt16]' = objc_property(object)
@@ -75,6 +78,7 @@ class Plane(Node, protocols=[Renderable,]):
     self.constants = Constants()
 
     # Renderable
+    print('plane')
     self.fragmentFunctionName = 'fragment_shader'
     self.vertexFunctionName = 'vertex_shader'
 
@@ -105,16 +109,15 @@ class Plane(Node, protocols=[Renderable,]):
     self.buildBuffersDevice_(device)
     self.pipelineState = self.buildPipelineStateWithDevice_(device)
 
-
     return self
 
+  # --- Renderable
   @objc_method
-  def buildPipelineStateWithDevice_(self, device):
+  def buildPipelineStateWithDevice_(self, device) -> ObjCInstance:
     source = shader_path.read_text('utf-8')
     options = MTLCompileOptions.new()
 
-    library = device.newLibraryWithSource_options_error_(
-      source, options, None)
+    library = device.newLibraryWithSource_options_error_(source, options, None)
 
     vertexFunction = library.newFunctionWithName_(self.vertexFunctionName)
     fragmentFunction = library.newFunctionWithName_(self.fragmentFunctionName)
@@ -124,7 +127,7 @@ class Plane(Node, protocols=[Renderable,]):
     pipelineDescriptor.fragmentFunction = fragmentFunction
     pipelineDescriptor.colorAttachments.objectAtIndexedSubscript_(
       0).pixelFormat = MTLPixelFormat.bgra8Unorm
-      
+
     pipelineDescriptor.vertexDescriptor = self.vertexDescriptor
 
     pipelineState = None
@@ -133,7 +136,7 @@ class Plane(Node, protocols=[Renderable,]):
         pipelineDescriptor, None)
     except Exception as e:
       print(f'pipelineState error: {e}')
-    
+
     return pipelineState
 
   # --- private
@@ -151,8 +154,8 @@ class Plane(Node, protocols=[Renderable,]):
     self.indexBuffer = indexBuffer
 
   @objc_method
-  def renderCommandEncoder_deltaTime_(self, commandEncoder,
-                                      deltaTime: CGFloat):
+  def renderWithCommandEncoder_deltaTime_(self, commandEncoder,
+                                          deltaTime: CGFloat):
     send_super(__class__,
                self,
                'renderCommandEncoder:deltaTime:',
@@ -169,6 +172,8 @@ class Plane(Node, protocols=[Renderable,]):
     self.time += deltaTime
     animateBy = abs(sin(self.time) / 2 + 0.5)
     self.constants.animateBy = animateBy
+
+    commandEncoder.setRenderPipelineState_(self.pipelineState)
 
     commandEncoder.setVertexBuffer_offset_atIndex_(self.vertexBuffer, 0, 0)
     commandEncoder.setVertexBytes_length_atIndex_(

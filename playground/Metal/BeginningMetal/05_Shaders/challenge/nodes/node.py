@@ -23,8 +23,8 @@ class Node(NSObject):
     self.children.append(childNode)
 
   @objc_method
-  def renderCommandEncoder_deltaTime_(self, commandEncoder,
+  def renderWithCommandEncoder_deltaTime_(self, commandEncoder,
                                       deltaTime: CGFloat):
     for child in self.children:
-      child.renderCommandEncoder_deltaTime_(commandEncoder, deltaTime)
+      child.renderWithCommandEncoder_deltaTime_(commandEncoder, deltaTime)
 

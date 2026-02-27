@@ -20,25 +20,15 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
       warnings.warn(__warning_message, ImportWarning)
 
 import ctypes
-from math import sin
 
-from pyrubicon.objc.api import ObjCClass, ObjCProtocol, NSObject
+from pyrubicon.objc.api import ObjCProtocol, NSObject
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
-from pyrubicon.objc.types import CGSize, CGFloat
-
-from objc_frameworks.Metal import MTLPixelFormat, MTLVertexFormat
+from pyrubicon.objc.types import CGSize
 
 from scenes import Scene
-from simdTypes import Vertex, Position, Color
-
-MTLCompileOptions = ObjCClass('MTLCompileOptions')
-MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
-MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
 
 MTKViewDelegate = ObjCProtocol('MTKViewDelegate')
-
-shader_path = Path(__file__).parent / 'Shader.metal'
 
 
 class Renderer(NSObject, protocols=[
@@ -47,8 +37,8 @@ class Renderer(NSObject, protocols=[
 
   device: 'MTLDevice' = objc_property()
   commandQueue: 'MTLCommandQueue' = objc_property()
-  scene: Scene = objc_property()
 
+  scene: Scene = objc_property()
 
   @objc_method
   def initWithDevice_(self, device):
@@ -65,21 +55,19 @@ class Renderer(NSObject, protocols=[
     pass
 
   @objc_method
-  def drawInMTKView_(self, view):
+  def drawInMTKView_(self, view): 
     if not ((drawable := view.currentDrawable) and
-            (pipelineState := self.pipelineState) and
             (descriptor := view.currentRenderPassDescriptor)):
       return
 
     commandBuffer = self.commandQueue.commandBuffer()
     commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
       descriptor)
-    commandEncoder.setRenderPipelineState_(pipelineState)
 
     deltaTime = 1 / view.preferredFramesPerSecond
 
     try:  # `scene?.`
-      self.scene.renderCommandEncoder_deltaTime_(commandEncoder, deltaTime)
+      self.scene.renderWithCommandEncoder_deltaTime_(commandEncoder, deltaTime)
     except Exception as e:
       print(e)
 
