@@ -59,13 +59,13 @@ class Plane(Node):
     self.time = 0.0
     self.constants = Constants()
 
-    self.buildBuffersDevice_(device)
+    self.buildBuffersWithDevice_(device)
 
     return self
 
   # --- private
   @objc_method
-  def buildBuffersDevice_(self, device):
+  def buildBuffersWithDevice_(self, device):
     vertexBuffer = device.newBufferWithBytes_length_options_(
       ctypes.byref(self.vertices), ctypes.sizeof(self.vertices),
       MTLResourceOptions.storageModeShared)
@@ -78,11 +78,11 @@ class Plane(Node):
     self.indexBuffer = indexBuffer
 
   @objc_method
-  def renderCommandEncoder_deltaTime_(self, commandEncoder,
+  def renderWithCommandEncoder_deltaTime_(self, commandEncoder,
                                       deltaTime: CGFloat):
     send_super(__class__,
                self,
-               'renderCommandEncoder:deltaTime:',
+               'renderWithCommandEncoder:deltaTime:',
                commandEncoder,
                deltaTime,
                argtypes=[

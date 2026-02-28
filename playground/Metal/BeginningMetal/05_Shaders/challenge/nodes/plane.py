@@ -106,7 +106,7 @@ class Plane(Node, protocols=[
       0).stride = ctypes.sizeof(Vertex)
     self.vertexDescriptor = vertexDescriptor
 
-    self.buildBuffersDevice_(device)
+    self.buildBuffersWithDevice_(device)
     self.pipelineState = self.buildPipelineStateWithDevice_(device)
 
     return self
@@ -141,7 +141,7 @@ class Plane(Node, protocols=[
 
   # --- private
   @objc_method
-  def buildBuffersDevice_(self, device):
+  def buildBuffersWithDevice_(self, device):
     vertexBuffer = device.newBufferWithBytes_length_options_(
       ctypes.byref(self.vertices), ctypes.sizeof(self.vertices),
       MTLResourceOptions.storageModeShared)

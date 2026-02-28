@@ -131,7 +131,7 @@ class Renderer(NSObject):
     deltaTime = 1 / view.preferredFramesPerSecond
 
     try:  # `scene?.`
-      self.scene.renderCommandEncoder_deltaTime_(commandEncoder, deltaTime)
+      self.scene.renderWithCommandEncoder_deltaTime_(commandEncoder, deltaTime)
     except Exception as e:
       print(e)
 
