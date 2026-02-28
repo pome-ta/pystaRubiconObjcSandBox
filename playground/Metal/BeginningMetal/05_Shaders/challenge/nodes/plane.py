@@ -12,6 +12,7 @@ from objc_frameworks.Metal import (
   MTLPrimitiveType,
   MTLIndexType,
   MTLVertexFormat,
+  MTLPixelFormat,
 )
 
 MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
@@ -107,7 +108,7 @@ class Plane(Node, protocols=[
     self.vertexDescriptor = vertexDescriptor
 
     self.buildBuffersDevice_(device)
-    self.pipelineState = self.buildPipelineStateWithDevice_(device)
+    #self.pipelineState = self.buildPipelineStateWithDevice_(device)
 
     return self
 
