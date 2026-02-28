@@ -3,10 +3,18 @@
 [Beginning Metal | Kodeco](https://www.kodeco.com/3537-beginning-metal)
 
 
+## 06. Textures
+
+[Beginning Metal, Episode 6: Textures | Kodeco](https://www.kodeco.com/3537-beginning-metal/lessons/6)
+
+## 05. Shaders
+
+[Beginning Metal, Episode 5: Shaders | Kodeco](https://www.kodeco.com/3537-beginning-metal/lessons/5)
+
 ## 04. Indices and Constants
 
 [Beginning Metal, Episode 4: Indices and Constants | Kodeco](https://www.kodeco.com/3537-beginning-metal/lessons/4)
-
+ 
 
 ## 03. Triangles
 
