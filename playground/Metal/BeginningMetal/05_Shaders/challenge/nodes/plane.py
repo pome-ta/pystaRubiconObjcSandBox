@@ -79,7 +79,6 @@ class Plane(Node, protocols=[
     self.constants = Constants()
 
     # Renderable
-    print('plane')
     self.fragmentFunctionName = 'fragment_shader'
     self.vertexFunctionName = 'vertex_shader'
 
@@ -108,7 +107,7 @@ class Plane(Node, protocols=[
     self.vertexDescriptor = vertexDescriptor
 
     self.buildBuffersDevice_(device)
-    #self.pipelineState = self.buildPipelineStateWithDevice_(device)
+    self.pipelineState = self.buildPipelineStateWithDevice_(device)
 
     return self
 
@@ -133,7 +132,7 @@ class Plane(Node, protocols=[
 
     pipelineState = None
     try:
-      pipelineState = self.device.newRenderPipelineStateWithDescriptor_error_(
+      pipelineState = device.newRenderPipelineStateWithDescriptor_error_(
         pipelineDescriptor, None)
     except Exception as e:
       print(f'pipelineState error: {e}')
@@ -159,7 +158,7 @@ class Plane(Node, protocols=[
                                           deltaTime: CGFloat):
     send_super(__class__,
                self,
-               'renderCommandEncoder:deltaTime:',
+               'renderWithCommandEncoder:deltaTime:',
                commandEncoder,
                deltaTime,
                argtypes=[

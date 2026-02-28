@@ -55,7 +55,7 @@ class Renderer(NSObject, protocols=[
     pass
 
   @objc_method
-  def drawInMTKView_(self, view): 
+  def drawInMTKView_(self, view):
     if not ((drawable := view.currentDrawable) and
             (descriptor := view.currentRenderPassDescriptor)):
       return

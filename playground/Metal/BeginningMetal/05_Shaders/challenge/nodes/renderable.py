@@ -1,4 +1,4 @@
-from pyrubicon.objc.api import ObjCProtocol, ObjCInstance, NSString
+from pyrubicon.objc.api import ObjCProtocol, ObjCInstance
 from pyrubicon.objc.api import objc_method, objc_property
 
 
