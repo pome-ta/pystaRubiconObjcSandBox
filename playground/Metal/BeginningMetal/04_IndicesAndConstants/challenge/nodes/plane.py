@@ -97,7 +97,7 @@ class Plane(Node):
 
   @objc_method
   def renderWithCommandEncoder_deltaTime_(self, commandEncoder,
-                                      deltaTime: CGFloat):
+                                          deltaTime: CGFloat):
     send_super(__class__,
                self,
                'renderWithCommandEncoder:deltaTime:',

@@ -45,7 +45,7 @@ class Node(NSObject):
 
   @objc_method
   def renderWithCommandEncoder_deltaTime_(self, commandEncoder,
-                                      deltaTime: CGFloat):
+                                          deltaTime: CGFloat):
     for child in self.children:
       child.renderWithCommandEncoder_deltaTime_(commandEncoder, deltaTime)
 
