@@ -57,6 +57,7 @@ class Plane(Node, protocols=[
 
   @objc_method
   def init_properties(self):
+    # todo: class member declarations
     self.vertices = Vertices((
       Vertex(  # v0
         position=(-1.0,  1.0,  0.0), color=(1.0, 0.0, 0.0, 1.0)),
