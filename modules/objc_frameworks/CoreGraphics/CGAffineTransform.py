@@ -3,7 +3,7 @@ import ctypes
 from pyrubicon.objc.types import CGFloat
 from pyrubicon.objc.types import __LP64__, with_preferred_encoding
 
-from .constants import CoreGraphics
+from .constants import framework as CoreGraphics
 
 if __LP64__:
   _CGAffineTransformEncoding = b'{CGAffineTransform=dddddd}'

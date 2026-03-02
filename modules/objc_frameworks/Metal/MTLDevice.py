@@ -3,7 +3,7 @@ from enum import IntEnum
 
 from pyrubicon.objc.api import ObjCInstance
 
-from .constants import Metal
+from .constants import framework as Metal
 
 
 def MTLCreateSystemDefaultDevice() -> ObjCInstance:
