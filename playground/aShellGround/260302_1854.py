@@ -19,21 +19,17 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
       __warning_message = f'./{_TOP_DIR_NAME}/{_MODULES_DIR_NAME} not found in parent directories'
       warnings.warn(__warning_message, ImportWarning)
 
-
 from pyrubicon.objc.api import objc_const, ObjCInstance
 from pyrubicon.objc.runtime import load_library
 
-#MetalKit = load_library('MetalKit')
-framework = load_library('MetalKit')
+from objc_frameworks.MetalKit import (
+  MTKTextureLoaderOptionOrigin,
+  MTKTextureLoaderOriginBottomLeft,
+)
 
-def get_const(global_variable_name) -> ObjCInstance:
-  return objc_const(framework, global_variable_name)
 
-
-MTKTextureLoaderOriginBottomLeft = get_const('MTKTextureLoaderOriginBottomLeft')
-
-print(str(MTKTextureLoaderOriginBottomLeft))
-
+origin = str(MTKTextureLoaderOriginBottomLeft)
 
 if __name__ == '__main__':
   pass
+
