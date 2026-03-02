@@ -15,13 +15,13 @@ from objc_frameworks.Metal import (
   MTLPixelFormat,
 )
 
-MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
-MTLCompileOptions = ObjCClass('MTLCompileOptions')
-MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
-
 from .node import Node
 from .renderable import Renderable
 from simdTypes import Vertex, Position
+
+MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
+MTLCompileOptions = ObjCClass('MTLCompileOptions')
+MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 
 
 class Vertices(ctypes.Structure):
