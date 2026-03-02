@@ -10,7 +10,7 @@ class Node(NSObject):
   children: ['Node'] = objc_property(object)
 
   @objc_method
-  def init_properties(self):
+  def initializeProperties(self):
     # todo: class member declarations
     self.name = 'Untitled'
     self.children = []
@@ -18,7 +18,7 @@ class Node(NSObject):
   @objc_method
   def init(self):
     send_super(__class__, self, 'init')
-    self.init_properties()
+    self.initializeProperties()
 
     return self
 

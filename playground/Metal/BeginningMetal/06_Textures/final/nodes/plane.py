@@ -56,8 +56,10 @@ class Plane(Node, protocols=[
   vertexDescriptor: 'MTLVertexDescriptor' = objc_property()
 
   @objc_method
-  def init_properties(self):
+  def initializeProperties(self):
     # todo: class member declarations
+    send_super(__class__, self, 'initializeProperties')
+    
     self.vertices = Vertices((
       Vertex(  # v0
         position=(-1.0,  1.0,  0.0), color=(1.0, 0.0, 0.0, 1.0)),
@@ -110,7 +112,7 @@ class Plane(Node, protocols=[
   @objc_method
   def initWithDevice_(self, device):
     send_super(__class__, self, 'init')
-    self.init_properties()
+    self.initializeProperties()
 
     self.buildBuffersWithDevice_(device)
     self.pipelineState = self.buildPipelineStateWithDevice_(device)
