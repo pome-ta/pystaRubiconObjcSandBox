@@ -26,6 +26,15 @@ MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 
 MTKTextureLoader = ObjCClass('MTKTextureLoader')
 
+NSURL = ObjCClass('NSURL')
+
+
+def nsurl(url_or_path):
+  if not isinstance(url_or_path, str):
+    raise TypeError('expected a string')
+  return NSURL.URLWithString_(
+    url_or_path) if ':' in url_or_path else NSURL.fileURLWithPath_(url_or_path)
+
 
 class Vertices(ctypes.Structure):
   _fields_ = [
@@ -134,7 +143,8 @@ class Plane(Node, protocols=[
   # --- extension Texturable
   @objc_method
   def setTextureWithDevice_imageName_(self, device, imageName) -> ObjCInstance:
-    ...
+    textureLoader = MTKTextureLoader.alloc().initWithDevice_(device)
+    # todo: `#available(iOS 10.0, *)` 古すぎるので処理しない
 
   # --- Renderable
   # --- extension Renderable
