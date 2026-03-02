@@ -15,13 +15,16 @@ from objc_frameworks.Metal import (
   MTLPixelFormat,
 )
 
+from .node import Node
+from .renderable import Renderable
+from .texturable import Texturable
+from simdTypes import Vertex, Position
+
 MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
 MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 
-from .node import Node
-from .renderable import Renderable
-from simdTypes import Vertex, Position
+MTKTextureLoader = ObjCClass('MTKTextureLoader')
 
 
 class Vertices(ctypes.Structure):
@@ -41,6 +44,7 @@ shader_path = Path(__file__).parents[1] / 'Shader.metal'
 
 class Plane(Node, protocols=[
     Renderable,
+    Texturable,
 ]):
 
   vertices: '[Vertices]' = objc_property(object)
@@ -54,12 +58,14 @@ class Plane(Node, protocols=[
   vertexFunctionName: str = objc_property(object)
   fragmentFunctionName: str = objc_property(object)
   vertexDescriptor: 'MTLVertexDescriptor' = objc_property()
+  # Texturable
+  texture: 'MTLTexture?' = objc_property()
 
   @objc_method
   def initializeProperties(self):
     # todo: class member declarations
     send_super(__class__, self, 'initializeProperties')
-    
+
     self.vertices = Vertices((
       Vertex(  # v0
         position=(-1.0,  1.0,  0.0), color=(1.0, 0.0, 0.0, 1.0)),
@@ -107,8 +113,6 @@ class Plane(Node, protocols=[
       0).stride = ctypes.sizeof(Vertex)
     self.vertexDescriptor = vertexDescriptor
 
-  
-  
   @objc_method
   def initWithDevice_(self, device):
     send_super(__class__, self, 'init')
@@ -119,7 +123,21 @@ class Plane(Node, protocols=[
 
     return self
 
+  @objc_method
+  def initWithDevice_imageName_(self, device, imageName):
+    send_super(__class__, self, 'init')
+    self.initializeProperties()
+
+    return self
+
+  # --- Texturable
+  # --- extension Texturable
+  @objc_method
+  def setTextureWithDevice_imageName_(self, device, imageName) -> ObjCInstance:
+    ...
+
   # --- Renderable
+  # --- extension Renderable
   @objc_method
   def buildPipelineStateWithDevice_(self, device) -> ObjCInstance:
     source = shader_path.read_text('utf-8')
