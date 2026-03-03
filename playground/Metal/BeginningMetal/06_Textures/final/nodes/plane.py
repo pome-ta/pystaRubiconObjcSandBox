@@ -3,6 +3,7 @@ from pathlib import Path
 from math import sin
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance
+from pyrubicon.objc.api import NSDictionary
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGFloat
@@ -14,6 +15,12 @@ from objc_frameworks.Metal import (
   MTLVertexFormat,
   MTLPixelFormat,
 )
+from objc_frameworks.MetalKit import (
+  MTKTextureLoaderOptionOrigin,
+  MTKTextureLoaderOriginBottomLeft,
+)
+
+from rbedge.utils import nsurl
 
 from .node import Node
 from .renderable import Renderable
@@ -26,14 +33,7 @@ MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 
 MTKTextureLoader = ObjCClass('MTKTextureLoader')
 
-NSURL = ObjCClass('NSURL')
-
-
-def nsurl(url_or_path):
-  if not isinstance(url_or_path, str):
-    raise TypeError('expected a string')
-  return NSURL.URLWithString_(
-    url_or_path) if ':' in url_or_path else NSURL.fileURLWithPath_(url_or_path)
+ROOT_PATH = Path(__file__).parents[1]
 
 
 class Vertices(ctypes.Structure):
@@ -48,7 +48,15 @@ class Constants(ctypes.Structure):
   ]
 
 
-shader_path = Path(__file__).parents[1] / 'Shader.metal'
+# wip: 雑
+def get_image_path(imageName: str) -> str:
+  root = ROOT_PATH / 'Images'
+  for file in root.iterdir():
+    if file.name == imageName:
+      return str(file.resolve())
+
+
+shader_path = ROOT_PATH / 'Shader.metal'
 
 
 class Plane(Node, protocols=[
@@ -137,14 +145,35 @@ class Plane(Node, protocols=[
     send_super(__class__, self, 'init')
     self.initializeProperties()
 
+    if (texture := self.setTextureWithDevice_imageName_(device, imageName)):
+      self.texture = texture
+      self.fragmentFunctionName = 'textured_fragment'
+
+    self.buildBuffersWithDevice_(device)
+    self.pipelineState = self.buildPipelineStateWithDevice_(device)
+
     return self
 
   # --- Texturable
   # --- extension Texturable
   @objc_method
   def setTextureWithDevice_imageName_(self, device, imageName) -> ObjCInstance:
+    texture = None
     textureLoader = MTKTextureLoader.alloc().initWithDevice_(device)
     # todo: `#available(iOS 10.0, *)` 古すぎるので処理しない
+    origin = str(MTKTextureLoaderOriginTopLeft)
+    textureLoaderOptions = NSDictionary.dictionaryWithObject_forKey_(
+      origin, MTKTextureLoaderOptionOrigin)
+
+    if (textureURL := nsurl(get_image_path(imageName))):
+      try:
+        texture = textureLoader.newTextureWithContentsOfURL_options_error_(
+          textureURL, textureLoaderOptions, None)
+
+      except Exception:
+        print('texture not created')
+
+    return texture
 
   # --- Renderable
   # --- extension Renderable

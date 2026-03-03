@@ -32,18 +32,18 @@ from objc_frameworks.MetalKit import (
 )
 
 from rbedge import pdbr
+from rbedge.utils import nsurl
 
 MTKTextureLoader = ObjCClass('MTKTextureLoader')
 
 NSURL = ObjCClass('NSURL')
-
-
+'''
 def nsurl(url_or_path):
   if not isinstance(url_or_path, str):
     raise TypeError('expected a string')
   return NSURL.URLWithString_(
     url_or_path) if ':' in url_or_path else NSURL.fileURLWithPath_(url_or_path)
-
+'''
 
 device = MTLCreateSystemDefaultDevice()
 textureLoader = MTKTextureLoader.alloc().initWithDevice_(device)
