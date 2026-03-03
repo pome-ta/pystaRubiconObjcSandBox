@@ -21,15 +21,15 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
 
 from pathlib import Path
 from pyrubicon.objc.api import ObjCClass, ObjCInstance
-from pyrubicon.objc.api import objc_const
+from pyrubicon.objc.api import objc_const, NSDictionary
 from pyrubicon.objc.runtime import load_library
 
 from objc_frameworks.Metal import MTLCreateSystemDefaultDevice
 from objc_frameworks.MetalKit import (
   MTKTextureLoaderOptionOrigin,
   MTKTextureLoaderOriginBottomLeft,
+  MTKTextureLoaderOriginTopLeft,
 )
-
 
 from rbedge import pdbr
 
@@ -45,20 +45,25 @@ def nsurl(url_or_path):
     url_or_path) if ':' in url_or_path else NSURL.fileURLWithPath_(url_or_path)
 
 
-
 device = MTLCreateSystemDefaultDevice()
 textureLoader = MTKTextureLoader.alloc().initWithDevice_(device)
 
-origin = str(MTKTextureLoaderOriginBottomLeft)
-textureLoaderOptions = {str(MTKTextureLoaderOptionOrigin): origin}
+#origin = str(MTKTextureLoaderOriginBottomLeft)
 
-image_path = Path('../Metal/BeginningMetal/06_Textures/final/Images/picture.png')#.resolve()
+origin = str(MTKTextureLoaderOriginTopLeft)
+#textureLoaderOptions = {str(MTKTextureLoaderOptionOrigin): origin}
+textureLoaderOptions = NSDictionary.dictionaryWithObject_forKey_(
+  origin, MTKTextureLoaderOptionOrigin)
+
+image_path = Path(
+  '../Metal/BeginningMetal/06_Textures/final/Images/picture.png')  #.resolve()
 
 path_str = str(image_path.resolve())
 
+texture = textureLoader.newTextureWithContentsOfURL_options_error_(
+  nsurl(path_str), textureLoaderOptions, None)
 
-texture = textureLoader.newTextureWithContentsOfURL_options_error_(nsurl(path_str), textureLoaderOptions, None)
-
+#pdbr.state(NSDictionary)
 pdbr.state(texture)
 
 if __name__ == '__main__':
