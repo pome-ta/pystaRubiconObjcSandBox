@@ -25,7 +25,7 @@ from rbedge.utils import nsurl
 from .node import Node
 from .renderable import Renderable
 from .texturable import Texturable
-from simdTypes import Vertex, Position
+from simdTypes import Vertex, Position, Color
 
 MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
@@ -85,13 +85,13 @@ class Plane(Node, protocols=[
 
     self.vertices = Vertices((
       Vertex(  # v0
-        position=(-1.0,  1.0,  0.0), color=(1.0, 0.0, 0.0, 1.0)),
+        position=(-1.0,  1.0,  0.0), color=(1.0, 0.0, 0.0, 1.0), texture=(0.0, 1.0)),
       Vertex(  # v1
-        position=(-1.0, -1.0,  0.0), color=(0.0, 1.0, 0.0, 1.0)),
+        position=(-1.0, -1.0,  0.0), color=(0.0, 1.0, 0.0, 1.0), texture=(0.0, 0.0)),
       Vertex(  # v2
-        position=( 1.0, -1.0,  0.0), color=(0.0, 0.0, 1.0, 1.0)),
+        position=( 1.0, -1.0,  0.0), color=(0.0, 0.0, 1.0, 1.0), texture=(1.0, 0.0)),
       Vertex(  # v3
-        position=( 1.0,  1.0,  0.0), color=(1.0, 0.0, 1.0, 1.0)),
+        position=( 1.0,  1.0,  0.0), color=(1.0, 0.0, 1.0, 1.0), texture=(1.0, 1.0)),
     ))  # yapf: disable
 
     self.indices = (ctypes.c_int16 * (2 * 3))(
@@ -120,6 +120,10 @@ class Plane(Node, protocols=[
         case 1:
           attribute.format = MTLVertexFormat.float4
           attribute.offset = ctypes.sizeof(Position)
+          attribute.bufferIndex = 0
+        case 2:
+          attribute.format = MTLVertexFormat.float2
+          attribute.offset = ctypes.sizeof(Position) + ctypes.sizeof(Color)
           attribute.bufferIndex = 0
         case _:
           import logging
