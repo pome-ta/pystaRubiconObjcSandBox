@@ -247,6 +247,7 @@ class Plane(Node, protocols=[
     commandEncoder.setVertexBuffer_offset_atIndex_(self.vertexBuffer, 0, 0)
     commandEncoder.setVertexBytes_length_atIndex_(
       ctypes.byref(self.constants), ctypes.sizeof(self.constants), 1)
+    commandEncoder.setFragmentTexture_atIndex_(self.texture, 0)
     commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
       MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
       self.indexBuffer, 0)

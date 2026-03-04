@@ -23,7 +23,7 @@ class GameScene(Scene):
                  CGSize,
                ])
 
-    self.quad = Plane.alloc().initWithDevice_(device)
+    self.quad = Plane.alloc().initWithDevice_imageName_(device, 'picture.png')
     self.addChildNode_(self.quad)
 
     return self
