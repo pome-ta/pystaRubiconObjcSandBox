@@ -3,6 +3,10 @@
 [Beginning Metal | Kodeco](https://www.kodeco.com/3537-beginning-metal)
 
 
+## 07. Matrices 2D to 3D
+
+[Beginning Metal, Episode 7: Matrices 2D to 3D | Kodeco](https://www.kodeco.com/3537-beginning-metal/lessons/7)
+
 ## 06. Textures
 
 [Beginning Metal, Episode 6: Textures | Kodeco](https://www.kodeco.com/3537-beginning-metal/lessons/6)
