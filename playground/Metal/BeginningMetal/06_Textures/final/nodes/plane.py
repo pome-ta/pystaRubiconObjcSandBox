@@ -109,9 +109,10 @@ class Plane(Node, protocols=[
 
     vertexDescriptor = MTLVertexDescriptor.new()
     # todo: `objectAtIndexedSubscript_` 長いので配列処理
+    range_num = 3
     for idx, attribute in enumerate([
         vertexDescriptor.attributes.objectAtIndexedSubscript_(i)
-        for i in range(2)
+        for i in range(range_num)
     ]):
       match idx:
         case 0:

@@ -10,4 +10,3 @@ class Texturable(metaclass=ObjCProtocol):
   def setTextureWithDevice_imageName_(self, device, imageName) -> ObjCInstance:
     ...
 
-
