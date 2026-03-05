@@ -155,7 +155,6 @@ class Plane(Node, protocols=[
       self.texture = texture
       self.fragmentFunctionName = 'textured_fragment'
 
-    print(self.fragmentFunctionName)
     self.buildBuffersWithDevice_(device)
     self.pipelineState = self.buildPipelineStateWithDevice_(device)
 
