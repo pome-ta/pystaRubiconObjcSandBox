@@ -21,6 +21,7 @@ from objc_frameworks.MetalKit import (
 )
 
 from rbedge.utils import nsurl
+from rbedge import pdbr
 
 from .node import Node
 from .renderable import Renderable
@@ -145,7 +146,7 @@ class Plane(Node, protocols=[
     return self
 
   @objc_method
-  def initWithDevice_imageName_(self, device, imageName):
+  def initWithDevice_imageName_(self, device, imageName: object):
     send_super(__class__, self, 'init')
     self.initializeProperties()
 
@@ -153,6 +154,7 @@ class Plane(Node, protocols=[
       self.texture = texture
       self.fragmentFunctionName = 'textured_fragment'
 
+    print(self.fragmentFunctionName)
     self.buildBuffersWithDevice_(device)
     self.pipelineState = self.buildPipelineStateWithDevice_(device)
 
@@ -161,11 +163,13 @@ class Plane(Node, protocols=[
   # --- Texturable
   # --- extension Texturable
   @objc_method
-  def setTextureWithDevice_imageName_(self, device, imageName) -> ObjCInstance:
+  def setTextureWithDevice_imageName_(self, device,
+                                      imageName: object) -> ObjCInstance:
     texture = None
     textureLoader = MTKTextureLoader.alloc().initWithDevice_(device)
     # todo: `#available(iOS 10.0, *)` 古すぎるので処理しない
-    origin = str(MTKTextureLoaderOriginTopLeft)
+    origin = str(MTKTextureLoaderOriginBottomLeft)
+
     textureLoaderOptions = NSDictionary.dictionaryWithObject_forKey_(
       origin, MTKTextureLoaderOptionOrigin)
 
