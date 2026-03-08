@@ -23,8 +23,8 @@
 #include <metal_stdlib>
 using namespace metal;
 
-struct ModelConstants {
-  float4x4 modelViewMatrix;
+struct Constants {
+  float animateBy;
 };
 
 struct VertexIn {
@@ -39,12 +39,13 @@ struct VertexOut {
   float2 textureCoordinates;
 };
 
-vertex VertexOut vertex_shader(const VertexIn vertexIn [[ stage_in ]],
-                               constant ModelConstants &modelConstants [[ buffer(1) ]])  {
+vertex VertexOut vertex_shader(const VertexIn vertexIn [[ stage_in ]]) {
+  
   VertexOut vertexOut;
-  vertexOut.position = modelConstants.modelViewMatrix * vertexIn.position;
+  vertexOut.position = vertexIn.position;
   vertexOut.color = vertexIn.color;
   vertexOut.textureCoordinates = vertexIn.textureCoordinates;
+
   return vertexOut;
 }
 
