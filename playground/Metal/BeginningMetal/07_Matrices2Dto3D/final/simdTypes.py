@@ -23,7 +23,6 @@ class _SimdMeta(type(ctypes.Structure)):
 
 
 class _SimdBase(ctypes.Structure, metaclass=_SimdMeta):
-
   _components_ = ''
   _aliases_ = {
     'r': 'x', 'g': 'y', 'b': 'z', 'a': 'w',
@@ -31,7 +30,6 @@ class _SimdBase(ctypes.Structure, metaclass=_SimdMeta):
   }  # yapf: disable
 
   def __init__(self, *values):
-
     n = len(self._components_)
     vals = list(values[:n])
     vals += [0.0] * (n - len(vals))
@@ -57,14 +55,12 @@ class _SimdBase(ctypes.Structure, metaclass=_SimdMeta):
     return f'{self.__class__.__name__}({vals})'
 
   def _map_comp(self, comp):
-
     if comp in self._components_:
       return comp
 
     return self._aliases_.get(comp)
 
   def _resolve(self, name):
-
     mapped = []
     comps = self._components_
 
@@ -77,7 +73,6 @@ class _SimdBase(ctypes.Structure, metaclass=_SimdMeta):
     return mapped
 
   def __getattr__(self, name):
-
     comps = self._resolve(name)
 
     if not comps:
@@ -114,14 +109,12 @@ class _SimdBase(ctypes.Structure, metaclass=_SimdMeta):
     '''
 
   def __setattr__(self, name, value):
-
     comps = self._resolve(name)
 
     if comps and len(comps) > 1:
 
       if len(set(comps)) != len(comps):
         raise ValueError('duplicate swizzle assignment')
-
       vals = list(value)
 
       if len(vals) != len(comps):
@@ -136,9 +129,7 @@ class _SimdBase(ctypes.Structure, metaclass=_SimdMeta):
 
 
 class simd_float2(_SimdBase):
-
   _components_ = 'xy'
-
   _fields_ = [
     ('x', ctypes.c_float),
     ('y', ctypes.c_float),
@@ -146,9 +137,7 @@ class simd_float2(_SimdBase):
 
 
 class simd_float3(_SimdBase):
-
   _components_ = 'xyz'
-
   _fields_ = [
     ('x', ctypes.c_float),
     ('y', ctypes.c_float),
@@ -158,16 +147,13 @@ class simd_float3(_SimdBase):
 
 
 class simd_float4(_SimdBase):
-
   _components_ = 'xyzw'
-
   _fields_ = [
     ('x', ctypes.c_float),
     ('y', ctypes.c_float),
     ('z', ctypes.c_float),
     ('w', ctypes.c_float),
   ]
-
 
 
 Position = (ctypes.c_float * 3)
