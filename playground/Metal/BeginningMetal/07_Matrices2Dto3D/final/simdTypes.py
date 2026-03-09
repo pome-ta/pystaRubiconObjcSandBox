@@ -31,11 +31,19 @@ class _SimdBase(ctypes.Structure, metaclass=_SimdMeta):
 
   def __init__(self, *values):
     n = len(self._components_)
+    '''
+    if len(values) == 1:
+      vals = [values[0]] * n
+    else:
+      vals = list(values[:n])
+      vals += [0.0] * (n - len(vals))
+    '''
     vals = list(values[:n])
     vals += [0.0] * (n - len(vals))
+    
 
     if len(self._fields_) > n:
-      vals.append(0.0)
+      vals.append(0.0)  # todo: padding
 
     super().__init__(*vals)
 
@@ -66,13 +74,19 @@ class _SimdBase(ctypes.Structure, metaclass=_SimdMeta):
 
     for c in name:
       m = self._map_comp(c)
-      if m not in comps:
+      if m is None or m not in comps:
         return None
       mapped.append(m)
 
     return mapped
 
   def __getattr__(self, name):
+    
+    if name.startswith('_'):
+      raise AttributeError(name)
+    
+    
+    
     comps = self._resolve(name)
 
     if not comps:
@@ -168,3 +182,10 @@ class Vertex(ctypes.Structure):
     ('texture', Texture),
   ]
 
+
+
+
+if __name__ == '__main__':
+  x = 1
+  f3 = simd_float3(2.0,3.0,4.0)
+  print(f3)
