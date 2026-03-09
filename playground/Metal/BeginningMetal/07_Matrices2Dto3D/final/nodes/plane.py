@@ -26,7 +26,11 @@ from rbedge import pdbr
 from .node import Node
 from .renderable import Renderable
 from .texturable import Texturable
-from simdTypes import Vertex, Position, Color
+from simdTypes import (
+  Vertex,
+  simd_float3,
+  simd_float4,
+)
 
 MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
