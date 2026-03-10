@@ -147,8 +147,6 @@ class simd_float4(_SimdVector):
   ]
 
 
-
-
 class Vertex(ctypes.Structure):
   _fields_ = [
     ('position', simd_float3),
@@ -156,3 +154,20 @@ class Vertex(ctypes.Structure):
     ('texture', simd_float2),
   ]
 
+
+
+
+if __name__ == '__main__':
+  Vertices = Vertex * 4
+  vertices = Vertices(
+      Vertex(  # v0
+        position=(-1.0,  1.0,  0.0), color=(1.0, 0.0, 0.0, 1.0), texture=(0.0, 1.0)),
+      Vertex(  # v1
+        position=(-1.0, -1.0,  0.0), color=(0.0, 1.0, 0.0, 1.0), texture=(0.0, 0.0)),
+      Vertex(  # v2
+        position=( 1.0, -1.0,  0.0), color=(0.0, 0.0, 1.0, 1.0), texture=(1.0, 0.0)),
+      Vertex(  # v3
+        position=( 1.0,  1.0,  0.0), color=(1.0, 0.0, 1.0, 1.0), texture=(1.0, 1.0)),
+    )  # yapf: disable
+
+  print(ctypes.sizeof(vertices))

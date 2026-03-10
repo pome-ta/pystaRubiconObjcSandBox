@@ -28,6 +28,7 @@ from .renderable import Renderable
 from .texturable import Texturable
 from simdTypes import (
   Vertex,
+  simd_float2,
   simd_float3,
   simd_float4,
 )
@@ -40,12 +41,12 @@ MTKTextureLoader = ObjCClass('MTKTextureLoader')
 
 ROOT_PATH = Path(__file__).parents[1]
 
-
+'''
 class Vertices(ctypes.Structure):
   _fields_ = [
     ('vertex', Vertex * 4),
   ]
-
+'''
 
 class Constants(ctypes.Structure):
   _fields_ = [
@@ -89,7 +90,20 @@ class Plane(Node, protocols=[
     # todo: class member declarations
     send_super(__class__, self, 'initializeProperties')
 
-    self.vertices = Vertices((
+
+    self.vertices = (Vertex * 4)(
+      Vertex(  # v0
+        position=simd_float3(-1.0,  1.0,  0.0), color=simd_float4(1.0, 0.0, 0.0, 1.0), texture=simd_float2(0.0, 1.0)),
+      Vertex(  # v1
+        position=simd_float3(-1.0, -1.0,  0.0), color=simd_float4(0.0, 1.0, 0.0, 1.0), texture=simd_float2(0.0, 0.0)),
+      Vertex(  # v2
+        position=simd_float3( 1.0, -1.0,  0.0), color=simd_float4(0.0, 0.0, 1.0, 1.0), texture=simd_float2(1.0, 0.0)),
+      Vertex(  # v3
+        position=simd_float3( 1.0,  1.0,  0.0), color=simd_float4(1.0, 0.0, 1.0, 1.0), texture=simd_float2(1.0, 1.0)),
+    )  # yapf: disable
+
+    '''
+    self.vertices = Vertices(
       Vertex(  # v0
         position=(-1.0,  1.0,  0.0), color=(1.0, 0.0, 0.0, 1.0), texture=(0.0, 1.0)),
       Vertex(  # v1
@@ -98,9 +112,10 @@ class Plane(Node, protocols=[
         position=( 1.0, -1.0,  0.0), color=(0.0, 0.0, 1.0, 1.0), texture=(1.0, 0.0)),
       Vertex(  # v3
         position=( 1.0,  1.0,  0.0), color=(1.0, 0.0, 1.0, 1.0), texture=(1.0, 1.0)),
-    ))  # yapf: disable
+    )  # yapf: disable
+    '''
 
-    self.indices = (ctypes.c_int16 * (2 * 3))(
+    self.indices = (ctypes.c_uint16 * (2 * 3))(
       0, 1, 2,
       2, 3, 0,
     )  # yapf: disable
@@ -244,10 +259,11 @@ class Plane(Node, protocols=[
       ctypes.byref(self.vertices), ctypes.sizeof(self.vertices),
       MTLResourceOptions.storageModeShared)
     indexBuffer = device.newBufferWithBytes_length_options_(
-      self.indices,
-      self.indices.__len__() * ctypes.sizeof(self.indices),
+      self.indices, ctypes.sizeof(self.indices),
       MTLResourceOptions.storageModeShared)
 
+    print(f'vertexBuffer: {ctypes.sizeof(self.vertices)}')
+    print(f'indexBuffer: {self.indices.__len__() * ctypes.sizeof(self.indices)}')
     self.vertexBuffer = vertexBuffer
     self.indexBuffer = indexBuffer
 
@@ -270,6 +286,7 @@ class Plane(Node, protocols=[
     self.time += deltaTime
     animateBy = abs(sin(self.time) / 2 + 0.5)
     self.constants.animateBy = animateBy
+    
 
     commandEncoder.setRenderPipelineState_(self.pipelineState)
 
