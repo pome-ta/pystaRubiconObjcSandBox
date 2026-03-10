@@ -41,12 +41,6 @@ MTKTextureLoader = ObjCClass('MTKTextureLoader')
 
 ROOT_PATH = Path(__file__).parents[1]
 
-'''
-class Vertices(ctypes.Structure):
-  _fields_ = [
-    ('vertex', Vertex * 4),
-  ]
-'''
 
 class Constants(ctypes.Structure):
   _fields_ = [
@@ -90,7 +84,6 @@ class Plane(Node, protocols=[
     # todo: class member declarations
     send_super(__class__, self, 'initializeProperties')
 
-
     self.vertices = (Vertex * 4)(
       Vertex(  # v0
         position=simd_float3(-1.0,  1.0,  0.0), color=simd_float4(1.0, 0.0, 0.0, 1.0), texture=simd_float2(0.0, 1.0)),
@@ -101,19 +94,6 @@ class Plane(Node, protocols=[
       Vertex(  # v3
         position=simd_float3( 1.0,  1.0,  0.0), color=simd_float4(1.0, 0.0, 1.0, 1.0), texture=simd_float2(1.0, 1.0)),
     )  # yapf: disable
-
-    '''
-    self.vertices = Vertices(
-      Vertex(  # v0
-        position=(-1.0,  1.0,  0.0), color=(1.0, 0.0, 0.0, 1.0), texture=(0.0, 1.0)),
-      Vertex(  # v1
-        position=(-1.0, -1.0,  0.0), color=(0.0, 1.0, 0.0, 1.0), texture=(0.0, 0.0)),
-      Vertex(  # v2
-        position=( 1.0, -1.0,  0.0), color=(0.0, 0.0, 1.0, 1.0), texture=(1.0, 0.0)),
-      Vertex(  # v3
-        position=( 1.0,  1.0,  0.0), color=(1.0, 0.0, 1.0, 1.0), texture=(1.0, 1.0)),
-    )  # yapf: disable
-    '''
 
     self.indices = (ctypes.c_uint16 * (2 * 3))(
       0, 1, 2,
@@ -207,7 +187,7 @@ class Plane(Node, protocols=[
                                       imageName: object) -> ObjCInstance:
     texture = None
     textureLoader = MTKTextureLoader.alloc().initWithDevice_(device)
-    # todo: `#available(iOS 10.0, *)` 古すぎるので処理しない
+    # todo: `#available(iOS 10.0, *)` 古すぎるので処理しない
     origin = str(MTKTextureLoaderOriginBottomLeft)
 
     textureLoaderOptions = NSDictionary.dictionaryWithObject_forKey_(
@@ -262,8 +242,6 @@ class Plane(Node, protocols=[
       self.indices, ctypes.sizeof(self.indices),
       MTLResourceOptions.storageModeShared)
 
-    print(f'vertexBuffer: {ctypes.sizeof(self.vertices)}')
-    print(f'indexBuffer: {ctypes.sizeof(self.indices)}')
     self.vertexBuffer = vertexBuffer
     self.indexBuffer = indexBuffer
 
@@ -286,10 +264,8 @@ class Plane(Node, protocols=[
     self.time += deltaTime
     animateBy = abs(sin(self.time) / 2 + 0.5)
     self.constants.animateBy = animateBy
-    
 
     commandEncoder.setRenderPipelineState_(self.pipelineState)
-
     commandEncoder.setVertexBuffer_offset_atIndex_(self.vertexBuffer, 0, 0)
     commandEncoder.setVertexBytes_length_atIndex_(
       ctypes.byref(self.constants), ctypes.sizeof(self.constants), 1)
