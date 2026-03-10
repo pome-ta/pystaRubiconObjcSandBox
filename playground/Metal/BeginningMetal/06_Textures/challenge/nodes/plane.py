@@ -26,7 +26,12 @@ from rbedge import pdbr
 from .node import Node
 from .renderable import Renderable
 from .texturable import Texturable
-from simdTypes import Vertex, Position, Color
+from simdTypes import (
+  Vertex,
+  simd_float2,
+  simd_float3,
+  simd_float4,
+)
 
 MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
@@ -35,12 +40,6 @@ MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 MTKTextureLoader = ObjCClass('MTKTextureLoader')
 
 ROOT_PATH = Path(__file__).parents[1]
-
-
-class Vertices(ctypes.Structure):
-  _fields_ = [
-    ('vertex', Vertex * 4),
-  ]
 
 
 class Constants(ctypes.Structure):
@@ -85,18 +84,18 @@ class Plane(Node, protocols=[
     # todo: class member declarations
     send_super(__class__, self, 'initializeProperties')
 
-    self.vertices = Vertices((
+    self.vertices = (Vertex * 4)(
       Vertex(  # v0
-        position=(-1.0,  1.0,  0.0), color=(1.0, 0.0, 0.0, 1.0), texture=(0.0, 1.0)),
+        position=simd_float3(-1.0,  1.0,  0.0), color=simd_float4(1.0, 0.0, 0.0, 1.0), texture=simd_float2(0.0, 1.0)),
       Vertex(  # v1
-        position=(-1.0, -1.0,  0.0), color=(0.0, 1.0, 0.0, 1.0), texture=(0.0, 0.0)),
+        position=simd_float3(-1.0, -1.0,  0.0), color=simd_float4(0.0, 1.0, 0.0, 1.0), texture=simd_float2(0.0, 0.0)),
       Vertex(  # v2
-        position=( 1.0, -1.0,  0.0), color=(0.0, 0.0, 1.0, 1.0), texture=(1.0, 0.0)),
+        position=simd_float3( 1.0, -1.0,  0.0), color=simd_float4(0.0, 0.0, 1.0, 1.0), texture=simd_float2(1.0, 0.0)),
       Vertex(  # v3
-        position=( 1.0,  1.0,  0.0), color=(1.0, 0.0, 1.0, 1.0), texture=(1.0, 1.0)),
-    ))  # yapf: disable
+        position=simd_float3( 1.0,  1.0,  0.0), color=simd_float4(1.0, 0.0, 1.0, 1.0), texture=simd_float2(1.0, 1.0)),
+    )  # yapf: disable
 
-    self.indices = (ctypes.c_int16 * (2 * 3))(
+    self.indices = (ctypes.c_uint16 * (2 * 3))(
       0, 1, 2,
       2, 3, 0,
     )  # yapf: disable
@@ -122,11 +121,11 @@ class Plane(Node, protocols=[
           attribute.bufferIndex = 0
         case 1:
           attribute.format = MTLVertexFormat.float4
-          attribute.offset = ctypes.sizeof(Position)
+          attribute.offset = simd_float3.stride
           attribute.bufferIndex = 0
         case 2:
           attribute.format = MTLVertexFormat.float2
-          attribute.offset = ctypes.sizeof(Position) + ctypes.sizeof(Color)
+          attribute.offset = simd_float3.stride + simd_float4.stride
           attribute.bufferIndex = 0
         case _:
           import logging
@@ -188,7 +187,7 @@ class Plane(Node, protocols=[
                                       imageName: object) -> ObjCInstance:
     texture = None
     textureLoader = MTKTextureLoader.alloc().initWithDevice_(device)
-    # todo: `#available(iOS 10.0, *)` 古すぎるので処理しない
+    # todo: `#available(iOS 10.0, *)` 古すぎるので処理しない
     origin = str(MTKTextureLoaderOriginBottomLeft)
 
     textureLoaderOptions = NSDictionary.dictionaryWithObject_forKey_(
@@ -237,11 +236,10 @@ class Plane(Node, protocols=[
   @objc_method
   def buildBuffersWithDevice_(self, device):
     vertexBuffer = device.newBufferWithBytes_length_options_(
-      ctypes.byref(self.vertices), ctypes.sizeof(self.vertices),
+      self.vertices, ctypes.sizeof(self.vertices),
       MTLResourceOptions.storageModeShared)
     indexBuffer = device.newBufferWithBytes_length_options_(
-      self.indices,
-      self.indices.__len__() * ctypes.sizeof(self.indices),
+      self.indices, ctypes.sizeof(self.indices),
       MTLResourceOptions.storageModeShared)
 
     self.vertexBuffer = vertexBuffer
@@ -268,7 +266,6 @@ class Plane(Node, protocols=[
     self.constants.animateBy = animateBy
 
     commandEncoder.setRenderPipelineState_(self.pipelineState)
-
     commandEncoder.setVertexBuffer_offset_atIndex_(self.vertexBuffer, 0, 0)
     commandEncoder.setVertexBytes_length_atIndex_(
       ctypes.byref(self.constants), ctypes.sizeof(self.constants), 1)

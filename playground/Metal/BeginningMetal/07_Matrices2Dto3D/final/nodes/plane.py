@@ -256,14 +256,14 @@ class Plane(Node, protocols=[
   @objc_method
   def buildBuffersWithDevice_(self, device):
     vertexBuffer = device.newBufferWithBytes_length_options_(
-      ctypes.byref(self.vertices), ctypes.sizeof(self.vertices),
+      self.vertices, ctypes.sizeof(self.vertices),
       MTLResourceOptions.storageModeShared)
     indexBuffer = device.newBufferWithBytes_length_options_(
       self.indices, ctypes.sizeof(self.indices),
       MTLResourceOptions.storageModeShared)
 
     print(f'vertexBuffer: {ctypes.sizeof(self.vertices)}')
-    print(f'indexBuffer: {self.indices.__len__() * ctypes.sizeof(self.indices)}')
+    print(f'indexBuffer: {ctypes.sizeof(self.indices)}')
     self.vertexBuffer = vertexBuffer
     self.indexBuffer = indexBuffer
 
