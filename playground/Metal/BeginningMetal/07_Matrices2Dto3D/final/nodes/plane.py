@@ -126,11 +126,11 @@ class Plane(Node, protocols=[
           attribute.bufferIndex = 0
         case 1:
           attribute.format = MTLVertexFormat.float4
-          attribute.offset = ctypes.sizeof(Position)
+          attribute.offset = simd_float3.stride
           attribute.bufferIndex = 0
         case 2:
           attribute.format = MTLVertexFormat.float2
-          attribute.offset = ctypes.sizeof(Position) + ctypes.sizeof(Color)
+          attribute.offset = simd_float3.stride + simd_float4.stride
           attribute.bufferIndex = 0
         case _:
           import logging
