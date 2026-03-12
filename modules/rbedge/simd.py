@@ -146,3 +146,9 @@ class simd_float4(_SimdVector):
     ('w', ctypes.c_float),
   ]
 
+
+class simd_float4x4(ctypes.Structure):
+  _fields_ = [
+    ('columns', simd_float4 * 4),
+  ]
+

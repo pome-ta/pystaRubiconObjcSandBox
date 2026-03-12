@@ -1,6 +1,6 @@
 import ctypes
 from pathlib import Path
-from math import sin
+from math import sin, radians
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import NSDictionary
@@ -31,7 +31,10 @@ from simdTypes import (
   simd_float2,
   simd_float3,
   simd_float4,
+  ModelConstants,
 )
+
+from matrixMath import matrix_float4x4, matrix_multiply
 
 MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
@@ -40,12 +43,6 @@ MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 MTKTextureLoader = ObjCClass('MTKTextureLoader')
 
 ROOT_PATH = Path(__file__).parents[1]
-
-
-class Constants(ctypes.Structure):
-  _fields_ = [
-    ('animateBy', ctypes.c_float),
-  ]
 
 
 # wip: 雑
@@ -69,7 +66,7 @@ class Plane(Node, protocols=[
   vertexBuffer: 'MTLBuffer?' = objc_property()
   indexBuffer: 'MTLBuffer?' = objc_property()
   time: CGFloat = objc_property(CGFloat)
-  constants: Constants = objc_property(object)
+  modelConstants: ModelConstants = objc_property(object)
   # Renderable
   pipelineState: 'MTLRenderPipelineState!' = objc_property()
   vertexFunctionName: str = objc_property(object)
@@ -101,7 +98,7 @@ class Plane(Node, protocols=[
     )  # yapf: disable
 
     self.time = 0.0
-    self.constants = Constants()
+    self.modelConstants = ModelConstants(matrix_float4x4.identity())
 
     # Renderable
     self.fragmentFunctionName = 'fragment_shader'
@@ -263,12 +260,22 @@ class Plane(Node, protocols=[
 
     self.time += deltaTime
     animateBy = abs(sin(self.time) / 2 + 0.5)
-    self.constants.animateBy = animateBy
+    #self.constants.animateBy = animateBy
+    rotationMatrix = matrix_float4x4.rotation(animateBy, 0.0, 0.0, 1.0)
+    viewMatrix = matrix_float4x4.translation(0.0, 0.0, -4.0)
+
+    viewMatrix = matrix_multiply(rotationMatrix, viewMatrix)
+    self.modelConstants.modelViewMatrix = modelViewMatrix
+    aspect = 750.0 / 1334.0
+    projectionMatrix = matrix_float4x4.projection(radians(65), aspect, 0.1,
+                                                  100.0)
+    self.modelConstants.modelViewMatrix = matrix_multiply(
+      projectionMatrix, modelViewMatrix)
 
     commandEncoder.setRenderPipelineState_(self.pipelineState)
     commandEncoder.setVertexBuffer_offset_atIndex_(self.vertexBuffer, 0, 0)
     commandEncoder.setVertexBytes_length_atIndex_(
-      ctypes.byref(self.constants), ctypes.sizeof(self.constants), 1)
+      ctypes.byref(self.modelConstants), ctypes.sizeof(self.modelConstants), 1)
     commandEncoder.setFragmentTexture_atIndex_(self.texture, 0)
     commandEncoder.setFragmentTexture_atIndex_(self.maskTexture, 1)
     commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
