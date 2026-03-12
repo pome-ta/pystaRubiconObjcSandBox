@@ -47,6 +47,10 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdMeta):
   def __getitem__(self, index):
     return getattr(self, self._components_[index])
 
+  def __setitem__(self, index, value):
+    component = self._components_[index]
+    setattr(self, component, float(value))
+
   def __iter__(self):
     for component_name in self._components_:
       yield getattr(self, component_name)

@@ -15,12 +15,10 @@ def degrees_from_radians(rad: float) -> float:
 class matrix_float4x4(simd_float4x4):
 
   _array_type = simd_float4 * 4
-  
+
   @classmethod
   def from_columns(cls, c0, c1, c2, c3):
     return cls(cls._array_type(c0, c1, c2, c3))
-
- 
 
   @classmethod
   def identity(cls):

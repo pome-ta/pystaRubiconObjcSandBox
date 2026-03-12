@@ -263,17 +263,20 @@ class Plane(Node, protocols=[
     #self.constants.animateBy = animateBy
     rotationMatrix = matrix_float4x4.rotation(animateBy, 0.0, 0.0, 1.0)
     viewMatrix = matrix_float4x4.translation(0.0, 0.0, -4.0)
-
+    '''
     viewMatrix = matrix_multiply(rotationMatrix, viewMatrix)
+    
     self.modelConstants.modelViewMatrix = modelViewMatrix
     aspect = 750.0 / 1334.0
+    
+
     projectionMatrix = matrix_float4x4.projection(radians(65), aspect, 0.1,
                                                   100.0)
-    self.modelConstants.modelViewMatrix = matrix_multiply(
-      projectionMatrix, modelViewMatrix)
+    self.modelConstants.modelViewMatrix = matrix_multiply(projectionMatrix, modelViewMatrix)
 
     commandEncoder.setRenderPipelineState_(self.pipelineState)
     commandEncoder.setVertexBuffer_offset_atIndex_(self.vertexBuffer, 0, 0)
+    
     commandEncoder.setVertexBytes_length_atIndex_(
       ctypes.byref(self.modelConstants), ctypes.sizeof(self.modelConstants), 1)
     commandEncoder.setFragmentTexture_atIndex_(self.texture, 0)
@@ -281,4 +284,5 @@ class Plane(Node, protocols=[
     commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
       MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
       self.indexBuffer, 0)
+    '''
 
