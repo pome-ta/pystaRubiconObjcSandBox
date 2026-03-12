@@ -1,6 +1,5 @@
 import ctypes
 
-
 class _SimdMeta(type(ctypes.Structure)):
 
   @property
