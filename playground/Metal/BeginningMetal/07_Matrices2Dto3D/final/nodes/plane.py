@@ -260,17 +260,13 @@ class Plane(Node, protocols=[
 
     self.time += deltaTime
     animateBy = abs(sin(self.time) / 2 + 0.5)
-    
-    #self.constants.animateBy = animateBy
+
     rotationMatrix = matrix_float4x4.rotation(animateBy, 0.0, 0.0, 1.0)
     viewMatrix = matrix_float4x4.translation(0.0, 0.0, -4.0)
-    #print(viewMatrix)
-
     modelViewMatrix = matrix_multiply(rotationMatrix, viewMatrix)
-
     self.modelConstants.modelViewMatrix = modelViewMatrix
-    aspect = 750.0 / 1334.0
 
+    aspect = 750.0 / 1334.0
     projectionMatrix = matrix_float4x4.projection(radians(65), aspect, 0.1,
                                                   100.0)
     self.modelConstants.modelViewMatrix = matrix_multiply(
