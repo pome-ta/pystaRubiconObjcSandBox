@@ -1,5 +1,6 @@
 import ctypes
 
+
 class _SimdMeta(type(ctypes.Structure)):
 
   @property
@@ -26,6 +27,7 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdMeta):
     's': 'x', 't': 'y', 'p': 'z', 'q': 'w',
   }  # yapf: disable
 
+
   def __init__(self, *values):
     component_count = len(self._components_)
 
@@ -40,6 +42,21 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdMeta):
 
     super().__init__(*components)
 
+  def _map_component(self, component):
+    if component in self._components_:
+      return component
+
+    return self._aliases_.get(component)
+
+  def _resolve(self, name):
+    mapped = [self._map_component(char) for char in name]
+
+    if any(component is None or component not in self._components_
+           for component in mapped):
+      return None
+
+    return mapped
+
   def __len__(self):
     return len(self._components_)
 
@@ -51,30 +68,15 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdMeta):
     setattr(self, component, float(value))
 
   def __iter__(self):
-    for component_name in self._components_:
-      yield getattr(self, component_name)
+    for component in self._components_:
+      yield getattr(self, component)
 
   def __repr__(self):
+
     values = ', '.join(
-      str(getattr(self, component_name))
-      for component_name in self._components_)
+      str(getattr(self, component)) for component in self._components_)
 
     return f'{self.__class__.__name__}({values})'
-
-  def _map_component(self, component):
-    if component in self._components_:
-      return component
-
-    return self._aliases_.get(component)
-
-  def _resolve(self, name):
-    mapped = [self._map_component(character) for character in name]
-
-    if any(component is None or component not in self._components_
-           for component in mapped):
-      return None
-
-    return mapped
 
   def __getattr__(self, name):
     if name.startswith('_'):
