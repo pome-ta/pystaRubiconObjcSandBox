@@ -1,4 +1,5 @@
 import ctypes
+import operator
 
 
 class _SimdMeta(type(ctypes.Structure)):
@@ -19,8 +20,36 @@ class _SimdMeta(type(ctypes.Structure)):
   def count(cls):
     return len(cls._components_)
 
+  @property
+  def scalar_type(cls):
+    return cls._fields_[0][1]
+
+
+class _SimdMatrixMeta(type(ctypes.Structure)):
+
+  @property
+  def stride(cls):
+    return ctypes.sizeof(cls)
+
+  @property
+  def size(cls):
+    return ctypes.sizeof(cls)
+
+  @property
+  def alignment(cls):
+    return ctypes.alignment(cls)
+
+  @property
+  def column_count(cls):
+    return cls._fields_[0][1]._length_
+
+  @property
+  def vector_type(cls):
+    return cls._fields_[0][1]._type_
+
 
 class _SimdVector(ctypes.Structure, metaclass=_SimdMeta):
+
   _components_ = ''
   _aliases_ = {
     'r': 'x', 'g': 'y', 'b': 'z', 'a': 'w',
@@ -123,7 +152,39 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdMeta):
     for component, component_value in zip(components, values):
       super().__setattr__(component, float(component_value))
 
+  # --- vector math
 
+  def _binary_op(self, other, op):
+    if isinstance(other, self.__class__):
+      values = [op(a, b) for a, b in zip(self, other)]
+
+    elif isinstance(other, (int, float)):
+      values = [op(a, other) for a in self]
+
+    else:
+      return NotImplemented
+
+    return self.__class__(*values)
+
+  def __add__(self, other):
+    return self._binary_op(other, operator.add)
+
+  def __sub__(self, other):
+    return self._binary_op(other, operator.sub)
+
+  def __mul__(self, other):
+    return self._binary_op(other, operator.mul)
+
+  def __truediv__(self, other):
+    return self._binary_op(other, operator.truediv)
+
+  def __rmul__(self, other):
+    return self.__mul__(other)
+
+  def __neg__(self):
+    return self.__class__(*(-x for x in self))
+
+# --- vectors
 class simd_float2(_SimdVector):
   _components_ = 'xy'
   _fields_ = [
