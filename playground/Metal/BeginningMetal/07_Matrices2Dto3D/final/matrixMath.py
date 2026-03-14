@@ -4,21 +4,21 @@ from math import cos, sin, tan, pi
 from rbedge.simd import simd_float4, simd_float4x4
 
 
-def radians_from_degrees(deg: float) -> float:
-  return (deg / 180.0) * pi
+def radians(fromDegrees: float) -> float:
+  return (fromDegrees / 180.0) * pi
 
 
-def degrees_from_radians(rad: float) -> float:
-  return (rad / pi) * 180.0
+def degrees(fromRadians: float) -> float:
+  return (fromRadians / pi) * 180.0
 
 
 class matrix_float4x4(simd_float4x4):
 
-  _array_type = simd_float4 * 4
+  _array = simd_float4 * 4
 
   @classmethod
   def from_columns(cls, c0, c1, c2, c3):
-    return cls(cls._array_type(c0, c1, c2, c3))
+    return cls(cls._array(c0, c1, c2, c3))
 
   @classmethod
   def identity(cls):
@@ -54,7 +54,8 @@ class matrix_float4x4(simd_float4x4):
     return matrix_multiply(self, matrix_float4x4.scale(x, y, z))
 
   @classmethod
-  def rotation(cls, angle: float, x: float, y: float, z: float):
+  def rotationAngle(cls, angle: float, x: float, y: float, z: float):
+
     c = cos(angle)
     s = sin(angle)
 
@@ -84,10 +85,11 @@ class matrix_float4x4(simd_float4x4):
     return cls.from_columns(column0, column1, column2, column3)
 
   def rotatedBy(self, angle: float, x: float, y: float, z: float):
-    return matrix_multiply(self, matrix_float4x4.rotation(angle, x, y, z))
+    return matrix_multiply(self, matrix_float4x4.rotationAngle(angle, x, y, z))
 
   @classmethod
-  def projection(cls, fov: float, aspect: float, nearZ: float, farZ: float):
+  def projectionFov(cls, fov: float, aspect: float, nearZ: float, farZ: float):
+
     y = 1 / tan(fov * 0.5)
     x = y / aspect
     z = farZ / (nearZ - farZ)
@@ -100,7 +102,9 @@ class matrix_float4x4(simd_float4x4):
     )
 
   def __repr__(self):
+
     rows = []
+
     for r in range(4):
       row = []
       for c in range(4):
@@ -110,7 +114,8 @@ class matrix_float4x4(simd_float4x4):
     return '\n'.join(rows)
 
 
-def matrix_multiply(a: matrix_float4x4, b: matrix_float4x4):
+def matrix_multiply(a: matrix_float4x4, b: matrix_float4x4) -> matrix_float4x4:
+
   result = matrix_float4x4()
 
   for c in range(4):
