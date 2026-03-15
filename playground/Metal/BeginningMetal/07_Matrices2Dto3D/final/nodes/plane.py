@@ -20,6 +20,7 @@ from objc_frameworks.MetalKit import (
   MTKTextureLoaderOriginBottomLeft,
 )
 
+from rbedge.simd import matrix_multiply
 from rbedge.utils import nsurl
 from rbedge import pdbr
 
@@ -34,7 +35,7 @@ from simdTypes import (
   ModelConstants,
 )
 
-from matrixMath import matrix_float4x4, matrix_multiply
+from matrixMath import matrix_float4x4
 
 MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
 MTLCompileOptions = ObjCClass('MTLCompileOptions')

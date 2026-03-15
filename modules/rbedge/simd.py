@@ -292,3 +292,18 @@ class simd_float4x4(_SimdMatrix):
     ('columns', simd_float4 * 4),
   ]
 
+
+def matrix_multiply(a: simd_float4x4, b: simd_float4x4) -> simd_float4x4:
+
+  result = simd_float4x4()
+
+  for c in range(4):
+    for r in range(4):
+
+      result.columns[c][r] = (a.columns[0][r] * b.columns[c][0] +
+                              a.columns[1][r] * b.columns[c][1] +
+                              a.columns[2][r] * b.columns[c][2] +
+                              a.columns[3][r] * b.columns[c][3])
+
+  return result
+
