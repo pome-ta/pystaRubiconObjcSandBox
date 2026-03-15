@@ -1,7 +1,7 @@
 import ctypes
 from math import cos, sin, tan, pi
 
-from rbedge.simd import simd_float4, simd_float4x4
+from rbedge.simd import simd_float4, simd_float3x3, simd_float4x4
 
 
 def radians(fromDegrees: float) -> float:
@@ -55,7 +55,6 @@ class matrix_float4x4(simd_float4x4):
 
   @classmethod
   def rotationAngle(cls, angle: float, x: float, y: float, z: float):
-
     c = cos(angle)
     s = sin(angle)
 
@@ -89,7 +88,6 @@ class matrix_float4x4(simd_float4x4):
 
   @classmethod
   def projectionFov(cls, fov: float, aspect: float, nearZ: float, farZ: float):
-
     y = 1 / tan(fov * 0.5)
     x = y / aspect
     z = farZ / (nearZ - farZ)
@@ -101,8 +99,14 @@ class matrix_float4x4(simd_float4x4):
       simd_float4(0, 0, z * nearZ, 0),
     )
 
-  def __repr__(self):
+  def upperLeft3x3(self):
+    return simd_float3x3((
+      self.columns[0].xyz,
+      self.columns[1].xyz,
+      self.columns[2].xyz,
+    ))
 
+  def __repr__(self):
     rows = []
 
     for r in range(4):
