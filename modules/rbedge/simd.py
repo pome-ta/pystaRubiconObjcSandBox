@@ -4,6 +4,16 @@ from math import sqrt
 
 
 class _SimdVectorMeta(type(ctypes.Structure)):
+  _VECTOR_TYPES = {}
+
+  def __init__(cls, name, bases, namespace):
+    super().__init__(name, bases, namespace)
+
+    components = getattr(cls, '_components_', None)
+
+    if components:
+      self_dim = len(components)
+      _SimdVectorMeta._VECTOR_TYPES[self_dim] = cls
 
   @property
   def stride(cls):
@@ -23,8 +33,7 @@ class _SimdVectorMeta(type(ctypes.Structure)):
 
   @property
   def scalar_type(cls):
-    scalar = cls._fields_[0][1]
-    return scalar
+    return cls._fields_[0][1]
 
 
 class _SimdMatrixMeta(type(ctypes.Structure)):
@@ -46,18 +55,16 @@ class _SimdMatrixMeta(type(ctypes.Structure)):
     return cls._fields_[0][1]._length_
 
   @property
-  def vector_type(cls):
+  def column_vector_type(cls):
     return cls._fields_[0][1]._type_
 
 
 class _SimdVector(ctypes.Structure, metaclass=_SimdVectorMeta):
-
   _components_ = ''
   _aliases_ = {
     'r': 'x', 'g': 'y', 'b': 'z', 'a': 'w',
     's': 'x', 't': 'y', 'p': 'z', 'q': 'w',
   }  # yapf: disable
-
 
   def __init__(self, *values):
     component_count = len(self._components_)
@@ -99,7 +106,7 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdVectorMeta):
 
   def __iter__(self):
     for component in self._components_:
-      yield object.__getattribute__(self, component)
+      yield getattr(self, component)
 
   def __repr__(self):
     values = ', '.join(f'{getattr(self, component):.4}'
@@ -195,7 +202,7 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdVectorMeta):
     return self.dot(self)
 
   def length(self):
-    return sqrt(self.dot(self))
+    return sqrt(self.length_squared())
 
   def normalize(self):
     l = self.length()
@@ -275,25 +282,3 @@ class simd_float4x4(_SimdMatrix):
   _fields_ = [
     ('columns', simd_float4 * 4),
   ]
-
-
-# --- simd math
-def simd_dot(a, b):
-  if len(a) != len(b):
-    raise ValueError('vector size mismatch')
-
-  return sum(x * y for x, y in zip(a, b))
-
-
-def simd_length(v):
-  return sqrt(simd_dot(v, v))
-
-
-def simd_normalize(v):
-  l = simd_length(v)
-
-  if l == 0:
-    return v.__class__()
-
-  return v / l
-
