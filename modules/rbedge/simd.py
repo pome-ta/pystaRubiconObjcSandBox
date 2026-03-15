@@ -99,7 +99,7 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdVectorMeta):
 
   def __iter__(self):
     for component in self._components_:
-      yield getattr(self, component)
+      yield object.__getattribute__(self, component)
 
   def __repr__(self):
     values = ', '.join(f'{getattr(self, component):.4}'
@@ -183,8 +183,42 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdVectorMeta):
   def __neg__(self):
     return self.__class__(*(-x for x in self))
 
+  # --- simd math
+
+  def dot(self, other):
+    if len(self) != len(other):
+      raise ValueError('vector size mismatch')
+
+    return sum(a * b for a, b in zip(self, other))
+
+  def length_squared(self):
+    return self.dot(self)
+
+  def length(self):
+    return sqrt(self.dot(self))
+
+  def normalize(self):
+    l = self.length()
+
+    if l == 0:
+      return self.__class__()
+
+    return self / l
+
 
 class _SimdMatrix(ctypes.Structure, metaclass=_SimdMatrixMeta):
+
+  def __getitem__(self, index):
+    return self.columns[index]
+
+  def __setitem__(self, index, value):
+    self.columns[index] = value
+
+  def __len__(self):
+    return len(self.columns)
+
+  def __iter__(self):
+    return iter(self.columns)
 
   def __repr__(self):
     cols = len(self.columns)
@@ -245,6 +279,9 @@ class simd_float4x4(_SimdMatrix):
 
 # --- simd math
 def simd_dot(a, b):
+  if len(a) != len(b):
+    raise ValueError('vector size mismatch')
+
   return sum(x * y for x, y in zip(a, b))
 
 
