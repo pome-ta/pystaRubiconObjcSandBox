@@ -32,7 +32,7 @@ class _SimdVectorMeta(type(ctypes.Structure)):
     return len(cls._components_)
 
   @property
-  def scalar_type(cls):
+  def component_type(cls):
     return cls._fields_[0][1]
 
 
@@ -98,18 +98,22 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdVectorMeta):
     return len(self._components_)
 
   def __getitem__(self, index):
+    if not 0 <= index < len(self):
+      raise IndexError
     return getattr(self, self._components_[index])
 
   def __setitem__(self, index, value):
+    if not 0 <= index < len(self):
+      raise IndexError
     component = self._components_[index]
     setattr(self, component, float(value))
 
   def __iter__(self):
     for component in self._components_:
-      yield getattr(self, component)
+      yield object.__getattribute__(self, component)
 
   def __repr__(self):
-    values = ', '.join(f'{getattr(self, component):.4}'
+    values = ', '.join(f'{getattr(self, component):.4f}'
                        for component in self._components_)
 
     return f'{self.__class__.__name__}({values})'
@@ -120,20 +124,15 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdVectorMeta):
 
     components = self._resolve(name)
 
-    if not components:
+    if components is None:
       raise AttributeError(name)
 
-    values = [getattr(self, component) for component in components]
-    vector_types = {
-      2: simd_float2,
-      3: simd_float3,
-      4: simd_float4,
-    }
+    values = [getattr(self, c) for c in components]
 
     if len(values) == 1:
       return values[0]
 
-    vector_type = vector_types.get(len(values))
+    vector_type = type(self)._VECTOR_TYPES.get(len(values))
 
     if vector_type:
       return vector_type(*values)
@@ -141,6 +140,9 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdVectorMeta):
     raise AttributeError(name)
 
   def __setattr__(self, name, value):
+    if name.startswith('_'):
+      super().__setattr__(name, value)
+      return
     components = self._resolve(name)
 
     if not components or len(components) == 1:
@@ -150,7 +152,10 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdVectorMeta):
     if len(set(components)) != len(components):
       raise ValueError('duplicate swizzle assignment')
 
-    values = list(value)
+    try:
+      values = list(value)
+    except TypeError:
+      raise TypeError('swizzle assignment requires iterable')
 
     if len(values) != len(components):
       raise ValueError('swizzle size mismatch')
@@ -216,13 +221,17 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdVectorMeta):
 class _SimdMatrix(ctypes.Structure, metaclass=_SimdMatrixMeta):
 
   def __getitem__(self, index):
+    if not 0 <= index < len(self):
+      raise IndexError
     return self.columns[index]
 
   def __setitem__(self, index, value):
+    if not 0 <= index < len(self):
+      raise IndexError
     self.columns[index] = value
 
   def __len__(self):
-    return len(self.columns)
+    return type(self).column_count
 
   def __iter__(self):
     return iter(self.columns)
@@ -257,7 +266,7 @@ class simd_float3(_SimdVector):
     ('x', ctypes.c_float),
     ('y', ctypes.c_float),
     ('z', ctypes.c_float),
-    ('_pad', ctypes.c_float),  # todo: padding
+    ('_pad', ctypes.c_float),  # padding (SIMD alignment)
   ]
 
 
@@ -282,3 +291,4 @@ class simd_float4x4(_SimdMatrix):
   _fields_ = [
     ('columns', simd_float4 * 4),
   ]
+
