@@ -1,8 +1,9 @@
 import ctypes
 import operator
+from math import sqrt
 
 
-class _SimdMeta(type(ctypes.Structure)):
+class _SimdVectorMeta(type(ctypes.Structure)):
 
   @property
   def stride(cls):
@@ -22,7 +23,8 @@ class _SimdMeta(type(ctypes.Structure)):
 
   @property
   def scalar_type(cls):
-    return cls._fields_[0][1]
+    scalar = cls._fields_[0][1]
+    return scalar
 
 
 class _SimdMatrixMeta(type(ctypes.Structure)):
@@ -48,7 +50,7 @@ class _SimdMatrixMeta(type(ctypes.Structure)):
     return cls._fields_[0][1]._type_
 
 
-class _SimdVector(ctypes.Structure, metaclass=_SimdMeta):
+class _SimdVector(ctypes.Structure, metaclass=_SimdVectorMeta):
 
   _components_ = ''
   _aliases_ = {
@@ -74,7 +76,6 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdMeta):
   def _map_component(self, component):
     if component in self._components_:
       return component
-
     return self._aliases_.get(component)
 
   def _resolve(self, name):
@@ -101,9 +102,8 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdMeta):
       yield getattr(self, component)
 
   def __repr__(self):
-
-    values = ', '.join(
-      str(getattr(self, component)) for component in self._components_)
+    values = ', '.join(f'{getattr(self, component):.4}'
+                       for component in self._components_)
 
     return f'{self.__class__.__name__}({values})'
 
@@ -117,7 +117,6 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdMeta):
       raise AttributeError(name)
 
     values = [getattr(self, component) for component in components]
-
     vector_types = {
       2: simd_float2,
       3: simd_float3,
@@ -152,15 +151,15 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdMeta):
     for component, component_value in zip(components, values):
       super().__setattr__(component, float(component_value))
 
-  # --- vector math
-
+  # --- vector math operator
   def _binary_op(self, other, op):
+    if hasattr(other, 'value'):
+      other = other.value
+
     if isinstance(other, self.__class__):
       values = [op(a, b) for a, b in zip(self, other)]
-
     elif isinstance(other, (int, float)):
       values = [op(a, other) for a in self]
-
     else:
       return NotImplemented
 
@@ -183,6 +182,24 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdMeta):
 
   def __neg__(self):
     return self.__class__(*(-x for x in self))
+
+
+class _SimdMatrix(ctypes.Structure, metaclass=_SimdMatrixMeta):
+
+  def __repr__(self):
+    cols = len(self.columns)
+    rows = len(self.columns[0])
+
+    lines = []
+
+    for r in range(rows):
+      row = []
+      for c in range(cols):
+        row.append(f'{self.columns[c][r]:.4f}')
+      lines.append(' '.join(row))
+
+    return '\n'.join(lines)
+
 
 # --- vectors
 class simd_float2(_SimdVector):
@@ -213,8 +230,33 @@ class simd_float4(_SimdVector):
   ]
 
 
-class simd_float4x4(ctypes.Structure):
+# --- matrix
+class simd_float3x3(_SimdMatrix):
+  _fields_ = [
+    ('columns', simd_float3 * 3),
+  ]
+
+
+class simd_float4x4(_SimdMatrix):
   _fields_ = [
     ('columns', simd_float4 * 4),
   ]
+
+
+# --- simd math
+def simd_dot(a, b):
+  return sum(x * y for x, y in zip(a, b))
+
+
+def simd_length(v):
+  return sqrt(simd_dot(v, v))
+
+
+def simd_normalize(v):
+  l = simd_length(v)
+
+  if l == 0:
+    return v.__class__()
+
+  return v / l
 
