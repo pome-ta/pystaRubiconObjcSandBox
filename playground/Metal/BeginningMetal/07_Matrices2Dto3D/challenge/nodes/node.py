@@ -3,13 +3,10 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGFloat
 
-from rbedge.simd import (
-  simd_float2,
-  simd_float3,
-  simd_float4,
-  simd_float4x4,
-)
+from rbedge.simd import simd_float3, matrix_multiply
+from rbedge import pdbr
 
+from .renderable import Renderable
 from matrixMath import matrix_float4x4
 
 
@@ -37,15 +34,12 @@ class Node(NSObject):
     matrix = matrix_float4x4.translation(self.position.x, self.position.y,
                                          self.position.z)
 
-    #print(dir(matrix))
     matrix = matrix.rotatedBy(self.rotation.x, 1, 0, 0)
     matrix = matrix.rotatedBy(self.rotation.y, 0, 1, 0)
     matrix = matrix.rotatedBy(self.rotation.z, 0, 0, 1)
     matrix = matrix.scaledBy(self.scale.x, self.scale.y, self.scale.z)
 
-    #print(dir(matrix))
-    print(matrix)
-    print('')
+    self.modelMatrix = matrix
 
   @objc_method
   def init(self):
@@ -59,8 +53,28 @@ class Node(NSObject):
     self.children.append(childNode)
 
   @objc_method
-  def renderWithCommandEncoder_deltaTime_(self, commandEncoder,
-                                          deltaTime: CGFloat):
+  def renderWithCommandEncoder_parentModelViewMatrix_(
+      self, commandEncoder, parentModelViewMatrix: object):
+    modelViewMatrix = matrix_multiply(parentModelViewMatrix, self.modelMatrix)
+    
     for child in self.children:
       child.renderWithCommandEncoder_deltaTime_(commandEncoder, deltaTime)
+    #pushDebugGroup_
+    #popDebugGroup
+    #conformsToProtocol_
+
+  
+  @objc_method
+  def renderWithCommandEncoder_deltaTime_(self, commandEncoder,
+                                          deltaTime: CGFloat):
+    #pdbr.state(self)
+    #print(self)
+    #print(self.conformsToProtocol_(Renderable))
+    for child in self.children:
+      child.renderWithCommandEncoder_deltaTime_(commandEncoder, deltaTime)
+    if self.conformsToProtocol_(Renderable) and (renderable := self):
+      #print(renderable)
+      commandEncoder.pushDebugGroup_(self.name)
+      commandEncoder.popDebugGroup()
+  
 
