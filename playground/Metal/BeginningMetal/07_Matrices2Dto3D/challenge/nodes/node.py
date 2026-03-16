@@ -36,11 +36,14 @@ class Node(NSObject):
 
     matrix = matrix_float4x4.translation(self.position.x, self.position.y,
                                          self.position.z)
-    matrix = matrix.rotatedBy(self.rotation.x, 1, 0, 0)
-    #matrix = matrix.rotatedBy(self.rotation.y, 0, 1, 0)
-    #matrix = matrix.rotatedBy(self.rotation.z, 0, 0, 1)
-    #matrix = matrix.scaledBy(self.scale.x, self.scale.y, self.scale.z)
 
+    #print(dir(matrix))
+    matrix = matrix.rotatedBy(self.rotation.x, 1, 0, 0)
+    matrix = matrix.rotatedBy(self.rotation.y, 0, 1, 0)
+    matrix = matrix.rotatedBy(self.rotation.z, 0, 0, 1)
+    matrix = matrix.scaledBy(self.scale.x, self.scale.y, self.scale.z)
+
+    #print(dir(matrix))
     print(matrix)
     print('')
 

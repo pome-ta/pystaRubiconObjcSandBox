@@ -295,7 +295,7 @@ class simd_float4x4(_SimdMatrix):
 
 def matrix_multiply(a: simd_float4x4, b: simd_float4x4) -> simd_float4x4:
 
-  result = simd_float4x4()
+  result = type(a)()
 
   for c in range(4):
     for r in range(4):
@@ -306,6 +306,7 @@ def matrix_multiply(a: simd_float4x4, b: simd_float4x4) -> simd_float4x4:
                               a.columns[3][r] * b.columns[c][3])
 
   return result
+
 
 if __name__ == '__main__':
   pass
