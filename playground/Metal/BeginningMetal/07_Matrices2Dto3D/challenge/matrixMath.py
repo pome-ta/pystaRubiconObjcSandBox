@@ -1,4 +1,3 @@
-import ctypes
 from math import cos, sin, tan, pi
 
 from rbedge.simd import simd_float4x4, simd_float3x3, simd_float4, matrix_multiply
@@ -116,6 +115,4 @@ class matrix_float4x4(simd_float4x4):
       rows.append(' '.join(row))
 
     return '\n'.join(rows)
-
-
 

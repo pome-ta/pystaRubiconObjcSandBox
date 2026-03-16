@@ -307,3 +307,6 @@ def matrix_multiply(a: simd_float4x4, b: simd_float4x4) -> simd_float4x4:
 
   return result
 
+if __name__ == '__main__':
+  pass
+
