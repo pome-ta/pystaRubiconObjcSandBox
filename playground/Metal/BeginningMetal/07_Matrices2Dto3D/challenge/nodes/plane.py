@@ -245,6 +245,7 @@ class Plane(Node, protocols=[
     self.vertexBuffer = vertexBuffer
     self.indexBuffer = indexBuffer
 
+  '''
   @objc_method
   def renderWithCommandEncoder_deltaTime_(self, commandEncoder,
                                           deltaTime: CGFloat):
@@ -285,4 +286,29 @@ class Plane(Node, protocols=[
     commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
       MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
       self.indexBuffer, 0)
+  '''
+  
+  # --- extension Renderable
+  @objc_method
+  def doRenderWithCommandEncoder_modelViewMatrix_(self, commandEncoder,
+                                                  modelViewMatrix: object):
+    if not (indexBuffer := self.indexBuffer):
+      return
+    
+    print(indexBuffer)
+    aspect = 750.0 / 1334.0
+    projectionMatrix = matrix_float4x4.projectionFov(radians(65), aspect, 0.1,
+                                                     100.0)
+
+    self.modelConstants.modelViewMatrix = matrix_multiply(
+      projectionMatrix, modelViewMatrix)
+    commandEncoder.setRenderPipelineState_(self.pipelineState)
+    commandEncoder.setVertexBuffer_offset_atIndex_(self.vertexBuffer, 0, 0)
+    commandEncoder.setVertexBytes_length_atIndex_(
+      ctypes.byref(self.modelConstants), ctypes.sizeof(self.modelConstants), 1)
+    commandEncoder.setFragmentTexture_atIndex_(self.texture, 0)
+    commandEncoder.setFragmentTexture_atIndex_(self.maskTexture, 1)
+    commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
+      MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
+      indexBuffer, 0)
 

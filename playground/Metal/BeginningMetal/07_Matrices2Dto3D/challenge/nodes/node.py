@@ -56,25 +56,22 @@ class Node(NSObject):
   def renderWithCommandEncoder_parentModelViewMatrix_(
       self, commandEncoder, parentModelViewMatrix: object):
     modelViewMatrix = matrix_multiply(parentModelViewMatrix, self.modelMatrix)
-    
-    for child in self.children:
-      child.renderWithCommandEncoder_deltaTime_(commandEncoder, deltaTime)
-    #pushDebugGroup_
-    #popDebugGroup
-    #conformsToProtocol_
 
-  
+    for child in self.children:
+      child.renderWithCommandEncoder_parentModelViewMatrix_(
+        commandEncoder, modelViewMatrix)
+
+    if self.conformsToProtocol_(Renderable) and (renderable := self):
+      commandEncoder.pushDebugGroup_(self.name)
+      renderable.doRenderWithCommandEncoder_modelViewMatrix_(
+        commandEncoder, modelViewMatrix)
+      commandEncoder.popDebugGroup()
+
+  '''
   @objc_method
   def renderWithCommandEncoder_deltaTime_(self, commandEncoder,
                                           deltaTime: CGFloat):
-    #pdbr.state(self)
-    #print(self)
-    #print(self.conformsToProtocol_(Renderable))
     for child in self.children:
       child.renderWithCommandEncoder_deltaTime_(commandEncoder, deltaTime)
-    if self.conformsToProtocol_(Renderable) and (renderable := self):
-      #print(renderable)
-      commandEncoder.pushDebugGroup_(self.name)
-      commandEncoder.popDebugGroup()
-  
+  '''
 

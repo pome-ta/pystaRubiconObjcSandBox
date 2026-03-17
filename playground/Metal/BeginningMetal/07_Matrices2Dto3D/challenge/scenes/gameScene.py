@@ -1,6 +1,8 @@
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
-from pyrubicon.objc.types import CGSize
+from pyrubicon.objc.types import CGSize, CGFloat
+
+from rbedge.simd import simd_float3
 
 # todo: Pythonista3 の`scene.Scene` ではない
 from .scene import Scene
@@ -14,8 +16,7 @@ class GameScene(Scene):
   @objc_method
   def initWithDevice_size_(self, device, size: CGSize):
 
-    self.quad = Plane.alloc().initWithDevice_imageName_maskImageName_(
-      device, 'picture.png', 'picture-frame-mask.png')
+    self.quad = Plane.alloc().initWithDevice_imageName_(device, 'picture.png')
 
     send_super(__class__,
                self,
@@ -29,9 +30,25 @@ class GameScene(Scene):
 
     self.addChildNode_(self.quad)
 
-    pictureFrame = Plane.alloc().initWithDevice_imageName_(
-      device, 'picture-frame.png')
-    self.addChildNode_(pictureFrame)
+    quad2 = Plane.alloc().initWithDevice_imageName_(device, 'picture.png')
+
+    quad2.scale = simd_float3(0.5)
+    quad2.position.y = 1.5
+
+    self.addChildNode_(quad2)
 
     return self
+
+  # --- override
+  @objc_method
+  def updateWithDeltaTime_(self, deltaTime: CGFloat):
+    send_super(__class__,
+               self,
+               'updateWithDeltaTime:',
+               deltaTime,
+               argtypes=[
+                 CGFloat,
+               ])
+
+    self.quad.rotation.y += deltaTime
 
