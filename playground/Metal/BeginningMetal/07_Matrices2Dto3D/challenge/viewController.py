@@ -78,9 +78,9 @@ class MainViewController(UIViewController):
     metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
     metalView.clearColor = Colors.wenderlichGreen
     metalView.delegate = renderer
-    
-    metalView.enableSetNeedsDisplay = True
-    metalView.setNeedsDisplay()
+
+    #metalView.enableSetNeedsDisplay = True
+    #metalView.setNeedsDisplay()
 
     self.view.addSubview_(metalView)
 

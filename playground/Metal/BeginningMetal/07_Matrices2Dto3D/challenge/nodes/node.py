@@ -19,7 +19,23 @@ class Node(NSObject):
   rotation: 'float3' = objc_property(object)
   scale: 'float3' = objc_property(object)
 
-  modelMatrix: matrix_float4x4 = objc_property(object)
+  #modelMatrix: matrix_float4x4 = objc_property(object)
+  _modelMatrixValue: matrix_float4x4 = objc_property(object)
+
+  @objc_method  # getter
+  def modelMatrix(self) -> object:
+    matrix = matrix_float4x4.translation(self.position.x, self.position.y,
+                                         self.position.z)
+
+    matrix = matrix.rotatedBy(self.rotation.x, 1, 0, 0)
+    matrix = matrix.rotatedBy(self.rotation.y, 0, 0.5, 0)
+    matrix = matrix.rotatedBy(self.rotation.z, 0, 0, 1)
+    matrix = matrix.scaledBy(self.scale.x, self.scale.y, self.scale.z)
+    return matrix
+
+  @objc_method  # setter
+  def setModelMatrix_(self, modelMatrixValue: object):
+    self._modelMatrixValue = modelMatrixValue
 
   @objc_method
   def initializeProperties(self):
@@ -29,7 +45,12 @@ class Node(NSObject):
 
     self.position = simd_float3(0)
     self.rotation = simd_float3(0)
+    #self.position = simd_float3(0.25)
+    #self.rotation = simd_float3(0.7)
     self.scale = simd_float3(1)
+    
+    
+    '''
 
     matrix = matrix_float4x4.translation(self.position.x, self.position.y,
                                          self.position.z)
@@ -38,8 +59,13 @@ class Node(NSObject):
     matrix = matrix.rotatedBy(self.rotation.y, 0, 1, 0)
     matrix = matrix.rotatedBy(self.rotation.z, 0, 0, 1)
     matrix = matrix.scaledBy(self.scale.x, self.scale.y, self.scale.z)
+    '''
 
-    self.modelMatrix = matrix
+    #self.modelMatrix = matrix
+    #self.modelMatrix = self.modelMatrix
+    #self.modelMatrixaa = matrix
+
+    #print(self.modelMatrixaa)
 
   @objc_method
   def init(self):
@@ -50,17 +76,20 @@ class Node(NSObject):
 
   @objc_method
   def addChildNode_(self, childNode):
-    print(f'childNode: {childNode}')
+    #print(f'childNode: {childNode}')
     self.children.append(childNode)
 
   @objc_method
   def renderWithCommandEncoder_parentModelViewMatrix_(
       self, commandEncoder, parentModelViewMatrix: object):
     modelViewMatrix = matrix_multiply(parentModelViewMatrix, self.modelMatrix)
-  
+
+    #print(self.name)
+    #print(dir(modelViewMatrix))
+    #print(modelViewMatrix)
 
     for child in self.children:
-      print(f'{child.name}')
+      #print(f'{child.name}')
       child.renderWithCommandEncoder_parentModelViewMatrix_(
         commandEncoder, modelViewMatrix)
 

@@ -36,7 +36,7 @@ class GameScene(Scene):
     quad2.position.y = 1.5
 
     self.quad.addChildNode_(quad2)
-    print(self.quad.children)
+    #print(self.quad.children)
 
     return self
 
