@@ -39,7 +39,7 @@ class Node(NSObject):
     self.position = simd_float3(0)
     self.rotation = simd_float3(0)
     self.scale = simd_float3(1)
-    __class__.declare_property('modelMatrix')
+    #__class__.declare_property('modelMatrix')
 
   @objc_method
   def init(self):
@@ -66,4 +66,7 @@ class Node(NSObject):
       renderable.doRenderWithCommandEncoder_modelViewMatrix_(
         commandEncoder, modelViewMatrix)
       commandEncoder.popDebugGroup()
+
+
+Node.declare_property('modelMatrix')
 
