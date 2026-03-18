@@ -30,13 +30,11 @@ class GameScene(Scene):
 
     self.addChildNode_(self.quad)
 
-    quad2 = Plane.alloc().initWithDevice_imageName_(device,
-                                                    'picture-frame.png')
+    quad2 = Plane.alloc().initWithDevice_imageName_(device, 'picture.png')
     quad2.scale = simd_float3(0.5)
     quad2.position.y = 1.5
 
     self.quad.addChildNode_(quad2)
-    #print(self.quad.children)
 
     return self
 
@@ -50,5 +48,6 @@ class GameScene(Scene):
                argtypes=[
                  CGFloat,
                ])
+
     self.quad.rotation.y += deltaTime
 

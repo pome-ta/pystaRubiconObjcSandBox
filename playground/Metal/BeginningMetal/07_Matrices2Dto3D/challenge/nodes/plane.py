@@ -1,11 +1,11 @@
 import ctypes
 from pathlib import Path
-from math import sin, radians
+from math import radians
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import NSDictionary
 from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super, objc_id
+from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGFloat
 
 from objc_frameworks.Metal import (
@@ -27,16 +27,15 @@ from rbedge.simd import (
   simd_float4,
   matrix_multiply,
 )
-from rbedge import pdbr
 
 from .node import Node
 from .renderable import Renderable
 from .texturable import Texturable
+
 from simdTypes import (
   Vertex,
   ModelConstants,
 )
-
 from matrixMath import matrix_float4x4
 
 MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
@@ -245,61 +244,14 @@ class Plane(Node, protocols=[
     self.vertexBuffer = vertexBuffer
     self.indexBuffer = indexBuffer
 
-  '''
-  @objc_method
-  def renderWithCommandEncoder_deltaTime_(self, commandEncoder,
-                                          deltaTime: CGFloat):
-    send_super(__class__,
-               self,
-               'renderWithCommandEncoder:deltaTime:',
-               commandEncoder,
-               deltaTime,
-               argtypes=[
-                 objc_id,
-                 CGFloat,
-               ])
-
-    if not self.indexBuffer:
-      return
-
-    self.time += deltaTime
-    animateBy = abs(sin(self.time) / 2 + 0.5)
-
-    rotationMatrix = matrix_float4x4.rotationAngle(animateBy, 0.0, 0.0, 1.0)
-    viewMatrix = matrix_float4x4.translation(0.0, 0.0, -4.0)
-    modelViewMatrix = matrix_multiply(rotationMatrix, viewMatrix)
-    self.modelConstants.modelViewMatrix = modelViewMatrix
-
-    aspect = 750.0 / 1334.0
-    projectionMatrix = matrix_float4x4.projectionFov(radians(65), aspect, 0.1,
-                                                     100.0)
-    self.modelConstants.modelViewMatrix = matrix_multiply(
-      projectionMatrix, modelViewMatrix)
-
-    commandEncoder.setRenderPipelineState_(self.pipelineState)
-    commandEncoder.setVertexBuffer_offset_atIndex_(self.vertexBuffer, 0, 0)
-
-    commandEncoder.setVertexBytes_length_atIndex_(
-      ctypes.byref(self.modelConstants), ctypes.sizeof(self.modelConstants), 1)
-    commandEncoder.setFragmentTexture_atIndex_(self.texture, 0)
-    commandEncoder.setFragmentTexture_atIndex_(self.maskTexture, 1)
-    commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
-      MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
-      self.indexBuffer, 0)
-  '''
-  
   # --- extension Renderable
   @objc_method
   def doRenderWithCommandEncoder_modelViewMatrix_(self, commandEncoder,
                                                   modelViewMatrix: object):
-    '''
+
     if not (indexBuffer := self.indexBuffer):
       return
-    '''
-    if not self.indexBuffer:
-      return
-    
-    #print(indexBuffer)
+
     aspect = 750.0 / 1334.0
     projectionMatrix = matrix_float4x4.projectionFov(radians(65), aspect, 0.1,
                                                      100.0)
@@ -314,5 +266,5 @@ class Plane(Node, protocols=[
     commandEncoder.setFragmentTexture_atIndex_(self.maskTexture, 1)
     commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
       MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
-      self.indexBuffer, 0)
+      indexBuffer, 0)
 

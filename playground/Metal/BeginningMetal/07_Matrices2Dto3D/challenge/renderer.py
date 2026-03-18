@@ -26,8 +26,7 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGSize
 
-from objc_frameworks.Metal import (
-  MTLSamplerMinMagFilter, )
+from objc_frameworks.Metal import MTLSamplerMinMagFilter
 
 from scenes import Scene
 
@@ -48,7 +47,6 @@ class Renderer(NSObject, protocols=[
 
   @objc_method
   def initWithDevice_(self, device):
-
     self.device = device
     self.commandQueue = device.newCommandQueue()
 
