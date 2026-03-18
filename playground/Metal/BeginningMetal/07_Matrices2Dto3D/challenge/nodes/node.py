@@ -20,7 +20,7 @@ class Node(NSObject):
   scale: 'float3' = objc_property(object)
 
   #modelMatrix: matrix_float4x4 = objc_property(object)
-  _modelMatrixValue: matrix_float4x4 = objc_property(object)
+  #_modelMatrixValue: matrix_float4x4 = objc_property(object)
 
   @objc_method  # getter
   def modelMatrix(self) -> object:
@@ -28,14 +28,16 @@ class Node(NSObject):
                                          self.position.z)
 
     matrix = matrix.rotatedBy(self.rotation.x, 1, 0, 0)
-    matrix = matrix.rotatedBy(self.rotation.y, 0, 0.5, 0)
+    matrix = matrix.rotatedBy(self.rotation.y, 0, 1, 0)
     matrix = matrix.rotatedBy(self.rotation.z, 0, 0, 1)
     matrix = matrix.scaledBy(self.scale.x, self.scale.y, self.scale.z)
+    #self._modelMatrixValue = matrix
     return matrix
 
   @objc_method  # setter
   def setModelMatrix_(self, modelMatrixValue: object):
-    self._modelMatrixValue = modelMatrixValue
+    #self._modelMatrixValue = modelMatrixValue
+    pass
 
   @objc_method
   def initializeProperties(self):
