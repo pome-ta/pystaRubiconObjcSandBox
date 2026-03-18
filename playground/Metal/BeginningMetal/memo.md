@@ -2,6 +2,9 @@
 
 [Beginning Metal | Kodeco](https://www.kodeco.com/3537-beginning-metal)
 
+[Programming Metal in iOS - YouTube](https://m.youtube.com/playlist?list=PL23Revp-82LJG3vcDPm8w7b5HTKjBOY0W)
+
+
 
 ## 07. Matrices 2D to 3D
 
