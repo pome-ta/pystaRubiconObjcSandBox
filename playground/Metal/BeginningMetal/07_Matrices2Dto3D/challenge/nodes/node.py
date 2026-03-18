@@ -52,6 +52,9 @@ class Node(NSObject):
     #self.rotation = simd_float3(0.7)
     self.scale = simd_float3(1)
     
+    #self.declare_property('modelMatrix')
+    __class__.declare_property('modelMatrix')
+    
     
     '''
 
@@ -110,4 +113,4 @@ class Node(NSObject):
       child.renderWithCommandEncoder_deltaTime_(commandEncoder, deltaTime)
   '''
 
-Node.declare_property('modelMatrix')
+#Node.declare_property('modelMatrix')
