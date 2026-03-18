@@ -82,9 +82,9 @@ class Renderer(NSObject, protocols=[
     commandBuffer = self.commandQueue.commandBuffer()
     commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
       descriptor)
-    commandEncoder.setFragmentSamplerState_atIndex_(self.samplerState, 0)
 
     deltaTime = 1 / view.preferredFramesPerSecond
+    commandEncoder.setFragmentSamplerState_atIndex_(self.samplerState, 0)
 
     try:  # `scene?.`
       self.scene.renderWithCommandEncoder_deltaTime_(commandEncoder, deltaTime)

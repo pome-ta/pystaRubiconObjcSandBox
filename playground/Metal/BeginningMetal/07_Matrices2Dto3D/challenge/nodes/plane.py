@@ -292,10 +292,14 @@ class Plane(Node, protocols=[
   @objc_method
   def doRenderWithCommandEncoder_modelViewMatrix_(self, commandEncoder,
                                                   modelViewMatrix: object):
+    '''
     if not (indexBuffer := self.indexBuffer):
       return
+    '''
+    if not self.indexBuffer:
+      return
     
-    print(indexBuffer)
+    #print(indexBuffer)
     aspect = 750.0 / 1334.0
     projectionMatrix = matrix_float4x4.projectionFov(radians(65), aspect, 0.1,
                                                      100.0)
@@ -310,5 +314,5 @@ class Plane(Node, protocols=[
     commandEncoder.setFragmentTexture_atIndex_(self.maskTexture, 1)
     commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
       MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
-      indexBuffer, 0)
+      self.indexBuffer, 0)
 

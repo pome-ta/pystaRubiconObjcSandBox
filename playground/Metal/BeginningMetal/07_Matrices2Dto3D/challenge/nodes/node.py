@@ -50,14 +50,17 @@ class Node(NSObject):
 
   @objc_method
   def addChildNode_(self, childNode):
+    print(f'childNode: {childNode}')
     self.children.append(childNode)
 
   @objc_method
   def renderWithCommandEncoder_parentModelViewMatrix_(
       self, commandEncoder, parentModelViewMatrix: object):
     modelViewMatrix = matrix_multiply(parentModelViewMatrix, self.modelMatrix)
+  
 
     for child in self.children:
+      print(f'{child.name}')
       child.renderWithCommandEncoder_parentModelViewMatrix_(
         commandEncoder, modelViewMatrix)
 
