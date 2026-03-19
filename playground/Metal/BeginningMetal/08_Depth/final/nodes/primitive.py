@@ -230,6 +230,10 @@ class Primitive(Node, protocols=[
 
     return pipelineState
 
+  @objc_method
+  def buildVertices(self):
+    pass
+
   # --- private
   @objc_method
   def buildBuffersWithDevice_(self, device):
