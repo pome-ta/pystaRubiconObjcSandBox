@@ -13,3 +13,19 @@ class MTLPrimitiveType(IntEnum):
   #[doc(alias = "MTLPrimitiveTypeTriangleStrip")]
   triangleStrip = 4
 
+
+class MTLCullMode(IntEnum):
+  #[doc(alias = "MTLCullModeNone")]
+  none = 0
+  #[doc(alias = "MTLCullModeFront")]
+  front = 1
+  #[doc(alias = "MTLCullModeBack")]
+  back = 2
+
+
+class MTLWinding(IntEnum):
+  #[doc(alias = "MTLWindingClockwise")]
+  clockwise = 0
+  #[doc(alias = "MTLWindingCounterClockwise")]
+  counterClockwise = 1
+

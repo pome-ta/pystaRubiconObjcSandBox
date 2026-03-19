@@ -14,13 +14,17 @@ from objc_frameworks.Metal import (
   MTLIndexType,
   MTLVertexFormat,
   MTLPixelFormat,
+  MTLCullMode,
+  MTLWinding,
 )
+
 from objc_frameworks.MetalKit import (
   MTKTextureLoaderOptionOrigin,
   MTKTextureLoaderOriginBottomLeft,
 )
 
 from rbedge.utils import nsurl
+from rbedge.utils import readonly_properties
 from rbedge.simd import (
   simd_float2,
   simd_float3,
@@ -58,6 +62,7 @@ def get_image_path(imageName: str) -> str:
 shader_path = ROOT_PATH / 'Shader.metal'
 
 
+@readonly_properties('vertexDescriptor')
 class Primitive(Node, protocols=[
     Renderable,
     Texturable,
@@ -65,44 +70,28 @@ class Primitive(Node, protocols=[
 
   vertices: '[Vertices]' = objc_property(object)
   indices: '[UInt16]' = objc_property(object)
+
   vertexBuffer: 'MTLBuffer?' = objc_property()
   indexBuffer: 'MTLBuffer?' = objc_property()
+
   time: CGFloat = objc_property(CGFloat)
+
   modelConstants: ModelConstants = objc_property(object)
+
   # Renderable
   pipelineState: 'MTLRenderPipelineState!' = objc_property()
   vertexFunctionName: str = objc_property(object)
   fragmentFunctionName: str = objc_property(object)
-  vertexDescriptor: 'MTLVertexDescriptor' = objc_property()
+
   # Texturable
   texture: 'MTLTexture?' = objc_property()
   maskTexture: 'MTLTexture?' = objc_property()
 
-
-  '''
-  @objc_method
-  def vertexDescriptor(self)->objc:
-  '''
-  
-  
-  @objc_method
-  def initializeProperties(self):
-    # todo: class member declarations
-    send_super(__class__, self, 'initializeProperties')
-
-    self.vertices = (Vertex * 4)
-    self.indices = (ctypes.c_uint16 * (2 * 3))
-
-    self.time = 0.0
-    self.modelConstants = ModelConstants(matrix_float4x4.identity())
-
-    # Renderable
-    self.fragmentFunctionName = 'fragment_shader'
-    self.vertexFunctionName = 'vertex_shader'
-
+  @objc_method  # declare_property - getter
+  def vertexDescriptor(self) -> objc_id:
     vertexDescriptor = MTLVertexDescriptor.new()
     # todo: `objectAtIndexedSubscript_` 長いので配列処理
-    range_num = 3
+    range_num: int = 3
     for idx, attribute in enumerate([
         vertexDescriptor.attributes.objectAtIndexedSubscript_(i)
         for i in range(range_num)
@@ -127,7 +116,23 @@ class Primitive(Node, protocols=[
 
     vertexDescriptor.layouts.objectAtIndexedSubscript_(
       0).stride = ctypes.sizeof(Vertex)
-    self.vertexDescriptor = vertexDescriptor
+
+    return vertexDescriptor
+
+  @objc_method
+  def initializeProperties(self):
+    # todo: class member declarations
+    send_super(__class__, self, 'initializeProperties')
+
+    self.vertices = []  #(Vertex * 4)
+    self.indices = []  #(ctypes.c_uint16 * (2 * 3))
+
+    self.time = 0.0
+    self.modelConstants = ModelConstants(matrix_float4x4.identity())
+
+    # Renderable
+    self.fragmentFunctionName = 'fragment_shader'
+    self.vertexFunctionName = 'vertex_shader'
 
   @objc_method
   def initWithDevice_(self, device):
@@ -258,8 +263,10 @@ class Primitive(Node, protocols=[
       ctypes.byref(self.modelConstants), ctypes.sizeof(self.modelConstants), 1)
     commandEncoder.setFragmentTexture_atIndex_(self.texture, 0)
     commandEncoder.setFragmentTexture_atIndex_(self.maskTexture, 1)
+    commandEncoder.setFrontFacingWinding_(MTLWinding.counterClockwise)
+    commandEncoder.setCullMode_(MTLCullMode.back)
+
     commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
       MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
       indexBuffer, 0)
-
 
