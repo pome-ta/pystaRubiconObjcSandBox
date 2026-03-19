@@ -3,12 +3,14 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGFloat
 
+from rbedge.utils import readonly_properties
 from rbedge.simd import simd_float3, matrix_multiply
 
 from .renderable import Renderable
 from matrixMath import matrix_float4x4
 
 
+@readonly_properties('modelMatrix')
 class Node(NSObject):
 
   name: str = objc_property(object)
@@ -66,7 +68,4 @@ class Node(NSObject):
       renderable.doRenderWithCommandEncoder_modelViewMatrix_(
         commandEncoder, modelViewMatrix)
       commandEncoder.popDebugGroup()
-
-
-Node.declare_property('modelMatrix')
 

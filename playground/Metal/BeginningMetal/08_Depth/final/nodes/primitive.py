@@ -5,7 +5,7 @@ from math import radians
 from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import NSDictionary
 from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGFloat
 
 from objc_frameworks.Metal import (

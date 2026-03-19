@@ -21,6 +21,7 @@ from objc_frameworks.MetalKit import (
 )
 
 from rbedge.utils import nsurl
+from rbedge.utils import readonly_properties
 from rbedge.simd import (
   simd_float2,
   simd_float3,
@@ -58,6 +59,7 @@ def get_image_path(imageName: str) -> str:
 shader_path = ROOT_PATH / 'Shader.metal'
 
 
+@readonly_properties('vertexDescriptor')
 class Plane(Node, protocols=[
     Renderable,
     Texturable,
@@ -269,7 +271,4 @@ class Plane(Node, protocols=[
     commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
       MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
       indexBuffer, 0)
-
-
-Plane.declare_property('vertexDescriptor')
 
