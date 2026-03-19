@@ -5,7 +5,7 @@ from math import radians
 from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import NSDictionary
 from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGFloat
 
 from objc_frameworks.Metal import (
@@ -73,10 +73,41 @@ class Plane(Node, protocols=[
   pipelineState: 'MTLRenderPipelineState!' = objc_property()
   vertexFunctionName: str = objc_property(object)
   fragmentFunctionName: str = objc_property(object)
-  vertexDescriptor: 'MTLVertexDescriptor' = objc_property()
   # Texturable
   texture: 'MTLTexture?' = objc_property()
   maskTexture: 'MTLTexture?' = objc_property()
+
+  @objc_method  # declare_property - getter
+  def vertexDescriptor(self) -> objc_id:
+    vertexDescriptor = MTLVertexDescriptor.new()
+    # todo: `objectAtIndexedSubscript_` 長いので配列処理
+    range_num = 3
+    for idx, attribute in enumerate([
+        vertexDescriptor.attributes.objectAtIndexedSubscript_(i)
+        for i in range(range_num)
+    ]):
+      match idx:
+        case 0:
+          attribute.format = MTLVertexFormat.float3
+          attribute.offset = 0
+          attribute.bufferIndex = 0
+        case 1:
+          attribute.format = MTLVertexFormat.float4
+          attribute.offset = simd_float3.stride
+          attribute.bufferIndex = 0
+        case 2:
+          attribute.format = MTLVertexFormat.float2
+          attribute.offset = simd_float3.stride + simd_float4.stride
+          attribute.bufferIndex = 0
+        case _:
+          import logging
+          error = IndexError(f'{idx=}: list index out of range')
+          logging.warning(f'{type(error).__name__} -> {error}')
+
+    vertexDescriptor.layouts.objectAtIndexedSubscript_(
+      0).stride = ctypes.sizeof(Vertex)
+
+    return vertexDescriptor
 
   @objc_method
   def initializeProperties(self):
@@ -105,35 +136,6 @@ class Plane(Node, protocols=[
     # Renderable
     self.fragmentFunctionName = 'fragment_shader'
     self.vertexFunctionName = 'vertex_shader'
-
-    vertexDescriptor = MTLVertexDescriptor.new()
-    # todo: `objectAtIndexedSubscript_` 長いので配列処理
-    range_num = 3
-    for idx, attribute in enumerate([
-        vertexDescriptor.attributes.objectAtIndexedSubscript_(i)
-        for i in range(range_num)
-    ]):
-      match idx:
-        case 0:
-          attribute.format = MTLVertexFormat.float3
-          attribute.offset = 0
-          attribute.bufferIndex = 0
-        case 1:
-          attribute.format = MTLVertexFormat.float4
-          attribute.offset = simd_float3.stride
-          attribute.bufferIndex = 0
-        case 2:
-          attribute.format = MTLVertexFormat.float2
-          attribute.offset = simd_float3.stride + simd_float4.stride
-          attribute.bufferIndex = 0
-        case _:
-          import logging
-          error = IndexError(f'{idx=}: list index out of range')
-          logging.warning(f'{type(error).__name__} -> {error}')
-
-    vertexDescriptor.layouts.objectAtIndexedSubscript_(
-      0).stride = ctypes.sizeof(Vertex)
-    self.vertexDescriptor = vertexDescriptor
 
   @objc_method
   def initWithDevice_(self, device):
@@ -267,4 +269,7 @@ class Plane(Node, protocols=[
     commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
       MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
       indexBuffer, 0)
+
+
+Plane.declare_property('vertexDescriptor')
 

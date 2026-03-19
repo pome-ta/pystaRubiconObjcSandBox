@@ -78,26 +78,20 @@ class Primitive(Node, protocols=[
   texture: 'MTLTexture?' = objc_property()
   maskTexture: 'MTLTexture?' = objc_property()
 
+
+  '''
+  @objc_method
+  def vertexDescriptor(self)->objc:
+  '''
+  
+  
   @objc_method
   def initializeProperties(self):
     # todo: class member declarations
     send_super(__class__, self, 'initializeProperties')
 
-    self.vertices = (Vertex * 4)(
-      Vertex(  # v0
-        position=simd_float3(-1.0,  1.0,  0.0), color=simd_float4(1.0, 0.0, 0.0, 1.0), texture=simd_float2(0.0, 1.0)),
-      Vertex(  # v1
-        position=simd_float3(-1.0, -1.0,  0.0), color=simd_float4(0.0, 1.0, 0.0, 1.0), texture=simd_float2(0.0, 0.0)),
-      Vertex(  # v2
-        position=simd_float3( 1.0, -1.0,  0.0), color=simd_float4(0.0, 0.0, 1.0, 1.0), texture=simd_float2(1.0, 0.0)),
-      Vertex(  # v3
-        position=simd_float3( 1.0,  1.0,  0.0), color=simd_float4(1.0, 0.0, 1.0, 1.0), texture=simd_float2(1.0, 1.0)),
-    )  # yapf: disable
-
-    self.indices = (ctypes.c_uint16 * (2 * 3))(
-      0, 1, 2,
-      2, 3, 0,
-    )  # yapf: disable
+    self.vertices = (Vertex * 4)
+    self.indices = (ctypes.c_uint16 * (2 * 3))
 
     self.time = 0.0
     self.modelConstants = ModelConstants(matrix_float4x4.identity())
