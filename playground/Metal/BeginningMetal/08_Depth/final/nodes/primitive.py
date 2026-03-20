@@ -267,8 +267,8 @@ class Primitive(Node, protocols=[
       ctypes.byref(self.modelConstants), ctypes.sizeof(self.modelConstants), 1)
     commandEncoder.setFragmentTexture_atIndex_(self.texture, 0)
     commandEncoder.setFragmentTexture_atIndex_(self.maskTexture, 1)
-    commandEncoder.setFrontFacingWinding_(MTLWinding.counterClockwise)
-    commandEncoder.setCullMode_(MTLCullMode.back)
+    #commandEncoder.setFrontFacingWinding_(MTLWinding.counterClockwise)
+    #commandEncoder.setCullMode_(MTLCullMode.back)
 
     commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
       MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,

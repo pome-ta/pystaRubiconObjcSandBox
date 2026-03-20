@@ -10,4 +10,5 @@ from .MTLRenderCommandEncoder import (
 from .MTLArgument import MTLIndexType
 from .MTLVertexDescriptor import MTLVertexFormat
 from .MTLSampler import MTLSamplerMinMagFilter
+from .MTLDepthStencil import MTLCompareFunction
 

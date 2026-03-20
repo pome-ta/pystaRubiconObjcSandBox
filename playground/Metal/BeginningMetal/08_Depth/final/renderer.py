@@ -26,11 +26,12 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGSize
 
-from objc_frameworks.Metal import MTLSamplerMinMagFilter
+from objc_frameworks.Metal import MTLSamplerMinMagFilter, MTLCompareFunction
 
 from scenes import Scene
 
 MTLSamplerDescriptor = ObjCClass('MTLSamplerDescriptor')
+MTLDepthStencilDescriptor = ObjCClass('MTLDepthStencilDescriptor')
 
 MTKViewDelegate = ObjCProtocol('MTKViewDelegate')
 
@@ -43,7 +44,9 @@ class Renderer(NSObject, protocols=[
   commandQueue: 'MTLCommandQueue' = objc_property()
 
   scene: Scene = objc_property()
+
   samplerState: 'MTLSamplerState?' = objc_property()
+  depthStencilState: 'MTLDepthStencilState?' = objc_property()
 
   @objc_method
   def initWithDevice_(self, device):
@@ -53,6 +56,7 @@ class Renderer(NSObject, protocols=[
     send_super(__class__, self, 'init')
 
     self.buildSamplerState()
+    self.buildDepthStencilState()
 
     return self
 
@@ -65,6 +69,15 @@ class Renderer(NSObject, protocols=[
     samplerState = self.device.newSamplerStateWithDescriptor_(descriptor)
 
     self.samplerState = samplerState
+
+  @objc_method
+  def buildDepthStencilState(self):
+    depthStencilDescriptor = MTLDepthStencilDescriptor.new()
+    depthStencilDescriptor.depthCompareFunction = MTLCompareFunction.less
+    depthStencilDescriptor.depthWriteEnabled = True
+    depthStencilState = self.device.newDepthStencilStateWithDescriptor_(
+      depthStencilDescriptor)
+    self.depthStencilState = depthStencilState
 
   # --- MTKViewDelegate
   @objc_method
@@ -83,6 +96,7 @@ class Renderer(NSObject, protocols=[
 
     deltaTime = 1 / view.preferredFramesPerSecond
     commandEncoder.setFragmentSamplerState_atIndex_(self.samplerState, 0)
+    commandEncoder.setDepthStencilState_(self.depthStencilState)
 
     try:  # `scene?.`
       self.scene.renderWithCommandEncoder_deltaTime_(commandEncoder, deltaTime)

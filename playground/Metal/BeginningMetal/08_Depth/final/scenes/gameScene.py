@@ -17,7 +17,7 @@ class GameScene(Scene):
 
   @objc_method
   def initWithDevice_size_(self, device, size: CGSize):
-    #self.cube = Cube.alloc().initWithDevice_(device)
+    self.cube = Cube.alloc().initWithDevice_(device)
     self.quad = Plane.alloc().initWithDevice_imageName_(device, 'picture.png')
 
     send_super(__class__,
@@ -30,7 +30,7 @@ class GameScene(Scene):
                  CGSize,
                ])
 
-    #self.addChildNode_(self.cube)
+    self.addChildNode_(self.cube)
     self.addChildNode_(self.quad)
 
     self.quad.position.z = -3.0
