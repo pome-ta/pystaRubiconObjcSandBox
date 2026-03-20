@@ -19,8 +19,6 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
       __warning_message = f'./{_TOP_DIR_NAME}/{_MODULES_DIR_NAME} not found in parent directories'
       warnings.warn(__warning_message, ImportWarning)
 
-import ctypes
-
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol, NSObject
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super

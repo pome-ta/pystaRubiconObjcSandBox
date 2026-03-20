@@ -48,5 +48,5 @@ class GameScene(Scene):
                  CGFloat,
                ])
 
-    self.quad.rotation.y += deltaTime
+    self.cube.rotation.y += deltaTime
 
