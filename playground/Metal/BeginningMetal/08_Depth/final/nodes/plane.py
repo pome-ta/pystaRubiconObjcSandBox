@@ -14,7 +14,7 @@ from .primitive import Primitive
 from simdTypes import Vertex
 
 
-class Plane(Node):
+class Plane(Primitive):
 
   # --- override
   @objc_method

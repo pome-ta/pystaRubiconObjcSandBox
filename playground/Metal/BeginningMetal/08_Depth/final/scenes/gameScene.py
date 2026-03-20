@@ -7,15 +7,17 @@ from rbedge.simd import simd_float3
 # todo: Pythonista3 の`scene.Scene` ではない
 from .scene import Scene
 from nodes import Plane
+from nodes import Cube
 
 
 class GameScene(Scene):
 
   quad: Plane = objc_property()
+  cube: Cube = objc_property()
 
   @objc_method
   def initWithDevice_size_(self, device, size: CGSize):
-
+    #self.cube = Cube.alloc().initWithDevice_(device)
     self.quad = Plane.alloc().initWithDevice_imageName_(device, 'picture.png')
 
     send_super(__class__,
@@ -28,13 +30,11 @@ class GameScene(Scene):
                  CGSize,
                ])
 
+    #self.addChildNode_(self.cube)
     self.addChildNode_(self.quad)
 
-    quad2 = Plane.alloc().initWithDevice_imageName_(device, 'picture.png')
-    quad2.scale = simd_float3(0.5)
-    quad2.position.y = 1.5
-
-    self.quad.addChildNode_(quad2)
+    self.quad.position.z = -3.0
+    self.quad.scale = simd_float3(3.0)
 
     return self
 
