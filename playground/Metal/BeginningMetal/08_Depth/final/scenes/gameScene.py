@@ -6,8 +6,7 @@ from rbedge.simd import simd_float3
 
 # todo: Pythonista3 の`scene.Scene` ではない
 from .scene import Scene
-from nodes import Plane
-from nodes import Cube
+from nodes import Plane, Cube
 
 
 class GameScene(Scene):
