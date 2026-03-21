@@ -1,3 +1,5 @@
+from math import radians
+
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGSize, CGFloat
@@ -34,6 +36,12 @@ class GameScene(Scene):
 
     self.quad.position.z = -3.0
     self.quad.scale = simd_float3(3.0)
+
+    self.camera.position.y = -1
+    self.camera.position.x = 1
+    self.camera.position.z = -6
+    self.camera.rotation.x = radians(-45.0)
+    self.camera.rotation.y = radians(-45.0)
 
     return self
 

@@ -1,9 +1,13 @@
+import ctypes
+
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGSize, CGFloat
 
-from nodes import Node
+from nodes import Node, Camera
 from matrixMath import matrix_float4x4
+
+from simdTypes import SceneConstants
 
 
 class Scene(Node):
@@ -11,13 +15,29 @@ class Scene(Node):
   device: 'MTLDevice' = objc_property()
   size: CGSize = objc_property(CGSize)
 
+  camera: Camera = objc_property()
+  sceneConstants: SceneConstants = objc_property(object)
+
+  @objc_method
+  def initializeProperties(self):
+    # todo: class member declarations
+    send_super(__class__, self, 'initializeProperties')
+    self.camera = Camera.new()
+    self.sceneConstants = SceneConstants()
+
   @objc_method
   def initWithDevice_size_(self, device, size: CGSize):
+    self.initializeProperties()
 
     self.device = device
     self.size = size
 
     send_super(__class__, self, 'init')
+
+    self.camera.aspect = size.width / size.height
+    self.camera.position.z = -6.0
+
+    self.addChildNode_(self.camera)
 
     return self
 
@@ -29,8 +49,13 @@ class Scene(Node):
   def renderWithCommandEncoder_deltaTime_(self, commandEncoder,
                                           deltaTime: CGFloat):
     self.updateWithDeltaTime_(deltaTime)
-    viewMatrix = matrix_float4x4.translation(0.0, 0.0, -4.0)
+
+    self.sceneConstants.projectionMatrix = self.camera.projectionMatrix
+
+    commandEncoder.setVertexBytes_length_atIndex_(
+      ctypes.byref(self.sceneConstants), ctypes.sizeof(self.sceneConstants), 2)
+
     for child in self.children:
       child.renderWithCommandEncoder_parentModelViewMatrix_(
-        commandEncoder, viewMatrix)
+        commandEncoder, self.camera.viewMatrix)
 

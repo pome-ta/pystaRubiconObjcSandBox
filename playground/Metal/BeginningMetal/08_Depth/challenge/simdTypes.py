@@ -22,6 +22,8 @@ class ModelConstants(ctypes.Structure):
   ]
 
 
-if __name__ == '__main__':
-  pass
+class SceneConstants(ctypes.Structure):
+  _fields_ = [
+    ('projectionMatrix', simd_float4x4),
+  ]
 

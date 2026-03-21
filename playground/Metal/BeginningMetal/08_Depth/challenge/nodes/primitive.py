@@ -1,6 +1,5 @@
 import ctypes
 from pathlib import Path
-from math import radians
 
 from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import NSDictionary
@@ -258,12 +257,7 @@ class Primitive(Node, protocols=[
     if not (indexBuffer := self.indexBuffer):
       return
 
-    aspect = 750.0 / 1334.0
-    projectionMatrix = matrix_float4x4.projectionFov(radians(65), aspect, 0.1,
-                                                     100.0)
-
-    self.modelConstants.modelViewMatrix = matrix_multiply(
-      projectionMatrix, modelViewMatrix)
+    self.modelConstants.modelViewMatrix = modelViewMatrix
     commandEncoder.setRenderPipelineState_(self.pipelineState)
     commandEncoder.setVertexBuffer_offset_atIndex_(self.vertexBuffer, 0, 0)
     commandEncoder.setVertexBytes_length_atIndex_(
