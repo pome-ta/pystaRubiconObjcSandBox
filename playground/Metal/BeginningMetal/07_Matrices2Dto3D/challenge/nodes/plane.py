@@ -50,7 +50,7 @@ ROOT_PATH = Path(__file__).parents[1]
 
 # wip: 雑
 def get_image_path(imageName: str) -> str:
-  root = ROOT_PATH / 'Images'
+  root = ROOT_PATH.parents[1] / 'Images'
   for file in root.iterdir():
     if file.name == imageName:
       return str(file.resolve())
