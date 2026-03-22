@@ -4,7 +4,7 @@ from pathlib import Path
 from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import NSDictionary
 from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super, objc_id
+from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGFloat
 
 from objc_frameworks.Metal import (
@@ -86,7 +86,7 @@ class Primitive(Node, protocols=[
   maskTexture: 'MTLTexture?' = objc_property()
 
   @objc_method  # declare_property - getter
-  def vertexDescriptor(self) -> objc_id:
+  def vertexDescriptor(self) -> ObjCInstance:
     vertexDescriptor = MTLVertexDescriptor.new()
     # todo: `objectAtIndexedSubscript_` 長いので配列処理
     range_num: int = 3

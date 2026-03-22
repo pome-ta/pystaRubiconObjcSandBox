@@ -62,7 +62,7 @@ shader_path = ROOT_PATH / 'Shader.metal'
 
 
 @readonly_properties('vertexDescriptor')
-class Primitive(Node, protocols=[
+class Model(Node, protocols=[
     Renderable,
     Texturable,
 ]):
