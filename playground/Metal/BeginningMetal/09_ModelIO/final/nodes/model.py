@@ -4,7 +4,7 @@ from pathlib import Path
 from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import NSDictionary
 from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super, objc_id
+from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGFloat
 
 from objc_frameworks.Metal import (
@@ -67,30 +67,22 @@ class Model(Node, protocols=[
     Texturable,
 ]):
 
-  vertices: '[Vertices]' = objc_property(object)
-  indices: '[UInt16]' = objc_property(object)
+  meshes: '[AnyObject]?' = objc_property(object)
 
-  vertexBuffer: 'MTLBuffer?' = objc_property()
-  indexBuffer: 'MTLBuffer?' = objc_property()
-
-  time: CGFloat = objc_property(CGFloat)
-
-  modelConstants: ModelConstants = objc_property(object)
+  # Texturable
+  texture: 'MTLTexture?' = objc_property()
 
   # Renderable
   pipelineState: 'MTLRenderPipelineState!' = objc_property()
   vertexFunctionName: str = objc_property(object)
   fragmentFunctionName: str = objc_property(object)
-
-  # Texturable
-  texture: 'MTLTexture?' = objc_property()
-  maskTexture: 'MTLTexture?' = objc_property()
+  modelConstants: ModelConstants = objc_property(object)
 
   @objc_method  # declare_property - getter
-  def vertexDescriptor(self) -> objc_id:
+  def vertexDescriptor(self) -> ObjCInstance:
     vertexDescriptor = MTLVertexDescriptor.new()
     # todo: `objectAtIndexedSubscript_` 長いので配列処理
-    range_num: int = 3
+    range_num: int = 4
     for idx, attribute in enumerate([
         vertexDescriptor.attributes.objectAtIndexedSubscript_(i)
         for i in range(range_num)
@@ -102,11 +94,15 @@ class Model(Node, protocols=[
           attribute.bufferIndex = 0
         case 1:
           attribute.format = MTLVertexFormat.float4
-          attribute.offset = simd_float3.stride
+          attribute.offset = ctypes.sizeof(ctypes.c_float) * 3
           attribute.bufferIndex = 0
         case 2:
           attribute.format = MTLVertexFormat.float2
-          attribute.offset = simd_float3.stride + simd_float4.stride
+          attribute.offset = ctypes.sizeof(ctypes.c_float) * 7
+          attribute.bufferIndex = 0
+        case 3:
+          attribute.format = MTLVertexFormat.float3
+          attribute.offset = ctypes.sizeof(ctypes.c_float) * 9
           attribute.bufferIndex = 0
         case _:
           import logging
@@ -114,7 +110,7 @@ class Model(Node, protocols=[
           logging.warning(f'{type(error).__name__} -> {error}')
 
     vertexDescriptor.layouts.objectAtIndexedSubscript_(
-      0).stride = ctypes.sizeof(Vertex)
+      0).stride = ctypes.sizeof(ctypes.c_float) * 12
 
     return vertexDescriptor
 
@@ -123,29 +119,13 @@ class Model(Node, protocols=[
     # todo: class member declarations
     send_super(__class__, self, 'initializeProperties')
 
-    self.vertices = []  #(Vertex * 4)
-    self.indices = []  #(ctypes.c_uint16 * (2 * 3))
-
-    self.time = 0.0
-    self.modelConstants = ModelConstants(matrix_float4x4.identity())
-
     # Renderable
     self.fragmentFunctionName = 'fragment_shader'
     self.vertexFunctionName = 'vertex_shader'
+    self.modelConstants = ModelConstants(matrix_float4x4.identity())
 
   @objc_method
-  def initWithDevice_(self, device):
-    send_super(__class__, self, 'init')
-    self.initializeProperties()
-
-    self.buildVertices()
-    self.buildBuffersWithDevice_(device)
-    self.pipelineState = self.buildPipelineStateWithDevice_(device)
-
-    return self
-
-  @objc_method
-  def initWithDevice_imageName_(self, device, imageName: object):
+  def initWithDevice_modelName_(self, device, modelName: object):
     send_super(__class__, self, 'init')
     self.initializeProperties()
 
@@ -159,27 +139,11 @@ class Model(Node, protocols=[
 
     return self
 
+
+
   @objc_method
-  def initWithDevice_imageName_maskImageName_(self, device, imageName: object,
-                                              maskImageName: object):
-    send_super(__class__, self, 'init')
-    self.initializeProperties()
-
-    self.buildVertices()
-    if (texture := self.setTextureWithDevice_imageName_(device, imageName)):
-      self.texture = texture
-      self.fragmentFunctionName = 'textured_fragment'
-
-    if (maskTexture :=
-        self.setTextureWithDevice_imageName_(device, maskImageName)):
-      self.maskTexture = maskTexture
-      self.fragmentFunctionName = 'textured_mask_fragment'
-
-    self.buildBuffersWithDevice_(device)
-    self.pipelineState = self.buildPipelineStateWithDevice_(device)
-
-    return self
-
+  def loadModelWithDevice_modelName_(self,device,modelName:object):
+    pass
   # --- Texturable
   # --- extension Texturable
   @objc_method
@@ -270,5 +234,4 @@ class Model(Node, protocols=[
     commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
       MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
       indexBuffer, 0)
-
 
