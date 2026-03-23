@@ -6,18 +6,30 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
     _TOP_DIR_NAME):
   import pathlib
   import sys
+  
+  __pick_dirs = ['final', 'challenge']
+  
   __parents = pathlib.Path(__file__).resolve().parents
   for __dir_path in __parents:
+    #print(__dir_path.resolve())
     if __dir_path.name == _TOP_DIR_NAME and (__modules_path := __dir_path /
                                              _MODULES_DIR_NAME).exists():
       sys.path.insert(0, str(__modules_path))
       break
+    if __dir_path.name in __pick_dirs:
+      sys.path.insert(0, str(__dir_path))
+  
+  
+  
   else:
     import warnings
     with warnings.catch_warnings():
       warnings.simplefilter('always', ImportWarning)
       __warning_message = f'./{_TOP_DIR_NAME}/{_MODULES_DIR_NAME} not found in parent directories'
       warnings.warn(__warning_message, ImportWarning)
+  print(sys.path)
+
+
 
 import ctypes
 from pathlib import Path
@@ -48,21 +60,24 @@ from rbedge.simd import (
   simd_float4,
   matrix_multiply,
 )
-'''
+
+
 from .node import Node
 from .renderable import Renderable
 from .texturable import Texturable
 
+
 '''
 from node import Node
-#from node.renderable import Renderable
-#from node.texturable import Texturable
+from nodes.renderable import Renderable
+from nodes.texturable import Texturable
+'''
 
-from simdTypes import (
+from ..simdTypes import (
   Vertex,
   ModelConstants,
 )
-from matrixMath import matrix_float4x4
+from ..matrixMath import matrix_float4x4
 
 MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
@@ -85,17 +100,14 @@ def get_model_path(modelName: str, extension: str = '') -> str:
 
 
 shader_path = ROOT_PATH / 'Shader.metal'
-'''
+
+
 @readonly_properties('vertexDescriptor')
 class Model(Node, protocols=[
     Renderable,
     Texturable,
 ]):
-'''
 
-
-@readonly_properties('vertexDescriptor')
-class Model(Node):
   meshes: '[AnyObject]?' = objc_property(object)
 
   # Texturable
@@ -175,6 +187,8 @@ class Model(Node):
     if not (assetURL := get_model_path(modelName, 'obj')):
       raise ValueError(f'Asset {modelName} does not exist.')
 
+
+    descriptor = MTKModelIOVertexDescriptorFromMetal(self.vertexDescriptor)
   # --- Texturable
   # --- extension Texturable
   @objc_method
