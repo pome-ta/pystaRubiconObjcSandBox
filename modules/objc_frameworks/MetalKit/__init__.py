@@ -5,3 +5,5 @@ from .MTKTextureLoader import (
   MTKTextureLoaderOriginFlippedVertically,
 )
 
+from .MTKModel import MTKModelIOVertexDescriptorFromMetal
+

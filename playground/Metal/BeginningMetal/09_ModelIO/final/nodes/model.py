@@ -1,3 +1,24 @@
+_TOP_DIR_NAME = 'pystaRubiconObjcSandBox'
+_MODULES_DIR_NAME = 'modules'
+
+# todo: `./{_TOP_DIR_NAME}/{_MODULES_DIR_NAME}` にあるpackage のimport 準備
+if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
+    _TOP_DIR_NAME):
+  import pathlib
+  import sys
+  __parents = pathlib.Path(__file__).resolve().parents
+  for __dir_path in __parents:
+    if __dir_path.name == _TOP_DIR_NAME and (__modules_path := __dir_path /
+                                             _MODULES_DIR_NAME).exists():
+      sys.path.insert(0, str(__modules_path))
+      break
+  else:
+    import warnings
+    with warnings.catch_warnings():
+      warnings.simplefilter('always', ImportWarning)
+      __warning_message = f'./{_TOP_DIR_NAME}/{_MODULES_DIR_NAME} not found in parent directories'
+      warnings.warn(__warning_message, ImportWarning)
+
 import ctypes
 from pathlib import Path
 
@@ -17,12 +38,9 @@ from objc_frameworks.Metal import (
   MTLWinding,
 )
 
-from objc_frameworks.MetalKit import (
-  MTKTextureLoaderOptionOrigin,
-  MTKTextureLoaderOriginBottomLeft,
-)
+from objc_frameworks.MetalKit import MTKModelIOVertexDescriptorFromMetal
 
-from rbedge.utils import nsurl
+from rbedge.utils import nsurl, get_str_filepath
 from rbedge.utils import readonly_properties
 from rbedge.simd import (
   simd_float2,
@@ -30,10 +48,15 @@ from rbedge.simd import (
   simd_float4,
   matrix_multiply,
 )
-
+'''
 from .node import Node
 from .renderable import Renderable
 from .texturable import Texturable
+
+'''
+from node import Node
+#from node.renderable import Renderable
+#from node.texturable import Texturable
 
 from simdTypes import (
   Vertex,
@@ -53,20 +76,26 @@ ROOT_PATH = Path(__file__).parents[1]
 # wip: 雑
 def get_image_path(imageName: str) -> str:
   root = ROOT_PATH.parents[1] / 'Images'
-  for file in root.iterdir():
-    if file.name == imageName:
-      return str(file.resolve())
+  return get_str_filepath(root, imageName)
+
+
+def get_model_path(modelName: str, extension: str = '') -> str:
+  root = ROOT_PATH.parents[1] / 'Models'
+  return get_str_filepath(root, f'{modelName}.{extension}')
 
 
 shader_path = ROOT_PATH / 'Shader.metal'
-
-
+'''
 @readonly_properties('vertexDescriptor')
 class Model(Node, protocols=[
     Renderable,
     Texturable,
 ]):
+'''
 
+
+@readonly_properties('vertexDescriptor')
+class Model(Node):
   meshes: '[AnyObject]?' = objc_property(object)
 
   # Texturable
@@ -129,6 +158,8 @@ class Model(Node, protocols=[
     send_super(__class__, self, 'init')
     self.initializeProperties()
 
+    name = modelName
+
     self.buildVertices()
     if (texture := self.setTextureWithDevice_imageName_(device, imageName)):
       self.texture = texture
@@ -139,11 +170,11 @@ class Model(Node, protocols=[
 
     return self
 
-
-
   @objc_method
-  def loadModelWithDevice_modelName_(self,device,modelName:object):
-    pass
+  def loadModelWithDevice_modelName_(self, device, modelName: object):
+    if not (assetURL := get_model_path(modelName, 'obj')):
+      raise ValueError(f'Asset {modelName} does not exist.')
+
   # --- Texturable
   # --- extension Texturable
   @objc_method
@@ -195,10 +226,6 @@ class Model(Node, protocols=[
       print(f'pipelineState error: {e}')
 
     return pipelineState
-
-  @objc_method
-  def buildVertices(self):
-    pass
 
   # --- private
   @objc_method
