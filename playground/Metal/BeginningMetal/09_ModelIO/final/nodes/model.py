@@ -1,36 +1,3 @@
-_TOP_DIR_NAME = 'pystaRubiconObjcSandBox'
-_MODULES_DIR_NAME = 'modules'
-
-# todo: `./{_TOP_DIR_NAME}/{_MODULES_DIR_NAME}` にあるpackage のimport 準備
-if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
-    _TOP_DIR_NAME):
-  import pathlib
-  import sys
-  
-  __pick_dirs = ['final', 'challenge']
-  
-  __parents = pathlib.Path(__file__).resolve().parents
-  for __dir_path in __parents:
-    #print(__dir_path.resolve())
-    if __dir_path.name == _TOP_DIR_NAME and (__modules_path := __dir_path /
-                                             _MODULES_DIR_NAME).exists():
-      sys.path.insert(0, str(__modules_path))
-      break
-    if __dir_path.name in __pick_dirs:
-      sys.path.insert(0, str(__dir_path))
-  
-  
-  
-  else:
-    import warnings
-    with warnings.catch_warnings():
-      warnings.simplefilter('always', ImportWarning)
-      __warning_message = f'./{_TOP_DIR_NAME}/{_MODULES_DIR_NAME} not found in parent directories'
-      warnings.warn(__warning_message, ImportWarning)
-  print(sys.path)
-
-
-
 import ctypes
 from pathlib import Path
 
@@ -61,23 +28,21 @@ from rbedge.simd import (
   matrix_multiply,
 )
 
-
 from .node import Node
 from .renderable import Renderable
 from .texturable import Texturable
-
-
-'''
-from node import Node
-from nodes.renderable import Renderable
-from nodes.texturable import Texturable
-'''
 
 from simdTypes import (
   Vertex,
   ModelConstants,
 )
 from matrixMath import matrix_float4x4
+
+
+
+MDLVertexAttribute = ObjCClass('MDLVertexAttribute')
+
+
 
 MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
@@ -170,7 +135,11 @@ class Model(Node, protocols=[
     send_super(__class__, self, 'init')
     self.initializeProperties()
 
-    name = modelName
+    self.name = modelName
+    
+    self.loadModelWithDevice_modelName_(self.device, modelName)
+    
+    '''
 
     self.buildVertices()
     if (texture := self.setTextureWithDevice_imageName_(device, imageName)):
@@ -179,6 +148,7 @@ class Model(Node, protocols=[
 
     self.buildBuffersWithDevice_(device)
     self.pipelineState = self.buildPipelineStateWithDevice_(device)
+    '''
 
     return self
 
@@ -187,8 +157,20 @@ class Model(Node, protocols=[
     if not (assetURL := get_model_path(modelName, 'obj')):
       raise ValueError(f'Asset {modelName} does not exist.')
 
-
     descriptor = MTKModelIOVertexDescriptorFromMetal(self.vertexDescriptor)
+
+    range_num: int = 4
+    for idx, attribute in enumerate([
+        descriptor.attributes.objectAtIndexedSubscript_(i)
+        for i in range(range_num)
+    ]):
+      match idx:
+        case 0:
+          attributePosition = 
+          attribute.format = MTLVertexFormat.float3
+          attribute.offset = 0
+          attribute.bufferIndex = 0
+
   # --- Texturable
   # --- extension Texturable
   @objc_method

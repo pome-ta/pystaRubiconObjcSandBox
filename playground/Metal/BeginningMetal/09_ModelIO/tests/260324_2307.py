@@ -1,3 +1,10 @@
+"""
+Model:
+let attributePosition = descriptor.attributes[0] as! MDLVertexAttribute
+
+確認
+"""
+
 _TOP_DIR_NAME = 'pystaRubiconObjcSandBox'
 _MODULES_DIR_NAME = 'modules'
 
@@ -23,34 +30,7 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
   sys.path.insert(0, str(pathlib.Path(__file__).parent.parent / 'final'))
   #sys.path.insert(0, str(pathlib.Path(__file__).parent.parent / 'challenge'))
 
-#from final.renderer import Renderer
-from final.nodes.plane import Plane
+from objc_frameworks.Metal import MTLCreateSystemDefaultDevice
+from final.nodes.model import Model
 
-if __name__ == '__main__':
-  from objc_frameworks.Metal import MTLCreateSystemDefaultDevice
-
-  from objc_frameworks.ModelIO import (
-    MDLVertexAttributeAnisotropy,
-    MDLVertexAttributeBinormal,
-    MDLVertexAttributeBitangent,
-    MDLVertexAttributeColor,
-    MDLVertexAttributeEdgeCrease,
-    MDLVertexAttributeJointIndices,
-    MDLVertexAttributeJointWeights,
-    MDLVertexAttributeNormal,
-    MDLVertexAttributeOcclusionValue,
-    MDLVertexAttributePosition,
-    MDLVertexAttributeShadingBasisU,
-    MDLVertexAttributeShadingBasisV,
-    MDLVertexAttributeSubdivisionStencil,
-    MDLVertexAttributeTangent,
-    MDLVertexAttributeTextureCoordinate,
-  )
-  from rbedge import pdbr
-
-  #renderer = Renderer.alloc().initWithDevice_(MTLCreateSystemDefaultDevice())
-
-  p = Plane.alloc().initWithDevice_(MTLCreateSystemDefaultDevice())
-
-  print(MDLVertexAttributePosition)
 
