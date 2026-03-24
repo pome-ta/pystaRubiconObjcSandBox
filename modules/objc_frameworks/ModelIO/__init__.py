@@ -1,0 +1,3 @@
+from .MDLVertexDescriptor import (
+  MDLVertexAttributePosition, )
+
