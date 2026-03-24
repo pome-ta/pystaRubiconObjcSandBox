@@ -1,3 +1,18 @@
 from .MDLVertexDescriptor import (
-  MDLVertexAttributePosition, )
+  MDLVertexAttributeAnisotropy,
+  MDLVertexAttributeBinormal,
+  MDLVertexAttributeBitangent,
+  MDLVertexAttributeColor,
+  MDLVertexAttributeEdgeCrease,
+  MDLVertexAttributeJointIndices,
+  MDLVertexAttributeJointWeights,
+  MDLVertexAttributeNormal,
+  MDLVertexAttributeOcclusionValue,
+  MDLVertexAttributePosition,
+  MDLVertexAttributeShadingBasisU,
+  MDLVertexAttributeShadingBasisV,
+  MDLVertexAttributeSubdivisionStencil,
+  MDLVertexAttributeTangent,
+  MDLVertexAttributeTextureCoordinate,
+)
 
