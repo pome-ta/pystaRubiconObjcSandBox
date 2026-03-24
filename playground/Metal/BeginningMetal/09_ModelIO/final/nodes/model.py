@@ -73,11 +73,11 @@ from nodes.renderable import Renderable
 from nodes.texturable import Texturable
 '''
 
-from ..simdTypes import (
+from simdTypes import (
   Vertex,
   ModelConstants,
 )
-from ..matrixMath import matrix_float4x4
+from matrixMath import matrix_float4x4
 
 MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
