@@ -19,6 +19,13 @@ from objc_frameworks.Metal import (
 
 from objc_frameworks.MetalKit import MTKModelIOVertexDescriptorFromMetal
 
+from objc_frameworks.ModelIO import (
+  MDLVertexAttributePosition,
+  MDLVertexAttributeColor,
+  MDLVertexAttributeTextureCoordinate,
+  MDLVertexAttributeNormal,
+)
+
 from rbedge.utils import nsurl, get_str_filepath
 from rbedge.utils import readonly_properties
 from rbedge.simd import (
@@ -40,6 +47,9 @@ from simdTypes import (
 from matrixMath import matrix_float4x4
 
 MDLVertexAttribute = ObjCClass('MDLVertexAttribute')
+MTKMeshBufferAllocator = ObjCClass('MTKMeshBufferAllocator')
+MDLAsset = ObjCClass('MDLAsset')
+MTKMesh = ObjCClass('MTKMesh')
 
 MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
@@ -150,14 +160,10 @@ class Model(Node, protocols=[
 
   @objc_method
   def loadModelWithDevice_modelName_(self, device, modelName: object):
-    
-    
     if not (assetURL := get_model_path(modelName, 'obj')):
       raise ValueError(f'Asset {modelName} does not exist.')
-    
 
     descriptor = MTKModelIOVertexDescriptorFromMetal(self.vertexDescriptor)
-    
 
     range_num: int = 4
     for idx, attribute in enumerate([
@@ -166,15 +172,42 @@ class Model(Node, protocols=[
     ]):
       match idx:
         case 0:
-          #attributePosition =
-          pdbr.state(attribute)
-          
-          #attribute.format = MTLVertexFormat.float3
-          #attribute.offset = 0
-          #attribute.bufferIndex = 0
+          if not isinstance(
+            (attributePosition := attribute), MDLVertexAttribute):
+            raise ValueError(f'{idx}: {attribute=}')
+          attributePosition.name = MDLVertexAttributePosition
+          descriptor.attributes.setObject_atIndexedSubscript_(
+            attributePosition, idx)
+        case 1:
+          if not isinstance((attributeColor := attribute), MDLVertexAttribute):
+            raise ValueError(f'{idx}: {attribute=}')
+          attributeColor.name = MDLVertexAttributeColor
+          descriptor.attributes.setObject_atIndexedSubscript_(
+            attributeColor, idx)
+        case 2:
+          if not isinstance(
+            (attributeTexture := attribute), MDLVertexAttribute):
+            raise ValueError(f'{idx}: {attribute=}')
+          attributeTexture.name = MDLVertexAttributeTextureCoordinate
+          descriptor.attributes.setObject_atIndexedSubscript_(
+            attributeTexture, idx)
+        case 3:
+          if not isinstance(
+            (attributeNormal := attribute), MDLVertexAttribute):
+            raise ValueError(f'{idx}: {attribute=}')
+          attributeNormal.name = MDLVertexAttributeNormal
+          descriptor.attributes.setObject_atIndexedSubscript_(
+            attributeNormal, idx)
         case _:
-          pass
-    
+          import logging
+          error = IndexError(f'{idx=}: list index out of range')
+          logging.warning(f'{type(error).__name__} -> {error}')
+
+    bufferAllocator = MTKMeshBufferAllocator.alloc().initWithDevice_(device)
+
+    asset = MDLAsset.alloc().initWithURL_vertexDescriptor_bufferAllocator_(
+      nsurl(str(assetURL)), descriptor, bufferAllocator)
+    pdbr.state(asset)
 
   # --- Texturable
   # --- extension Texturable

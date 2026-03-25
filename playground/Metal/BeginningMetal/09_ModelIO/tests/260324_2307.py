@@ -1,5 +1,5 @@
 """
-Model:
+Model: loadModelWithDevice_modelName_ まわり
 let attributePosition = descriptor.attributes[0] as! MDLVertexAttribute
 
 確認
@@ -29,7 +29,6 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
   sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
   sys.path.insert(0, str(pathlib.Path(__file__).parent.parent / 'final'))
   #sys.path.insert(0, str(pathlib.Path(__file__).parent.parent / 'challenge'))
-
 
 from rbedge import pdbr
 from objc_frameworks.Metal import MTLCreateSystemDefaultDevice
