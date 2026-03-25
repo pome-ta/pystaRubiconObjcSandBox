@@ -14,11 +14,8 @@ def nsurl(url_or_path):
 
 # wip: 雑
 def get_str_filepath(dir_path: Path, file_name: str) -> str | None:
-  for glob_path in dir_path.glob('./**'):
-    for file in glob_path.iterdir():
-      if file.name == file_name:
-        return str(file.resolve())
-  return None
+  return str(file_path.resolve()) if (file_path := next(
+    dir_path.rglob(file_name), None)) else None
 
 
 def readonly_properties(*property_names):

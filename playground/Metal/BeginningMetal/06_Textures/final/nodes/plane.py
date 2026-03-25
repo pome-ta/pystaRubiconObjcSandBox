@@ -20,7 +20,7 @@ from objc_frameworks.MetalKit import (
   MTKTextureLoaderOriginBottomLeft,
 )
 
-from rbedge.utils import nsurl
+from rbedge.utils import nsurl, get_str_filepath
 from rbedge import pdbr
 
 from .node import Node
@@ -50,11 +50,9 @@ class Constants(ctypes.Structure):
 
 
 # wip: 雑
-def get_image_path(imageName: str) -> str:
-  root = ROOT_PATH.parents[1] / 'Images'
-  for file in root.iterdir():
-    if file.name == imageName:
-      return str(file.resolve())
+def get_image_path(imageName: str) -> str | None:
+  root = ROOT_PATH.parents[1] / 'assets'
+  return get_str_filepath(root, imageName)
 
 
 shader_path = ROOT_PATH / 'Shader.metal'

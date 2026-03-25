@@ -61,13 +61,13 @@ ROOT_PATH = Path(__file__).parents[1]
 
 
 # wip: 雑
-def get_image_path(imageName: str) -> str:
-  root = ROOT_PATH.parents[1] / 'Images'
+def get_image_path(imageName: str) -> str | None:
+  root = ROOT_PATH.parents[1] / 'assets'
   return get_str_filepath(root, imageName)
 
 
-def get_model_path(modelName: str, extension: str = '') -> str:
-  root = ROOT_PATH.parents[1] / 'Models'
+def get_model_path(modelName: str, extension: str = '') -> str | None:
+  root = ROOT_PATH.parents[1] / 'assets'
   return get_str_filepath(root, f'{modelName}.{extension}')
 
 
@@ -80,7 +80,7 @@ class Model(Node, protocols=[
     Texturable,
 ]):
 
-  meshes: '[AnyObject]?' = objc_property(object)
+  meshes: '[AnyObject]?' = objc_property()
 
   # Texturable
   texture: 'MTLTexture?' = objc_property()
@@ -143,16 +143,18 @@ class Model(Node, protocols=[
     self.initializeProperties()
 
     self.name = modelName
-
     self.loadModelWithDevice_modelName_(device, modelName)
-    '''
 
-    self.buildVertices()
+    imageName = modelName + '.png'
+
+    print(get_image_path(imageName))
+    '''
+    
+
     if (texture := self.setTextureWithDevice_imageName_(device, imageName)):
       self.texture = texture
       self.fragmentFunctionName = 'textured_fragment'
 
-    self.buildBuffersWithDevice_(device)
     self.pipelineState = self.buildPipelineStateWithDevice_(device)
     '''
 
@@ -207,7 +209,12 @@ class Model(Node, protocols=[
 
     asset = MDLAsset.alloc().initWithURL_vertexDescriptor_bufferAllocator_(
       nsurl(str(assetURL)), descriptor, bufferAllocator)
-    pdbr.state(asset)
+
+    try:
+      self.meshes = MTKMesh.newMeshesFromAsset_device_sourceMeshes_error_(
+        asset, device, None, None)
+    except Exception as e:
+      print(e)
 
   # --- Texturable
   # --- extension Texturable

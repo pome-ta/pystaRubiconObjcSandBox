@@ -50,8 +50,8 @@ MTKTextureLoader = ObjCClass('MTKTextureLoader')
 ROOT_PATH = Path(__file__).parents[1]
 
 # wip: 雑
-def get_image_path(imageName: str) -> str:
-  root = ROOT_PATH.parents[1] / 'Images'
+def get_image_path(imageName: str) -> str | None:
+  root = ROOT_PATH.parents[1] / 'assets'
   return get_str_filepath(root, imageName)
 
 
