@@ -27,6 +27,7 @@ from rbedge.simd import (
   simd_float4,
   matrix_multiply,
 )
+from rbedge import pdbr
 
 from .node import Node
 from .renderable import Renderable
@@ -38,11 +39,7 @@ from simdTypes import (
 )
 from matrixMath import matrix_float4x4
 
-
-
 MDLVertexAttribute = ObjCClass('MDLVertexAttribute')
-
-
 
 MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
@@ -136,9 +133,8 @@ class Model(Node, protocols=[
     self.initializeProperties()
 
     self.name = modelName
-    
-    self.loadModelWithDevice_modelName_(self.device, modelName)
-    
+
+    self.loadModelWithDevice_modelName_(device, modelName)
     '''
 
     self.buildVertices()
@@ -154,10 +150,14 @@ class Model(Node, protocols=[
 
   @objc_method
   def loadModelWithDevice_modelName_(self, device, modelName: object):
+    
+    
     if not (assetURL := get_model_path(modelName, 'obj')):
       raise ValueError(f'Asset {modelName} does not exist.')
+    
 
     descriptor = MTKModelIOVertexDescriptorFromMetal(self.vertexDescriptor)
+    
 
     range_num: int = 4
     for idx, attribute in enumerate([
@@ -166,10 +166,15 @@ class Model(Node, protocols=[
     ]):
       match idx:
         case 0:
-          attributePosition = 
-          attribute.format = MTLVertexFormat.float3
-          attribute.offset = 0
-          attribute.bufferIndex = 0
+          #attributePosition =
+          pdbr.state(attribute)
+          
+          #attribute.format = MTLVertexFormat.float3
+          #attribute.offset = 0
+          #attribute.bufferIndex = 0
+        case _:
+          pass
+    
 
   # --- Texturable
   # --- extension Texturable

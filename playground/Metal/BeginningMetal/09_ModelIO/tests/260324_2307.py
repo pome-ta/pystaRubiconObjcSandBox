@@ -30,7 +30,13 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
   sys.path.insert(0, str(pathlib.Path(__file__).parent.parent / 'final'))
   #sys.path.insert(0, str(pathlib.Path(__file__).parent.parent / 'challenge'))
 
+
+from rbedge import pdbr
 from objc_frameworks.Metal import MTLCreateSystemDefaultDevice
 from final.nodes.model import Model
 
+device = MTLCreateSystemDefaultDevice()
+
+#mushroom
+m = Model.alloc().initWithDevice_modelName_(device, 'mushroom')
 
