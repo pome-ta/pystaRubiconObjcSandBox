@@ -17,6 +17,11 @@ from objc_frameworks.Metal import (
   MTLWinding,
 )
 
+from objc_frameworks.MetalKit import (
+  MTKTextureLoaderOptionOrigin,
+  MTKTextureLoaderOriginBottomLeft,
+)
+
 from objc_frameworks.MetalKit import MTKModelIOVertexDescriptorFromMetal
 
 from objc_frameworks.ModelIO import (
@@ -147,16 +152,13 @@ class Model(Node, protocols=[
 
     imageName = modelName + '.png'
 
-    print(get_image_path(imageName))
-    '''
-    
-
     if (texture := self.setTextureWithDevice_imageName_(device, imageName)):
       self.texture = texture
       self.fragmentFunctionName = 'textured_fragment'
 
     self.pipelineState = self.buildPipelineStateWithDevice_(device)
-    '''
+    
+    pdbr.state(self.meshes)
 
     return self
 
@@ -268,33 +270,21 @@ class Model(Node, protocols=[
 
     return pipelineState
 
-  # --- private
-  @objc_method
-  def buildBuffersWithDevice_(self, device):
-    vertexBuffer = device.newBufferWithBytes_length_options_(
-      self.vertices, ctypes.sizeof(self.vertices),
-      MTLResourceOptions.storageModeShared)
-    indexBuffer = device.newBufferWithBytes_length_options_(
-      self.indices, ctypes.sizeof(self.indices),
-      MTLResourceOptions.storageModeShared)
 
-    self.vertexBuffer = vertexBuffer
-    self.indexBuffer = indexBuffer
 
   # --- extension Renderable
   @objc_method
   def doRenderWithCommandEncoder_modelViewMatrix_(self, commandEncoder,
                                                   modelViewMatrix: object):
-
-    if not (indexBuffer := self.indexBuffer):
-      return
-
     self.modelConstants.modelViewMatrix = modelViewMatrix
-    commandEncoder.setRenderPipelineState_(self.pipelineState)
-    commandEncoder.setVertexBuffer_offset_atIndex_(self.vertexBuffer, 0, 0)
+
     commandEncoder.setVertexBytes_length_atIndex_(
       ctypes.byref(self.modelConstants), ctypes.sizeof(self.modelConstants), 1)
-    commandEncoder.setFragmentTexture_atIndex_(self.texture, 0)
+    if self.texture != None:
+      commandEncoder.setFragmentTexture_atIndex_(self.texture, 0)
+    commandEncoder.setRenderPipelineState_(self.pipelineState)
+    
+    
     commandEncoder.setFragmentTexture_atIndex_(self.maskTexture, 1)
     commandEncoder.setFrontFacingWinding_(MTLWinding.counterClockwise)
     commandEncoder.setCullMode_(MTLCullMode.back)
