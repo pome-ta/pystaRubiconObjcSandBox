@@ -4,8 +4,6 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGSize, CGFloat
 
-from rbedge.simd import simd_float3
-
 # todo: Pythonista3 の`scene.Scene` ではない
 from .scene import Scene
 from nodes import Model
