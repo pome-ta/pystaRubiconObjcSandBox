@@ -26,7 +26,7 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
       __warning_message = f'./{_TOP_DIR_NAME}/{_MODULES_DIR_NAME} not found in parent directories'
       warnings.warn(__warning_message, ImportWarning)
 
-  sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
+  #sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
   sys.path.insert(0, str(pathlib.Path(__file__).parent.parent / 'final'))
   #sys.path.insert(0, str(pathlib.Path(__file__).parent.parent / 'challenge'))
 

@@ -141,7 +141,7 @@ class Model(Node, protocols=[
     send_super(__class__, self, 'initializeProperties')
 
     # Renderable
-    self.fragmentFunctionName = 'fragment_shader'
+    self.fragmentFunctionName = 'fragment_color'
     self.vertexFunctionName = 'vertex_shader'
     self.modelConstants = ModelConstants(matrix_float4x4.identity())
 
@@ -276,6 +276,8 @@ class Model(Node, protocols=[
   def doRenderWithCommandEncoder_modelViewMatrix_(self, commandEncoder,
                                                   modelViewMatrix: object):
     self.modelConstants.modelViewMatrix = modelViewMatrix
+    #self.modelConstants.modelViewMatrix = modelViewMatrix
+    #modelConstants.materialColor = materialColor
 
     commandEncoder.setVertexBytes_length_atIndex_(
       ctypes.byref(self.modelConstants), ctypes.sizeof(self.modelConstants), 1)
