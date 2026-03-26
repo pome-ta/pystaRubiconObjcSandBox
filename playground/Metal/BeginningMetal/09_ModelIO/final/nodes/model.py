@@ -158,7 +158,9 @@ class Model(Node, protocols=[
 
     self.pipelineState = self.buildPipelineStateWithDevice_(device)
     
-    pdbr.state(self.meshes)
+    #pdbr.state(self.meshes)
+    print(len(self.meshes))
+    #print(type(self.meshes.count()))
 
     return self
 
@@ -283,6 +285,12 @@ class Model(Node, protocols=[
     if self.texture != None:
       commandEncoder.setFragmentTexture_atIndex_(self.texture, 0)
     commandEncoder.setRenderPipelineState_(self.pipelineState)
+    
+    if (meshes := self.meshes) is None or len(self.meshes) == 0:
+      return 
+      
+    for mesh in meshes:
+      pass
     
     
     commandEncoder.setFragmentTexture_atIndex_(self.maskTexture, 1)
