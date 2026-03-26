@@ -66,14 +66,17 @@ ROOT_PATH = Path(__file__).parents[1]
 
 
 # wip: 雑
-def get_image_path(imageName: str) -> str | None:
+def _get_filepath(file_name: str) -> str | None:
   root = ROOT_PATH.parents[1] / 'assets'
-  return get_str_filepath(root, imageName)
+  return get_str_filepath(root, file_name)
+
+
+def get_image_path(imageName: str) -> str | None:
+  return _get_filepath(imageName)
 
 
 def get_model_path(modelName: str, extension: str = '') -> str | None:
-  root = ROOT_PATH.parents[1] / 'assets'
-  return get_str_filepath(root, f'{modelName}.{extension}')
+  return _get_filepath(f'{modelName}.{extension}')
 
 
 shader_path = ROOT_PATH / 'Shader.metal'
@@ -157,10 +160,6 @@ class Model(Node, protocols=[
       self.fragmentFunctionName = 'textured_fragment'
 
     self.pipelineState = self.buildPipelineStateWithDevice_(device)
-    
-    #pdbr.state(self.meshes)
-    print(len(self.meshes))
-    #print(type(self.meshes.count()))
 
     return self
 
@@ -272,8 +271,6 @@ class Model(Node, protocols=[
 
     return pipelineState
 
-
-
   # --- extension Renderable
   @objc_method
   def doRenderWithCommandEncoder_modelViewMatrix_(self, commandEncoder,
@@ -285,19 +282,16 @@ class Model(Node, protocols=[
     if self.texture != None:
       commandEncoder.setFragmentTexture_atIndex_(self.texture, 0)
     commandEncoder.setRenderPipelineState_(self.pipelineState)
-    
-    if (meshes := self.meshes) is None or len(self.meshes) == 0:
-      return 
-      
-    for mesh in meshes:
-      pass
-    
-    
-    commandEncoder.setFragmentTexture_atIndex_(self.maskTexture, 1)
-    commandEncoder.setFrontFacingWinding_(MTLWinding.counterClockwise)
-    commandEncoder.setCullMode_(MTLCullMode.back)
 
-    commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
-      MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
-      indexBuffer, 0)
+    if (meshes := self.meshes) is None or len(self.meshes) == 0:
+      return
+
+    for mesh in meshes:
+      vertexBuffer = mesh.vertexBuffers.objectAtIndexedSubscript_(0)
+      commandEncoder.setVertexBuffer_offset_atIndex_(vertexBuffer.buffer,
+                                                     vertexBuffer.offset, 0)
+      for submesh in mesh.submeshes:
+        commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
+          submesh.primitiveType, submesh.indexCount, submesh.indexType,
+          submesh.indexBuffer.buffer, submesh.indexBuffer.offset)
 

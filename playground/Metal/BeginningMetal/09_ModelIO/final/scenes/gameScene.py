@@ -8,18 +8,16 @@ from rbedge.simd import simd_float3
 
 # todo: Pythonista3 の`scene.Scene` ではない
 from .scene import Scene
-from nodes import Plane, Cube
+from nodes import Model
 
 
 class GameScene(Scene):
 
-  quad: Plane = objc_property()
-  cube: Cube = objc_property()
+  mushroom: Model = objc_property()
 
   @objc_method
   def initWithDevice_size_(self, device, size: CGSize):
-    self.cube = Cube.alloc().initWithDevice_(device)
-    self.quad = Plane.alloc().initWithDevice_imageName_(device, 'picture.png')
+    self.mushroom = Model.alloc().initWithDevice_modelName_(device, 'mushroom')
 
     send_super(__class__,
                self,
@@ -31,17 +29,9 @@ class GameScene(Scene):
                  CGSize,
                ])
 
-    self.addChildNode_(self.cube)
-    self.addChildNode_(self.quad)
+    self.addChildNode_(self.mushroom)
 
-    self.quad.position.z = -3.0
-    self.quad.scale = simd_float3(3.0)
-
-    self.camera.position.y = -1
-    self.camera.position.x = 1
     self.camera.position.z = -6
-    self.camera.rotation.x = radians(-45.0)
-    self.camera.rotation.y = radians(-45.0)
 
     return self
 
@@ -56,5 +46,5 @@ class GameScene(Scene):
                  CGFloat,
                ])
 
-    self.cube.rotation.y += deltaTime
+    self.mushroom.rotation.y += deltaTime
 
