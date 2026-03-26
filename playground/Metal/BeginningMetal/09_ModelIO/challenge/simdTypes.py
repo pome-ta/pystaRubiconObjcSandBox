@@ -42,3 +42,13 @@ class SceneConstants(ctypes.Structure):
     ('projectionMatrix', simd_float4x4),
   ]
 
+  def __init__(
+    self,
+    projectionMatrix: simd_float4x4 | None = None,
+  ):
+
+    projectionMatrix = matrix_float4x4.identity(
+    ) if projectionMatrix is None else projectionMatrix
+
+    super().__init__(projectionMatrix=projectionMatrix)
+

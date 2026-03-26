@@ -39,7 +39,6 @@ from simdTypes import (
   Vertex,
   ModelConstants,
 )
-from matrixMath import matrix_float4x4
 
 MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
@@ -48,6 +47,7 @@ MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 MTKTextureLoader = ObjCClass('MTKTextureLoader')
 
 ROOT_PATH = Path(__file__).parents[1]
+
 
 # wip: 雑
 def get_image_path(imageName: str) -> str | None:
@@ -124,7 +124,7 @@ class Primitive(Node, protocols=[
     self.indices = []  #(ctypes.c_uint16 * (2 * 3))
 
     self.time = 0.0
-    self.modelConstants = ModelConstants(matrix_float4x4.identity())
+    self.modelConstants = ModelConstants()
 
     # Renderable
     self.fragmentFunctionName = 'fragment_shader'

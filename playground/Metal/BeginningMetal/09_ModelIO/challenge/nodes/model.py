@@ -49,7 +49,7 @@ from simdTypes import (
   Vertex,
   ModelConstants,
 )
-from matrixMath import matrix_float4x4
+
 
 MDLVertexAttribute = ObjCClass('MDLVertexAttribute')
 MTKMeshBufferAllocator = ObjCClass('MTKMeshBufferAllocator')
@@ -143,7 +143,7 @@ class Model(Node, protocols=[
     # Renderable
     self.fragmentFunctionName = 'fragment_color'
     self.vertexFunctionName = 'vertex_shader'
-    self.modelConstants = ModelConstants(matrix_float4x4.identity())
+    self.modelConstants = ModelConstants()
 
   @objc_method
   def initWithDevice_modelName_(self, device, modelName: object):
