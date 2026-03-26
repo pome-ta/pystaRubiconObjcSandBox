@@ -27,12 +27,13 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
   #sys.path.insert(0, str(pathlib.Path(__file__).parent.parent / 'final'))
   sys.path.insert(0, str(pathlib.Path(__file__).parent.parent / 'challenge'))
 
+from pprint import pprint
+for p in sys.path:
+  print(p)
+  print('')
 from rbedge import pdbr
-from objc_frameworks.Metal import MTLCreateSystemDefaultDevice
-from final.nodes.model import Model
+#from objc_frameworks.Metal import MTLCreateSystemDefaultDevice
+from simdTypes import ModelConstants, Vertex
 
-device = MTLCreateSystemDefaultDevice()
-
-#mushroom
-m = Model.alloc().initWithDevice_modelName_(device, 'mushroom')
-
+modelConstants = ModelConstants()
+vertex = Vertex()

@@ -32,7 +32,7 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
 
 from rbedge import pdbr
 from objc_frameworks.Metal import MTLCreateSystemDefaultDevice
-from final.nodes.model import Model
+from nodes.model import Model
 
 device = MTLCreateSystemDefaultDevice()
 
