@@ -1,21 +1,21 @@
-from math import radians
-
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGSize, CGFloat
+
+from rbedge.simd import simd_float4
 
 # todo: Pythonista3 の`scene.Scene` ではない
 from .scene import Scene
 from nodes import Model
 
 
-class GameScene(Scene):
+class LandscapeScene(Scene):
 
-  mushroom: Model = objc_property()
+  sun: Model = objc_property()
 
   @objc_method
   def initWithDevice_size_(self, device, size: CGSize):
-    self.mushroom = Model.alloc().initWithDevice_modelName_(device, 'mushroom')
+    self.sun = Model.alloc().initWithDevice_modelName_(device, 'sun')
 
     send_super(__class__,
                self,
@@ -27,9 +27,9 @@ class GameScene(Scene):
                  CGSize,
                ])
 
-    self.addChildNode_(self.mushroom)
+    self.addChildNode_(self.sun)
 
-    self.camera.position.z = -6
+    self.sun.materialColor = simd_float4(1.0, 1.0, 0.0, 1.0)
 
     return self
 
@@ -43,6 +43,4 @@ class GameScene(Scene):
                argtypes=[
                  CGFloat,
                ])
-
-    self.mushroom.rotation.y += deltaTime
 
