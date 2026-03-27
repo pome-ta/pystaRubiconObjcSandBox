@@ -32,6 +32,9 @@ class Scene(Node):
     self.size = size
 
     send_super(__class__, self, 'init')
+    
+    #print(size.width / size.height)
+    print(f'Scene{self.size}')
 
     self.camera.aspect = size.width / size.height
     self.camera.position.z = -6.0
