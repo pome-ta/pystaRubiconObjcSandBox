@@ -5,6 +5,14 @@
 [Programming Metal in iOS - YouTube](https://m.youtube.com/playlist?list=PL23Revp-82LJG3vcDPm8w7b5HTKjBOY0W)
 
 
+## 10. Instancing
+
+[Beginning Metal, Episode 10: Instancing | Kodeco](https://www.kodeco.com/3537-beginning-metal/lessons/10)
+
+## 09. Model I/O
+
+[Beginning Metal, Episode 9: Model I/O | Kodeco](https://www.kodeco.com/3537-beginning-metal/lessons/9)
+
 ## 08. Depth
 
 [Beginning Metal, Episode 8: Depth | Kodeco](https://www.kodeco.com/3537-beginning-metal/lessons/8)
