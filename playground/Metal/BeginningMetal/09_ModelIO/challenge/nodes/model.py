@@ -50,7 +50,6 @@ from simdTypes import (
   ModelConstants,
 )
 
-
 MDLVertexAttribute = ObjCClass('MDLVertexAttribute')
 MTKMeshBufferAllocator = ObjCClass('MTKMeshBufferAllocator')
 MDLAsset = ObjCClass('MDLAsset')
@@ -232,10 +231,10 @@ class Model(Node, protocols=[
     textureLoaderOptions = NSDictionary.dictionaryWithObject_forKey_(
       origin, MTKTextureLoaderOptionOrigin)
 
-    if (textureURL := nsurl(get_image_path(imageName))):
+    if (textureURL := get_image_path(imageName)):
       try:
         texture = textureLoader.newTextureWithContentsOfURL_options_error_(
-          textureURL, textureLoaderOptions, None)
+          nsurl(textureURL), textureLoaderOptions, None)
 
       except Exception:
         print('texture not created')
@@ -276,8 +275,7 @@ class Model(Node, protocols=[
   def doRenderWithCommandEncoder_modelViewMatrix_(self, commandEncoder,
                                                   modelViewMatrix: object):
     self.modelConstants.modelViewMatrix = modelViewMatrix
-    #self.modelConstants.modelViewMatrix = modelViewMatrix
-    #modelConstants.materialColor = materialColor
+    self.modelConstants.materialColor = self.materialColor
 
     commandEncoder.setVertexBytes_length_atIndex_(
       ctypes.byref(self.modelConstants), ctypes.sizeof(self.modelConstants), 1)

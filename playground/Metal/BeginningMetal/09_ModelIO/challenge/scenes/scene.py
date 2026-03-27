@@ -5,7 +5,6 @@ from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGSize, CGFloat
 
 from nodes import Node, Camera
-from matrixMath import matrix_float4x4
 
 from simdTypes import SceneConstants
 
