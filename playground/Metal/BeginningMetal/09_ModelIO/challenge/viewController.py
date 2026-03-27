@@ -72,14 +72,11 @@ class MainViewController(UIViewController):
 
     device = MTLCreateSystemDefaultDevice()
     metalView = MTKView.alloc().initWithFrame_device_(self.view.bounds, device)
-    
 
     renderer = Renderer.alloc().initWithDevice_(device)
-    #renderer.scene = LandscapeScene.alloc().initWithDevice_size_(device, self.view.bounds.size)
     renderer.scene = LandscapeScene.alloc().initWithDevice_size_(
       device, metalView.bounds.size)
 
-    #metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
     metalView.clearColor = Colors.skyBlue
     metalView.delegate = renderer
 
@@ -91,7 +88,6 @@ class MainViewController(UIViewController):
     self.metalView = metalView
     self.renderer = renderer
     self.setupLayoutConstraint()
-    print(f'viewDidLoad{metalView.bounds.size}')
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -112,7 +108,6 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    print(f'viewDidAppear{self.metalView.bounds.size}')
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
