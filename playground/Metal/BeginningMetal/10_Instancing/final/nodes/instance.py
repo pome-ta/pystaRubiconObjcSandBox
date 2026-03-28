@@ -5,7 +5,10 @@ from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 
-from objc_frameworks.Metal import MTLResourceOptions, MTLPixelFormat
+from objc_frameworks.Metal import (
+  MTLResourceOptions,
+  MTLPixelFormat,
+)
 
 from .node import Node
 from .model import Model

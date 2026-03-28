@@ -7,7 +7,10 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGFloat
 
-from objc_frameworks.Metal import MTLVertexFormat, MTLPixelFormat
+from objc_frameworks.Metal import (
+  MTLVertexFormat,
+  MTLPixelFormat,
+)
 
 from objc_frameworks.MetalKit import (
   MTKTextureLoaderOptionOrigin,
