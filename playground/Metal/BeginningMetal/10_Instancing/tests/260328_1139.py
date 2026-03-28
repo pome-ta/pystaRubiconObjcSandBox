@@ -28,5 +28,14 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
 
 from rbedge import pdbr
 
+from objc_frameworks.Metal import MTLCreateSystemDefaultDevice
+
 from nodes.instance import Instance
 
+device = MTLCreateSystemDefaultDevice()
+
+modelName = 'humanFigure'
+
+instance = Instance.alloc().initWithDevice_modelName_instances_(device, modelName, 40)
+
+pdbr.state(instance)

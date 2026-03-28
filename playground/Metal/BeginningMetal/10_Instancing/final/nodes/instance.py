@@ -1,4 +1,5 @@
 from pyrubicon.objc.api import objc_method, objc_property
+from pyrubicon.objc.runtime import send_super
 
 from .node import Node
 from .model import Model
@@ -16,3 +17,52 @@ class Instance(Node):
 
   modelConstants: ModelConstants = objc_property(object)
 
+  instanceBuffer: 'MTLBuffer?' = objc_property()
+
+  # Renderable
+  pipelineState: 'MTLRenderPipelineState!' = objc_property()
+  vertexFunctionName: str = objc_property(object)
+
+  fragmentFunctionName: str = objc_property(object)
+  vertexDescriptor: 'MTLVertexDescriptor' = objc_property()
+
+  @objc_method
+  def initializeProperties(self):
+    # todo: class member declarations
+    send_super(__class__, self, 'initializeProperties')
+
+    self.nodes = []
+    self.instanceConstants = []
+
+    self.modelConstants = ModelConstants()
+
+    # Renderable
+    self.vertexFunctionName = 'vertex_instance_shader'
+
+  @objc_method
+  def initWithDevice_modelName_instances_(self, device, modelName: object,
+                                          instances: int):
+    
+    
+    self.model = Model.alloc().initWithDevice_modelName_(device, modelName)
+    self.vertexDescriptor = self.model.vertexDescriptor
+    self.fragmentFunctionName = self.model.fragmentFunctionName
+    
+
+    send_super(__class__, self, 'init')
+    self.initializeProperties()
+
+    self.name = modelName
+    self.createInstances_(instances)
+    
+    return self
+
+
+  @objc_method
+  def createInstances_(self, instances:int):
+    for i in range(instances):
+      node = Node.new()
+      node.name = f'Instance {i}'
+      self.nodes.append(node)
+      self.instanceConstants.append(ModelConstants())
+      
