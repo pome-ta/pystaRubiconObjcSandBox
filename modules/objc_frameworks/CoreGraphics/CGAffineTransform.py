@@ -35,13 +35,18 @@ CGAffineTransformIdentity = CGAffineTransform.in_dll(
 
 
 def CGAffineTransformMakeScale(sx: CGFloat, sy: CGFloat) -> CGAffineTransform:
-  _function = CoreGraphics.CGAffineTransformMakeScale
-  _function.restype = CGAffineTransform
-  _function.argtypes = [
-    CGFloat,
-    CGFloat,
-  ]
-  return _function(sx, sy)
+  try:
+    _func = CGAffineTransformMakeScale._cfunc
+  except AttributeError:
+    _func = CoreGraphics.CGAffineTransformMakeScale
+    _func.restype = CGAffineTransform
+    _func.argtypes = [
+      CGFloat,
+      CGFloat,
+    ]
+    CGAffineTransformMakeScale._cfunc = _func
+
+  return _func(sx, sy)
 
 
 # CGAffineTransformMake
@@ -51,14 +56,19 @@ def CGAffineTransformMakeScale(sx: CGFloat, sy: CGFloat) -> CGAffineTransform:
 
 def CGAffineTransformTranslate(t: CGAffineTransform, sx: CGFloat,
                                sy: CGFloat) -> CGAffineTransform:
-  _function = CoreGraphics.CGAffineTransformTranslate
-  _function.restype = CGAffineTransform
-  _function.argtypes = [
-    CGAffineTransform,
-    CGFloat,
-    CGFloat,
-  ]
-  return _function(t, sx, sy)
+  try:
+    _func = CGAffineTransformTranslate._cfunc
+  except AttributeError:
+    _func = CoreGraphics.CGAffineTransformTranslate
+    _func.restype = CGAffineTransform
+    _func.argtypes = [
+      CGAffineTransform,
+      CGFloat,
+      CGFloat,
+    ]
+    CGAffineTransformTranslate._cfunc = _func
+
+  return _func(t, sx, sy)
 
 
 # CGAffineTransformScale
@@ -68,11 +78,16 @@ def CGAffineTransformTranslate(t: CGAffineTransform, sx: CGFloat,
 
 def CGAffineTransformConcat(t1: CGAffineTransform,
                             t2: CGAffineTransform) -> CGAffineTransform:
-  _function = CoreGraphics.CGAffineTransformConcat
-  _function.restype = CGAffineTransform
-  _function.argtypes = [
-    CGAffineTransform,
-    CGAffineTransform,
-  ]
-  return _function(t1, t2)
+  try:
+    _func = CGAffineTransformConcat._cfunc
+  except AttributeError:
+    _func = CoreGraphics.CGAffineTransformConcat
+    _func.restype = CGAffineTransform
+    _func.argtypes = [
+      CGAffineTransform,
+      CGAffineTransform,
+    ]
+    CGAffineTransformConcat._cfunc = _func
+
+  return _func(t1, t2)
 

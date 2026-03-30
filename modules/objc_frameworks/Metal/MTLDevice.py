@@ -1,15 +1,20 @@
-import ctypes
 from enum import IntEnum
 
 from pyrubicon.objc.api import ObjCInstance
+from pyrubicon.objc.runtime import objc_id
 
 from .constants import framework as Metal
 
 
 def MTLCreateSystemDefaultDevice() -> ObjCInstance:
-  _function = Metal.MTLCreateSystemDefaultDevice
-  _function.restype = ctypes.c_void_p
-  return ObjCInstance(_function())
+  try:
+    _func = MTLCreateSystemDefaultDevice._cfunc
+  except AttributeError:
+    _func = Metal.MTLCreateSystemDefaultDevice
+    _func.restype = objc_id
+    MTLCreateSystemDefaultDevice._cfunc = _func
+
+  return ObjCInstance(_func())
 
 
 class MTLGPUFamily(IntEnum):
@@ -54,5 +59,4 @@ class MTLGPUFamily(IntEnum):
   metal3 = 5001
   #[doc(alias = "MTLGPUFamilyMetal4")]
   metal4 = 5002
-  
 
