@@ -37,4 +37,5 @@ from nodes.instance import Instance
 
 for i in range(10):
   print(drand48())
+  #print(arc4random_uniform(5)/10)
 
