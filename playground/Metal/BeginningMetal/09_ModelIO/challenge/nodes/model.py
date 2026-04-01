@@ -283,7 +283,7 @@ class Model(Node, protocols=[
       commandEncoder.setFragmentTexture_atIndex_(self.texture, 0)
     commandEncoder.setRenderPipelineState_(self.pipelineState)
 
-    if (meshes := self.meshes) is None or len(self.meshes) == 0:
+    if not ((meshes := self.meshes) and len(self.meshes) > 0):
       return
 
     for mesh in meshes:
