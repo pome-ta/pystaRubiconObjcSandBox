@@ -4,7 +4,7 @@ from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGFloat
 
 from rbedge.utils import readonly_properties
-from rbedge.simd import simd_float3, simd_float4,matrix_multiply
+from rbedge.simd import simd_float3, simd_float4, matrix_multiply
 
 from .renderable import Renderable
 from matrixMath import matrix_float4x4
@@ -14,7 +14,7 @@ from matrixMath import matrix_float4x4
 class Node(NSObject):
 
   name: str = objc_property(object)
-  materialColor: 'float4'= objc_property(object)
+  materialColor: 'float4' = objc_property(object)
   children: ['Node'] = objc_property(object)
 
   position: 'float3' = objc_property(object)
@@ -43,7 +43,6 @@ class Node(NSObject):
     self.position = simd_float3(0)
     self.rotation = simd_float3(0)
     self.scale = simd_float3(1)
-
 
   @objc_method
   def init(self):

@@ -32,6 +32,8 @@ class CrowdScene(Scene):
                  CGSize,
                ])
 
+    self.initializeProperties()
+
     for _ in range(40):
       human = Model.alloc().initWithDevice_modelName_(device, 'humanFigure')
       self.humans.append(human)

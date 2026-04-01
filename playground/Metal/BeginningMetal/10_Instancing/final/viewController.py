@@ -40,7 +40,7 @@ from objc_frameworks.Metal import (
 )
 
 from renderer import Renderer
-from scenes import LandscapeScene
+from scenes import InstanceScene
 
 MTKView = ObjCClass('MTKView')
 
@@ -74,14 +74,14 @@ class MainViewController(UIViewController):
     metalView = MTKView.alloc().initWithFrame_device_(self.view.bounds, device)
 
     renderer = Renderer.alloc().initWithDevice_(device)
-    renderer.scene = LandscapeScene.alloc().initWithDevice_size_(
+    renderer.scene = InstanceScene.alloc().initWithDevice_size_(
       device, metalView.bounds.size)
 
     metalView.clearColor = Colors.skyBlue
     metalView.delegate = renderer
 
-    #metalView.enableSetNeedsDisplay = True
-    #metalView.setNeedsDisplay()
+    metalView.enableSetNeedsDisplay = True
+    metalView.setNeedsDisplay()
 
     self.view.addSubview_(metalView)
 

@@ -10,6 +10,8 @@ from objc_frameworks.Metal import (
   MTLPixelFormat,
 )
 
+from rbedge.simd import matrix_multiply
+
 from .node import Node
 from .model import Model
 from .renderable import Renderable
@@ -120,4 +122,44 @@ class Instance(Node, protocols=[
       print(f'pipelineState error: {e}')
 
     return pipelineState
+
+  # --- extension Renderable
+  @objc_method
+  def doRenderWithCommandEncoder_modelViewMatrix_(self, commandEncoder,
+                                                  modelViewMatrix: object):
+
+    if not ((instanceBuffer := self.instanceBuffer) and len(self.nodes) > 0):
+      return
+    '''
+    # pointer = bindMemory(...)
+    ptr = instanceBuffer.contents()
+    pointer = ctypes.cast(ptr, ctypes.POINTER(ModelConstants))
+    '''
+    pointer = ctypes.cast(instanceBuffer.contents(),
+                          ctypes.POINTER(ModelConstants))
+
+    for node in self.nodes:
+      pointer.contents.modelViewMatrix = matrix_multiply(
+        modelViewMatrix, node.modelMatrix)
+      pointer.contents.materialColor = node.materialColor
+
+      pointer = ctypes.pointer(pointer[1])
+
+    commandEncoder.setFragmentTexture_atIndex_(self.model.texture, 0)
+    commandEncoder.setRenderPipelineState_(self.pipelineState)
+    commandEncoder.setVertexBuffer_offset_atIndex_(instanceBuffer, 0, 1)
+
+    if not ((meshes := self.model.meshes) and len(meshes) > 0):
+      return
+
+    for mesh in meshes:
+      vertexBuffer = mesh.vertexBuffers.objectAtIndexedSubscript_(0)
+      commandEncoder.setVertexBuffer_offset_atIndex_(vertexBuffer.buffer,
+                                                     vertexBuffer.offset, 0)
+
+      for submesh in mesh.submeshes:
+        commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_instanceCount_(
+          submesh.primitiveType, submesh.indexCount, submesh.indexType,
+          submesh.indexBuffer.buffer, submesh.indexBuffer.offset,
+          len(self.nodes))
 

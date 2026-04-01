@@ -10,7 +10,7 @@ from .scene import Scene
 from nodes import Instance
 
 
-class CrowdScene(Scene):
+class InstanceScene(Scene):
 
   humans: Instance = objc_property()
 
