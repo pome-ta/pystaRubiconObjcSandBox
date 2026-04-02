@@ -131,22 +131,22 @@ class Instance(Node, protocols=[
 
     if not ((instanceBuffer := self.instanceBuffer) and len(self.nodes) > 0):
       return
-    '''
-    # pointer = bindMemory(...)
-    ptr = instanceBuffer.contents()
+    
+
+
+    ptr = instanceBuffer.contents
     pointer = ctypes.cast(ptr, ctypes.POINTER(ModelConstants))
     '''
-    #pointer = ctypes.cast(instanceBuffer.contents, ctypes.POINTER(ModelConstants))
-
-
-    '''
     for node in self.nodes:
-      pointer.contents.modelViewMatrix = matrix_multiply(
-        modelViewMatrix, node.modelMatrix)
+      pointer.contents.modelViewMatrix = matrix_multiply(modelViewMatrix, node.modelMatrix)
       pointer.contents.materialColor = node.materialColor
-
-      #pointer = ctypes.pointer(pointer[1])
+    
       pointer = pointer + 1
+    '''
+    for i, node in enumerate(self.nodes):
+      pointer[i].modelViewMatrix = matrix_multiply(modelViewMatrix, node.modelMatrix)
+      pointer[i].materialColor = node.materialColor
+    
     '''
     pointer = instanceBuffer.contents
     contents = (ModelConstants * len(self.instanceConstants))()
@@ -156,6 +156,7 @@ class Instance(Node, protocols=[
       content.materialColor = node.materialColor
     
     ctypes.memmove(pointer, contents, len(self.instanceConstants) * ctypes.sizeof(ModelConstants))
+    '''
     
 
     commandEncoder.setFragmentTexture_atIndex_(self.model.texture, 0)
