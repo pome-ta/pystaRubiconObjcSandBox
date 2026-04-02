@@ -78,7 +78,7 @@ class MainViewController(UIViewController):
       device, metalView.bounds.size)
 
     metalView.clearColor = Colors.skyBlue
-    metalView.delegate = renderer
+    #metalView.delegate = renderer
 
     metalView.enableSetNeedsDisplay = True
     metalView.setNeedsDisplay()

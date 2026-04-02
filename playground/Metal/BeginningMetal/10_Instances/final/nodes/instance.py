@@ -138,6 +138,7 @@ class Instance(Node, protocols=[
     pointer = ctypes.cast(instanceBuffer.contents(),
                           ctypes.POINTER(ModelConstants))
 
+    '''
     for node in self.nodes:
       pointer.contents.modelViewMatrix = matrix_multiply(
         modelViewMatrix, node.modelMatrix)
@@ -162,4 +163,4 @@ class Instance(Node, protocols=[
           submesh.primitiveType, submesh.indexCount, submesh.indexType,
           submesh.indexBuffer.buffer, submesh.indexBuffer.offset,
           len(self.nodes))
-
+    '''
