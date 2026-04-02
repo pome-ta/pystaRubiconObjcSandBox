@@ -11,6 +11,7 @@ from objc_frameworks.Metal import (
 )
 
 from rbedge.simd import matrix_multiply
+from rbedge import pdbr
 
 from .node import Node
 from .model import Model
@@ -135,8 +136,8 @@ class Instance(Node, protocols=[
     ptr = instanceBuffer.contents()
     pointer = ctypes.cast(ptr, ctypes.POINTER(ModelConstants))
     '''
-    pointer = ctypes.cast(instanceBuffer.contents(),
-                          ctypes.POINTER(ModelConstants))
+    #pointer = ctypes.cast(instanceBuffer.contents, ctypes.POINTER(ModelConstants))
+
 
     '''
     for node in self.nodes:
@@ -144,7 +145,18 @@ class Instance(Node, protocols=[
         modelViewMatrix, node.modelMatrix)
       pointer.contents.materialColor = node.materialColor
 
-      pointer = ctypes.pointer(pointer[1])
+      #pointer = ctypes.pointer(pointer[1])
+      pointer = pointer + 1
+    '''
+    pointer = instanceBuffer.contents
+    contents = (ModelConstants * len(self.instanceConstants))()
+    
+    for content, node in zip(contents, self.nodes):
+      content.modelViewMatrix = matrix_multiply(modelViewMatrix, node.modelMatrix)
+      content.materialColor = node.materialColor
+    
+    ctypes.memmove(pointer, contents, len(self.instanceConstants) * ctypes.sizeof(ModelConstants))
+    
 
     commandEncoder.setFragmentTexture_atIndex_(self.model.texture, 0)
     commandEncoder.setRenderPipelineState_(self.pipelineState)
@@ -163,4 +175,4 @@ class Instance(Node, protocols=[
           submesh.primitiveType, submesh.indexCount, submesh.indexType,
           submesh.indexBuffer.buffer, submesh.indexBuffer.offset,
           len(self.nodes))
-    '''
+

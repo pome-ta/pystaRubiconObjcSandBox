@@ -26,19 +26,27 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
   sys.path.insert(0, str(pathlib.Path(__file__).parent.parent / 'final'))
   #sys.path.insert(0, str(pathlib.Path(__file__).parent.parent / 'challenge'))
 
+
+import ctypes
 from rbedge import pdbr
-from rbedge.stdlib import arc4random_uniform, drand48
+
 
 from objc_frameworks.Metal import MTLCreateSystemDefaultDevice
 
 from nodes.instance import Instance
-
+from simdTypes import ModelConstants
 
 device = MTLCreateSystemDefaultDevice()
 
 instance = Instance.alloc().initWithDevice_modelName_instances_(
       device, 'humanFigure', 40)
 
-ptr = instance.instanceBuffer.contents
 
-print(ptr)
+pointer = ctypes.cast(instance.instanceBuffer.contents,
+                          ctypes.POINTER(ModelConstants))
+
+
+
+
+print(pointer.contents.modelViewMatrix)
+#print(dir(pointer))

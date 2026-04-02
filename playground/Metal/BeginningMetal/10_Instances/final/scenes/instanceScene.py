@@ -30,7 +30,6 @@ class InstanceScene(Scene):
                ])
 
     self.addChildNode_(self.humans)
-    print(self.humans.nodes)
 
     for _ in range(40):
       for human in self.humans.nodes:
