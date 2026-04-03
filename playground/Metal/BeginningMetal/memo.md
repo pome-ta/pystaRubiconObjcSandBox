@@ -5,6 +5,10 @@
 [Programming Metal in iOS - YouTube](https://m.youtube.com/playlist?list=PL23Revp-82LJG3vcDPm8w7b5HTKjBOY0W)
 
 
+## 11. Ambient Lighting
+
+[Beginning Metal, Episode 11: Ambient Lighting | Kodeco](https://www.kodeco.com/3537-beginning-metal/lessons/11)
+
 ## 10. Instancing
 
 [Beginning Metal, Episode 10: Instancing | Kodeco](https://www.kodeco.com/3537-beginning-metal/lessons/10)
