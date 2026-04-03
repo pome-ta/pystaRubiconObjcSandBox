@@ -1,8 +1,10 @@
+from math import radians
+
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGSize, CGFloat
 
-from rbedge.simd import simd_float4
+from rbedge.simd import simd_float3, simd_float4
 
 # todo: Pythonista3 の`scene.Scene` ではない
 from .scene import Scene
@@ -48,6 +50,13 @@ class LandscapeScene(Scene):
     self.addChildNode_(self.ground)
     self.addChildNode_(self.grass)
     self.addChildNode_(self.mushroom)
+
+    self.ground.scale = simd_float3(20)
+    self.ground.rotation.x = radians(90)
+
+    self.camera.rotation.x = radians(-10)
+    self.camera.position.z = -20
+    self.camera.position.y = -2
 
   # --- override
   @objc_method
