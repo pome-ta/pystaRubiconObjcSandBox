@@ -130,7 +130,7 @@ class Primitive(
     self.modelConstants = ModelConstants()
 
     # Renderable
-    self.fragmentFunctionName = 'fragment_shader'
+    self.fragmentFunctionName = 'fragment_color'
     self.vertexFunctionName = 'vertex_shader'
 
   @objc_method
@@ -271,6 +271,7 @@ class Primitive(
       return
 
     self.modelConstants.modelViewMatrix = modelViewMatrix
+    self.modelConstants.materialColor = self.materialColor
     commandEncoder.setRenderPipelineState_(self.pipelineState)
     commandEncoder.setVertexBuffer_offset_atIndex_(
       self.vertexBuffer,
