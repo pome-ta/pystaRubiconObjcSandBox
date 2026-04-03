@@ -26,7 +26,7 @@ class LandscapeScene(Scene):
       device,
       'grass',
       10000,
-    )  # 10000
+    )
     self.mushroom = Model.alloc().initWithDevice_modelName_(device, 'mushroom')
     self.sun = Model.alloc().initWithDevice_modelName_(device, 'sun')
     send_super(__class__,
@@ -76,6 +76,18 @@ class LandscapeScene(Scene):
 
         blade.materialColor = greens[int(arc4random_uniform(3))]
         blade.rotation.y = radians(float(arc4random_uniform(360)))
+
+    self.grass.position.x = -12
+    self.grass.position.z = -12
+    self.mushroom.position.x = -6
+    self.mushroom.position.z = -8
+    self.mushroom.scale = simd_float3(2)
+
+    self.sun.position.y = 7
+    self.sun.position.x = 6
+    self.sun.scale = simd_float3(2)
+
+    #self.camera.fovDegrees = 25
 
   # --- override
   @objc_method
