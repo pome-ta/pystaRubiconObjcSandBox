@@ -65,7 +65,10 @@ class Renderer(
   # --- MTKViewDelegate
   @objc_method
   def mtkView_drawableSizeWillChange_(self, view, size: CGSize):
-    pass
+    try:  # `scene?.`
+      self.scene.sceneSizeWillChangeTo_(size)
+    except Exception as e:
+      print(e)
 
   @objc_method
   def drawInMTKView_(self, view):
@@ -78,7 +81,10 @@ class Renderer(
       descriptor)
 
     deltaTime = 1 / view.preferredFramesPerSecond
-    commandEncoder.setFragmentSamplerState_atIndex_(self.samplerState, 0)
+    commandEncoder.setFragmentSamplerState_atIndex_(
+      self.samplerState,
+      0,
+    )
     commandEncoder.setDepthStencilState_(self.depthStencilState)
 
     try:  # `scene?.`

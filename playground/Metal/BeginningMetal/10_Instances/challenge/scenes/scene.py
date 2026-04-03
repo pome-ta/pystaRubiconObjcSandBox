@@ -33,9 +33,7 @@ class Scene(Node):
 
     send_super(__class__, self, 'init')
 
-    self.camera.aspect = size.width / size.height
     self.camera.position.z = -6.0
-
     self.addChildNode_(self.camera)
 
     return self
@@ -65,4 +63,8 @@ class Scene(Node):
         commandEncoder,
         self.camera.viewMatrix,
       )
+
+  @objc_method
+  def sceneSizeWillChangeTo_(self, size: CGSize):
+    self.camera.aspect = float(size.width / size.height)
 
