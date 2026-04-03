@@ -29,8 +29,12 @@ class Camera(Node):
 
   @objc_method  # declare_property - getter
   def projectionMatrix(self) -> object:
-    return matrix_float4x4.projectionFov(self.fovRadians, self.aspect,
-                                         self.nearZ, self.farZ)
+    return matrix_float4x4.projectionFov(
+      self.fovRadians,
+      self.aspect,
+      self.nearZ,
+      self.farZ,
+    )
 
   @objc_method
   def initializeProperties(self):

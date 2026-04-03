@@ -71,11 +71,16 @@ class MainViewController(UIViewController):
     self.navigationItem.title = NSStringFromClass(__class__)
 
     device = MTLCreateSystemDefaultDevice()
-    metalView = MTKView.alloc().initWithFrame_device_(self.view.bounds, device)
+    metalView = MTKView.alloc().initWithFrame_device_(
+      self.view.bounds,
+      device,
+    )
 
     renderer = Renderer.alloc().initWithDevice_(device)
     renderer.scene = InstanceScene.alloc().initWithDevice_size_(
-      device, metalView.bounds.size)
+      device,
+      metalView.bounds.size,
+    )
 
     metalView.clearColor = Colors.skyBlue
     metalView.delegate = renderer
@@ -146,9 +151,13 @@ class MainViewController(UIViewController):
       self.metalView.centerYAnchor.constraintEqualToAnchor_(
         safeAreaLayoutGuide.centerYAnchor),
       self.metalView.widthAnchor.constraintEqualToAnchor_multiplier_(
-        safeAreaLayoutGuide.widthAnchor, 0.88),
+        safeAreaLayoutGuide.widthAnchor,
+        0.88,
+      ),
       self.metalView.heightAnchor.constraintEqualToAnchor_multiplier_(
-        safeAreaLayoutGuide.heightAnchor, 0.88),
+        safeAreaLayoutGuide.heightAnchor,
+        0.88,
+      ),
     ])
 
 

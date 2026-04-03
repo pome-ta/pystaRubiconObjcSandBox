@@ -27,9 +27,12 @@ ROOT_PATH = Path(__file__).parents[1]
 shader_path = ROOT_PATH / 'Shader.metal'
 
 
-class Instance(Node, protocols=[
-    Renderable,
-]):
+class Instance(
+    Node,
+    protocols=[
+      Renderable,
+    ],
+):
 
   model: Model = objc_property()
 
@@ -61,10 +64,17 @@ class Instance(Node, protocols=[
     self.vertexFunctionName = 'vertex_instance_shader'
 
   @objc_method
-  def initWithDevice_modelName_instances_(self, device, modelName: object,
-                                          instances: int):
+  def initWithDevice_modelName_instances_(
+    self,
+    device,
+    modelName: object,
+    instances: int,
+  ):
 
-    self.model = Model.alloc().initWithDevice_modelName_(device, modelName)
+    self.model = Model.alloc().initWithDevice_modelName_(
+      device,
+      modelName,
+    )
     self.vertexDescriptor = self.model.vertexDescriptor
     self.fragmentFunctionName = self.model.fragmentFunctionName
 
@@ -91,7 +101,8 @@ class Instance(Node, protocols=[
   def makeBufferWithDevice_(self, device):
     self.instanceBuffer = device.newBufferWithLength_options_(
       len(self.instanceConstants) * ctypes.sizeof(ModelConstants),
-      MTLResourceOptions.storageModeShared)
+      MTLResourceOptions.storageModeShared,
+    )
 
     self.instanceBuffer.label = 'Instance Buffer'
 
@@ -118,7 +129,9 @@ class Instance(Node, protocols=[
     pipelineState = None
     try:
       pipelineState = device.newRenderPipelineStateWithDescriptor_error_(
-        pipelineDescriptor, None)
+        pipelineDescriptor,
+        None,
+      )
     except Exception as e:
       print(f'pipelineState error: {e}')
 
@@ -126,38 +139,26 @@ class Instance(Node, protocols=[
 
   # --- extension Renderable
   @objc_method
-  def doRenderWithCommandEncoder_modelViewMatrix_(self, commandEncoder,
-                                                  modelViewMatrix: object):
+  def doRenderWithCommandEncoder_modelViewMatrix_(
+    self,
+    commandEncoder,
+    modelViewMatrix: object,
+  ):
 
     if not ((instanceBuffer := self.instanceBuffer) and len(self.nodes) > 0):
       return
-    
 
+    pointer = ctypes.cast(
+      instanceBuffer.contents,
+      ctypes.POINTER(ModelConstants),
+    )
 
-    ptr = instanceBuffer.contents
-    pointer = ctypes.cast(ptr, ctypes.POINTER(ModelConstants))
-    '''
-    for node in self.nodes:
-      pointer.contents.modelViewMatrix = matrix_multiply(modelViewMatrix, node.modelMatrix)
-      pointer.contents.materialColor = node.materialColor
-    
-      pointer = pointer + 1
-    '''
-    for i, node in enumerate(self.nodes):
-      pointer[i].modelViewMatrix = matrix_multiply(modelViewMatrix, node.modelMatrix)
-      pointer[i].materialColor = node.materialColor
-    
-    '''
-    pointer = instanceBuffer.contents
-    contents = (ModelConstants * len(self.instanceConstants))()
-    
-    for content, node in zip(contents, self.nodes):
-      content.modelViewMatrix = matrix_multiply(modelViewMatrix, node.modelMatrix)
-      content.materialColor = node.materialColor
-    
-    ctypes.memmove(pointer, contents, len(self.instanceConstants) * ctypes.sizeof(ModelConstants))
-    '''
-    
+    for idx, node in enumerate(self.nodes):
+      pointer[idx].modelViewMatrix = matrix_multiply(
+        modelViewMatrix,
+        node.modelMatrix,
+      )
+      pointer[idx].materialColor = node.materialColor
 
     commandEncoder.setFragmentTexture_atIndex_(self.model.texture, 0)
     commandEncoder.setRenderPipelineState_(self.pipelineState)
@@ -168,12 +169,19 @@ class Instance(Node, protocols=[
 
     for mesh in meshes:
       vertexBuffer = mesh.vertexBuffers.objectAtIndexedSubscript_(0)
-      commandEncoder.setVertexBuffer_offset_atIndex_(vertexBuffer.buffer,
-                                                     vertexBuffer.offset, 0)
+      commandEncoder.setVertexBuffer_offset_atIndex_(
+        vertexBuffer.buffer,
+        vertexBuffer.offset,
+        0,
+      )
 
       for submesh in mesh.submeshes:
         commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_instanceCount_(
-          submesh.primitiveType, submesh.indexCount, submesh.indexType,
-          submesh.indexBuffer.buffer, submesh.indexBuffer.offset,
-          len(self.nodes))
+          submesh.primitiveType,
+          submesh.indexCount,
+          submesh.indexType,
+          submesh.indexBuffer.buffer,
+          submesh.indexBuffer.offset,
+          len(self.nodes),
+        )
 

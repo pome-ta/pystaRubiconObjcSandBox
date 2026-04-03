@@ -1,6 +1,11 @@
 from math import cos, sin, tan, pi
 
-from rbedge.simd import simd_float4x4, simd_float3x3, simd_float4, matrix_multiply
+from rbedge.simd import (
+  simd_float4,
+  simd_float3x3,
+  simd_float4x4,
+  matrix_multiply,
+)
 
 
 def radians(fromDegrees: float) -> float:
@@ -63,27 +68,37 @@ class matrix_float4x4(simd_float4x4):
       x * z * (1 - c) + y * s,
       0,
     )
-
     column1 = simd_float4(
       x * y * (1 - c) + z * s,
       y * y + (1 - y * y) * c,
       y * z * (1 - c) - x * s,
       0,
     )
-
     column2 = simd_float4(
       x * z * (1 - c) - y * s,
       y * z * (1 - c) + x * s,
       z * z + (1 - z * z) * c,
       0,
     )
+    column3 = simd_float4(
+      0,
+      0,
+      0,
+      1,
+    )
 
-    column3 = simd_float4(0, 0, 0, 1)
-
-    return cls.from_columns(column0, column1, column2, column3)
+    return cls.from_columns(
+      column0,
+      column1,
+      column2,
+      column3,
+    )
 
   def rotatedBy(self, angle: float, x: float, y: float, z: float):
-    return matrix_multiply(self, matrix_float4x4.rotationAngle(angle, x, y, z))
+    return matrix_multiply(
+      self,
+      matrix_float4x4.rotationAngle(angle, x, y, z),
+    )
 
   @classmethod
   def projectionFov(cls, fov: float, aspect: float, nearZ: float, farZ: float):

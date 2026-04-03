@@ -15,7 +15,10 @@ class GameScene(Scene):
 
   @objc_method
   def initWithDevice_size_(self, device, size: CGSize):
-    self.mushroom = Model.alloc().initWithDevice_modelName_(device, 'mushroom')
+    self.mushroom = Model.alloc().initWithDevice_modelName_(
+      device,
+      'mushroom',
+    )
 
     send_super(__class__,
                self,

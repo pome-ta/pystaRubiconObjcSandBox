@@ -69,7 +69,10 @@ def get_image_path(imageName: str) -> str | None:
   return _get_filepath(imageName)
 
 
-def get_model_path(modelName: str, extension: str = '') -> str | None:
+def get_model_path(
+  modelName: str,
+  extension: str = '',
+) -> str | None:
   return _get_filepath(f'{modelName}.{extension}')
 
 
@@ -77,10 +80,13 @@ shader_path = ROOT_PATH / 'Shader.metal'
 
 
 @readonly_properties('vertexDescriptor')
-class Model(Node, protocols=[
-    Renderable,
-    Texturable,
-]):
+class Model(
+    Node,
+    protocols=[
+      Renderable,
+      Texturable,
+    ],
+):
 
   meshes: '[AnyObject]?' = objc_property()
 
@@ -176,27 +182,35 @@ class Model(Node, protocols=[
             raise ValueError(f'{idx}: {attribute=}')
           attributePosition.name = MDLVertexAttributePosition
           descriptor.attributes.setObject_atIndexedSubscript_(
-            attributePosition, idx)
+            attributePosition,
+            idx,
+          )
         case 1:
           if not isinstance((attributeColor := attribute), MDLVertexAttribute):
             raise ValueError(f'{idx}: {attribute=}')
           attributeColor.name = MDLVertexAttributeColor
           descriptor.attributes.setObject_atIndexedSubscript_(
-            attributeColor, idx)
+            attributeColor,
+            idx,
+          )
         case 2:
           if not isinstance(
             (attributeTexture := attribute), MDLVertexAttribute):
             raise ValueError(f'{idx}: {attribute=}')
           attributeTexture.name = MDLVertexAttributeTextureCoordinate
           descriptor.attributes.setObject_atIndexedSubscript_(
-            attributeTexture, idx)
+            attributeTexture,
+            idx,
+          )
         case 3:
           if not isinstance(
             (attributeNormal := attribute), MDLVertexAttribute):
             raise ValueError(f'{idx}: {attribute=}')
           attributeNormal.name = MDLVertexAttributeNormal
           descriptor.attributes.setObject_atIndexedSubscript_(
-            attributeNormal, idx)
+            attributeNormal,
+            idx,
+          )
         case _:
           import logging
           error = IndexError(f'{idx=}: list index out of range')
@@ -205,11 +219,18 @@ class Model(Node, protocols=[
     bufferAllocator = MTKMeshBufferAllocator.alloc().initWithDevice_(device)
 
     asset = MDLAsset.alloc().initWithURL_vertexDescriptor_bufferAllocator_(
-      nsurl(str(assetURL)), descriptor, bufferAllocator)
+      nsurl(str(assetURL)),
+      descriptor,
+      bufferAllocator,
+    )
 
     try:
       self.meshes = MTKMesh.newMeshesFromAsset_device_sourceMeshes_error_(
-        asset, device, None, None)
+        asset,
+        device,
+        None,
+        None,
+      )
     except Exception as e:
       print(e)
 
@@ -224,12 +245,17 @@ class Model(Node, protocols=[
     origin = str(MTKTextureLoaderOriginBottomLeft)
 
     textureLoaderOptions = NSDictionary.dictionaryWithObject_forKey_(
-      origin, MTKTextureLoaderOptionOrigin)
+      origin,
+      MTKTextureLoaderOptionOrigin,
+    )
 
     if (textureURL := get_image_path(imageName)):
       try:
         texture = textureLoader.newTextureWithContentsOfURL_options_error_(
-          nsurl(textureURL), textureLoaderOptions, None)
+          nsurl(textureURL),
+          textureLoaderOptions,
+          None,
+        )
 
       except Exception:
         print('texture not created')
@@ -243,7 +269,11 @@ class Model(Node, protocols=[
     source = shader_path.read_text('utf-8')
     options = MTLCompileOptions.new()
 
-    library = device.newLibraryWithSource_options_error_(source, options, None)
+    library = device.newLibraryWithSource_options_error_(
+      source,
+      options,
+      None,
+    )
 
     vertexFunction = library.newFunctionWithName_(self.vertexFunctionName)
     fragmentFunction = library.newFunctionWithName_(self.fragmentFunctionName)
@@ -259,7 +289,9 @@ class Model(Node, protocols=[
     pipelineState = None
     try:
       pipelineState = device.newRenderPipelineStateWithDescriptor_error_(
-        pipelineDescriptor, None)
+        pipelineDescriptor,
+        None,
+      )
     except Exception as e:
       print(f'pipelineState error: {e}')
 
@@ -267,13 +299,19 @@ class Model(Node, protocols=[
 
   # --- extension Renderable
   @objc_method
-  def doRenderWithCommandEncoder_modelViewMatrix_(self, commandEncoder,
-                                                  modelViewMatrix: object):
+  def doRenderWithCommandEncoder_modelViewMatrix_(
+    self,
+    commandEncoder,
+    modelViewMatrix: object,
+  ):
     self.modelConstants.modelViewMatrix = modelViewMatrix
     self.modelConstants.materialColor = self.materialColor
 
     commandEncoder.setVertexBytes_length_atIndex_(
-      ctypes.byref(self.modelConstants), ctypes.sizeof(self.modelConstants), 1)
+      ctypes.byref(self.modelConstants),
+      ctypes.sizeof(self.modelConstants),
+      1,
+    )
     if self.texture != None:
       commandEncoder.setFragmentTexture_atIndex_(self.texture, 0)
     commandEncoder.setRenderPipelineState_(self.pipelineState)
@@ -283,10 +321,17 @@ class Model(Node, protocols=[
 
     for mesh in meshes:
       vertexBuffer = mesh.vertexBuffers.objectAtIndexedSubscript_(0)
-      commandEncoder.setVertexBuffer_offset_atIndex_(vertexBuffer.buffer,
-                                                     vertexBuffer.offset, 0)
+      commandEncoder.setVertexBuffer_offset_atIndex_(
+        vertexBuffer.buffer,
+        vertexBuffer.offset,
+        0,
+      )
       for submesh in mesh.submeshes:
         commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
-          submesh.primitiveType, submesh.indexCount, submesh.indexType,
-          submesh.indexBuffer.buffer, submesh.indexBuffer.offset)
+          submesh.primitiveType,
+          submesh.indexCount,
+          submesh.indexType,
+          submesh.indexBuffer.buffer,
+          submesh.indexBuffer.offset,
+        )
 

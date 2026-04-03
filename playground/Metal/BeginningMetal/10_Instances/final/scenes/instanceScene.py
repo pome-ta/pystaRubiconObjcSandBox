@@ -17,7 +17,10 @@ class InstanceScene(Scene):
   @objc_method
   def initWithDevice_size_(self, device, size: CGSize):
     self.humans = Instance.alloc().initWithDevice_modelName_instances_(
-      device, 'humanFigure', 40)
+      device,
+      'humanFigure',
+      40,
+    )
 
     send_super(__class__,
                self,
@@ -33,11 +36,15 @@ class InstanceScene(Scene):
 
     for _ in range(40):
       for human in self.humans.nodes:
-
         human.scale = simd_float3(arc4random_uniform(5) / 10)
         human.position.x = float(arc4random_uniform(5)) - 2
         human.position.y = float(arc4random_uniform(5)) - 3
-        human.materialColor = simd_float4(drand48(), drand48(), drand48(), 1.0)
+        human.materialColor = simd_float4(
+          drand48(),
+          drand48(),
+          drand48(),
+          1.0,
+        )
 
     return self
 

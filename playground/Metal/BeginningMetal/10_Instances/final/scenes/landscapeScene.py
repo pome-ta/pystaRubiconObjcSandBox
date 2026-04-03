@@ -15,7 +15,10 @@ class LandscapeScene(Scene):
 
   @objc_method
   def initWithDevice_size_(self, device, size: CGSize):
-    self.sun = Model.alloc().initWithDevice_modelName_(device, 'sun')
+    self.sun = Model.alloc().initWithDevice_modelName_(
+      device,
+      'sun',
+    )
 
     send_super(__class__,
                self,

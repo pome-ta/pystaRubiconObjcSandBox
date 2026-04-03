@@ -58,7 +58,10 @@ class Node(NSObject):
   @objc_method
   def renderWithCommandEncoder_parentModelViewMatrix_(
       self, commandEncoder, parentModelViewMatrix: object):
-    modelViewMatrix = matrix_multiply(parentModelViewMatrix, self.modelMatrix)
+    modelViewMatrix = matrix_multiply(
+      parentModelViewMatrix,
+      self.modelMatrix,
+    )
 
     for child in self.children:
       child.renderWithCommandEncoder_parentModelViewMatrix_(
@@ -67,6 +70,8 @@ class Node(NSObject):
     if self.conformsToProtocol_(Renderable) and (renderable := self):
       commandEncoder.pushDebugGroup_(self.name)
       renderable.doRenderWithCommandEncoder_modelViewMatrix_(
-        commandEncoder, modelViewMatrix)
+        commandEncoder,
+        modelViewMatrix,
+      )
       commandEncoder.popDebugGroup()
 

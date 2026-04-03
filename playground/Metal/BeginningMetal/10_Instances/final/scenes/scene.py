@@ -45,16 +45,24 @@ class Scene(Node):
     pass
 
   @objc_method
-  def renderWithCommandEncoder_deltaTime_(self, commandEncoder,
-                                          deltaTime: CGFloat):
+  def renderWithCommandEncoder_deltaTime_(
+    self,
+    commandEncoder,
+    deltaTime: CGFloat,
+  ):
     self.updateWithDeltaTime_(deltaTime)
 
     self.sceneConstants.projectionMatrix = self.camera.projectionMatrix
 
     commandEncoder.setVertexBytes_length_atIndex_(
-      ctypes.byref(self.sceneConstants), ctypes.sizeof(self.sceneConstants), 2)
+      ctypes.byref(self.sceneConstants),
+      ctypes.sizeof(self.sceneConstants),
+      2,
+    )
 
     for child in self.children:
       child.renderWithCommandEncoder_parentModelViewMatrix_(
-        commandEncoder, self.camera.viewMatrix)
+        commandEncoder,
+        self.camera.viewMatrix,
+      )
 

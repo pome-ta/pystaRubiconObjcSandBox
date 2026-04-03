@@ -3,7 +3,10 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGSize
 
-from objc_frameworks.Metal import MTLSamplerMinMagFilter, MTLCompareFunction
+from objc_frameworks.Metal import (
+  MTLSamplerMinMagFilter,
+  MTLCompareFunction,
+)
 
 from scenes import Scene
 
@@ -13,9 +16,12 @@ MTLDepthStencilDescriptor = ObjCClass('MTLDepthStencilDescriptor')
 MTKViewDelegate = ObjCProtocol('MTKViewDelegate')
 
 
-class Renderer(NSObject, protocols=[
-    MTKViewDelegate,
-]):
+class Renderer(
+    NSObject,
+    protocols=[
+      MTKViewDelegate,
+    ],
+):
 
   device: 'MTLDevice' = objc_property()
   commandQueue: 'MTLCommandQueue' = objc_property()
@@ -76,7 +82,10 @@ class Renderer(NSObject, protocols=[
     commandEncoder.setDepthStencilState_(self.depthStencilState)
 
     try:  # `scene?.`
-      self.scene.renderWithCommandEncoder_deltaTime_(commandEncoder, deltaTime)
+      self.scene.renderWithCommandEncoder_deltaTime_(
+        commandEncoder,
+        deltaTime,
+      )
     except Exception as e:
       print(e)
 

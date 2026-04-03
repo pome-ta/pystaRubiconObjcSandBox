@@ -41,7 +41,12 @@ class CrowdScene(Scene):
       human.scale = simd_float3(arc4random_uniform(5) / 10)
       human.position.x = float(arc4random_uniform(5)) - 2
       human.position.y = float(arc4random_uniform(5)) - 3
-      human.materialColor = simd_float4(drand48(), drand48(), drand48(), 1.0)
+      human.materialColor = simd_float4(
+        drand48(),
+        drand48(),
+        drand48(),
+        1.0,
+      )
 
     return self
 

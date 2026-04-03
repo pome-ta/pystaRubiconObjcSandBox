@@ -10,8 +10,11 @@ class Renderable(metaclass=ObjCProtocol):
   vertexDescriptor: 'MTLVertexDescriptor' = objc_property()
 
   @objc_method
-  def doRenderWithCommandEncoder_modelViewMatrix_(self, commandEncoder,
-                                                  modelViewMatrix: object):
+  def doRenderWithCommandEncoder_modelViewMatrix_(
+    self,
+    commandEncoder,
+    modelViewMatrix: object,
+  ):
     ...
 
   @objc_method

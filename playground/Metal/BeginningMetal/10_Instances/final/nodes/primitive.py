@@ -59,10 +59,13 @@ shader_path = ROOT_PATH / 'Shader.metal'
 
 
 @readonly_properties('vertexDescriptor')
-class Primitive(Node, protocols=[
-    Renderable,
-    Texturable,
-]):
+class Primitive(
+    Node,
+    protocols=[
+      Renderable,
+      Texturable,
+    ],
+):
 
   vertices: '[Vertices]' = objc_property(object)
   indices: '[UInt16]' = objc_property(object)
@@ -193,7 +196,10 @@ class Primitive(Node, protocols=[
     if (textureURL := nsurl(get_image_path(imageName))):
       try:
         texture = textureLoader.newTextureWithContentsOfURL_options_error_(
-          textureURL, textureLoaderOptions, None)
+          textureURL,
+          textureLoaderOptions,
+          None,
+        )
 
       except Exception:
         print('texture not created')
@@ -207,7 +213,11 @@ class Primitive(Node, protocols=[
     source = shader_path.read_text('utf-8')
     options = MTLCompileOptions.new()
 
-    library = device.newLibraryWithSource_options_error_(source, options, None)
+    library = device.newLibraryWithSource_options_error_(
+      source,
+      options,
+      None,
+    )
 
     vertexFunction = library.newFunctionWithName_(self.vertexFunctionName)
     fragmentFunction = library.newFunctionWithName_(self.fragmentFunctionName)
@@ -223,7 +233,9 @@ class Primitive(Node, protocols=[
     pipelineState = None
     try:
       pipelineState = device.newRenderPipelineStateWithDescriptor_error_(
-        pipelineDescriptor, None)
+        pipelineDescriptor,
+        None,
+      )
     except Exception as e:
       print(f'pipelineState error: {e}')
 
@@ -237,11 +249,15 @@ class Primitive(Node, protocols=[
   @objc_method
   def buildBuffersWithDevice_(self, device):
     vertexBuffer = device.newBufferWithBytes_length_options_(
-      self.vertices, ctypes.sizeof(self.vertices),
-      MTLResourceOptions.storageModeShared)
+      self.vertices,
+      ctypes.sizeof(self.vertices),
+      MTLResourceOptions.storageModeShared,
+    )
     indexBuffer = device.newBufferWithBytes_length_options_(
-      self.indices, ctypes.sizeof(self.indices),
-      MTLResourceOptions.storageModeShared)
+      self.indices,
+      ctypes.sizeof(self.indices),
+      MTLResourceOptions.storageModeShared,
+    )
 
     self.vertexBuffer = vertexBuffer
     self.indexBuffer = indexBuffer
@@ -256,15 +272,26 @@ class Primitive(Node, protocols=[
 
     self.modelConstants.modelViewMatrix = modelViewMatrix
     commandEncoder.setRenderPipelineState_(self.pipelineState)
-    commandEncoder.setVertexBuffer_offset_atIndex_(self.vertexBuffer, 0, 0)
+    commandEncoder.setVertexBuffer_offset_atIndex_(
+      self.vertexBuffer,
+      0,
+      0,
+    )
     commandEncoder.setVertexBytes_length_atIndex_(
-      ctypes.byref(self.modelConstants), ctypes.sizeof(self.modelConstants), 1)
+      ctypes.byref(self.modelConstants),
+      ctypes.sizeof(self.modelConstants),
+      1,
+    )
     commandEncoder.setFragmentTexture_atIndex_(self.texture, 0)
     commandEncoder.setFragmentTexture_atIndex_(self.maskTexture, 1)
     commandEncoder.setFrontFacingWinding_(MTLWinding.counterClockwise)
     commandEncoder.setCullMode_(MTLCullMode.back)
 
     commandEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
-      MTLPrimitiveType.triangle, self.indices.__len__(), MTLIndexType.uInt16,
-      indexBuffer, 0)
+      MTLPrimitiveType.triangle,
+      len(self.indices),
+      MTLIndexType.uInt16,
+      indexBuffer,
+      0,
+    )
 
