@@ -5,6 +5,7 @@ from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGSize, CGFloat
 
 from rbedge.simd import simd_float3, simd_float4
+from rbedge.stdlib import arc4random_uniform
 
 # todo: Pythonista3 の`scene.Scene` ではない
 from .scene import Scene
@@ -24,7 +25,7 @@ class LandscapeScene(Scene):
     self.grass = Instance.alloc().initWithDevice_modelName_instances_(
       device,
       'grass',
-      100,
+      10000,
     )  # 10000
     self.mushroom = Model.alloc().initWithDevice_modelName_(device, 'mushroom')
     self.sun = Model.alloc().initWithDevice_modelName_(device, 'sun')
@@ -57,6 +58,24 @@ class LandscapeScene(Scene):
     self.camera.rotation.x = radians(-10)
     self.camera.position.z = -20
     self.camera.position.y = -2
+
+    greens = [
+      simd_float4(0.34, 0.51, 0.01, 1),
+      simd_float4(0.5, 0.5, 0, 1),
+      simd_float4(0.29, 0.36, 0.14, 1),
+    ]
+    for row in range(100):
+      for column in range(100):
+        position = simd_float3(0)
+        position.x = float(row) / 4
+        position.z = float(column) / 4
+
+        blade = self.grass.nodes[row * 100 + column]
+        blade.scale = simd_float3(0.5)
+        blade.position = position
+
+        blade.materialColor = greens[int(arc4random_uniform(3))]
+        blade.rotation.y = radians(float(arc4random_uniform(360)))
 
   # --- override
   @objc_method
