@@ -6,20 +6,26 @@ from rbedge.simd import simd_float4
 
 # todo: Pythonista3 の`scene.Scene` ではない
 from .scene import Scene
-from nodes import Model
+from nodes import Model, Plane, Instance
 
 
 class LandscapeScene(Scene):
 
   sun: Model = objc_property()
+  ground: Plane = objc_property()
+  grass: Instance = objc_property()
+  mushroom: Model = objc_property()
 
   @objc_method
   def initWithDevice_size_(self, device, size: CGSize):
-    self.sun = Model.alloc().initWithDevice_modelName_(
+    self.ground = Plane.alloc().initWithDevice_(device)
+    self.grass = Instance.alloc().initWithDevice_modelName_instances_(
       device,
-      'sun',
-    )
-
+      'grass',
+      100,
+    )  # 10000
+    self.mushroom = Model.alloc().initWithDevice_modelName_(device, 'mushroom')
+    self.sun = Model.alloc().initWithDevice_modelName_(device, 'sun')
     send_super(__class__,
                self,
                'initWithDevice:size:',
@@ -31,10 +37,17 @@ class LandscapeScene(Scene):
                ])
 
     self.addChildNode_(self.sun)
-
     self.sun.materialColor = simd_float4(1.0, 1.0, 0.0, 1.0)
+    self.setupScene()
 
     return self
+
+  @objc_method
+  def setupScene(self):
+    self.ground.materialColor = simd_float4(0.4, 0.3, 0.1, 1)  # brown
+    self.addChildNode_(self.ground)
+    self.addChildNode_(self.grass)
+    self.addChildNode_(self.mushroom)
 
   # --- override
   @objc_method
