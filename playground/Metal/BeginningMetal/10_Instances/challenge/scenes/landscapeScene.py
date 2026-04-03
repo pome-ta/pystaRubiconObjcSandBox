@@ -87,7 +87,7 @@ class LandscapeScene(Scene):
     self.sun.position.x = 6
     self.sun.scale = simd_float3(2)
 
-    #self.camera.fovDegrees = 25
+    self.camera.fovDegrees = 25
 
   # --- override
   @objc_method
