@@ -157,7 +157,7 @@ class Model(
 
     if (texture := self.setTextureWithDevice_imageName_(device, imageName)):
       self.texture = texture
-      self.fragmentFunctionName = 'textured_fragment'
+      self.fragmentFunctionName = 'lit_textured_fragment'
 
     self.pipelineState = self.buildPipelineStateWithDevice_(device)
 

@@ -6,7 +6,7 @@ from pyrubicon.objc.types import CGSize, CGFloat
 
 from nodes import Node, Camera
 
-from simdTypes import SceneConstants
+from simdTypes import SceneConstants, Light
 
 
 class Scene(Node):
@@ -16,6 +16,7 @@ class Scene(Node):
 
   camera: Camera = objc_property()
   sceneConstants: SceneConstants = objc_property(object)
+  light : Light = objc_property(object)
 
   @objc_method
   def initializeProperties(self):
@@ -23,6 +24,7 @@ class Scene(Node):
     send_super(__class__, self, 'initializeProperties')
     self.camera = Camera.new()
     self.sceneConstants = SceneConstants()
+    self.light = Light()
 
   @objc_method
   def initWithDevice_size_(self, device, size: CGSize):
@@ -51,6 +53,12 @@ class Scene(Node):
     self.updateWithDeltaTime_(deltaTime)
 
     self.sceneConstants.projectionMatrix = self.camera.projectionMatrix
+
+    commandEncoder.setVertexBytes_length_atIndex_(
+      ctypes.byref(self.light),
+      ctypes.sizeof(self.light),
+      3,
+    )
 
     commandEncoder.setVertexBytes_length_atIndex_(
       ctypes.byref(self.sceneConstants),
