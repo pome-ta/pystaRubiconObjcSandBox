@@ -16,7 +16,7 @@ class Scene(Node):
 
   camera: Camera = objc_property()
   sceneConstants: SceneConstants = objc_property(object)
-  light : Light = objc_property(object)
+  light: Light = objc_property(object)
 
   @objc_method
   def initializeProperties(self):
@@ -59,6 +59,7 @@ class Scene(Node):
       ctypes.sizeof(Light),
       3,
     )
+    #print(ctypes.sizeof(Light))
 
     commandEncoder.setVertexBytes_length_atIndex_(
       ctypes.byref(self.sceneConstants),

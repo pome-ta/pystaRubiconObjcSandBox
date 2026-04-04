@@ -57,19 +57,22 @@ class SceneConstants(ctypes.Structure):
     super().__init__(projectionMatrix=projectionMatrix)
 
 
+'''
 class Light(ctypes.Structure):
   _fields_ = [
-    ('color', simd_float3),
+    ('color', simd_float4),
     ('ambientIntensity', ctypes.c_float),
+    ('_pad', ctypes.c_float * 3),
   ]
 
   def __init__(
     self,
-    color: simd_float3 | None = None,
+    color: simd_float4 | None = None,
     ambientIntensity: ctypes.c_float | None = None,
   ):
 
-    color = simd_float3(1) if color is None else color
+    color = simd_float4(1) if color is None else color
+
     ambientIntensity = ctypes.c_float(
       1.0) if ambientIntensity is None else ambientIntensity
 
@@ -77,3 +80,13 @@ class Light(ctypes.Structure):
       color=color,
       ambientIntensity=ambientIntensity,
     )
+'''
+
+
+class Light(ctypes.Structure):
+  _fields_ = [
+    ('color', simd_float4),
+    ('ambientIntensity', ctypes.c_float),
+    ('_pad', ctypes.c_float * 3),
+  ]
+

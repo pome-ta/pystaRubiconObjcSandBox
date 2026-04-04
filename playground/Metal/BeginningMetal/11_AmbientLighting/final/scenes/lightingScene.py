@@ -2,7 +2,7 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGSize, CGFloat
 
-from rbedge.simd import simd_float3
+from rbedge.simd import simd_float3, simd_float4
 
 # todo: Pythonista3 の`scene.Scene` ではない
 from .scene import Scene
@@ -30,7 +30,7 @@ class LightingScene(Scene):
     self.mushroom.position.y = -1
     self.addChildNode_(self.mushroom)
 
-    self.light.color = simd_float3(0, 0, 1)
+    self.light.color = simd_float4(0, 0, 1, 0)
     self.light.ambientIntensity = 0.5
 
     return self
