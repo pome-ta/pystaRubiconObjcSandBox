@@ -45,12 +45,18 @@ struct VertexOut {
   float4 materialColor;
 };
 
+struct Light {
+  float3 color;
+  float ambientIntensity;
+};
+
 vertex VertexOut vertex_shader(const VertexIn vertexIn [[ stage_in ]],
                                constant ModelConstants &modelConstants [[ buffer(1) ]],
                                constant SceneConstants &sceneConstants [[ buffer(2) ]]) {
   VertexOut vertexOut;
   float4x4 matrix = sceneConstants.projectionMatrix * modelConstants.modelViewMatrix;
   vertexOut.position = matrix * vertexIn.position;
+  
   vertexOut.color = vertexIn.color;
   vertexOut.materialColor = modelConstants.materialColor;
   vertexOut.textureCoordinates = vertexIn.textureCoordinates;
@@ -70,8 +76,6 @@ vertex VertexOut vertex_instance_shader(const VertexIn vertexIn [[ stage_in ]],
   vertexOut.textureCoordinates = vertexIn.textureCoordinates;
   return vertexOut;
 }
-
-
 
 fragment half4 fragment_shader(VertexOut vertexIn [[ stage_in ]]) {
   return half4(vertexIn.color);
@@ -103,4 +107,19 @@ fragment half4 fragment_color(VertexOut vertexIn [[ stage_in ]]) {
   return half4(vertexIn.materialColor);
 }
 
+fragment half4 lit_textured_fragment(VertexOut vertexIn [[ stage_in ]],
+                                 sampler sampler2d [[ sampler(0) ]],
+                                 constant Light &light [[ buffer(3) ]],
+                                 texture2d<float> texture [[ texture(0) ]] ) {
+  float4 color = texture.sample(sampler2d, vertexIn.textureCoordinates);
+  color = color * vertexIn.materialColor;
+  
+  // Ambient
+  float3 ambientColor = light.color * light.ambientIntensity;
+  
+  color = color * float4(ambientColor, 1);
+  if (color.a == 0.0)
+    discard_fragment();
+  return half4(color.r, color.g, color.b, 1);
+}
 
