@@ -85,7 +85,7 @@ class Light(ctypes.Structure):
 
 class Light(ctypes.Structure):
   _fields_ = [
-    ('color', simd_float4),
+    ('color', ctypes.c_float * 4),
     ('ambientIntensity', ctypes.c_float),
     ('_pad', ctypes.c_float * 3),
   ]

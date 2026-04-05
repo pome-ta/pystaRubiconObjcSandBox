@@ -4,6 +4,8 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGSize, CGFloat
 
+from objc_frameworks.Metal import MTLResourceOptions
+
 from nodes import Node, Camera
 
 from simdTypes import SceneConstants, Light
@@ -53,13 +55,22 @@ class Scene(Node):
     self.updateWithDeltaTime_(deltaTime)
 
     self.sceneConstants.projectionMatrix = self.camera.projectionMatrix
-
+    '''
     commandEncoder.setVertexBytes_length_atIndex_(
       ctypes.byref(self.light),
       ctypes.sizeof(Light),
       3,
     )
-    print(self.light.color)
+    '''
+    #print(f'alignment: {ctypes.alignment(Light)}')
+    #print(f'sizeof: {ctypes.sizeof(Light)}')
+
+    buffer = self.device.newBufferWithBytes_length_options_(
+      ctypes.byref(self.light),
+      ctypes.sizeof(Light),
+      MTLResourceOptions.storageModeShared,
+    )
+    commandEncoder.setFragmentBuffer_offset_atIndex_(buffer, 0, 3)
 
     commandEncoder.setVertexBytes_length_atIndex_(
       ctypes.byref(self.sceneConstants),
