@@ -59,7 +59,7 @@ class Scene(Node):
       ctypes.sizeof(Light),
       3,
     )
-    #print(ctypes.sizeof(Light))
+    print(self.light.color)
 
     commandEncoder.setVertexBytes_length_atIndex_(
       ctypes.byref(self.sceneConstants),

@@ -111,10 +111,18 @@ fragment half4 lit_textured_fragment(VertexOut vertexIn [[ stage_in ]],
                                  sampler sampler2d [[ sampler(0) ]],
                                  constant Light &light [[ buffer(3) ]],
                                  texture2d<float> texture [[ texture(0) ]] ) {
+  
+  /*
   float4 color = texture.sample(sampler2d, vertexIn.textureCoordinates);
   color = color * vertexIn.materialColor;
   
-return half4(0.0, 0.5, 1.0, 1.0);
+  // Ambient
+  float3 ambientColor = light.color * light.ambientIntensity;
   
-  
+  color = color * float4(ambientColor, 1);
+  if (color.a == 0.0)
+    discard_fragment();
+  return half4(color.r, color.g, color.b, 1);
+  */
+  return half4(light.color, 1);
 }

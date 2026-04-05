@@ -89,4 +89,5 @@ class Light(ctypes.Structure):
     ('ambientIntensity', ctypes.c_float),
     ('_pad', ctypes.c_float * 3),
   ]
+  _align_ = 16
 
