@@ -20,6 +20,8 @@ class Scene(Node):
   sceneConstants: SceneConstants = objc_property(object)
   light: Light = objc_property(object)
 
+  lightBuffer: 'ctypes.c_char_Array_32' = objc_property(object)
+
   @objc_method
   def initializeProperties(self):
     # todo: class member declarations
@@ -56,15 +58,44 @@ class Scene(Node):
 
     self.sceneConstants.projectionMatrix = self.camera.projectionMatrix
     
+    r = 0
+    g = 0
+    b=1
+    intensity=0.5
+    raw = (ctypes.c_float * 8)(
+      r, g, b, 0.0,
+      intensity, 0.0, 0.0, 0.0
+    )
+
+    commandEncoder.setFragmentBytes_length_atIndex_(raw, ctypes.sizeof(raw), 3)
+    
+    '''
     commandEncoder.setFragmentBytes_length_atIndex_(
       ctypes.byref(self.light),
       ctypes.sizeof(Light),
       3,
     )
+    '''
+
+    '''
+    self.lightBuffer = ctypes.create_string_buffer(ctypes.sizeof(Light))
+    ctypes.memmove(
+      self.lightBuffer,
+      ctypes.byref(self.light),
+      ctypes.sizeof(Light),
+    )
+    
+    self.lightBuffer = (ctypes.c_char * ctypes.sizeof(Light))()
+
+    commandEncoder.setFragmentBytes_length_atIndex_(
+      self.lightBuffer,
+      ctypes.sizeof(Light),
+      3,
+    )
+    
     #print(f'alignment: {ctypes.alignment(Light)}')
     #print(f'sizeof: {ctypes.sizeof(Light)}')
     
-    '''
 
     buffer = self.device.newBufferWithBytes_length_options_(
       ctypes.byref(self.light),
@@ -72,7 +103,9 @@ class Scene(Node):
       MTLResourceOptions.storageModeShared,
     )
     commandEncoder.setFragmentBuffer_offset_atIndex_(buffer, 0, 3)
+    
     '''
+    
 
     commandEncoder.setVertexBytes_length_atIndex_(
       ctypes.byref(self.sceneConstants),

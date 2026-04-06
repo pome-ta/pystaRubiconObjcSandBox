@@ -81,8 +81,8 @@ class Light(ctypes.Structure):
       ambientIntensity=ambientIntensity,
     )
 '''
-
 '''
+
 class Light(ctypes.Structure):
   _fields_ = [
     ('color', ctypes.c_float * 4),
@@ -91,14 +91,6 @@ class Light(ctypes.Structure):
   ]
   _align_ = 16
 '''
-
-'''
-class Light(ctypes.Structure):
-  _fields_ = [
-    ('color',  simd_float3),
-    ('ambientIntensity', ctypes.c_float),
-    #('_pad', ctypes.c_float * 3),
-  ]
 '''
 
 class Light(ctypes.Structure):
@@ -107,4 +99,24 @@ class Light(ctypes.Structure):
     ('ambientIntensity', ctypes.c_float),
 
   ]
+'''
 
+'''
+class Light(ctypes.Structure):
+  _fields_ = [
+    ('color', ctypes.c_float * 3),
+    ('_pad0', ctypes.c_float),
+    ('ambientIntensity', ctypes.c_float),
+    ('_pad1', ctypes.c_float * 3),
+  ]
+'''
+
+class Light(ctypes.Structure):
+  _fields_ = [
+    ('colorR', ctypes.c_float),
+    ('colorG', ctypes.c_float),
+    ('colorB', ctypes.c_float),
+    ('_pad0', ctypes.c_float),
+    ('ambientIntensity', ctypes.c_float),
+    ('_pad1', ctypes.c_float * 3),
+  ]
