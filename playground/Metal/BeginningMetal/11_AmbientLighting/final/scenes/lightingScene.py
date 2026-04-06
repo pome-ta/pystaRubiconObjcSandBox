@@ -1,3 +1,5 @@
+import ctypes
+
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGSize, CGFloat
@@ -30,8 +32,8 @@ class LightingScene(Scene):
     self.mushroom.position.y = -1
     self.addChildNode_(self.mushroom)
 
-    self.light.color[:] = [0.0, 0.0, 1.0, 1.0]
-    self.light.ambientIntensity = 0.5
+    self.light.color = (ctypes.c_float * 3)(0.0, 0.0, 1.0)
+    self.light.ambientIntensity = 0.1
 
     return self
 

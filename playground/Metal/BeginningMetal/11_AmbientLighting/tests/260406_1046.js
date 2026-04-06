@@ -123,8 +123,7 @@ fragment half4 lit_textured_fragment(VertexOut vertexIn [[ stage_in ]],
   //return half4(color.r, color.g, color.b, 1);
   //return half4(light.ambientIntensity, light.color.g, light.color.b, 1);
   //return half4(color.r, color.g, color.b, 0);
-  return half4(light.color.r, light.color.g, light.color.b, light.ambientIntensity);
-  //return half4(light.color);
+  //return half4(light.ambientIntensity, light.color.g, light.color.b, 1);
   
 }
 

@@ -82,7 +82,7 @@ class Light(ctypes.Structure):
     )
 '''
 
-
+'''
 class Light(ctypes.Structure):
   _fields_ = [
     ('color', ctypes.c_float * 4),
@@ -90,4 +90,21 @@ class Light(ctypes.Structure):
     ('_pad', ctypes.c_float * 3),
   ]
   _align_ = 16
+'''
+
+'''
+class Light(ctypes.Structure):
+  _fields_ = [
+    ('color',  simd_float3),
+    ('ambientIntensity', ctypes.c_float),
+    #('_pad', ctypes.c_float * 3),
+  ]
+'''
+
+class Light(ctypes.Structure):
+  _fields_ = [
+    ('color',  ctypes.c_float * 3),
+    ('ambientIntensity', ctypes.c_float),
+
+  ]
 

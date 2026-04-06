@@ -278,7 +278,7 @@ class simd_float4(_SimdVector):
     ('z', ctypes.c_float),
     ('w', ctypes.c_float),
   ]
-  _align_ = 16
+  #_align_ = 16
 
 
 # --- matrix

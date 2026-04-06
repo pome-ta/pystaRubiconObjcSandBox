@@ -55,15 +55,16 @@ class Scene(Node):
     self.updateWithDeltaTime_(deltaTime)
 
     self.sceneConstants.projectionMatrix = self.camera.projectionMatrix
-    '''
-    commandEncoder.setVertexBytes_length_atIndex_(
+    
+    commandEncoder.setFragmentBytes_length_atIndex_(
       ctypes.byref(self.light),
       ctypes.sizeof(Light),
       3,
     )
-    '''
     #print(f'alignment: {ctypes.alignment(Light)}')
     #print(f'sizeof: {ctypes.sizeof(Light)}')
+    
+    '''
 
     buffer = self.device.newBufferWithBytes_length_options_(
       ctypes.byref(self.light),
@@ -71,6 +72,7 @@ class Scene(Node):
       MTLResourceOptions.storageModeShared,
     )
     commandEncoder.setFragmentBuffer_offset_atIndex_(buffer, 0, 3)
+    '''
 
     commandEncoder.setVertexBytes_length_atIndex_(
       ctypes.byref(self.sceneConstants),
