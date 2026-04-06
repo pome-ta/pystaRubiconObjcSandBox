@@ -57,66 +57,80 @@ class SceneConstants(ctypes.Structure):
     super().__init__(projectionMatrix=projectionMatrix)
 
 
-'''
-class Light(ctypes.Structure):
-  _fields_ = [
-    ('color', simd_float4),
-    ('ambientIntensity', ctypes.c_float),
-    ('_pad', ctypes.c_float * 3),
-  ]
+class Light:
+
+  RAW_TYPE = ctypes.c_float * 8
+  color: simd_float3
+  ambientIntensity: float
 
   def __init__(
     self,
-    color: simd_float4 | None = None,
-    ambientIntensity: ctypes.c_float | None = None,
+    color: simd_float3 | None = None,
+    ambientIntensity: float | None = None,
   ):
+    self.raw = self.RAW_TYPE(
+      0.0, 0.0, 0.0,  # color
+      0.0,            # padding (SIMD alignment)
+      0.0,            # ambientIntensity
+      0.0, 0.0, 0.0,  # padding (SIMD alignment)
+    )  # yapf: disable
 
-    color = simd_float4(1) if color is None else color
+    self.color = simd_float3(1) if color is None else color
+    self.ambientIntensity = 1.0 if ambientIntensity is None else ambientIntensity
+    
 
-    ambientIntensity = ctypes.c_float(
-      1.0) if ambientIntensity is None else ambientIntensity
+    @classmethod
+    def size(cls) -> int:
+      return ctypes.sizeof(cls.RAW_TYPE)
 
-    super().__init__(
-      color=color,
-      ambientIntensity=ambientIntensity,
-    )
+    @classmethod
+    def stride(cls) -> int:
+      return ctypes.sizeof(cls.RAW_TYPE)
+
+    @property
+    def color(self) -> simd_float3:
+      return simd_float3.from_buffer(self.raw)
+
+    @color.setter
+    def color(self, values: simd_float3):
+      print(values)
+      for idx, value in enumerate(values):
+        print(idx)
+        self.raw[idx] = float(value)
+
+    @property
+    def ambientIntensity(self) -> float:
+      return float(self.raw[4])
+
+    @ambientIntensity.setter
+    def ambientIntensity(self, value: float):
+      self.raw[4] = float(value)
+
+    def __repr__(self) -> str:
+      # print(light) とした時に現在の値を綺麗に出力する
+      c = self.color
+      return f'<{self.__class__.__name__} color=(r={c.r:.2f}, g={c.g:.2f}, b={c.b:.2f}), ambientIntensity={self.ambientIntensity:.2f}>'
+
+
 '''
+    # ==========================================
+    # property: intensity (16バイト目からの領域)
+    # ==========================================
+    @property
+    def intensity(self) -> float:
+        return float(self.raw[4])
+
+    @intensity.setter
+    def intensity(self, value: float):
+        self.raw[4] = float(value)
+        # self.raw[5] ~ [7] の末尾パディングは 0.0 のまま安全に維持される
+
+    # ==========================================
+    # Debug Helper
+    # ==========================================
+    def __repr__(self) -> str:
+        # print(light) とした時に現在の値を綺麗に出力する
+        c = self.color
+        return f"<{self.__class__.__name__} color=(x={c.x:.2f}, y={c.y:.2f}, z={c.z:.2f}), intensity={self.intensity:.2f}>"
 '''
 
-class Light(ctypes.Structure):
-  _fields_ = [
-    ('color', ctypes.c_float * 4),
-    ('ambientIntensity', ctypes.c_float),
-    ('_pad', ctypes.c_float * 3),
-  ]
-  _align_ = 16
-'''
-'''
-
-class Light(ctypes.Structure):
-  _fields_ = [
-    ('color',  ctypes.c_float * 3),
-    ('ambientIntensity', ctypes.c_float),
-
-  ]
-'''
-
-'''
-class Light(ctypes.Structure):
-  _fields_ = [
-    ('color', ctypes.c_float * 3),
-    ('_pad0', ctypes.c_float),
-    ('ambientIntensity', ctypes.c_float),
-    ('_pad1', ctypes.c_float * 3),
-  ]
-'''
-
-class Light(ctypes.Structure):
-  _fields_ = [
-    ('colorR', ctypes.c_float),
-    ('colorG', ctypes.c_float),
-    ('colorB', ctypes.c_float),
-    ('_pad0', ctypes.c_float),
-    ('ambientIntensity', ctypes.c_float),
-    ('_pad1', ctypes.c_float * 3),
-  ]

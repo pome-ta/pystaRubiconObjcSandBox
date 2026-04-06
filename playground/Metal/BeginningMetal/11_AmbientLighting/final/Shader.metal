@@ -121,9 +121,5 @@ fragment half4 lit_textured_fragment(VertexOut vertexIn [[ stage_in ]],
   if (color.a == 0.0)
     discard_fragment();
   return half4(color.r, color.g, color.b, 1);
-  
-  //return half4(light.color.r,light.color.g,light.color.b, 1);
-  //return half4(light.color, 1);
-  
 }
 
