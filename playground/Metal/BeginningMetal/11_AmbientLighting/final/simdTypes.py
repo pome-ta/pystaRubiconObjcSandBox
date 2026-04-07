@@ -77,60 +77,35 @@ class Light:
 
     self.color = simd_float3(1) if color is None else color
     self.ambientIntensity = 1.0 if ambientIntensity is None else ambientIntensity
-    
 
-    @classmethod
-    def size(cls) -> int:
-      return ctypes.sizeof(cls.RAW_TYPE)
+  @classmethod
+  def size(cls) -> int:
+    return ctypes.sizeof(cls.RAW_TYPE)
 
-    @classmethod
-    def stride(cls) -> int:
-      return ctypes.sizeof(cls.RAW_TYPE)
+  @classmethod
+  def stride(cls) -> int:
+    return ctypes.sizeof(cls.RAW_TYPE)
 
-    @property
-    def color(self) -> simd_float3:
-      return simd_float3.from_buffer(self.raw)
+  @property
+  def color(self) -> simd_float3:
+    return simd_float3.from_buffer(self.raw)
 
-    @color.setter
-    def color(self, values: simd_float3):
-      print(values)
-      for idx, value in enumerate(values):
-        print(idx)
-        self.raw[idx] = float(value)
+  @color.setter
+  def color(self, values: simd_float3):
+    print(values)
+    for idx, value in enumerate(values):
+      print(idx)
+      self.raw[idx] = float(value)
 
-    @property
-    def ambientIntensity(self) -> float:
-      return float(self.raw[4])
+  @property
+  def ambientIntensity(self) -> float:
+    return float(self.raw[4])
 
-    @ambientIntensity.setter
-    def ambientIntensity(self, value: float):
-      self.raw[4] = float(value)
+  @ambientIntensity.setter
+  def ambientIntensity(self, value: float):
+    self.raw[4] = float(value)
 
-    def __repr__(self) -> str:
-      # print(light) とした時に現在の値を綺麗に出力する
-      c = self.color
-      return f'<{self.__class__.__name__} color=(r={c.r:.2f}, g={c.g:.2f}, b={c.b:.2f}), ambientIntensity={self.ambientIntensity:.2f}>'
-
-
-'''
-    # ==========================================
-    # property: intensity (16バイト目からの領域)
-    # ==========================================
-    @property
-    def intensity(self) -> float:
-        return float(self.raw[4])
-
-    @intensity.setter
-    def intensity(self, value: float):
-        self.raw[4] = float(value)
-        # self.raw[5] ~ [7] の末尾パディングは 0.0 のまま安全に維持される
-
-    # ==========================================
-    # Debug Helper
-    # ==========================================
-    def __repr__(self) -> str:
-        # print(light) とした時に現在の値を綺麗に出力する
-        c = self.color
-        return f"<{self.__class__.__name__} color=(x={c.x:.2f}, y={c.y:.2f}, z={c.z:.2f}), intensity={self.intensity:.2f}>"
-'''
+  def __repr__(self) -> str:
+    c = self.color
+    return f'<{self.__class__.__name__} color=(r={c.r:.2f}, g={c.g:.2f}, b={c.b:.2f}), ambientIntensity={self.ambientIntensity:.2f}>'
 

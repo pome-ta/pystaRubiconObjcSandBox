@@ -37,5 +37,5 @@ from objc_frameworks.Metal import MTLCreateSystemDefaultDevice
 from simdTypes import Light
 
 light = Light()
-#print(light)
+print(light)
 
