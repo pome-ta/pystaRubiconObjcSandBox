@@ -113,7 +113,46 @@ class MainViewController(UIViewController):
                  objc_id,
                  objc_id,
                ])
-    #print(event)
+    print('b')
+
+  @objc_method
+  def touchesMoved_withEvent_(self, touches, event):
+    send_super(__class__,
+               self,
+               'touchesMoved:withEvent:',
+               touches,
+               event,
+               argtypes=[
+                 objc_id,
+                 objc_id,
+               ])
+    print('m')
+
+  @objc_method
+  def touchesEnded_withEvent_(self, touches, event):
+    send_super(__class__,
+               self,
+               'touchesEnded:withEvent:',
+               touches,
+               event,
+               argtypes=[
+                 objc_id,
+                 objc_id,
+               ])
+    print('e')
+
+  @objc_method
+  def touchesCancelled_withEvent_(self, touches, event):
+    send_super(__class__,
+               self,
+               'touchesCancelled:withEvent:',
+               touches,
+               event,
+               argtypes=[
+                 objc_id,
+                 objc_id,
+               ])
+    print('c')
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
