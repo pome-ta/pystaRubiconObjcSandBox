@@ -60,6 +60,9 @@ class SceneConstants(ctypes.Structure):
 class Light:
 
   RAW_TYPE = ctypes.c_float * 8
+  size: int = ctypes.sizeof(RAW_TYPE)
+  stride: int = ctypes.sizeof(RAW_TYPE)
+
   color: simd_float3
   ambientIntensity: float
 
@@ -78,23 +81,13 @@ class Light:
     self.color = simd_float3(1) if color is None else color
     self.ambientIntensity = 1.0 if ambientIntensity is None else ambientIntensity
 
-  @classmethod
-  def size(cls) -> int:
-    return ctypes.sizeof(cls.RAW_TYPE)
-
-  @classmethod
-  def stride(cls) -> int:
-    return ctypes.sizeof(cls.RAW_TYPE)
-
   @property
   def color(self) -> simd_float3:
     return simd_float3.from_buffer(self.raw)
 
   @color.setter
   def color(self, values: simd_float3):
-    print(values)
     for idx, value in enumerate(values):
-      print(idx)
       self.raw[idx] = float(value)
 
   @property
@@ -105,7 +98,4 @@ class Light:
   def ambientIntensity(self, value: float):
     self.raw[4] = float(value)
 
-  def __repr__(self) -> str:
-    c = self.color
-    return f'<{self.__class__.__name__} color=(r={c.r:.2f}, g={c.g:.2f}, b={c.b:.2f}), ambientIntensity={self.ambientIntensity:.2f}>'
 

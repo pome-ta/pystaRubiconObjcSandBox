@@ -59,8 +59,8 @@ class Scene(Node):
     self.sceneConstants.projectionMatrix = self.camera.projectionMatrix
 
     commandEncoder.setFragmentBytes_length_atIndex_(
-      ctypes.byref(self.light),
-      ctypes.sizeof(Light),
+      self.light.raw,
+      Light.stride,
       3,
     )
 

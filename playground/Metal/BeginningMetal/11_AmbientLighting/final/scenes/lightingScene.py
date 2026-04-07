@@ -31,7 +31,7 @@ class LightingScene(Scene):
     self.addChildNode_(self.mushroom)
 
     self.light.color = simd_float3(0.0, 0.0, 1.0)
-    self.light.ambientIntensity = 0.1
+    self.light.ambientIntensity = 0.5
 
     return self
 
