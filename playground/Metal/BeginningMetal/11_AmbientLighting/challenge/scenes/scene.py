@@ -20,8 +20,6 @@ class Scene(Node):
   sceneConstants: SceneConstants = objc_property(object)
   light: Light = objc_property(object)
 
-  lightBuffer: 'ctypes.c_char_Array_32' = objc_property(object)
-
   @objc_method
   def initializeProperties(self):
     # todo: class member declarations

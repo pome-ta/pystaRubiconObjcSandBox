@@ -93,7 +93,20 @@ class MainViewController(UIViewController):
     self.metalView = metalView
     self.renderer = renderer
     self.setupLayoutConstraint()
+    '''
+    pdbr.state(self)
+    "touchesBegan_withEvent_",
+    "touchesCancelled_withEvent_",
+    "touchesEnded_withEvent_",
+    "touchesEstimatedPropertiesUpdated_",
+    "touchesMoved_withEvent_",
+    '''
 
+  @objc_method
+  def touchesBegan_withEvent_(self, touches, event):
+    
+  
+  
   @objc_method
   def viewWillAppear_(self, animated: bool):
     send_super(__class__,
