@@ -23,7 +23,7 @@ import ctypes
 
 from pyrubicon.objc.api import ObjCClass
 from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.runtime import send_super, objc_id
 
 from objc_frameworks.Foundation import NSStringFromClass
 
@@ -104,9 +104,17 @@ class MainViewController(UIViewController):
 
   @objc_method
   def touchesBegan_withEvent_(self, touches, event):
-    
-  
-  
+    send_super(__class__,
+               self,
+               'touchesBegan:withEvent:',
+               touches,
+               event,
+               argtypes=[
+                 objc_id,
+                 objc_id,
+               ])
+    #print(event)
+
   @objc_method
   def viewWillAppear_(self, animated: bool):
     send_super(__class__,
