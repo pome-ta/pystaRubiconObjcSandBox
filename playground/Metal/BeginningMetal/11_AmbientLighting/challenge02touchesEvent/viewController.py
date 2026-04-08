@@ -21,7 +21,7 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
 
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass
+from pyrubicon.objc.api import ObjCClass, Block
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGSize, CGPoint, CGRect
@@ -178,10 +178,7 @@ class MainViewController(UIViewController):
       self.renderer.scene.touchesEnded_touches_with_(self.view, touches, event)
     except Exception as e:
       print(e)
-    '''
-    if getattr(self, 'debugCircle', None):
-      self.debugCircle.removeFromSuperview()
-    '''
+
     self._removeDebugCircle()
 
   @objc_method
@@ -200,16 +197,32 @@ class MainViewController(UIViewController):
         self.view, touches, event)
     except Exception as e:
       print(e)
-    '''
-    if getattr(self, 'debugCircle', None):
-      self.debugCircle.removeFromSuperview()
-    '''
+
     self._removeDebugCircle()
 
   @objc_method
   def _removeDebugCircle(self):
-    if getattr(self, 'debugCircle', None):
-      self.debugCircle.removeFromSuperview()
+
+    if (circle := self.debugCircle) is None:
+      return
+    self.debugCircle = None
+    '''
+    @Block
+    def animations() -> None:
+      circle.alpha = 0.0
+
+    @Block
+    def completion() -> None:
+      circle.removeFromSuperview()
+
+    UIView.animateWithDuration_animations_completion_(0.3, animations, completion)
+    '''
+
+    UIView.animateWithDuration_animations_completion_(
+      0.3,
+      Block(lambda: circle.setAlpha_(0.0), None),
+      Block(lambda: circle.removeFromSuperview(), None),
+    )
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
