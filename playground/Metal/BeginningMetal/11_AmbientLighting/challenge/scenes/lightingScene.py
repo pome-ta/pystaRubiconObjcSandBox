@@ -1,6 +1,6 @@
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
-from pyrubicon.objc.types import CGSize, CGFloat
+from pyrubicon.objc.types import CGSize, CGFloat, CGPoint
 
 from rbedge.simd import simd_float3
 
@@ -12,6 +12,7 @@ from nodes import Model
 class LightingScene(Scene):
 
   mushroom: Model = objc_property()
+  previousTouchLocation: CGPoint = objc_property()
 
   @objc_method
   def initWithDevice_size_(self, device, size: CGSize):
@@ -45,4 +46,50 @@ class LightingScene(Scene):
                argtypes=[
                  CGFloat,
                ])
+
+  @objc_method
+  def touchesBegan_touches_with_(self, view, touches, event):
+
+    send_super(__class__,
+               self,
+               'touchesBegan:touches:with:',
+               view,
+               touches,
+               event,
+               argtypes=[
+                 objc_id,
+                 objc_id,
+                 objc_id,
+               ])
+
+    if (touch := touches.anyObject()) is None:
+      return
+    self.previousTouchLocation = touch.locationInView_(view)
+
+  @objc_method
+  def touchesMoved_touches_with_(self, view, touches, event):
+
+    send_super(__class__,
+               self,
+               'touchesMoved:touches:with:',
+               view,
+               touches,
+               event,
+               argtypes=[
+                 objc_id,
+                 objc_id,
+                 objc_id,
+               ])
+
+    if (touch := touches.anyObject()) is None:
+      return
+    touchLocation = touch.locationInView_(view)
+
+    delta = CGPoint(self.previousTouchLocation.x - touchLocation.x,
+                    self.previousTouchLocation.y - touchLocation.y)
+    sensitivity = 0.01
+    self.mushroom.rotation.x += float(delta.y) * sensitivity
+    self.mushroom.rotation.y += float(delta.x) * sensitivity
+    self.previousTouchLocation = touchLocation
+
 

@@ -93,14 +93,6 @@ class MainViewController(UIViewController):
     self.metalView = metalView
     self.renderer = renderer
     self.setupLayoutConstraint()
-    '''
-    pdbr.state(self)
-    "touchesBegan_withEvent_",
-    "touchesCancelled_withEvent_",
-    "touchesEnded_withEvent_",
-    "touchesEstimatedPropertiesUpdated_",
-    "touchesMoved_withEvent_",
-    '''
 
   @objc_method
   def touchesBegan_withEvent_(self, touches, event):
@@ -113,7 +105,10 @@ class MainViewController(UIViewController):
                  objc_id,
                  objc_id,
                ])
-    print('b')
+    try:  # `renderer?.scene?.`
+      self.renderer.scene.touchesBegan_touches_with_(self.view, touches, event)
+    except Exception as e:
+      print(e)
 
   @objc_method
   def touchesMoved_withEvent_(self, touches, event):
@@ -126,7 +121,10 @@ class MainViewController(UIViewController):
                  objc_id,
                  objc_id,
                ])
-    print('m')
+    try:  # `renderer?.scene?.`
+      self.renderer.scene.touchesMoved_touches_with_(self.view, touches, event)
+    except Exception as e:
+      print(e)
 
   @objc_method
   def touchesEnded_withEvent_(self, touches, event):
@@ -139,7 +137,10 @@ class MainViewController(UIViewController):
                  objc_id,
                  objc_id,
                ])
-    print('e')
+    try:  # `renderer?.scene?.`
+      self.renderer.scene.touchesEnded_touches_with_(self.view, touches, event)
+    except Exception as e:
+      print(e)
 
   @objc_method
   def touchesCancelled_withEvent_(self, touches, event):
@@ -152,7 +153,11 @@ class MainViewController(UIViewController):
                  objc_id,
                  objc_id,
                ])
-    print('c')
+    try:  # `renderer?.scene?.`
+      self.renderer.scene.touchesCancelled_touches_with_(
+        self.view, touches, event)
+    except Exception as e:
+      print(e)
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
