@@ -24,6 +24,7 @@ import ctypes
 from pyrubicon.objc.api import ObjCClass
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
+from pyrubicon.objc.types import CGSize, CGPoint, CGRect
 
 from objc_frameworks.Foundation import NSStringFromClass
 
@@ -44,6 +45,10 @@ from scenes import LightingScene
 
 MTKView = ObjCClass('MTKView')
 
+# --- touches event debug
+UIView = ObjCClass('UIView')
+UIColor = ObjCClass('UIColor')
+
 
 class Colors:
   wenderlichGreen = MTLClearColorMake(0.0, 0.4, 0.21, 1.0)
@@ -54,6 +59,8 @@ class MainViewController(UIViewController):
 
   metalView: MTKView = objc_property()
   renderer: Renderer = objc_property()
+
+  debugCircle: UIView = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -94,6 +101,8 @@ class MainViewController(UIViewController):
     self.renderer = renderer
     self.setupLayoutConstraint()
 
+    self.debugCircle = None
+
   @objc_method
   def touchesBegan_withEvent_(self, touches, event):
     send_super(__class__,
@@ -109,6 +118,26 @@ class MainViewController(UIViewController):
       self.renderer.scene.touchesBegan_touches_with_(self.view, touches, event)
     except Exception as e:
       print(e)
+
+    if (touch := touches.anyObject()) is None:
+      return
+
+    if getattr(self, 'debugCircle', None):
+      self.debugCircle.removeFromSuperview()
+
+    location = touch.locationInView_(self.view)
+    radius = 25.0
+    frame = CGRect(
+      CGPoint(location.x - radius, location.y - radius),
+      CGSize(radius * 2, radius * 2),
+    )
+    self.debugCircle = UIView.alloc().initWithFrame_(frame)
+    self.debugCircle.backgroundColor = UIColor.redColor.colorWithAlphaComponent_(
+      0.5)
+    self.debugCircle.layer.cornerRadius = radius
+    self.debugCircle.userInteractionEnabled = False
+
+    self.view.addSubview_(self.debugCircle)
 
   @objc_method
   def touchesMoved_withEvent_(self, touches, event):
@@ -126,6 +155,14 @@ class MainViewController(UIViewController):
     except Exception as e:
       print(e)
 
+    if not getattr(self, 'debugCircle', None):
+      return
+
+    if (touch := touches.anyObject()) is None:
+      return
+
+    self.debugCircle.center = touch.locationInView_(self.view)
+
   @objc_method
   def touchesEnded_withEvent_(self, touches, event):
     send_super(__class__,
@@ -141,6 +178,9 @@ class MainViewController(UIViewController):
       self.renderer.scene.touchesEnded_touches_with_(self.view, touches, event)
     except Exception as e:
       print(e)
+
+    if getattr(self, 'debugCircle', None):
+      self.debugCircle.removeFromSuperview()
 
   @objc_method
   def touchesCancelled_withEvent_(self, touches, event):
@@ -158,6 +198,9 @@ class MainViewController(UIViewController):
         self.view, touches, event)
     except Exception as e:
       print(e)
+
+    if getattr(self, 'debugCircle', None):
+      self.debugCircle.removeFromSuperview()
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
