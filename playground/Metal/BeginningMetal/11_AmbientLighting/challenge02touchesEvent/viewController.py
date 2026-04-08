@@ -178,9 +178,11 @@ class MainViewController(UIViewController):
       self.renderer.scene.touchesEnded_touches_with_(self.view, touches, event)
     except Exception as e:
       print(e)
-
+    '''
     if getattr(self, 'debugCircle', None):
       self.debugCircle.removeFromSuperview()
+    '''
+    self._removeDebugCircle()
 
   @objc_method
   def touchesCancelled_withEvent_(self, touches, event):
@@ -198,7 +200,14 @@ class MainViewController(UIViewController):
         self.view, touches, event)
     except Exception as e:
       print(e)
+    '''
+    if getattr(self, 'debugCircle', None):
+      self.debugCircle.removeFromSuperview()
+    '''
+    self._removeDebugCircle()
 
+  @objc_method
+  def _removeDebugCircle(self):
     if getattr(self, 'debugCircle', None):
       self.debugCircle.removeFromSuperview()
 
