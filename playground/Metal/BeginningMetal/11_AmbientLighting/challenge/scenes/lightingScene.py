@@ -12,7 +12,7 @@ from nodes import Model
 class LightingScene(Scene):
 
   mushroom: Model = objc_property()
-  previousTouchLocation: CGPoint = objc_property()
+  previousTouchLocation: CGPoint = objc_property(object)
 
   @objc_method
   def initWithDevice_size_(self, device, size: CGSize):
@@ -91,5 +91,4 @@ class LightingScene(Scene):
     self.mushroom.rotation.x += float(delta.y) * sensitivity
     self.mushroom.rotation.y += float(delta.x) * sensitivity
     self.previousTouchLocation = touchLocation
-
 

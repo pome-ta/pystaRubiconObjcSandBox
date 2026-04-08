@@ -77,7 +77,7 @@ class Scene(Node):
   @objc_method
   def sceneSizeWillChangeTo_(self, size: CGSize):
     self.camera.aspect = float(size.width / size.height)
-    
+
   @objc_method
   def touchesBegan_touches_with_(self, view, touches, event):
     pass
@@ -86,11 +86,10 @@ class Scene(Node):
   def touchesMoved_touches_with_(self, view, touches, event):
     pass
 
-
   @objc_method
   def touchesEnded_touches_with_(self, view, touches, event):
     pass
-    
+
   @objc_method
   def touchesCancelled_touches_with_(self, view, touches, event):
     pass
