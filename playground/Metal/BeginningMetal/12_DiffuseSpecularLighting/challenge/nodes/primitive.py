@@ -279,8 +279,8 @@ class Primitive(
       0,
     )
     commandEncoder.setVertexBytes_length_atIndex_(
-      ctypes.byref(self.modelConstants),
-      ctypes.sizeof(self.modelConstants),
+      self.modelConstants.raw,
+      self.modelConstants.stride,
       1,
     )
     commandEncoder.setFragmentTexture_atIndex_(self.texture, 0)

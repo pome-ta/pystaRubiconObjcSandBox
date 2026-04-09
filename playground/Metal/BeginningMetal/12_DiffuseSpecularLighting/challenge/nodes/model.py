@@ -311,8 +311,8 @@ class Model(
     self.modelConstants.specularIntensity = self.specularIntensity
 
     commandEncoder.setVertexBytes_length_atIndex_(
-      ctypes.byref(self.modelConstants),
-      ctypes.sizeof(self.modelConstants),
+      self.modelConstants.raw,
+      self.modelConstants.stride,
       1,
     )
     if self.texture != None:
