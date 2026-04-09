@@ -306,6 +306,7 @@ class Model(
   ):
     self.modelConstants.modelViewMatrix = modelViewMatrix
     self.modelConstants.materialColor = self.materialColor
+    self.modelConstants.normalMatrix = modelViewMatrix.upperLeft3x3()
 
     commandEncoder.setVertexBytes_length_atIndex_(
       ctypes.byref(self.modelConstants),

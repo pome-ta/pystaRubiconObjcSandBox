@@ -31,8 +31,10 @@ class LightingScene(Scene):
     self.mushroom.position.y = -1
     self.addChildNode_(self.mushroom)
 
-    self.light.color = simd_float3(0.0, 0.0, 1.0)
-    self.light.ambientIntensity = 0.5
+    self.light.color = simd_float3(1.0, 1.0, 1.0)
+    self.light.ambientIntensity = 0.2
+    self.light.diffuseIntensity = 0.8
+    self.light.direction = simd_float3(0.0, 0.0, -1.0)
 
     return self
 
