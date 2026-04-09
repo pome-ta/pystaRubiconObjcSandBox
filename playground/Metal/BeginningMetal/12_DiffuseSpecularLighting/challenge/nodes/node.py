@@ -15,6 +15,9 @@ class Node(NSObject):
 
   name: str = objc_property(object)
   materialColor: 'float4' = objc_property(object)
+  specularIntensity: float = objc_property(object)
+  shininess:float = objc_property(object)
+  
   children: ['Node'] = objc_property(object)
 
   position: 'float3' = objc_property(object)
@@ -38,6 +41,9 @@ class Node(NSObject):
     # todo: class member declarations
     self.name = 'Untitled'
     self.materialColor = simd_float4(1)
+    self.specularIntensity = 1.0
+    self.shininess = 1.0
+    
     self.children = []
 
     self.position = simd_float3(0)

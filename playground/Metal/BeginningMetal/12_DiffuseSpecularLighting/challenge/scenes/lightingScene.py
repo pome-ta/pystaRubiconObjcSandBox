@@ -28,6 +28,8 @@ class LightingScene(Scene):
                  CGSize,
                ])
 
+    self.mushroom.specularIntensity = 0.2
+    self.mushroom.shininess = 2.0
     self.mushroom.position.y = -1
     self.addChildNode_(self.mushroom)
 
