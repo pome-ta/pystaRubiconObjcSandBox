@@ -103,6 +103,15 @@ class MainViewController(UIViewController):
 
     self.debugCircle = None
 
+  # --- override
+  @objc_method
+  def prefersStatusBarHidden(self):
+    send_super(__class__,
+               self,
+               'prefersStatusBarHidden',
+               restype=ctypes.c_bool)
+    return True
+
   @objc_method
   def touchesBegan_withEvent_(self, touches, event):
     send_super(__class__,
