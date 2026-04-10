@@ -143,9 +143,13 @@ class MainViewController(UIViewController):
       self.metalView.centerYAnchor.constraintEqualToAnchor_(
         safeAreaLayoutGuide.centerYAnchor),
       self.metalView.widthAnchor.constraintEqualToAnchor_multiplier_(
-        safeAreaLayoutGuide.widthAnchor, 0.5),
+        safeAreaLayoutGuide.widthAnchor,
+        0.5,
+      ),
       self.metalView.heightAnchor.constraintEqualToAnchor_multiplier_(
-        safeAreaLayoutGuide.heightAnchor, 0.5),
+        safeAreaLayoutGuide.heightAnchor,
+        0.5,
+      ),
     ])
 
 
