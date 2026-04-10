@@ -19,37 +19,6 @@ class Vertex(ctypes.Structure):
   ]
 
 
-'''
-class ModelConstants(ctypes.Structure):
-  _fields_ = [
-    ('modelViewMatrix', simd_float4x4),
-    ('materialColor', simd_float4),
-    ('normalMatrix', simd_float3x3),
-  ]
-
-  def __init__(
-    self,
-    modelViewMatrix: simd_float4x4 | None = None,
-    materialColor: simd_float4 | None = None,
-    normalMatrix: simd_float3x3 | None = None,
-  ):
-
-    modelViewMatrix = matrix_float4x4.identity(
-    ) if modelViewMatrix is None else modelViewMatrix
-    materialColor = simd_float4(
-      1.0) if materialColor is None else materialColor
-    normalMatrix = matrix_float3x3.identity(
-    ) if normalMatrix is None else normalMatrix
-
-    super().__init__(
-      modelViewMatrix=modelViewMatrix,
-      materialColor=materialColor,
-      normalMatrix=normalMatrix,
-    )
-
-'''
-
-
 class ModelConstants:
 
   RAW_TYPE = ctypes.c_float * 36
