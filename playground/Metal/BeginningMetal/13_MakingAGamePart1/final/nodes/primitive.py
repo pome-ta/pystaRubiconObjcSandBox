@@ -280,7 +280,7 @@ class Primitive(
     )
     commandEncoder.setVertexBytes_length_atIndex_(
       self.modelConstants.raw,
-      self.modelConstants.stride,
+      ModelConstants.stride,
       1,
     )
     commandEncoder.setFragmentTexture_atIndex_(self.texture, 0)

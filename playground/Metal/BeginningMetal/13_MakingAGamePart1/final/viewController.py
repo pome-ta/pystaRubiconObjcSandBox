@@ -90,7 +90,7 @@ class MainViewController(UIViewController):
     )
 
     metalView.clearColor = Colors.wenderlichGreen
-    metalView.delegate = renderer
+    #metalView.delegate = renderer
 
     #metalView.enableSetNeedsDisplay = True
     #metalView.setNeedsDisplay()

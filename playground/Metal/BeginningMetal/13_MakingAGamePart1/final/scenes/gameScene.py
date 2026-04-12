@@ -1,3 +1,4 @@
+import ctypes
 from dataclasses import dataclass
 from math import radians, tan, pi
 
@@ -56,10 +57,14 @@ class GameScene(Scene):
                  CGSize,
                ])
 
+    
+    #self.camera.position.z = -self.sceneOffsetHeight_fov_(Constants.gameHeight,camera.fovRadians)
+    '''
     self.camera.position.z = -self.sceneOffsetHeight_fov_(
       Constants.gameHeight,
       camera.fovRadians,
     )
+    
     self.camera.position.x = -Constants.gameWidth / 2
     self.camera.position.y = -Constants.gameHeight / 2
     self.camera.rotation.x = radians(20)
@@ -69,7 +74,8 @@ class GameScene(Scene):
     self.light.ambientIntensity = 0.3
     self.light.diffuseIntensity = 0.8
     self.light.direction = simd_float3(0, -1, -1)
-    self.setupScene()
+    #self.setupScene()
+    '''
 
     return self
 
@@ -126,6 +132,6 @@ class GameScene(Scene):
       brick.rotation.z += pi / 4 * deltaTime
 
   @objc_method
-  def sceneOffsetHeight_fov_(self, height: float, fov: float) -> float:
+  def sceneOffsetHeight_fov_(self, height, fov):
     return (height / 2) / tan(fov / 2)
 
