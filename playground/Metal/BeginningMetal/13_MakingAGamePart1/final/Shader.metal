@@ -69,9 +69,9 @@ vertex VertexOut vertex_shader(const VertexIn vertexIn [[ stage_in ]],
   vertexOut.color = vertexIn.color;
   vertexOut.materialColor = modelConstants.materialColor;
   vertexOut.textureCoordinates = vertexIn.textureCoordinates;
-  vertexOut.normal = modelConstants.normalMatrix * vertexIn.normal;
   vertexOut.shininess = modelConstants.shininess;
   vertexOut.specularIntensity = modelConstants.specularIntensity;
+  vertexOut.normal = modelConstants.normalMatrix * vertexIn.normal;
   vertexOut.eyePosition = (modelConstants.modelViewMatrix
                            * vertexIn.position).xyz;
   return vertexOut;
@@ -88,10 +88,13 @@ vertex VertexOut vertex_instance_shader(const VertexIn vertexIn [[ stage_in ]],
   vertexOut.color = vertexIn.color;
   vertexOut.materialColor = modelConstants.materialColor;
   vertexOut.textureCoordinates = vertexIn.textureCoordinates;
+  vertexOut.shininess = modelConstants.shininess;
+  vertexOut.specularIntensity = modelConstants.specularIntensity;
+  vertexOut.normal = modelConstants.normalMatrix * vertexIn.normal;
+  vertexOut.eyePosition = (modelConstants.modelViewMatrix
+                           * vertexIn.position).xyz;
   return vertexOut;
 }
-
-
 
 fragment half4 fragment_shader(VertexOut vertexIn [[ stage_in ]]) {
   return half4(vertexIn.color);
@@ -137,15 +140,16 @@ fragment half4 lit_textured_fragment(VertexOut vertexIn [[ stage_in ]],
   // Diffuse lighting
   float3 normal = normalize(vertexIn.normal);
   float diffuseFactor = saturate(-dot(normal, light.direction));
-  float3 diffuseColor = light.color * light.diffuseIntensity * diffuseFactor;
   
+  float3 diffuseColor = light.color * light.diffuseIntensity * diffuseFactor;
+
   // Specular
   float3 eye = normalize(vertexIn.eyePosition);
   float3 reflection = reflect(light.direction, normal);
   float specularFactor = pow(saturate(-dot(reflection, eye)),
                              vertexIn.shininess);
   float3 specularColor = light.color * vertexIn.specularIntensity * specularFactor;
-
+  
   color = color * float4(ambientColor + diffuseColor + specularColor, 1);
   if (color.a == 0.0)
     discard_fragment();
