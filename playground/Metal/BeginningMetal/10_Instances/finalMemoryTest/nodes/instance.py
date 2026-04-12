@@ -148,19 +148,26 @@ class Instance(
     if not ((instanceBuffer := self.instanceBuffer) and len(self.nodes) > 0):
       return
 
-    base_address = ctypes.cast(instanceBuffer.contents, ctypes.c_void_p).value
-    constants = ModelConstants()
+    #base_address = ctypes.cast(instanceBuffer.contents, ctypes.c_void_p).value
+    pointer = ctypes.cast(instanceBuffer.contents, ctypes.c_void_p).value
+    #constants = ModelConstants()
+    pointee = ModelConstants()
 
     for idx, node in enumerate(self.nodes):
-      mv_matrix = matrix_multiply(modelViewMatrix, node.modelMatrix)
-      constants.modelViewMatrix = mv_matrix
-      constants.materialColor = node.materialColor
+      #mv_matrix = matrix_multiply(modelViewMatrix, node.modelMatrix)
+      pointee.modelViewMatrix = matrix_multiply(modelViewMatrix,
+                                                node.modelMatrix)
+      pointee.materialColor = node.materialColor
       #constants.normalMatrix = mv_matrix.upperLeft3x3()
       #constants.shininess = node.shininess
       #constants.specularIntensity = node.specularIntensity
 
-      dst_address = base_address + (idx * ModelConstants.size)
-      ctypes.memmove(dst_address, constants.raw, ModelConstants.size)
+      dst_address = pointer + (idx * ModelConstants.size)
+      ctypes.memmove(
+        dst_address,
+        ctypes.addressof(pointee.raw),
+        ModelConstants.size,
+      )
     '''
     pointer = ctypes.cast(
       instanceBuffer.contents,
