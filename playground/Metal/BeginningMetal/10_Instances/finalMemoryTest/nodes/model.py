@@ -308,8 +308,8 @@ class Model(
     self.modelConstants.materialColor = self.materialColor
 
     commandEncoder.setVertexBytes_length_atIndex_(
-      self.modelConstants.raw,
-      ModelConstants.stride,
+      ctypes.byref(self.modelConstants),
+      ctypes.sizeof(self.modelConstants),
       1,
     )
     if self.texture != None:
