@@ -100,7 +100,7 @@ class Instance(
   @objc_method
   def makeBufferWithDevice_(self, device):
     self.instanceBuffer = device.newBufferWithLength_options_(
-      len(self.instanceConstants) * ctypes.sizeof(ModelConstants),
+      len(self.instanceConstants) * ModelConstants.stride,
       MTLResourceOptions.storageModeShared,
     )
 
