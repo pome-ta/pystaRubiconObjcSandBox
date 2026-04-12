@@ -1,6 +1,7 @@
 from math import cos, sin, tan, pi
 
 from rbedge.simd import (
+  simd_float3,
   simd_float4,
   simd_float3x3,
   simd_float4x4,
@@ -14,6 +15,32 @@ def radians(fromDegrees: float) -> float:
 
 def degrees(fromRadians: float) -> float:
   return (fromRadians / pi) * 180.0
+
+
+class matrix_float3x3(simd_float3x3):
+
+  _array = simd_float3 * 3
+
+  @classmethod
+  def from_columns(cls, c0, c1, c2):
+    return cls(cls._array(c0, c1, c2))
+
+  @classmethod
+  def identity(cls):
+    return cls.from_columns(
+      simd_float3(1, 0, 0),
+      simd_float3(0, 1, 0),
+      simd_float3(0, 0, 1),
+    )
+
+  def __repr__(self):
+    rows = []
+    for r in range(3):
+      row = []
+      for c in range(3):
+        row.append(f'{self.columns[c][r]: .4f}')
+      rows.append(' '.join(row))
+    return '\n'.join(rows)
 
 
 class matrix_float4x4(simd_float4x4):
@@ -114,11 +141,11 @@ class matrix_float4x4(simd_float4x4):
     )
 
   def upperLeft3x3(self):
-    return simd_float3x3((
+    return matrix_float3x3.from_columns(
       self.columns[0].xyz,
       self.columns[1].xyz,
       self.columns[2].xyz,
-    ))
+    )
 
   def __repr__(self):
     rows = []
