@@ -27,3 +27,13 @@ def readonly_properties(*property_names):
 
   return wrapper
 
+
+def readonly_class_properties(*property_names):
+
+  def wrapper(cls):
+    for name in property_names:
+      cls.declare_class_property(name)
+    return cls
+
+  return wrapper
+
