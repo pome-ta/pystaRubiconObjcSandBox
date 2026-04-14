@@ -26,12 +26,10 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
   #sys.path.insert(0, str(pathlib.Path(__file__).parent.parent / 'final'))
   sys.path.insert(0, str(pathlib.Path(__file__).parent.parent / 'challenge'))
 
-
 import ctypes
 from rbedge import pdbr
 
-
 from soundController import SoundController
 
-
 SoundController.shared.playBackgroundMusic_('bulletstorm_bg_v1.mp3')
+
