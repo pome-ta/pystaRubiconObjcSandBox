@@ -31,6 +31,12 @@ import ctypes
 from rbedge import pdbr
 
 
-from soundController import SoundController
+from soundController import SoundController, get_sound_path
+
+path = get_sound_path('bulletstorm_bg_v1.mp3')
+
+
+print(path)
+print(type(path))
 
 
