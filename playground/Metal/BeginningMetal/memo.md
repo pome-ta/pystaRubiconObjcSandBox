@@ -5,6 +5,14 @@
 [Programming Metal in iOS - YouTube](https://m.youtube.com/playlist?list=PL23Revp-82LJG3vcDPm8w7b5HTKjBOY0W)
 
 
+## 14. Making a Game, Part 2
+
+[Beginning Metal, Episode 14: Making a Game, Part 2 | Kodeco](https://www.kodeco.com/3537-beginning-metal/lessons/14)
+
+## 13. Making a Game, Part 1
+
+[Beginning Metal, Episode 13: Making a Game, Part 1 | Kodeco](https://www.kodeco.com/3537-beginning-metal/lessons/13)
+
 ## 12. Diffuse and Specular Lighting
 
 [Beginning Metal, Episode 12: Diffuse and Specular Lighting | Kodeco](https://www.kodeco.com/3537-beginning-metal/lessons/12)
