@@ -219,7 +219,7 @@ class Model(
     bufferAllocator = MTKMeshBufferAllocator.alloc().initWithDevice_(device)
 
     asset = MDLAsset.alloc().initWithURL_vertexDescriptor_bufferAllocator_(
-      nsurl(str(assetURL)),
+      nsurl(assetURL),
       descriptor,
       bufferAllocator,
     )
