@@ -4,7 +4,7 @@ from pathlib import Path
 from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import NSDictionary
 from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super, SEL
+from pyrubicon.objc.runtime import send_super, SEL, libc, objc_id
 from pyrubicon.objc.types import CGFloat
 
 from objc_frameworks.Metal import (
@@ -44,6 +44,11 @@ from simdTypes import (
   Vertex,
   ModelConstants,
 )
+
+#libc.malloc.restype = ctypes.c_void_p
+libc.malloc.restype = objc_id
+libc.malloc.argtypes = [ctypes.c_size_t]
+
 
 MDLVertexAttribute = ObjCClass('MDLVertexAttribute')
 MTKMeshBufferAllocator = ObjCClass('MTKMeshBufferAllocator')
@@ -256,12 +261,30 @@ class Model(
     inv.setTarget_(asset)
 
     inv.invoke()
+    
+    struct_size = ctypes.sizeof(MDLAxisAlignedBoundingBox)
+    aligned_ptr = libc.malloc(struct_size)
+    print(aligned_ptr)
+    print(dir(aligned_ptr))
+    
+    try:
+      #inv.getReturnValue_(objc_id(aligned_ptr))
+      boundingBox = MDLAxisAlignedBoundingBox()
+      ctypes.memmove(ctypes.addressof(boundingBox), aligned_ptr, struct_size)
+    except Exception as e:
+      print(e)
+    finally:
+      libc.free(aligned_ptr)
+      
+    
+    
+    '''
 
     raw_buffer = (ctypes.c_char * (S_SIZE + _PAD))()
     raw_address = ctypes.addressof(raw_buffer)
     aligned_address = (raw_address + _PAD) & ~_PAD
 
-    inv.getReturnValue_(ctypes.c_void_p(aligned_address))
+    #inv.getReturnValue_(ctypes.c_void_p(aligned_address))
     boundingBox = MDLAxisAlignedBoundingBox()
     ctypes.memmove(ctypes.addressof(boundingBox), aligned_address, S_SIZE)
 
@@ -273,6 +296,7 @@ class Model(
     #inv.getReturnValue_(ctypes.byref(boundingBox))
 
     #valueForKey = asset.valueForKey_('boundingBox')
+    '''
 
     #pdbr.state(asset)
     print('---')
