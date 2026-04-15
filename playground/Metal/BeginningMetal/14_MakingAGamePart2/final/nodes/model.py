@@ -4,7 +4,7 @@ from pathlib import Path
 from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import NSDictionary
 from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.runtime import send_super, send_message, SEL
 from pyrubicon.objc.types import CGFloat
 
 from objc_frameworks.Metal import (
@@ -55,6 +55,17 @@ MTLCompileOptions = ObjCClass('MTLCompileOptions')
 MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 
 MTKTextureLoader = ObjCClass('MTKTextureLoader')
+
+NSInvocation = ObjCClass('NSInvocation')
+
+class MDLAxisAlignedBoundingBox(ctypes.Structure):
+  _fields_ = [
+    ('maxBounds', simd_float3),
+    ('minBounds', simd_float3),
+  ]
+
+
+#BOUNDING_BOX_SEL =
 
 ROOT_PATH = Path(__file__).parents[1]
 
@@ -224,8 +235,18 @@ class Model(
       bufferAllocator,
     )
 
-    #pdbr.state(asset)
-    print(asset.boundingBox.maxBounds.x)
+    boundingBox = send_message(
+      asset,
+      'boundingBox',
+      restype=MDLAxisAlignedBoundingBox,
+      argtypes=[],
+    )
+
+    print('---')
+    print(f'maxBounds: {boundingBox.maxBounds}')
+    print(f'minBounds: {boundingBox.minBounds}')
+    #print(boundingBox.minBounds)
+    #print(asset.boundingBox.maxBounds.x)
     #boundingBox = asset.boundingBox
     #self.width = boundingBox.maxBounds.x - boundingBox.minBounds.x
     #self.height = boundingBox.maxBounds.y - boundingBox.minBounds.y
