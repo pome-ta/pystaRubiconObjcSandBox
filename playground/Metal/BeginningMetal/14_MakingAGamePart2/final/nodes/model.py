@@ -4,7 +4,7 @@ from pathlib import Path
 from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import NSDictionary
 from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super, send_message, SEL
+from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGFloat
 
 from objc_frameworks.Metal import (
@@ -65,8 +65,6 @@ class MDLAxisAlignedBoundingBox(ctypes.Structure):
     ('minBounds', simd_float3),
   ]
 
-
-BOUNDING_BOX_SEL = SEL(b"boundingBox")
 
 ROOT_PATH = Path(__file__).parents[1]
 
@@ -235,6 +233,8 @@ class Model(
       descriptor,
       bufferAllocator,
     )
+
+    #boundingBox = asset.boundingBox
     '''
     
     boundingBox = send_message(
@@ -245,19 +245,14 @@ class Model(
     )
     '''
 
-    sig = asset.methodSignatureForSelector_(BOUNDING_BOX_SEL)
-    inv = NSInvocation.invocationWithMethodSignature_(sig)
-
-    inv.setSelector_(BOUNDING_BOX_SEL)
-    inv.setTarget_(asset)
-    inv.invoke()
-
-    boundingBox = MDLAxisAlignedBoundingBox()
+    #boundingBox = MDLAxisAlignedBoundingBox()
 
     #inv.getReturnValue_(ctypes.byref(boundingBox))
 
-    pdbr.state(inv)
-    print('---')
+    #valueForKey = asset.valueForKey_('boundingBox')
+
+    #pdbr.state(asset)
+    #print('---')
     #pdbr.state(asset)
     #print(f'maxBounds: {boundingBox.maxBounds}')
     #print(f'minBounds: {boundingBox.minBounds}')
