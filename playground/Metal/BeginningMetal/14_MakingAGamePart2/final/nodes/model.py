@@ -58,6 +58,7 @@ MTKTextureLoader = ObjCClass('MTKTextureLoader')
 
 NSInvocation = ObjCClass('NSInvocation')
 
+
 class MDLAxisAlignedBoundingBox(ctypes.Structure):
   _fields_ = [
     ('maxBounds', simd_float3),
@@ -65,7 +66,7 @@ class MDLAxisAlignedBoundingBox(ctypes.Structure):
   ]
 
 
-#BOUNDING_BOX_SEL =
+BOUNDING_BOX_SEL = SEL(b"boundingBox")
 
 ROOT_PATH = Path(__file__).parents[1]
 
@@ -234,17 +235,32 @@ class Model(
       descriptor,
       bufferAllocator,
     )
-
+    '''
+    
     boundingBox = send_message(
       asset,
       'boundingBox',
       restype=MDLAxisAlignedBoundingBox,
       argtypes=[],
     )
+    '''
 
+    sig = asset.methodSignatureForSelector_(BOUNDING_BOX_SEL)
+    inv = NSInvocation.invocationWithMethodSignature_(sig)
+
+    inv.setSelector_(BOUNDING_BOX_SEL)
+    inv.setTarget_(asset)
+    inv.invoke()
+
+    boundingBox = MDLAxisAlignedBoundingBox()
+
+    #inv.getReturnValue_(ctypes.byref(boundingBox))
+
+    pdbr.state(inv)
     print('---')
-    print(f'maxBounds: {boundingBox.maxBounds}')
-    print(f'minBounds: {boundingBox.minBounds}')
+    #pdbr.state(asset)
+    #print(f'maxBounds: {boundingBox.maxBounds}')
+    #print(f'minBounds: {boundingBox.minBounds}')
     #print(boundingBox.minBounds)
     #print(asset.boundingBox.maxBounds.x)
     #boundingBox = asset.boundingBox
