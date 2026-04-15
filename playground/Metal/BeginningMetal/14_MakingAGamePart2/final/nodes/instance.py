@@ -98,6 +98,11 @@ class Instance(
       self.instanceConstants.append(ModelConstants())
 
   @objc_method
+  def removeInstance_(self, instances:int):
+    self.nodes.pop(instances)
+    self.instanceConstants.pop(instances)
+  
+  @objc_method
   def makeBufferWithDevice_(self, device):
     self.instanceBuffer = device.newBufferWithLength_options_(
       len(self.instanceConstants) * ModelConstants.stride,
