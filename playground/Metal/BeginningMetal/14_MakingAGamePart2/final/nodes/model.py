@@ -4,7 +4,7 @@ from pathlib import Path
 from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import NSDictionary
 from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.runtime import send_super, SEL
 from pyrubicon.objc.types import CGFloat
 
 from objc_frameworks.Metal import (
@@ -65,6 +65,11 @@ class MDLAxisAlignedBoundingBox(ctypes.Structure):
     ('minBounds', simd_float3),
   ]
 
+
+S_SIZE = ctypes.sizeof(MDLAxisAlignedBoundingBox)
+_PAD = 15
+
+BOUNDING_BOX_SEL = SEL(b"boundingBox")
 
 ROOT_PATH = Path(__file__).parents[1]
 
@@ -245,6 +250,24 @@ class Model(
     )
     '''
 
+    sig = asset.methodSignatureForSelector_(BOUNDING_BOX_SEL)
+    inv = NSInvocation.invocationWithMethodSignature_(sig)
+    inv.setSelector_(BOUNDING_BOX_SEL)
+    inv.setTarget_(asset)
+
+    inv.invoke()
+
+    raw_buffer = (ctypes.c_char * (S_SIZE + _PAD))()
+    raw_address = ctypes.addressof(raw_buffer)
+    aligned_address = (raw_address + _PAD) & ~_PAD
+
+    inv.getReturnValue_(ctypes.c_void_p(aligned_address))
+    boundingBox = MDLAxisAlignedBoundingBox()
+    ctypes.memmove(ctypes.addressof(boundingBox), aligned_address, S_SIZE)
+
+    #inv.getReturnValue_(ctypes.byref(boundingBox))
+    #inv.getReturnValue_(ctypes.c_void_p(aligned_address))
+
     #boundingBox = MDLAxisAlignedBoundingBox()
 
     #inv.getReturnValue_(ctypes.byref(boundingBox))
@@ -252,7 +275,7 @@ class Model(
     #valueForKey = asset.valueForKey_('boundingBox')
 
     #pdbr.state(asset)
-    #print('---')
+    print('---')
     #pdbr.state(asset)
     #print(f'maxBounds: {boundingBox.maxBounds}')
     #print(f'minBounds: {boundingBox.minBounds}')
