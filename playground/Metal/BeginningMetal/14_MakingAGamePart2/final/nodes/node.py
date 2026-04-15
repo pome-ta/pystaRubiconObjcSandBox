@@ -16,13 +16,16 @@ class Node(NSObject):
   name: str = objc_property(object)
   materialColor: 'float4' = objc_property(object)
   specularIntensity: float = objc_property(object)
-  shininess:float = objc_property(object)
-  
+  shininess: float = objc_property(object)
+
   children: ['Node'] = objc_property(object)
 
   position: 'float3' = objc_property(object)
   rotation: 'float3' = objc_property(object)
   scale: 'float3' = objc_property(object)
+
+  #width: float = objc_property(object)
+  #height: float = objc_property(object)
 
   @objc_method  # declare_property - getter
   def modelMatrix(self) -> object:
@@ -43,12 +46,15 @@ class Node(NSObject):
     self.materialColor = simd_float4(1)
     self.specularIntensity = 1.0
     self.shininess = 1.0
-    
+
     self.children = []
 
     self.position = simd_float3(0)
     self.rotation = simd_float3(0)
     self.scale = simd_float3(1)
+
+    #self.width = 1.0
+    #self.height = 1.0
 
   @objc_method
   def init(self):

@@ -224,9 +224,11 @@ class Model(
       bufferAllocator,
     )
 
-    boundingBox = asset.boundingBox
-    self.width = boundingBox.maxBounds.x - boundingBox.minBounds.x
-    self.height = boundingBox.maxBounds.y - boundingBox.minBounds.y
+    #pdbr.state(asset)
+    print(asset.boundingBox.maxBounds.x)
+    #boundingBox = asset.boundingBox
+    #self.width = boundingBox.maxBounds.x - boundingBox.minBounds.x
+    #self.height = boundingBox.maxBounds.y - boundingBox.minBounds.y
 
     try:
       self.meshes = MTKMesh.newMeshesFromAsset_device_sourceMeshes_error_(
