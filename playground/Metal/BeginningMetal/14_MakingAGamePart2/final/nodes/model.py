@@ -224,6 +224,10 @@ class Model(
       bufferAllocator,
     )
 
+    boundingBox = asset.boundingBox
+    self.width = boundingBox.maxBounds.x - boundingBox.minBounds.x
+    self.height = boundingBox.maxBounds.y - boundingBox.minBounds.y
+
     try:
       self.meshes = MTKMesh.newMeshesFromAsset_device_sourceMeshes_error_(
         asset,
