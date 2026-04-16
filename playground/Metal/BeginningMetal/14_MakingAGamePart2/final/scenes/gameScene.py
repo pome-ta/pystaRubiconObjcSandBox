@@ -5,6 +5,8 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGSize, CGFloat
 
+from objc_frameworks.CoreGraphics import CGPointZero
+
 from rbedge.simd import simd_float3, simd_float4
 
 # todo: Pythonista3 の`scene.Scene` ではない
@@ -29,8 +31,22 @@ class GameScene(Scene):
 
   bricks: Instance = objc_property()
 
+  previousTouchLocation: CGPoint = objc_property()
+
+  ballVelocityX: float = objc_property(object)
+  ballVelocityY: float = objc_property(object)
+
+  @objc_method
+  def initializeProperties(self):
+    # todo: class member declarations
+    send_super(__class__, self, 'initializeProperties')
+    self.previousTouchLocation = CGPointZero
+    self.ballVelocityX = 0.0
+    self.ballVelocityY = 0.0
+
   @objc_method
   def initWithDevice_size_(self, device, size: CGSize):
+    self.initializeProperties()
     self.ball = Model.alloc().initWithDevice_modelName_(
       device,
       'ball',
@@ -76,6 +92,10 @@ class GameScene(Scene):
 
   @objc_method
   def setupScene(self):
+    self.ballVelocityX = 20.0
+    self.ballVelocityY = 15.0
+    
+    
     self.ball.position.x = Constants.gameWidth / 2
     self.ball.position.y = Constants.gameHeight * 0.1
     self.ball.materialColor = simd_float4(0.5, 0.9, 0, 1)
@@ -122,9 +142,23 @@ class GameScene(Scene):
                  CGFloat,
                ])
 
+    bounced = False
+    
     for brick in self.bricks.nodes:
       brick.rotation.y += pi / 4 * deltaTime
       brick.rotation.z += pi / 4 * deltaTime
+
+    self.ball.position.x += self.ballVelocityX * deltaTime
+    self.ball.position.y += self.ballVelocityY * deltaTime
+    
+    if self.ball.position.y > Constants.gameHeight:
+      self.ball.position.y = Constants.gameHeight
+      self.ballVelocityY = -self.ballVelocityY
+      bounced = True
+      
+    
+
+
 
   @objc_method
   def sceneOffsetHeight_fov_(self, height: float, fov: float) -> float:
