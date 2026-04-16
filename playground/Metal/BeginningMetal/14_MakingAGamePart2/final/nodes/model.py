@@ -26,7 +26,7 @@ from objc_frameworks.ModelIO import (
   MDLVertexAttributeNormal,
 )
 
-#from objc_frameworks.SceneKit import SCNVector3
+from objc_frameworks.SceneKit import SCNVector3
 
 
 from rbedge.utils import nsurl, get_str_filepath
@@ -60,6 +60,7 @@ MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 MTKTextureLoader = ObjCClass('MTKTextureLoader')
 
 SCNScene = ObjCClass('SCNScene')
+
 
 ROOT_PATH = Path(__file__).parents[1]
 
@@ -231,8 +232,8 @@ class Model(
 
     scnScene = SCNScene.sceneWithMDLAsset_(asset)
     boundingBox = scnScene.rootNode.getBoundingBox()
-    print('---')
-    pdbr.state(boundingBox.description)
+    #print('---')
+    pdbr.state(boundingBox)
     #print(f'maxBounds: {boundingBox.max}')
     #print(f'minBounds: {boundingBox.min}')
     #pdbr.state(scnScene.rootNode.childNodes.firstObject().getBoundingBox())
