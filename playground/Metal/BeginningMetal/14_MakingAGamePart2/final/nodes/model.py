@@ -26,6 +26,9 @@ from objc_frameworks.ModelIO import (
   MDLVertexAttributeNormal,
 )
 
+#from objc_frameworks.SceneKit import SCNVector3
+
+
 from rbedge.utils import nsurl, get_str_filepath
 from rbedge.utils import readonly_properties
 from rbedge.simd import (
@@ -227,7 +230,12 @@ class Model(
     )
 
     scnScene = SCNScene.sceneWithMDLAsset_(asset)
-    pdbr.state(scnScene.rootNode.childNodes.firstObject().getBoundingBox())
+    boundingBox = scnScene.rootNode.getBoundingBox()
+    print('---')
+    pdbr.state(boundingBox.description)
+    #print(f'maxBounds: {boundingBox.max}')
+    #print(f'minBounds: {boundingBox.min}')
+    #pdbr.state(scnScene.rootNode.childNodes.firstObject().getBoundingBox())
     #pdbr.state(scnScene.rootNode.getBoundingBox())
     '''
     
@@ -240,7 +248,7 @@ class Model(
     '''
 
     #pdbr.state(asset)
-    print('---')
+
     #pdbr.state(asset)
     #print(f'maxBounds: {boundingBox.maxBounds}')
     #print(f'minBounds: {boundingBox.minBounds}')
