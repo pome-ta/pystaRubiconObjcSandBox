@@ -1,7 +1,7 @@
 from pyrubicon.objc.api import NSObject
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
-from pyrubicon.objc.types import CGFloat
+from pyrubicon.objc.types import CGFloat, CGRect, CGRectMake
 
 from rbedge.utils import readonly_properties
 from rbedge.simd import simd_float3, simd_float4, matrix_multiply
@@ -24,8 +24,8 @@ class Node(NSObject):
   rotation: 'float3' = objc_property(object)
   scale: 'float3' = objc_property(object)
 
-  #width: float = objc_property(object)
-  #height: float = objc_property(object)
+  width: float = objc_property(object)
+  height: float = objc_property(object)
 
   @objc_method  # declare_property - getter
   def modelMatrix(self) -> object:
@@ -53,8 +53,8 @@ class Node(NSObject):
     self.rotation = simd_float3(0)
     self.scale = simd_float3(1)
 
-    #self.width = 1.0
-    #self.height = 1.0
+    self.width = 1.0
+    self.height = 1.0
 
   @objc_method
   def init(self):
@@ -86,4 +86,20 @@ class Node(NSObject):
         modelViewMatrix,
       )
       commandEncoder.popDebugGroup()
+
+  @objc_method
+  def boundingBox_(self, parentModelViewMatrix: object) -> CGRect:
+    modelViewMatrix = matrix_multiply(parentModelViewMatrix, self.modelMatrix)
+    lowerLeft = simd_float4(-self.width / 2, -self.height / 2, 0, 1)
+    lowerLeft = matrix_multiply(modelViewMatrix, lowerLeft)
+    upperRight = simd_float4(self.width / 2, self.height / 2, 0, 1)
+    upperRight = matrix_multiply(modelViewMatrix, upperRight)
+
+    boundingBox = CGRectMake(
+      x=float(lowerLeft.x),
+      y=float(lowerLeft.y),
+      w=float(upperRight.x - lowerLeft.x),
+      h=float(upperRight.y - lowerLeft.y),
+    )
+    return boundingBox
 
