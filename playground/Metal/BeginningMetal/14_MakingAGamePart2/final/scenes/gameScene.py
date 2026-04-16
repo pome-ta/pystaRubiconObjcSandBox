@@ -14,10 +14,12 @@ from .scene import Scene
 from nodes import Model, Instance
 
 from utilities import generateColorsNumber_
+from soundController import SoundController
 
 
 @dataclass
 class Constants:
+
   gameHeight: float = 48.0
   gameWidth: float = 27.0
   bricksPerRow: int = 8
@@ -94,8 +96,7 @@ class GameScene(Scene):
   def setupScene(self):
     self.ballVelocityX = 20.0
     self.ballVelocityY = 15.0
-    
-    
+
     self.ball.position.x = Constants.gameWidth / 2
     self.ball.position.y = Constants.gameHeight * 0.1
     self.ball.materialColor = simd_float4(0.5, 0.9, 0, 1)
@@ -143,22 +144,40 @@ class GameScene(Scene):
                ])
 
     bounced = False
-    
+
     for brick in self.bricks.nodes:
       brick.rotation.y += pi / 4 * deltaTime
       brick.rotation.z += pi / 4 * deltaTime
 
     self.ball.position.x += self.ballVelocityX * deltaTime
     self.ball.position.y += self.ballVelocityY * deltaTime
-    
+
     if self.ball.position.y > Constants.gameHeight:
       self.ball.position.y = Constants.gameHeight
       self.ballVelocityY = -self.ballVelocityY
       bounced = True
+
+    if self.ball.position.x < 0:
+      self.ball.position.x = 0
+      self.ballVelocityX = -self.ballVelocityX
+      bounced = True
+
+    if self.ball.position.x > Constants.gameWidth:
+      self.ball.position.x = Constants.gameWidth
+      self.ballVelocityX = -self.ballVelocityX
+      bounced = True
+
+    if self.ball.position.y < 0:
+      self.ballVelocityY = -self.ballVelocityY
+      bounced = True
+
+    if bounced:
+      SoundController.shared.playPopEffect()
       
+    # Check paddle collision
+    ballRect = self.ball.boundingBox_(self.camera.viewMatrix)
+    paddleRect = self.paddle.boundingBox_(self.camera.viewMatrix)
     
-
-
 
   @objc_method
   def sceneOffsetHeight_fov_(self, height: float, fov: float) -> float:
