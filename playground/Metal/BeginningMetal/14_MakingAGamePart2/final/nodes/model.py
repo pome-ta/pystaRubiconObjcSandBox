@@ -28,7 +28,6 @@ from objc_frameworks.ModelIO import (
 
 from objc_frameworks.SceneKit import SCNVector3
 
-
 from rbedge.utils import nsurl, get_str_filepath
 from rbedge.utils import readonly_properties
 from rbedge.simd import (
@@ -60,7 +59,6 @@ MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 MTKTextureLoader = ObjCClass('MTKTextureLoader')
 
 SCNScene = ObjCClass('SCNScene')
-
 
 ROOT_PATH = Path(__file__).parents[1]
 
@@ -229,17 +227,7 @@ class Model(
       descriptor,
       bufferAllocator,
     )
-
-    scnScene = SCNScene.sceneWithMDLAsset_(asset)
-    boundingBox = scnScene.rootNode.getBoundingBox()
-    #print('---')
-    pdbr.state(boundingBox)
-    #print(f'maxBounds: {boundingBox.max}')
-    #print(f'minBounds: {boundingBox.min}')
-    #pdbr.state(scnScene.rootNode.childNodes.firstObject().getBoundingBox())
-    #pdbr.state(scnScene.rootNode.getBoundingBox())
     '''
-    
     boundingBox = send_message(
       asset,
       'boundingBox',
@@ -248,16 +236,14 @@ class Model(
     )
     '''
 
-    #pdbr.state(asset)
+    _scnScene = SCNScene.sceneWithMDLAsset_(asset)
+    boundingBox = _scnScene.rootNode.getBoundingBox()
 
-    #pdbr.state(asset)
-    #print(f'maxBounds: {boundingBox.maxBounds}')
-    #print(f'minBounds: {boundingBox.minBounds}')
-    #print(boundingBox.minBounds)
-    #print(asset.boundingBox.maxBounds.x)
-    #boundingBox = asset.boundingBox
-    #self.width = boundingBox.maxBounds.x - boundingBox.minBounds.x
-    #self.height = boundingBox.maxBounds.y - boundingBox.minBounds.y
+    self.width = boundingBox.max.x - boundingBox.min.x
+    self.height = boundingBox.max.y - boundingBox.min.y
+    #print('---')
+    #print(f'{self.width=}')
+    #print(f'{self.height=}')
 
     try:
       self.meshes = MTKMesh.newMeshesFromAsset_device_sourceMeshes_error_(
