@@ -4,7 +4,7 @@ from pathlib import Path
 from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import NSDictionary
 from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super, SEL, libc, objc_id
+from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGFloat
 
 from objc_frameworks.Metal import (
@@ -45,11 +45,6 @@ from simdTypes import (
   ModelConstants,
 )
 
-#libc.malloc.restype = ctypes.c_void_p
-libc.malloc.restype = objc_id
-libc.malloc.argtypes = [ctypes.c_size_t]
-
-
 MDLVertexAttribute = ObjCClass('MDLVertexAttribute')
 MTKMeshBufferAllocator = ObjCClass('MTKMeshBufferAllocator')
 MDLAsset = ObjCClass('MDLAsset')
@@ -61,20 +56,7 @@ MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 
 MTKTextureLoader = ObjCClass('MTKTextureLoader')
 
-NSInvocation = ObjCClass('NSInvocation')
-
-
-class MDLAxisAlignedBoundingBox(ctypes.Structure):
-  _fields_ = [
-    ('maxBounds', simd_float3),
-    ('minBounds', simd_float3),
-  ]
-
-
-S_SIZE = ctypes.sizeof(MDLAxisAlignedBoundingBox)
-_PAD = 15
-
-BOUNDING_BOX_SEL = SEL(b"boundingBox")
+SCNScene = ObjCClass('SCNScene')
 
 ROOT_PATH = Path(__file__).parents[1]
 
@@ -244,7 +226,9 @@ class Model(
       bufferAllocator,
     )
 
-    #boundingBox = asset.boundingBox
+    scnScene = SCNScene.sceneWithMDLAsset_(asset)
+    pdbr.state(scnScene.rootNode.childNodes.firstObject().getBoundingBox())
+    #pdbr.state(scnScene.rootNode.getBoundingBox())
     '''
     
     boundingBox = send_message(
@@ -253,49 +237,6 @@ class Model(
       restype=MDLAxisAlignedBoundingBox,
       argtypes=[],
     )
-    '''
-
-    sig = asset.methodSignatureForSelector_(BOUNDING_BOX_SEL)
-    inv = NSInvocation.invocationWithMethodSignature_(sig)
-    inv.setSelector_(BOUNDING_BOX_SEL)
-    inv.setTarget_(asset)
-
-    inv.invoke()
-    
-    struct_size = ctypes.sizeof(MDLAxisAlignedBoundingBox)
-    aligned_ptr = libc.malloc(struct_size)
-    print(aligned_ptr)
-    print(dir(aligned_ptr))
-    
-    try:
-      #inv.getReturnValue_(objc_id(aligned_ptr))
-      boundingBox = MDLAxisAlignedBoundingBox()
-      ctypes.memmove(ctypes.addressof(boundingBox), aligned_ptr, struct_size)
-    except Exception as e:
-      print(e)
-    finally:
-      libc.free(aligned_ptr)
-      
-    
-    
-    '''
-
-    raw_buffer = (ctypes.c_char * (S_SIZE + _PAD))()
-    raw_address = ctypes.addressof(raw_buffer)
-    aligned_address = (raw_address + _PAD) & ~_PAD
-
-    #inv.getReturnValue_(ctypes.c_void_p(aligned_address))
-    boundingBox = MDLAxisAlignedBoundingBox()
-    ctypes.memmove(ctypes.addressof(boundingBox), aligned_address, S_SIZE)
-
-    #inv.getReturnValue_(ctypes.byref(boundingBox))
-    #inv.getReturnValue_(ctypes.c_void_p(aligned_address))
-
-    #boundingBox = MDLAxisAlignedBoundingBox()
-
-    #inv.getReturnValue_(ctypes.byref(boundingBox))
-
-    #valueForKey = asset.valueForKey_('boundingBox')
     '''
 
     #pdbr.state(asset)
