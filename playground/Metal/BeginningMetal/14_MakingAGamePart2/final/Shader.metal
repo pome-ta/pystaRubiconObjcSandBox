@@ -96,6 +96,8 @@ vertex VertexOut vertex_instance_shader(const VertexIn vertexIn [[ stage_in ]],
   return vertexOut;
 }
 
+
+
 fragment half4 fragment_shader(VertexOut vertexIn [[ stage_in ]]) {
   return half4(vertexIn.color);
 }
@@ -126,7 +128,6 @@ fragment half4 fragment_color(VertexOut vertexIn [[ stage_in ]]) {
   return half4(vertexIn.materialColor);
 }
 
-
 fragment half4 lit_textured_fragment(VertexOut vertexIn [[ stage_in ]],
                                  sampler sampler2d [[ sampler(0) ]],
                                  constant Light &light [[ buffer(3) ]],
@@ -140,7 +141,6 @@ fragment half4 lit_textured_fragment(VertexOut vertexIn [[ stage_in ]],
   // Diffuse lighting
   float3 normal = normalize(vertexIn.normal);
   float diffuseFactor = saturate(-dot(normal, light.direction));
-  
   float3 diffuseColor = light.color * light.diffuseIntensity * diffuseFactor;
 
   // Specular
