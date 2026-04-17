@@ -33,7 +33,7 @@ class GameScene(Scene):
 
   bricks: Instance = objc_property()
 
-  previousTouchLocation: CGPoint = objc_property()
+  previousTouchLocation: CGPoint = objc_property(object)
 
   ballVelocityX: float = objc_property(object)
   ballVelocityY: float = objc_property(object)
