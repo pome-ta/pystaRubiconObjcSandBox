@@ -5,7 +5,7 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGSize, CGFloat
 
-from objc_frameworks.CoreGraphics import CGPointZero
+from objc_frameworks.CoreGraphics import CGPointZero, CGRectIntersectsRect
 
 from rbedge.simd import simd_float3, simd_float4
 
@@ -173,11 +173,22 @@ class GameScene(Scene):
 
     if bounced:
       SoundController.shared.playPopEffect()
-      
+
     # Check paddle collision
     ballRect = self.ball.boundingBox_(self.camera.viewMatrix)
     paddleRect = self.paddle.boundingBox_(self.camera.viewMatrix)
-    
+
+    if CGRectIntersectsRect(ballRect, paddleRect):
+      self.ballVelocityY = -self.ballVelocityY
+      bounced = True
+
+    # Check bricks collision
+    for idx, brick in enumerate(self.bricks.nodes):
+      brickRect = brick.boundingBox_(self.camera.viewMatrix)
+      if CGRectIntersectsRect(ballRect, brickRect):
+        self.ballVelocityY = -self.ballVelocityY
+        self.bricks.removeInstance_(idx)
+        break
 
   @objc_method
   def sceneOffsetHeight_fov_(self, height: float, fov: float) -> float:
