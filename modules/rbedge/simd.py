@@ -62,8 +62,8 @@ class _SimdMatrixMeta(type(ctypes.Structure)):
 class _SimdVector(ctypes.Structure, metaclass=_SimdVectorMeta):
   _components_ = ''
   _aliases_ = {
-      'r': 'x', 'g': 'y', 'b': 'z', 'a': 'w',
-      's': 'x', 't': 'y', 'p': 'z', 'q': 'w',
+    'r': 'x', 'g': 'y', 'b': 'z', 'a': 'w',
+    's': 'x', 't': 'y', 'p': 'z', 'q': 'w',
   }  # yapf: disable
 
   def __init__(self, *values):
@@ -173,8 +173,6 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdVectorMeta):
     elif isinstance(other, (int, float)):
       values = [op(a, other) for a in self]
     else:
-      # ★ポイント: 行列など知らない型が来たら NotImplemented を返すことで、
-      # Pythonが自動的に相手(行列)の __rmul__ を呼び出してくれます
       return NotImplemented
 
     return self.__class__(*values)
@@ -198,7 +196,6 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdVectorMeta):
     return self.__class__(*(-x for x in self))
 
   # --- simd math
-
   def dot(self, other):
     if len(self) != len(other):
       raise ValueError('vector size mismatch')
@@ -252,15 +249,11 @@ class _SimdMatrix(ctypes.Structure, metaclass=_SimdMatrixMeta):
 
     return '\n'.join(lines)
 
-  # ==================================================
-  # 追加: 行列の掛け算サポート (__mul__ と __rmul__)
-  # ==================================================
   def __mul__(self, other):
     nrows = len(self.columns[0])
     ncols = type(self).column_count
 
     if isinstance(other, _SimdMatrix):
-      # パターン1: 行列 × 行列
       other_ncols = type(other).column_count
       other_nrows = len(other.columns[0])
 
@@ -276,7 +269,6 @@ class _SimdMatrix(ctypes.Structure, metaclass=_SimdMatrixMeta):
       return result
 
     elif isinstance(other, _SimdVector):
-      # パターン2: 行列 × 縦ベクトル
       if len(other) != ncols:
         raise ValueError("Matrix column count must match Vector length")
 
@@ -285,11 +277,9 @@ class _SimdMatrix(ctypes.Structure, metaclass=_SimdMatrixMeta):
         val = sum(self.columns[c][r] * other[c] for c in range(ncols))
         values.append(val)
 
-      # ベクトルと同じ型で返す
       return type(other)(*values)
 
     elif isinstance(other, (int, float)):
-      # パターン3: 行列 × スカラー
       result = type(self)()
       for c in range(ncols):
         for r in range(nrows):
@@ -299,12 +289,10 @@ class _SimdMatrix(ctypes.Structure, metaclass=_SimdMatrixMeta):
     return NotImplemented
 
   def __rmul__(self, other):
-    # 相手側(左側)が自分が知らない型で * 演算子を使った場合、ここにフォールバックしてくる
     nrows = len(self.columns[0])
     ncols = type(self).column_count
 
     if isinstance(other, _SimdVector):
-      # パターン4: 横ベクトル × 行列
       if len(other) != nrows:
         raise ValueError("Vector length must match Matrix row count")
 
@@ -313,12 +301,10 @@ class _SimdMatrix(ctypes.Structure, metaclass=_SimdMatrixMeta):
         val = sum(other[r] * self.columns[c][r] for r in range(nrows))
         values.append(val)
 
-      # 結果は行列の列(column)と同じベクトル型になる
       result_type = type(self).column_vector_type
       return result_type(*values)
 
     elif isinstance(other, (int, float)):
-      # スカラー × 行列 は、行列 × スカラー と同じ
       return self.__mul__(other)
 
     return NotImplemented
@@ -366,14 +352,7 @@ class simd_float4x4(_SimdMatrix):
   ]
 
 
-# ==================================================
-# 究極にシンプルになった matrix_multiply 関数
-# ==================================================
 def matrix_multiply(a, b):
-  """
-    行列 × 行列、行列 × ベクトル、ベクトル × 行列 を全て自動で判定して計算します。
-    """
-  # クラス側に定義した __mul__ や __rmul__ が勝手に最適な計算をしてくれる
   return a * b
 
 
