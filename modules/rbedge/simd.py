@@ -196,7 +196,6 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdVectorMeta):
     return self.__class__(*(-x for x in self))
 
   # --- simd math
-
   def dot(self, other):
     if len(self) != len(other):
       raise ValueError('vector size mismatch')
