@@ -294,11 +294,11 @@ class MainViewController(UIViewController):
         safeAreaLayoutGuide.centerYAnchor),
       self.metalView.widthAnchor.constraintEqualToAnchor_multiplier_(
         safeAreaLayoutGuide.widthAnchor,
-        0.88,
+        0.92,
       ),
       self.metalView.heightAnchor.constraintEqualToAnchor_multiplier_(
         safeAreaLayoutGuide.heightAnchor,
-        0.88,
+        0.92,
       ),
     ])
 

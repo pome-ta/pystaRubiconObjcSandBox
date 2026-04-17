@@ -33,7 +33,7 @@ class GameScene(Scene):
 
   bricks: Instance = objc_property()
 
-  previousTouchLocation: CGPoint = objc_property(object)
+  previousTouchLocation: CGPoint = objc_property(CGPoint)
 
   ballVelocityX: float = objc_property(object)
   ballVelocityY: float = objc_property(object)
@@ -193,4 +193,53 @@ class GameScene(Scene):
   @objc_method
   def sceneOffsetHeight_fov_(self, height: float, fov: float) -> float:
     return (height / 2) / tan(fov / 2)
+
+  @objc_method
+  def touchesBegan_touches_with_(self, view, touches, event):
+
+    send_super(__class__,
+               self,
+               'touchesBegan:touches:with:',
+               view,
+               touches,
+               event,
+               argtypes=[
+                 objc_id,
+                 objc_id,
+                 objc_id,
+               ])
+
+    if (touch := touches.anyObject()) is None:
+      return
+    self.previousTouchLocation = touch.locationInView_(view)
+
+  @objc_method
+  def touchesMoved_touches_with_(self, view, touches, event):
+
+    send_super(__class__,
+               self,
+               'touchesMoved:touches:with:',
+               view,
+               touches,
+               event,
+               argtypes=[
+                 objc_id,
+                 objc_id,
+                 objc_id,
+               ])
+
+    if (touch := touches.anyObject()) is None:
+      return
+    touchLocation = touch.locationInView_(view)
+
+    delta = CGPoint(self.previousTouchLocation.x - touchLocation.x,
+                    self.previousTouchLocation.y - touchLocation.y)
+    deltaX = float(delta.x) * (Constants.gameWidth / float(self.size.width))
+
+    newX = self.paddle.position.x + deltaX
+    newX = min(max(newX, self.paddle.width / 2),
+               Constants.gameWidth - self.paddle.width / 2)
+    self.paddle.position.x = newX
+
+    self.previousTouchLocation = touchLocation
 
