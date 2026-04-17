@@ -3,7 +3,7 @@ from math import radians, tan, pi
 
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id
-from pyrubicon.objc.types import CGSize, CGFloat
+from pyrubicon.objc.types import CGPoint, CGSize, CGFloat
 
 from objc_frameworks.CoreGraphics import CGPointZero, CGRectIntersectsRect
 

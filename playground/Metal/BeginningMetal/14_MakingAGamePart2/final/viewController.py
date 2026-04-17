@@ -91,9 +91,9 @@ class MainViewController(UIViewController):
     )
 
     metalView.clearColor = Colors.wenderlichGreen
-    metalView.delegate = renderer
+    #metalView.delegate = renderer
 
-    #SoundController.shared.playBackgroundMusic_('bulletstorm_bg_v1.mp3')
+    SoundController.shared.playBackgroundMusic_('bulletstorm_bg_v1.mp3')
 
     metalView.enableSetNeedsDisplay = True
     metalView.setNeedsDisplay()
