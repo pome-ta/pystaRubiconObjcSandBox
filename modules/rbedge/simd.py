@@ -196,6 +196,7 @@ class _SimdVector(ctypes.Structure, metaclass=_SimdVectorMeta):
     return self.__class__(*(-x for x in self))
 
   # --- simd math
+
   def dot(self, other):
     if len(self) != len(other):
       raise ValueError('vector size mismatch')
@@ -254,11 +255,12 @@ class _SimdMatrix(ctypes.Structure, metaclass=_SimdMatrixMeta):
     ncols = type(self).column_count
 
     if isinstance(other, _SimdMatrix):
+      # パターン1:  行列 * 行列
       other_ncols = type(other).column_count
       other_nrows = len(other.columns[0])
 
       if ncols != other_nrows:
-        raise ValueError("Matrix dimensions must agree for multiplication")
+        raise ValueError('Matrix dimensions must agree for multiplication')
 
       result = type(self)()
       for c in range(other_ncols):
@@ -269,17 +271,27 @@ class _SimdMatrix(ctypes.Structure, metaclass=_SimdMatrixMeta):
       return result
 
     elif isinstance(other, _SimdVector):
+      # パターン2:  行列(N行M列) * 縦ベクトル(要素数M) = 縦ベクトル(要素数N)
+
+      # NOTE:
+      # Result vector type is determined by dimension, not operand type.
+      # (Different from Swift SIMD behavior)
       if len(other) != ncols:
-        raise ValueError("Matrix column count must match Vector length")
+        raise ValueError('Matrix column count must match Vector length')
 
       values = []
       for r in range(nrows):
         val = sum(self.columns[c][r] * other[c] for c in range(ncols))
         values.append(val)
 
-      return type(other)(*values)
+      # 結果の要素数(nrows)に対応するベクトル型を動的に取得して返す
+      result_type = _SimdVectorMeta._VECTOR_TYPES.get(nrows)
+      if not result_type:
+        raise TypeError(f'Unsupported vector size: {nrows}')
+      return result_type(*values)
 
     elif isinstance(other, (int, float)):
+      # パターン3:  行列 * スカラー
       result = type(self)()
       for c in range(ncols):
         for r in range(nrows):
@@ -289,22 +301,32 @@ class _SimdMatrix(ctypes.Structure, metaclass=_SimdMatrixMeta):
     return NotImplemented
 
   def __rmul__(self, other):
+    # フォールバック:相手側(左側)が自分が知らない型で`*` 演算子を使用した場合
     nrows = len(self.columns[0])
     ncols = type(self).column_count
 
     if isinstance(other, _SimdVector):
+      # パターン4:  横ベクトル(要素数N) * 行列(N行M列) = 横ベクトル(要素数M)
+
+      # NOTE:
+      # Result vector type is determined by dimension, not operand type.
+      # (Different from Swift SIMD behavior)
       if len(other) != nrows:
-        raise ValueError("Vector length must match Matrix row count")
+        raise ValueError('Vector length must match Matrix row count')
 
       values = []
       for c in range(ncols):
         val = sum(other[r] * self.columns[c][r] for r in range(nrows))
         values.append(val)
 
-      result_type = type(self).column_vector_type
+      # 結果の要素数(ncols)に対応するベクトル型を動的に取得して返す
+      result_type = _SimdVectorMeta._VECTOR_TYPES.get(ncols)
+      if not result_type:
+        raise TypeError(f'Unsupported vector size: {ncols}')
       return result_type(*values)
 
     elif isinstance(other, (int, float)):
+      # スカラー * 行列 は、行列 * スカラー と同じ
       return self.__mul__(other)
 
     return NotImplemented
@@ -353,6 +375,16 @@ class simd_float4x4(_SimdMatrix):
 
 
 def matrix_multiply(a, b):
+  """
+    行列 × 行列、行列 × ベクトル、ベクトル × 行列 を全て自動で判定し計算
+    """
+  # エラーチェック: 対応していない型が来た場合（念のため）
+  if not isinstance(a, (_SimdMatrix, _SimdVector)) and not isinstance(
+      b, (_SimdMatrix, _SimdVector)):
+    raise TypeError(
+      f'Unsupported operand types for matrix_multiply: {type(a)} and {type(b)}'
+    )
+
   return a * b
 
 
