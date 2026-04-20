@@ -1,7 +1,5 @@
-import ctypes
-
-from pyrubicon.objc.api import objc_method, objc_property, objc_ivar
-from pyrubicon.objc.runtime import send_super, objc_id, get_ivar, set_ivar
+from pyrubicon.objc.api import objc_method, objc_property
+from pyrubicon.objc.runtime import send_super, objc_id
 from pyrubicon.objc.types import CGSize, CGFloat
 
 # todo: Pythonista3 の`scene.Scene` ではない
@@ -15,20 +13,17 @@ class GameOverScene(Scene):
   registerTouch: bool = objc_property(object)
   time: float = objc_property(object)
   #win: bool = objc_property(object)
-  _win:bool = objc_ivar(ctypes.c_bool)
-
+  #_win:bool = objc_ivar(ctypes.c_bool)
+  _winStorage: bool = objc_property(bool)
 
   @objc_method
-  def win(self):
-    return get_ivar(self, '_win')
-
+  def win(self) -> bool:
+    return self._winStorage
 
   @objc_method
   def setWin_(self, new_win: bool):
-    set_ivar(self, '_win', new_win)
+    self._winStorage = new_win
     print('se')
-
-
 
   @objc_method
   def initializeProperties(self):
@@ -36,8 +31,9 @@ class GameOverScene(Scene):
     send_super(__class__, self, 'initializeProperties')
     self.registerTouch = False
     self.time = 0.0
-    self.win = False
+    #self.win = False
     #set_ivar(self, '_win', False)
+    self._winStorage = False
 
   @objc_method
   def initWithDevice_size_(self, device, size: CGSize):
