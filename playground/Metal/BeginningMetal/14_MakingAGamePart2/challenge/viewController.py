@@ -90,7 +90,7 @@ class MainViewController(UIViewController):
       device,
       metalView.bounds.size,
     )
-    scene.win = True
+    scene.win = False
     renderer.scene = scene
     #renderer.scene = GameScene.alloc().initWithDevice_size_(device,metalView.bounds.size,)
 

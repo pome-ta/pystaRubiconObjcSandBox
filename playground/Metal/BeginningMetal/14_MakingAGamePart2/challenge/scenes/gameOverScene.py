@@ -36,7 +36,7 @@ class GameOverScene(Scene):
         self.device,
         'youlose',
       )
-      self.gameOverModel.materialColor = simd_float4(1, 0, 1, 0)
+      self.gameOverModel.materialColor = simd_float4(1, 0, 1, 1)
 
     self.addChildNode_(self.gameOverModel)
     self._win_storage = new_win

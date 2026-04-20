@@ -1,5 +1,6 @@
 import ctypes
 
+from pyrubicon.objc.api import ObjCProtocol
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGSize, CGFloat
@@ -11,14 +12,33 @@ from nodes import Node, Camera
 from simdTypes import SceneConstants, Light
 
 
-class Scene(Node):
+class SceneDelegate(metaclass=ObjCProtocol):
+
+  @objc_method
+  def transitionTo_(self, scene):
+    ...
+
+
+class Scene(Node, protocols=[SceneDelegate]):
 
   device: 'MTLDevice' = objc_property()
-  size: CGSize = objc_property(CGSize)
+  #size: CGSize = objc_property(CGSize)
+  _size_storage: CGSize = objc_property(CGSize)
 
   camera: Camera = objc_property()
   sceneConstants: SceneConstants = objc_property(object)
   light: Light = objc_property(object)
+
+  sceneDelegate: SceneDelegate = objc_property()
+
+  @objc_method
+  def size(self) -> CGSize:
+    return self._size_storage
+
+  @objc_method
+  def setSize_(self, new_size: CGSize):
+    self.sceneSizeWillChangeTo_(new_size)
+    self._size_storage = new_size
 
   @objc_method
   def initializeProperties(self):
