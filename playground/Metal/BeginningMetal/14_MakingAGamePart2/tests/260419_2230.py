@@ -41,6 +41,6 @@ device = MTLCreateSystemDefaultDevice()
 size = CGSizeMake(393.0, 852.0)
 
 gameOverScene = GameOverScene.alloc().initWithDevice_size_(device, size)
-gameOverScene.win = True
+#gameOverScene.win = True
 pdbr.state(gameOverScene)
 
