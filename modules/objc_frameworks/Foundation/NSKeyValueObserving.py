@@ -1,7 +1,7 @@
-from enum import IntEnum
+from enum import IntFlag
 
 
-class NSKeyValueObservingOptions(IntEnum):
+class NSKeyValueObservingOptions(IntFlag):
   #[doc(alias = "NSKeyValueObservingOptionNew")]
   new = 0x01
   #[doc(alias = "NSKeyValueObservingOptionOld")]

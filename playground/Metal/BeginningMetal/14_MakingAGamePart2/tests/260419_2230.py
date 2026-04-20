@@ -32,7 +32,7 @@ import ctypes
 from pyrubicon.objc.types import CGSizeMake
 
 from objc_frameworks.Metal import MTLCreateSystemDefaultDevice
-from objc_frameworks.Foundation import NSKeyValueObservingOptions
+
 from rbedge import pdbr
 
 from scenes import GameOverScene
@@ -41,7 +41,6 @@ device = MTLCreateSystemDefaultDevice()
 size = CGSizeMake(393.0, 852.0)
 
 gameOverScene = GameOverScene.alloc().initWithDevice_size_(device, size)
-#pdbr.state(gameOverScene)
-n = NSKeyValueObservingOptions.new
-print(n)
+gameOverScene.win = True
+pdbr.state(gameOverScene)
 
