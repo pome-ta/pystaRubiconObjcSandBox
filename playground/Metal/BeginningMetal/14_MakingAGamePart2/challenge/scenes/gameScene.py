@@ -11,6 +11,7 @@ from rbedge.simd import simd_float3, simd_float4
 
 # todo: Pythonista3 の`scene.Scene` ではない
 from .scene import Scene
+from .gameOverScene import GameOverScene
 from nodes import Model, Instance
 
 from utilities import generateColorsNumber_
@@ -242,4 +243,8 @@ class GameScene(Scene):
     self.paddle.position.x = newX
 
     self.previousTouchLocation = touchLocation
+    
+    
+  #def endGameWin_(self, win:bool):
+    
 

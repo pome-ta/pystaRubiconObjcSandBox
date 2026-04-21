@@ -1,4 +1,4 @@
-from .scene import Scene
+from .scene import Scene, SceneDelegate
 from .gameScene import GameScene
 from .landscapeScene import LandscapeScene
 from .instanceScene import InstanceScene

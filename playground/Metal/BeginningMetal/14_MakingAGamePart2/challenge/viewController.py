@@ -41,7 +41,7 @@ from objc_frameworks.Metal import (
 )
 
 from renderer import Renderer
-from scenes import GameScene
+from scenes import GameScene, SceneDelegate
 from scenes import GameOverScene
 from soundController import SoundController
 
@@ -86,11 +86,14 @@ class MainViewController(UIViewController):
     )
 
     renderer = Renderer.alloc().initWithDevice_(device)
+    '''
     scene = GameOverScene.alloc().initWithDevice_size_(
       device,
       metalView.bounds.size,
     )
     scene.win = False
+    '''
+    scene = GameScene.alloc().initWithDevice_size_(device,metalView.bounds.size,)
     renderer.scene = scene
     #renderer.scene = GameScene.alloc().initWithDevice_size_(device,metalView.bounds.size,)
 
