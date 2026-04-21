@@ -253,7 +253,7 @@ class GameScene(Scene):
       self.size,
     )
     gameOverScene.win = win
-    try:
+    try:  # `sceneDelegate?.`
       self.sceneDelegate.transitionTo_(gameOverScene)
     except Exception as e:
       print(f'{e}')

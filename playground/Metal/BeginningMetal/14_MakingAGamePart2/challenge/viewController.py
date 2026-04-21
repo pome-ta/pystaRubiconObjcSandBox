@@ -86,20 +86,13 @@ class MainViewController(UIViewController, protocols=[SceneDelegate]):
     )
 
     renderer = Renderer.alloc().initWithDevice_(device)
-    '''
-    scene = GameOverScene.alloc().initWithDevice_size_(
-      device,
-      metalView.bounds.size,
-    )
-    scene.win = False
-    '''
+
     scene = GameScene.alloc().initWithDevice_size_(
       device,
       metalView.bounds.size,
     )
     scene.sceneDelegate = self
     renderer.scene = scene
-    #renderer.scene = GameScene.alloc().initWithDevice_size_(device,metalView.bounds.size,)
 
     metalView.clearColor = Colors.wenderlichGreen
     metalView.delegate = renderer

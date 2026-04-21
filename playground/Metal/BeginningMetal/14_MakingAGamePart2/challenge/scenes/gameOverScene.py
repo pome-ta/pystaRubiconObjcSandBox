@@ -24,7 +24,7 @@ class GameOverScene(Scene):
 
   @objc_method
   def setWin_(self, new_win: bool):
-    
+
     if new_win:
       self.gameOverModel = Model.alloc().initWithDevice_modelName_(
         self.device,
@@ -86,8 +86,53 @@ class GameOverScene(Scene):
     amplitude: float = 0.5
     period: float = 2.0
 
-    periodicAmount = sin(float(self.time + 0.8) * period) * amplitude * deltaTime
+    periodicAmount = sin(
+      float(self.time + 0.8) * period) * amplitude * deltaTime
 
     self.gameOverModel.rotation.x -= pi * periodicAmount
     self.gameOverModel.scale += simd_float3(periodicAmount / 4)
+
+  @objc_method
+  def touchesBegan_touches_with_(self, view, touches, event):
+
+    send_super(__class__,
+               self,
+               'touchesBegan:touches:with:',
+               view,
+               touches,
+               event,
+               argtypes=[
+                 objc_id,
+                 objc_id,
+                 objc_id,
+               ])
+
+    self.registerTouch = True
+
+  @objc_method
+  def touchesEnded_touches_with_(self, view, touches, event):
+
+    send_super(__class__,
+               self,
+               'touchesEnded:touches:with:',
+               view,
+               touches,
+               event,
+               argtypes=[
+                 objc_id,
+                 objc_id,
+                 objc_id,
+               ])
+
+    if self.registerTouch:
+      from .gameScene import GameScene
+      
+      scene = GameScene.alloc().initWithDevice_size_(
+        self.device,
+        self.size,
+      )
+      try:  # `sceneDelegate?.`
+        self.sceneDelegate.transitionTo_(scene)
+      except Exception as e:
+        print(f'{e}')
 
