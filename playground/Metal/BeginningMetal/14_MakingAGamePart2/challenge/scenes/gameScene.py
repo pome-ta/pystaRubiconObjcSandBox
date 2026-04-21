@@ -169,8 +169,7 @@ class GameScene(Scene):
       bounced = True
 
     if self.ball.position.y < 0:
-      self.ballVelocityY = -self.ballVelocityY
-      bounced = True
+      self.endGameWin_(False)
 
     if bounced:
       SoundController.shared.playPopEffect()
@@ -190,6 +189,9 @@ class GameScene(Scene):
         self.ballVelocityY = -self.ballVelocityY
         self.bricks.removeInstance_(idx)
         break
+
+    if len(self.bricks.nodes) == 0:
+      self.endGameWin_(True)
 
   @objc_method
   def sceneOffsetHeight_fov_(self, height: float, fov: float) -> float:
@@ -243,8 +245,16 @@ class GameScene(Scene):
     self.paddle.position.x = newX
 
     self.previousTouchLocation = touchLocation
-    
-    
-  #def endGameWin_(self, win:bool):
-    
+
+  @objc_method
+  def endGameWin_(self, win: bool):
+    gameOverScene = GameOverScene.alloc().initWithDevice_size_(
+      self.device,
+      self.size,
+    )
+    gameOverScene.win = win
+    try:
+      self.sceneDelegate.transitionTo_(gameOverScene)
+    except Exception as e:
+      print(f'{e}')
 
