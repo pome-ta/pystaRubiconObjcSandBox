@@ -42,7 +42,7 @@ from objc_frameworks.Metal import (
 
 from renderer import Renderer
 from scenes import GameScene, SceneDelegate
-from scenes import GameOverScene
+#from scenes import GameOverScene
 from soundController import SoundController
 
 MTKView = ObjCClass('MTKView')
@@ -57,7 +57,7 @@ class Colors:
   skyBlue = MTLClearColorMake(0.66, 0.9, 0.96, 1.0)
 
 
-class MainViewController(UIViewController):
+class MainViewController(UIViewController, protocols=[SceneDelegate]):
 
   metalView: MTKView = objc_property()
   renderer: Renderer = objc_property()
@@ -93,7 +93,11 @@ class MainViewController(UIViewController):
     )
     scene.win = False
     '''
-    scene = GameScene.alloc().initWithDevice_size_(device,metalView.bounds.size,)
+    scene = GameScene.alloc().initWithDevice_size_(
+      device,
+      metalView.bounds.size,
+    )
+    scene.sceneDelegate = self
     renderer.scene = scene
     #renderer.scene = GameScene.alloc().initWithDevice_size_(device,metalView.bounds.size,)
 
@@ -121,6 +125,16 @@ class MainViewController(UIViewController):
                'prefersStatusBarHidden',
                restype=ctypes.c_bool)
     return True
+
+  # --- SceneDelegate
+  @objc_method
+  def transitionTo_(self, scene):
+    scene.size = self.metalView.bounds.size
+    scene.sceneDelegate = self
+    try:  # `renderer?.`
+      self.renderer.scene = scene
+    except Exception as e:
+      print(f'{e}')
 
   @objc_method
   def touchesBegan_withEvent_(self, touches, event):
