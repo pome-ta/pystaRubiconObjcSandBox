@@ -42,7 +42,7 @@ from objc_frameworks.Metal import (
 
 from renderer import Renderer
 from scenes import GameScene, SceneDelegate
-#from scenes import GameOverScene
+
 from soundController import SoundController
 
 MTKView = ObjCClass('MTKView')
@@ -97,7 +97,7 @@ class MainViewController(UIViewController, protocols=[SceneDelegate]):
     metalView.clearColor = Colors.wenderlichGreen
     metalView.delegate = renderer
 
-    #SoundController.shared.playBackgroundMusic_('bulletstorm_bg_v1.mp3')
+    SoundController.shared.playBackgroundMusic_('bulletstorm_bg_v1.mp3')
 
     #metalView.enableSetNeedsDisplay = True
     #metalView.setNeedsDisplay()
