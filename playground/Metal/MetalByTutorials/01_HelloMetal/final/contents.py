@@ -33,10 +33,26 @@ from objc_frameworks.Metal import (
   MTLClearColorMake,
 )
 
+from rbedge.simd import simd_float3
+
 from rbedge import pdbr
 
 UIViewController = ObjCClass('UIViewController')
 MTKView = ObjCClass('MTKView')
+
+MTKMeshBufferAllocator = ObjCClass('MTKMeshBufferAllocator')
+MDLMesh = ObjCClass('MDLMesh')
+
+if (device := MTLCreateSystemDefaultDevice()) is None:
+  raise ('GPU is not supported')
+
+allocator = MTKMeshBufferAllocator.alloc().initWithDevice_(device)
+
+mdlMesh = MDLMesh.alloc(
+).initSphereWithExtent_segments_inwardNormals_geometryType_allocator_(
+  simd_float3(0.75),[30,30],False )
+
+pdbr.state(allocator)
 
 shaders = '''
 #include <metal_stdlib>
@@ -213,6 +229,7 @@ class MainViewController(UIViewController):
 if __name__ == '__main__':
   from rbedge.app import App
   from objc_frameworks.UIKit import UIModalPresentationStyle
+  '''
 
   main_vc = MainViewController.new()
 
@@ -221,4 +238,5 @@ if __name__ == '__main__':
 
   app = App(main_vc, presentation_style)
   app.present()
+  '''
 

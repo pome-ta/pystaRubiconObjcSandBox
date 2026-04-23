@@ -15,4 +15,5 @@ from .MDLVertexDescriptor import (
   MDLVertexAttributeTangent,
   MDLVertexAttributeTextureCoordinate,
 )
+from .MDLTypes import MDLGeometryType
 
