@@ -32,6 +32,7 @@ from objc_frameworks.Metal import (
   MTLCreateSystemDefaultDevice,
   MTLClearColorMake,
 )
+from objc_frameworks.ModelIO import MDLGeometryType
 
 from rbedge.simd import simd_float3
 
@@ -47,12 +48,25 @@ if (device := MTLCreateSystemDefaultDevice()) is None:
   raise ('GPU is not supported')
 
 allocator = MTKMeshBufferAllocator.alloc().initWithDevice_(device)
-
+'''
 mdlMesh = MDLMesh.alloc(
 ).initSphereWithExtent_segments_inwardNormals_geometryType_allocator_(
-  simd_float3(0.75),[30,30],False )
+  simd_float3(0.75,0.75,0.75),
+  (30, 30),
+  False,
+  MDLGeometryType.triangles,
+  allocator,
+)
+'''
+mdlMesh = MDLMesh.alloc().initSphereWithExtent(
+  simd_float3(0.75, 0.75, 0.75),
+  segments=[30, 30],
+  inwardNormals=False,
+  geometryType=MDLGeometryType.triangles,
+  allocator=allocator,
+)
 
-pdbr.state(allocator)
+#pdbr.state(MDLMesh.new())
 
 shaders = '''
 #include <metal_stdlib>
