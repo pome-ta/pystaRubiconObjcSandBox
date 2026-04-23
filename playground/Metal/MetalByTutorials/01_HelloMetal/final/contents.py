@@ -74,9 +74,8 @@ class MainViewController(UIViewController):
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
-    #self.navigationItem.title = NSStringFromClass(__class__)
-    self.navigationItem.title = '1. Hello, Metal!'
-    self.navigationItem.subtitle = NSStringFromClass(__class__)
+    self.navigationItem.title = NSStringFromClass(__class__)
+    self.navigationItem.subtitle = '1. Hello, Metal!'
 
     if (device := MTLCreateSystemDefaultDevice()) is None:
       raise ('GPU is not supported')
