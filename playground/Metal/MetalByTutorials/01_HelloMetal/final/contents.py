@@ -26,8 +26,6 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGSize, CGRectMake
 
-from rbedge import pdbr
-
 from objc_frameworks.Foundation import NSStringFromClass
 from objc_frameworks.CoreGraphics import CGRectZero
 from objc_frameworks.Metal import (
@@ -35,15 +33,10 @@ from objc_frameworks.Metal import (
   MTLClearColorMake,
 )
 
+from rbedge import pdbr
 
 UIViewController = ObjCClass('UIViewController')
-NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
-
 MTKView = ObjCClass('MTKView')
-
-
-class Colors:
-  wenderlichGreen = MTLClearColorMake(0.0, 0.4, 0.21, 1.0)
 
 shaders = '''
 #include <metal_stdlib>
@@ -61,6 +54,7 @@ fragment float4 fragment_main() {
   return float4(1, 0, 0, 1);
 }
 '''
+
 
 class MainViewController(UIViewController):
 
@@ -85,11 +79,12 @@ class MainViewController(UIViewController):
     if (device := MTLCreateSystemDefaultDevice()) is None:
       raise ('GPU is not supported')
 
-    frame = CGRectMake(x=0, y=0, w=500, h=500)
-    
+    # todo: `translatesAutoresizingMaskIntoConstraints = False` するので、レイアウトでサイズ調整
+    #frame = CGRectMake(x=0, y=0, w=500, h=500)
+    frame = CGRectZero
+
     metalView = MTKView.alloc().initWithFrame_device_(frame, device)
     metalView.clearColor = MTLClearColorMake(red=1, green=1, blue=0.8, alpha=1)
-    #red, green, blue, alpha
 
     metalView.delegate = self
     commandQueue = device.newCommandQueue()
@@ -170,15 +165,47 @@ class MainViewController(UIViewController):
   # --- private
   @objc_method
   def setupLayoutConstraint(self):
-    safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
+    from objc_frameworks.UIKit import UILayoutPriorityDefaultHigh
+    NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
     self.metalView.translatesAutoresizingMaskIntoConstraints = False
+
+    safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
+
+    # センター
+    centerXAnchor = self.metalView.centerXAnchor.constraintEqualToAnchor_(
+      safeAreaLayoutGuide.centerXAnchor)
+    centerYAnchor = self.metalView.centerYAnchor.constraintEqualToAnchor_(
+      safeAreaLayoutGuide.centerYAnchor)
+
+    # 固定サイズ(500)
+    fixedWidth = self.metalView.widthAnchor.constraintEqualToConstant_(500)
+    fixedWidth.setPriority_(UILayoutPriorityDefaultHigh)
+    fixedHeight = self.metalView.heightAnchor.constraintEqualToConstant_(500)
+    fixedHeight.setPriority_(UILayoutPriorityDefaultHigh)
+
+    # safeArea に対する88%
+    maxWidth = self.metalView.widthAnchor.constraintLessThanOrEqualToAnchor_multiplier_(
+      safeAreaLayoutGuide.widthAnchor,
+      0.88,
+    )
+    maxHeight = self.metalView.heightAnchor.constraintLessThanOrEqualToAnchor_multiplier_(
+      safeAreaLayoutGuide.heightAnchor,
+      0.88,
+    )
+
+    # スクエア定義
+    aspect = self.metalView.widthAnchor.constraintEqualToAnchor_(
+      self.metalView.heightAnchor)
+
     NSLayoutConstraint.activateConstraints_([
-      self.metalView.centerXAnchor.constraintEqualToAnchor_(
-        safeAreaLayoutGuide.centerXAnchor),
-      self.metalView.centerYAnchor.constraintEqualToAnchor_(
-        safeAreaLayoutGuide.centerYAnchor),
-      
+      centerXAnchor,
+      centerYAnchor,
+      fixedWidth,
+      fixedHeight,
+      maxWidth,
+      maxHeight,
+      aspect,
     ])
 
 
