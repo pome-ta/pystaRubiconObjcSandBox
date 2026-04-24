@@ -69,16 +69,26 @@ if (device := MTLCreateSystemDefaultDevice()) is None:
   raise ('GPU is not supported')
 
 allocator = MTKMeshBufferAllocator.alloc().initWithDevice_(device)
-'''
+
+#print(MTKMeshBufferAllocator.alloc().initWithDevice_)
+
+#print(MDLMesh.alloc().initSphereWithExtent_segments_inwardNormals_geometryType_allocator_)
+#extent = simd_float3(0.75, 0.75, 0.75)
+
+#segments = simd_uint2(30, 30)
+extent = (ctypes.c_float * 4)(0.75, 0.75, 0.75, 0.0)
+
+segments = (ctypes.c_uint * 2)(30, 30)
+
 mdlMesh = MDLMesh.alloc(
 ).initSphereWithExtent_segments_inwardNormals_geometryType_allocator_(
-  simd_float3(0.75,0.75,0.75),
-  (30, 30),
+  extent,
+  segments,
   False,
-  MDLGeometryType.triangles,
+  0,
   allocator,
 )
-'''
+
 '''
 mdlMesh = MDLMesh.alloc().initSphereWithExtent(
   simd_float3(0.75, 0.75, 0.75),
@@ -110,7 +120,7 @@ mdlMesh_ptr = send_message(
 '''
 #mdlMesh = ObjCInstance(mdlMesh_ptr)
 
-print(MDLGeometryType.triangles)
+#print(MDLGeometryType.triangles)
 
 shaders = '''
 #include <metal_stdlib>
