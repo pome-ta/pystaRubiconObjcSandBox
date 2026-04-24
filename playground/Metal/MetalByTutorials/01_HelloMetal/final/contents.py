@@ -31,16 +31,21 @@ from objc_frameworks.CoreGraphics import CGRectZero
 from objc_frameworks.Metal import (
   MTLCreateSystemDefaultDevice,
   MTLClearColorMake,
+  MTLPixelFormat,
 )
+from objc_frameworks.MetalKit import MTKMetalVertexDescriptorFromModelIO
 
 from rbedge import pdbr
 
 UIViewController = ObjCClass('UIViewController')
-MTKView = ObjCClass('MTKView')
 
+MTKView = ObjCClass('MTKView')
 MTKMeshBufferAllocator = ObjCClass('MTKMeshBufferAllocator')
 MDLMesh = ObjCClass('MDLMesh')
 SCNSphere = ObjCClass('SCNSphere')
+MTKMesh = ObjCClass('MTKMesh')
+MTLCompileOptions = ObjCClass('MTLCompileOptions')
+MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 
 if (device := MTLCreateSystemDefaultDevice()) is None:
   raise ('GPU is not supported')
@@ -48,6 +53,10 @@ if (device := MTLCreateSystemDefaultDevice()) is None:
 allocator = MTKMeshBufferAllocator.alloc().initWithDevice_(device)
 mdlMesh = MDLMesh.meshWithSCNGeometry_bufferAllocator_(
   SCNSphere.sphereWithRadius_(0.75), allocator)
+
+mesh = MTKMesh.alloc().initWithMesh_device_error_(mdlMesh, device, None)
+
+commandQueue = device.newCommandQueue()
 
 shaders = '''
 #include <metal_stdlib>
@@ -65,6 +74,24 @@ fragment float4 fragment_main() {
   return float4(1, 0, 0, 1);
 }
 '''
+
+library = device.newLibraryWithSource_options_error_(
+  shaders,
+  MTLCompileOptions.new(),
+  None,
+)
+vertexFunction = library.newFunctionWithName_('vertex_main')
+fragmentFunction = library.newFunctionWithName_('fragment_main')
+
+pipelineDescriptor = MTLRenderPipelineDescriptor.new()
+pipelineDescriptor.colorAttachments.objectAtIndexedSubscript_(
+  0).pixelFormat = MTLPixelFormat.bgra8Unorm
+
+pipelineDescriptor.vertexFunction = vertexFunction
+pipelineDescriptor.fragmentFunction = fragmentFunction
+
+pipelineDescriptor.vertexDescriptor = MTKMetalVertexDescriptorFromModelIO(
+  mesh.vertexDescriptor)
 
 
 class MainViewController(UIViewController):
