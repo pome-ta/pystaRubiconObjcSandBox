@@ -21,7 +21,7 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
 
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass
+from pyrubicon.objc.api import ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGSize, CGRectMake
@@ -32,12 +32,15 @@ from objc_frameworks.Metal import (
   MTLCreateSystemDefaultDevice,
   MTLClearColorMake,
   MTLPixelFormat,
+  MTLPrimitiveType,
 )
 from objc_frameworks.MetalKit import MTKMetalVertexDescriptorFromModelIO
 
 from rbedge import pdbr
 
 UIViewController = ObjCClass('UIViewController')
+
+MTKViewDelegate = ObjCProtocol('MTKViewDelegate')
 
 MTKView = ObjCClass('MTKView')
 MTKMeshBufferAllocator = ObjCClass('MTKMeshBufferAllocator')
@@ -46,17 +49,6 @@ SCNSphere = ObjCClass('SCNSphere')
 MTKMesh = ObjCClass('MTKMesh')
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
 MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
-
-if (device := MTLCreateSystemDefaultDevice()) is None:
-  raise ('GPU is not supported')
-
-allocator = MTKMeshBufferAllocator.alloc().initWithDevice_(device)
-mdlMesh = MDLMesh.meshWithSCNGeometry_bufferAllocator_(
-  SCNSphere.sphereWithRadius_(0.75), allocator)
-
-mesh = MTKMesh.alloc().initWithMesh_device_error_(mdlMesh, device, None)
-
-commandQueue = device.newCommandQueue()
 
 shaders = '''
 #include <metal_stdlib>
@@ -75,29 +67,13 @@ fragment float4 fragment_main() {
 }
 '''
 
-library = device.newLibraryWithSource_options_error_(
-  shaders,
-  MTLCompileOptions.new(),
-  None,
-)
-vertexFunction = library.newFunctionWithName_('vertex_main')
-fragmentFunction = library.newFunctionWithName_('fragment_main')
 
-pipelineDescriptor = MTLRenderPipelineDescriptor.new()
-pipelineDescriptor.colorAttachments.objectAtIndexedSubscript_(
-  0).pixelFormat = MTLPixelFormat.bgra8Unorm
-
-pipelineDescriptor.vertexFunction = vertexFunction
-pipelineDescriptor.fragmentFunction = fragmentFunction
-
-pipelineDescriptor.vertexDescriptor = MTKMetalVertexDescriptorFromModelIO(
-  mesh.vertexDescriptor)
-
-
-class MainViewController(UIViewController):
+class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
 
   metalView: MTKView = objc_property()
+  mesh: MTKMesh = objc_property()
   commandQueue: 'MTLCommandQueue' = objc_property()
+  pipelineState: 'MTLRenderPipelineState' = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -123,10 +99,46 @@ class MainViewController(UIViewController):
     frame = CGRectZero
 
     metalView = MTKView.alloc().initWithFrame_device_(frame, device)
-    metalView.clearColor = MTLClearColorMake(red=1, green=1, blue=0.8, alpha=1)
+    metalView.clearColor = MTLClearColorMake(
+      red=1,
+      green=1,
+      blue=0.8,
+      alpha=1,
+    )
+
+    allocator = MTKMeshBufferAllocator.alloc().initWithDevice_(device)
+    mdlMesh = MDLMesh.meshWithSCNGeometry_bufferAllocator_(
+      SCNSphere.sphereWithRadius_(0.75), allocator)
+
+    mesh = MTKMesh.alloc().initWithMesh_device_error_(mdlMesh, device, None)
+
+    commandQueue = device.newCommandQueue()
+
+    library = device.newLibraryWithSource_options_error_(
+      shaders,
+      MTLCompileOptions.new(),
+      None,
+    )
+    vertexFunction = library.newFunctionWithName_('vertex_main')
+    fragmentFunction = library.newFunctionWithName_('fragment_main')
+
+    pipelineDescriptor = MTLRenderPipelineDescriptor.new()
+    pipelineDescriptor.colorAttachments.objectAtIndexedSubscript_(
+      0).pixelFormat = MTLPixelFormat.bgra8Unorm
+
+    pipelineDescriptor.vertexFunction = vertexFunction
+    pipelineDescriptor.fragmentFunction = fragmentFunction
+
+    pipelineDescriptor.vertexDescriptor = MTKMetalVertexDescriptorFromModelIO(
+      mesh.vertexDescriptor)
+
+    try:
+      pipelineState = device.newRenderPipelineStateWithDescriptor_error_(
+        pipelineDescriptor, None)
+    except Exception as e:
+      print(f'{e}')
 
     metalView.delegate = self
-    commandQueue = device.newCommandQueue()
 
     metalView.enableSetNeedsDisplay = True
     metalView.setNeedsDisplay()
@@ -134,7 +146,9 @@ class MainViewController(UIViewController):
     self.view.addSubview_(metalView)
 
     self.metalView = metalView
+    self.mesh = mesh
     self.commandQueue = commandQueue
+    self.pipelineState = pipelineState
 
     self.setupLayoutConstraint()
 
@@ -190,14 +204,34 @@ class MainViewController(UIViewController):
 
   @objc_method
   def drawInMTKView_(self, view):
-    if not ((drawable := view.currentDrawable) and
-            (descriptor := view.currentRenderPassDescriptor)):
+    if not ((commandBuffer := self.commandQueue.commandBuffer()) and
+            (renderPassDescriptor := view.currentRenderPassDescriptor) and
+            (renderEncoder := commandBuffer.
+             renderCommandEncoderWithDescriptor_(renderPassDescriptor))):
       return
 
-    commandBuffer = self.commandQueue.commandBuffer()
-    commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
-      descriptor)
-    commandEncoder.endEncoding()
+    renderEncoder.setRenderPipelineState_(self.pipelineState)
+
+    renderEncoder.setVertexBuffer_offset_atIndex_(
+      self.mesh.vertexBuffers.objectAtIndexedSubscript_(0).buffer,
+      0,
+      0,
+    )
+
+    if not (submesh := self.mesh.submeshes.firstObject()):
+      return
+
+    renderEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
+      MTLPrimitiveType.triangle,
+      submesh.indexCount,
+      submesh.indexType,
+      submesh.indexBuffer.buffer,
+      0,
+    )
+
+    renderEncoder.endEncoding()
+    if not (drawable := view.currentDrawable):
+      return
     commandBuffer.presentDrawable_(drawable)
     commandBuffer.commit()
 
@@ -251,7 +285,6 @@ class MainViewController(UIViewController):
 if __name__ == '__main__':
   from rbedge.app import App
   from objc_frameworks.UIKit import UIModalPresentationStyle
-  '''
 
   main_vc = MainViewController.new()
 
@@ -260,5 +293,4 @@ if __name__ == '__main__':
 
   app = App(main_vc, presentation_style)
   app.present()
-  '''
 
