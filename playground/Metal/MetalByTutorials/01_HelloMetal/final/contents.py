@@ -21,10 +21,10 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
 
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass, ObjCInstance
+from pyrubicon.objc.api import ObjCClass
 from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super, send_message, objc_id
-from pyrubicon.objc.types import CGSize, CGRectMake, with_preferred_encoding, _NSRangeEncoding, NSInteger
+from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.types import CGSize, CGRectMake
 
 from objc_frameworks.Foundation import NSStringFromClass
 from objc_frameworks.CoreGraphics import CGRectZero
@@ -32,95 +32,22 @@ from objc_frameworks.Metal import (
   MTLCreateSystemDefaultDevice,
   MTLClearColorMake,
 )
-from objc_frameworks.ModelIO import MDLGeometryType
-
-from rbedge.simd import simd_float3
 
 from rbedge import pdbr
-
-#@with_preferred_encoding(b'{?=ffff}')
-'''
-class simd_float3(ctypes.Structure):
-  _fields_ = [
-    ('x', ctypes.c_float),
-    ('y', ctypes.c_float),
-    ('z', ctypes.c_float),
-    ('_pad', ctypes.c_float),  # padding (SIMD alignment)
-  ]
-
-'''
-
-
-#@with_preferred_encoding(_NSRangeEncoding)
-class simd_uint2(ctypes.Structure):
-  _fields_ = [
-    ('x', ctypes.c_uint),
-    ('y', ctypes.c_uint),
-  ]
-
 
 UIViewController = ObjCClass('UIViewController')
 MTKView = ObjCClass('MTKView')
 
 MTKMeshBufferAllocator = ObjCClass('MTKMeshBufferAllocator')
 MDLMesh = ObjCClass('MDLMesh')
+SCNSphere = ObjCClass('SCNSphere')
 
 if (device := MTLCreateSystemDefaultDevice()) is None:
   raise ('GPU is not supported')
 
 allocator = MTKMeshBufferAllocator.alloc().initWithDevice_(device)
-
-#print(MTKMeshBufferAllocator.alloc().initWithDevice_)
-
-#print(MDLMesh.alloc().initSphereWithExtent_segments_inwardNormals_geometryType_allocator_)
-#extent = simd_float3(0.75, 0.75, 0.75)
-
-#segments = simd_uint2(30, 30)
-extent = (ctypes.c_float * 4)(0.75, 0.75, 0.75, 0.0)
-
-segments = (ctypes.c_uint * 2)(30, 30)
-
-mdlMesh = MDLMesh.alloc(
-).initSphereWithExtent_segments_inwardNormals_geometryType_allocator_(
-  extent,
-  segments,
-  False,
-  0,
-  allocator,
-)
-
-'''
-mdlMesh = MDLMesh.alloc().initSphereWithExtent(
-  simd_float3(0.75, 0.75, 0.75),
-  segments=simd_uint2(30, 30),
-  inwardNormals=False,
-  geometryType=MDLGeometryType.triangles,
-  allocator=allocator,
-)
-'''
-'''
-mdlMesh_ptr = send_message(
-  MDLMesh.alloc(),
-  'initSphereWithExtent:segments:inwardNormals:geometryType:allocator:',
-  simd_float3(0.75, 0.75, 0.75),
-  simd_uint2(30, 30),
-  False,
-  MDLGeometryType.triangles,
-  allocator,
-  restype=objc_id,
-  argtypes=[
-    simd_float3,  # extent
-    simd_uint2,  # segments
-    ctypes.c_bool,  # inwardNormals
-    NSInteger,  # geometryType
-    objc_id  # allocator
-  ],
-)
-#pdbr.state(MDLMesh.new())
-'''
-#mdlMesh = ObjCInstance(mdlMesh_ptr)
-
-#print(MDLGeometryType.triangles)
+mdlMesh = MDLMesh.meshWithSCNGeometry_bufferAllocator_(
+  SCNSphere.sphereWithRadius_(0.75), allocator)
 
 shaders = '''
 #include <metal_stdlib>
