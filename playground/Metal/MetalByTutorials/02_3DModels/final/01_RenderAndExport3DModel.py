@@ -33,6 +33,7 @@ from objc_frameworks.Metal import (
   MTLClearColorMake,
   MTLPixelFormat,
   MTLPrimitiveType,
+  MTLTriangleFillMode,
 )
 from objc_frameworks.MetalKit import MTKMetalVertexDescriptorFromModelIO
 
@@ -45,7 +46,7 @@ MTKViewDelegate = ObjCProtocol('MTKViewDelegate')
 MTKView = ObjCClass('MTKView')
 MTKMeshBufferAllocator = ObjCClass('MTKMeshBufferAllocator')
 MDLMesh = ObjCClass('MDLMesh')
-SCNSphere = ObjCClass('SCNSphere')
+SCNCone = ObjCClass('SCNCone')
 MTKMesh = ObjCClass('MTKMesh')
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
 MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
@@ -108,7 +109,7 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
 
     allocator = MTKMeshBufferAllocator.alloc().initWithDevice_(device)
     mdlMesh = MDLMesh.meshWithSCNGeometry_bufferAllocator_(
-      SCNSphere.sphereWithRadius_(0.75), allocator)
+      SCNCone.coneWithTopRadius_bottomRadius_height_(0.0, 0.5, 1.0), allocator)
 
     mesh = MTKMesh.alloc().initWithMesh_device_error_(mdlMesh, device, None)
 
@@ -217,6 +218,8 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
       0,
       0,
     )
+
+    renderEncoder.setTriangleFillMode_(MTLTriangleFillMode.lines)
 
     if not (submesh := self.mesh.submeshes.firstObject()):
       return

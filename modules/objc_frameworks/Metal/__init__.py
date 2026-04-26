@@ -6,6 +6,7 @@ from .MTLRenderCommandEncoder import (
   MTLPrimitiveType,
   MTLCullMode,
   MTLWinding,
+  MTLTriangleFillMode,
 )
 from .MTLArgument import MTLIndexType
 from .MTLVertexDescriptor import MTLVertexFormat

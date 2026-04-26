@@ -29,3 +29,10 @@ class MTLWinding(IntEnum):
   #[doc(alias = "MTLWindingCounterClockwise")]
   counterClockwise = 1
 
+
+class MTLTriangleFillMode(IntEnum):
+  #[doc(alias = "MTLTriangleFillModeFill")]
+  fill = 0
+  #[doc(alias = "MTLTriangleFillModeLines")]
+  lines = 0
+
