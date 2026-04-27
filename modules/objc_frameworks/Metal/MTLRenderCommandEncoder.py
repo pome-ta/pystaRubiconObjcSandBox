@@ -34,5 +34,5 @@ class MTLTriangleFillMode(IntEnum):
   #[doc(alias = "MTLTriangleFillModeFill")]
   fill = 0
   #[doc(alias = "MTLTriangleFillModeLines")]
-  lines = 0
+  lines = 1
 

@@ -218,6 +218,8 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
       0,
       0,
     )
+    
+
 
     renderEncoder.setTriangleFillMode_(MTLTriangleFillMode.lines)
 
