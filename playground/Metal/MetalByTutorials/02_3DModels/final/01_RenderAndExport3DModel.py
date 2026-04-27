@@ -108,10 +108,18 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
     )
 
     allocator = MTKMeshBufferAllocator.alloc().initWithDevice_(device)
-    mdlMesh = MDLMesh.meshWithSCNGeometry_bufferAllocator_(
-      SCNCone.coneWithTopRadius_bottomRadius_height_(0.0, 0.5, 1.0), allocator)
+
+    scnCone = SCNCone.coneWithTopRadius_bottomRadius_height_(0.0, 0.5, 1.0)
+    scnCone.setHeightSegmentCount_(10)
+    scnCone.setRadialSegmentCount_(10)
+
+    mdlMesh = MDLMesh.meshWithSCNGeometry_bufferAllocator_(scnCone, allocator)
 
     mesh = MTKMesh.alloc().initWithMesh_device_error_(mdlMesh, device, None)
+
+    # --- /* begin export code
+
+    # --- end export code */
 
     commandQueue = device.newCommandQueue()
 
@@ -218,8 +226,6 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
       0,
       0,
     )
-    
-
 
     renderEncoder.setTriangleFillMode_(MTLTriangleFillMode.lines)
 
