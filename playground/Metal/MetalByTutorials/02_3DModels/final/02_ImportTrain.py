@@ -20,6 +20,7 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
       warnings.warn(__warning_message, ImportWarning)
 
 import ctypes
+from pathlib import Path
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import objc_method, objc_property
@@ -33,8 +34,11 @@ from objc_frameworks.Metal import (
   MTLClearColorMake,
   MTLPixelFormat,
   MTLPrimitiveType,
+  MTLTriangleFillMode,
 )
 from objc_frameworks.MetalKit import MTKMetalVertexDescriptorFromModelIO
+
+from rbedge.utils import nsurl, get_str_filepath
 
 from rbedge import pdbr
 
@@ -45,8 +49,9 @@ MTKViewDelegate = ObjCProtocol('MTKViewDelegate')
 MTKView = ObjCClass('MTKView')
 MTKMeshBufferAllocator = ObjCClass('MTKMeshBufferAllocator')
 MDLMesh = ObjCClass('MDLMesh')
-SCNSphere = ObjCClass('SCNSphere')
+SCNCone = ObjCClass('SCNCone')
 MTKMesh = ObjCClass('MTKMesh')
+MDLAsset = ObjCClass('MDLAsset')
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
 MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 
@@ -59,13 +64,17 @@ struct VertexIn {
 };
 
 vertex float4 vertex_main(const VertexIn vertex_in [[stage_in]]) {
-  return vertex_in.position;
+float4 position = vertex_in.position;
+position.y -= 1.0;
+return position;
 }
 
 fragment float4 fragment_main() {
   return float4(1, 0, 0, 1);
 }
 '''
+
+ROOT_PATH = Path(__file__).parents[0]
 
 
 class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
@@ -94,7 +103,7 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
     if (device := MTLCreateSystemDefaultDevice()) is None:
       raise ('GPU is not supported')
 
-    # todo: `translatesAutoresizingMaskIntoConstraints = False` するので、レイアウトでサイズ調整
+    # todo: `translatesAutoresizingMaskIntoConstraints = False` するので、レイアウトでサイズ調整
     #frame = CGRectMake(x=0, y=0, w=500, h=500)
     frame = CGRectZero
 
@@ -107,10 +116,35 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
     )
 
     allocator = MTKMeshBufferAllocator.alloc().initWithDevice_(device)
-    mdlMesh = MDLMesh.meshWithSCNGeometry_bufferAllocator_(
-      SCNSphere.sphereWithRadius_(0.75), allocator)
+
+    scnCone = SCNCone.coneWithTopRadius_bottomRadius_height_(0.0, 0.5, 1.0)
+    scnCone.setHeightSegmentCount_(10)
+    scnCone.setRadialSegmentCount_(10)
+
+    mdlMesh = MDLMesh.meshWithSCNGeometry_bufferAllocator_(scnCone, allocator)
 
     mesh = MTKMesh.alloc().initWithMesh_device_error_(mdlMesh, device, None)
+
+    # --- /* begin export code
+    asset = MDLAsset.new()
+    asset.addObject_(mdlMesh)
+
+    fileExtension = 'usda'
+    if not MDLAsset.canExportFileExtension_(fileExtension):
+      raise RuntimeError(f"Can't export a `.{fileExtension}` format")
+
+    _export_dir = ROOT_PATH / 'export'
+    _generated_file = _export_dir / f'generatedCone.{fileExtension}'
+    _export_dir.mkdir(parents=True, exist_ok=True)
+    _generated_file.unlink(missing_ok=True)
+
+    try:
+      url = nsurl(str(_generated_file.resolve()))
+      asset.exportAssetToURL_(url)
+    except Exception as e:
+      print(f'{e}')
+
+    # --- end export code */
 
     commandQueue = device.newCommandQueue()
 
@@ -218,6 +252,8 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
       0,
     )
 
+    renderEncoder.setTriangleFillMode_(MTLTriangleFillMode.lines)
+
     if not (submesh := self.mesh.submeshes.firstObject()):
       return
 
@@ -251,7 +287,7 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
     centerYAnchor = self.metalView.centerYAnchor.constraintEqualToAnchor_(
       safeAreaLayoutGuide.centerYAnchor)
 
-    # 固定サイズ(500)
+    # 固定サイズ(500)
     fixedWidth = self.metalView.widthAnchor.constraintEqualToConstant_(500)
     fixedWidth.setPriority_(UILayoutPriorityDefaultHigh)
     fixedHeight = self.metalView.heightAnchor.constraintEqualToConstant_(500)
