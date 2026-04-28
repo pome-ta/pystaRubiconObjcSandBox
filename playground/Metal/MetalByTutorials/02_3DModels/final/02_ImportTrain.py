@@ -74,7 +74,24 @@ fragment float4 fragment_main() {
 }
 '''
 
+
+# wip: 雑
+def _get_filepath(file_name: str) -> str | None:
+  root = ROOT_PATH.parents[0] / 'resources'
+  return get_str_filepath(root, file_name)
+
+
+def get_model_path(
+  modelName: str,
+  extension: str = '',
+) -> str | None:
+  return _get_filepath(f'{modelName}.{extension}')
+
+
 ROOT_PATH = Path(__file__).parents[0]
+
+if not (assetURL := get_model_path('train', 'usdz')):
+  raise ValueError(f'Asset  does not exist.')
 
 
 class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
@@ -116,6 +133,10 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
     )
 
     allocator = MTKMeshBufferAllocator.alloc().initWithDevice_(device)
+    '''
+    if not (assetURL := get_model_path(modelName, 'obj')):
+      raise ValueError(f'Asset {modelName} does not exist.')
+    '''
 
     scnCone = SCNCone.coneWithTopRadius_bottomRadius_height_(0.0, 0.5, 1.0)
     scnCone.setHeightSegmentCount_(10)

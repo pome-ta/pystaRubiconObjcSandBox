@@ -16,7 +16,7 @@ def Xform "generatedCone" (
 {
     def Scope "Geom"
     {
-        def Xform "Obj2" (
+        def Xform "Obj1" (
             prepend apiSchemas = ["MaterialBindingAPI"]
         )
         {
