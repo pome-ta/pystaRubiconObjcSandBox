@@ -32,13 +32,25 @@ from objc_frameworks.CoreGraphics import CGRectZero
 from objc_frameworks.Metal import (
   MTLCreateSystemDefaultDevice,
   MTLClearColorMake,
+  MTLVertexFormat,
   MTLPixelFormat,
   MTLPrimitiveType,
   MTLTriangleFillMode,
 )
-from objc_frameworks.MetalKit import MTKMetalVertexDescriptorFromModelIO
+from objc_frameworks.MetalKit import (
+  MTKMetalVertexDescriptorFromModelIO,
+  MTKModelIOVertexDescriptorFromMetal,
+)
+
+from objc_frameworks.ModelIO import (
+  MDLVertexAttributePosition,
+  MDLVertexAttributeColor,
+  MDLVertexAttributeTextureCoordinate,
+  MDLVertexAttributeNormal,
+)
 
 from rbedge.utils import nsurl, get_str_filepath
+from rbedge.simd import simd_float3
 
 from rbedge import pdbr
 
@@ -49,7 +61,8 @@ MTKViewDelegate = ObjCProtocol('MTKViewDelegate')
 MTKView = ObjCClass('MTKView')
 MTKMeshBufferAllocator = ObjCClass('MTKMeshBufferAllocator')
 MDLMesh = ObjCClass('MDLMesh')
-SCNCone = ObjCClass('SCNCone')
+MTLVertexDescriptor = ObjCClass('MTLVertexDescriptor')
+
 MTKMesh = ObjCClass('MTKMesh')
 MDLAsset = ObjCClass('MDLAsset')
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
@@ -89,9 +102,6 @@ def get_model_path(
 
 
 ROOT_PATH = Path(__file__).parents[0]
-
-if not (assetURL := get_model_path('train', 'usdz')):
-  raise ValueError(f'Asset  does not exist.')
 
 
 class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
@@ -133,10 +143,27 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
     )
 
     allocator = MTKMeshBufferAllocator.alloc().initWithDevice_(device)
-    '''
-    if not (assetURL := get_model_path(modelName, 'obj')):
-      raise ValueError(f'Asset {modelName} does not exist.')
-    '''
+
+    if not (assetURL := get_model_path('train', 'usdz')):
+      raise ValueError('Asset `train` does not exist.')
+
+    vertexDescriptor = MTLVertexDescriptor.new()
+    vertexDescriptor.attributes.objectAtIndexedSubscript_(
+      0).format = MTLVertexFormat.float3
+    vertexDescriptor.attributes.objectAtIndexedSubscript_(0).offset = 0
+    vertexDescriptor.attributes.objectAtIndexedSubscript_(0).bufferIndex = 0
+
+    vertexDescriptor.layouts.objectAtIndexedSubscript_(
+      0).stride = simd_float3.stride
+
+    meshDescriptor = MTKModelIOVertexDescriptorFromMetal(vertexDescriptor)
+    meshDescriptor.attributes.objectAtIndexedSubscript_(
+      0).name = MDLVertexAttributePosition
+
+    asset = MDLAsset.alloc().initWithURL_vertexDescriptor_bufferAllocator_(
+      nsurl(assetURL), meshDescriptor, allocator)
+
+    pdbr.state(asset)
 
     scnCone = SCNCone.coneWithTopRadius_bottomRadius_height_(0.0, 0.5, 1.0)
     scnCone.setHeightSegmentCount_(10)
@@ -145,27 +172,6 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
     mdlMesh = MDLMesh.meshWithSCNGeometry_bufferAllocator_(scnCone, allocator)
 
     mesh = MTKMesh.alloc().initWithMesh_device_error_(mdlMesh, device, None)
-
-    # --- /* begin export code
-    asset = MDLAsset.new()
-    asset.addObject_(mdlMesh)
-
-    fileExtension = 'usda'
-    if not MDLAsset.canExportFileExtension_(fileExtension):
-      raise RuntimeError(f"Can't export a `.{fileExtension}` format")
-
-    _export_dir = ROOT_PATH / 'export'
-    _generated_file = _export_dir / f'generatedCone.{fileExtension}'
-    _export_dir.mkdir(parents=True, exist_ok=True)
-    _generated_file.unlink(missing_ok=True)
-
-    try:
-      url = nsurl(str(_generated_file.resolve()))
-      asset.exportAssetToURL_(url)
-    except Exception as e:
-      print(f'{e}')
-
-    # --- end export code */
 
     commandQueue = device.newCommandQueue()
 
