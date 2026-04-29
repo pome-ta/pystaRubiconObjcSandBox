@@ -160,10 +160,23 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
     meshDescriptor.attributes.objectAtIndexedSubscript_(
       0).name = MDLVertexAttributePosition
 
-    asset = MDLAsset.alloc().initWithURL_vertexDescriptor_bufferAllocator_(
-      nsurl(assetURL), meshDescriptor, allocator)
+    #asset = MDLAsset.alloc().initWithURL_vertexDescriptor_bufferAllocator_(nsurl(assetURL), meshDescriptor, allocator)
+    asset = MDLAsset.alloc().initWithURL(
+      nsurl(assetURL),
+      vertexDescriptor=meshDescriptor,
+      bufferAllocator=allocator,
+    )
+    
+    print(asset.childObjectsOfClass_(MTKMesh.self()))
+    
+    
+    
+    #pdbr.state(MTKMesh.self)
+    #print(MTKMesh.self)
+    #childObjectsOfClass_
+    #asset.childObjectsOfClass_
+    
 
-    pdbr.state(asset)
 
     scnCone = SCNCone.coneWithTopRadius_bottomRadius_height_(0.0, 0.5, 1.0)
     scnCone.setHeightSegmentCount_(10)
