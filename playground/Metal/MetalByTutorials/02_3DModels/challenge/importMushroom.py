@@ -120,7 +120,7 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     self.navigationItem.title = NSStringFromClass(__class__)
-    self.navigationItem.subtitle = '2 Import Train'
+    self.navigationItem.subtitle = 'Import Mushroom'
 
     if (device := MTLCreateSystemDefaultDevice()) is None:
       raise ('GPU is not supported')
