@@ -42,12 +42,7 @@ from objc_frameworks.MetalKit import (
   MTKModelIOVertexDescriptorFromMetal,
 )
 
-from objc_frameworks.ModelIO import (
-  MDLVertexAttributePosition,
-  MDLVertexAttributeColor,
-  MDLVertexAttributeTextureCoordinate,
-  MDLVertexAttributeNormal,
-)
+from objc_frameworks.ModelIO import MDLVertexAttributePosition
 
 from rbedge.utils import nsurl, get_str_filepath
 from rbedge.simd import simd_float3
@@ -125,7 +120,7 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     self.navigationItem.title = NSStringFromClass(__class__)
-    self.navigationItem.subtitle = '1. Hello, Metal!'
+    self.navigationItem.subtitle = '2 Import Train'
 
     if (device := MTLCreateSystemDefaultDevice()) is None:
       raise ('GPU is not supported')
@@ -160,31 +155,24 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
     meshDescriptor.attributes.objectAtIndexedSubscript_(
       0).name = MDLVertexAttributePosition
 
-    #asset = MDLAsset.alloc().initWithURL_vertexDescriptor_bufferAllocator_(nsurl(assetURL), meshDescriptor, allocator)
     asset = MDLAsset.alloc().initWithURL(
       nsurl(assetURL),
       vertexDescriptor=meshDescriptor,
       bufferAllocator=allocator,
     )
-    
-    print(asset.childObjectsOfClass_(MTKMesh.self()))
-    
-    
-    
-    #pdbr.state(MTKMesh.self)
-    #print(MTKMesh.self)
-    #childObjectsOfClass_
-    #asset.childObjectsOfClass_
-    
 
+    if not isinstance(
+      (mdlMesh := asset.childObjectsOfClass_(MDLMesh).firstObject()), MDLMesh):
+      raise TypeError(f'{mdlMesh}')
 
-    scnCone = SCNCone.coneWithTopRadius_bottomRadius_height_(0.0, 0.5, 1.0)
-    scnCone.setHeightSegmentCount_(10)
-    scnCone.setRadialSegmentCount_(10)
-
-    mdlMesh = MDLMesh.meshWithSCNGeometry_bufferAllocator_(scnCone, allocator)
-
-    mesh = MTKMesh.alloc().initWithMesh_device_error_(mdlMesh, device, None)
+    try:
+      mesh = MTKMesh.alloc().initWithMesh(
+        mdlMesh,
+        device=device,
+        error=None,
+      )
+    except Exception as e:
+      print(f'{e}')
 
     commandQueue = device.newCommandQueue()
 
@@ -286,24 +274,22 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
 
     renderEncoder.setRenderPipelineState_(self.pipelineState)
 
-    renderEncoder.setVertexBuffer_offset_atIndex_(
+    renderEncoder.setVertexBuffer(
       self.mesh.vertexBuffers.objectAtIndexedSubscript_(0).buffer,
-      0,
-      0,
+      offset=0,
+      atIndex=0,
     )
 
     renderEncoder.setTriangleFillMode_(MTLTriangleFillMode.lines)
 
-    if not (submesh := self.mesh.submeshes.firstObject()):
-      return
-
-    renderEncoder.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_(
-      MTLPrimitiveType.triangle,
-      submesh.indexCount,
-      submesh.indexType,
-      submesh.indexBuffer.buffer,
-      0,
-    )
+    for submesh in self.mesh.submeshes:
+      renderEncoder.drawIndexedPrimitives(
+        MTLPrimitiveType.triangle,
+        indexCount=submesh.indexCount,
+        indexType=submesh.indexType,
+        indexBuffer=submesh.indexBuffer.buffer,
+        indexBufferOffset=0,
+      )
 
     renderEncoder.endEncoding()
     if not (drawable := view.currentDrawable):

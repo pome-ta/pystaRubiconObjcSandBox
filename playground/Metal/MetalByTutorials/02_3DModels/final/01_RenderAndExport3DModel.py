@@ -96,7 +96,7 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     self.navigationItem.title = NSStringFromClass(__class__)
-    self.navigationItem.subtitle = '1. Hello, Metal!'
+    self.navigationItem.subtitle = '1 Render and Export 3D Model'
 
     if (device := MTLCreateSystemDefaultDevice()) is None:
       raise ('GPU is not supported')
