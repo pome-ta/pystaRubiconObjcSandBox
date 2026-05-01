@@ -15,4 +15,5 @@ from .NSLayoutConstraint import (
 )
 from .UIView import UILayoutConstraintAxis
 from .UIStackView import UIStackViewDistribution, UIStackViewAlignment
+from .NSText import NSTextAlignment
 
