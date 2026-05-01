@@ -27,7 +27,10 @@ from pyrubicon.objc.runtime import send_super
 from pyrubicon.objc.types import CGSize, UIEdgeInsetsMake
 
 from objc_frameworks.Foundation import NSStringFromClass
-from objc_frameworks.UIKit import UILayoutConstraintAxis
+from objc_frameworks.UIKit import (
+  UILayoutConstraintAxis,
+  NSTextAlignment,
+)
 
 from rbedge import pdbr
 
@@ -66,6 +69,7 @@ class MainViewController(UIViewController):
 
     text = UILabel.new()
     text.text = 'Hello, Metal!'
+    text.textAlignment = NSTextAlignment.center
     text.backgroundColor = UIColor.systemDarkOrangeColor()
 
     verticalView = UIStackView.alloc().initWithArrangedSubviews_([
@@ -75,13 +79,10 @@ class MainViewController(UIViewController):
 
     verticalView.axis = UILayoutConstraintAxis.vertical
 
-    verticalView.spacing = 16.0
-    #verticalView.alignment = 3
-    pdbr.state(verticalView)
+    #verticalView.spacing = 16.0
     verticalView.layoutMargins = UIEdgeInsetsMake(16.0, 16.0, 16.0, 16.0)
     verticalView.setLayoutMarginsRelativeArrangement_(True)
 
-    #pdbr.state(text)
 
     verticalView.backgroundColor = UIColor.systemDarkTealColor()
 
@@ -137,7 +138,6 @@ class MainViewController(UIViewController):
   # --- private
   @objc_method
   def setupLayoutConstraint(self):
-    #from objc_frameworks.UIKit import UILayoutPriorityDefaultHigh
     NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
     self.view.addSubview_(self.verticalView)
@@ -152,11 +152,11 @@ class MainViewController(UIViewController):
         safeAreaLayoutGuide.centerYAnchor),
       self.verticalView.widthAnchor.constraintEqualToAnchor_multiplier_(
         safeAreaLayoutGuide.widthAnchor,
-        0.92,
+        0.88,
       ),
       self.verticalView.heightAnchor.constraintEqualToAnchor_multiplier_(
         safeAreaLayoutGuide.heightAnchor,
-        0.92,
+        0.88,
       ),
     ])
 
