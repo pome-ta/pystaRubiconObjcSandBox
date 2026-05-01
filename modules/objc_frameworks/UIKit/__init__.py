@@ -13,4 +13,5 @@ from .NSLayoutConstraint import (
   UILayoutPriorityDefaultLow,
   UILayoutPriorityFittingSizeLevel,
 )
+from .UIView import UILayoutConstraintAxis
 

@@ -24,9 +24,10 @@ import ctypes
 from pyrubicon.objc.api import ObjCClass
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
-from pyrubicon.objc.types import CGSize
+from pyrubicon.objc.types import CGSize, UIEdgeInsetsMake
 
 from objc_frameworks.Foundation import NSStringFromClass
+from objc_frameworks.UIKit import UILayoutConstraintAxis
 
 from rbedge import pdbr
 
@@ -68,15 +69,19 @@ class MainViewController(UIViewController):
     text = UILabel.new()
     text.text = 'Hello, Metal!'
     text.backgroundColor = UIColor.systemDarkOrangeColor()
-    
-    #pdbr.state(UIColor)
 
     verticalView = UIStackView.alloc().initWithArrangedSubviews_([
       metalView,
       text,
     ])
     
+    verticalView.axis = UILayoutConstraintAxis.vertical
+    
     verticalView.spacing = 16.0
+    verticalView.layoutMargins = UIEdgeInsetsMake(16.0,16.0,16.0,16.0)
+    verticalView.setLayoutMarginsRelativeArrangement_(True)
+
+    pdbr.state(text)
     
     verticalView.backgroundColor = UIColor.systemDarkTealColor()
     
