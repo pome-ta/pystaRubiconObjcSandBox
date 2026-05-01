@@ -65,12 +65,15 @@ class MainViewController(UIViewController):
     self.navigationItem.title = NSStringFromClass(__class__)
 
     metalView = UIView.new()
+    metalView.layer.borderWidth = 1.0
+    metalView.layer.borderColor = UIColor.labelColor().CGColor
+    #separatorColor
     metalView.backgroundColor = UIColor.systemDarkRedColor()
 
     text = UILabel.new()
     text.text = 'Hello, Metal!'
     text.textAlignment = NSTextAlignment.center
-    text.backgroundColor = UIColor.systemDarkOrangeColor()
+    #text.backgroundColor = UIColor.systemDarkOrangeColor()
 
     verticalView = UIStackView.alloc().initWithArrangedSubviews_([
       metalView,
@@ -78,13 +81,12 @@ class MainViewController(UIViewController):
     ])
 
     verticalView.axis = UILayoutConstraintAxis.vertical
-
     #verticalView.spacing = 16.0
     verticalView.layoutMargins = UIEdgeInsetsMake(16.0, 16.0, 16.0, 16.0)
     verticalView.setLayoutMarginsRelativeArrangement_(True)
 
-
-    verticalView.backgroundColor = UIColor.systemDarkTealColor()
+    verticalView.backgroundColor = UIColor.systemFillColor()
+    #systemBackgroundColor
 
     self.verticalView = verticalView
 
