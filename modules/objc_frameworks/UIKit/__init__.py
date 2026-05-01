@@ -14,4 +14,5 @@ from .NSLayoutConstraint import (
   UILayoutPriorityFittingSizeLevel,
 )
 from .UIView import UILayoutConstraintAxis
+from .UIStackView import UIStackViewDistribution, UIStackViewAlignment
 

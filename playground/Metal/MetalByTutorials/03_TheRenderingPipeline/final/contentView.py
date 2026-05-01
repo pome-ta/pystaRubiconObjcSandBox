@@ -63,8 +63,6 @@ class MainViewController(UIViewController):
 
     metalView = UIView.new()
     metalView.backgroundColor = UIColor.systemDarkRedColor()
-    
-
 
     text = UILabel.new()
     text.text = 'Hello, Metal!'
@@ -74,19 +72,19 @@ class MainViewController(UIViewController):
       metalView,
       text,
     ])
-    
+
     verticalView.axis = UILayoutConstraintAxis.vertical
-    
+
     verticalView.spacing = 16.0
-    verticalView.layoutMargins = UIEdgeInsetsMake(16.0,16.0,16.0,16.0)
+    #verticalView.alignment = 3
+    pdbr.state(verticalView)
+    verticalView.layoutMargins = UIEdgeInsetsMake(16.0, 16.0, 16.0, 16.0)
     verticalView.setLayoutMarginsRelativeArrangement_(True)
 
-    pdbr.state(text)
-    
-    verticalView.backgroundColor = UIColor.systemDarkTealColor()
-    
+    #pdbr.state(text)
 
-    
+    verticalView.backgroundColor = UIColor.systemDarkTealColor()
+
     self.verticalView = verticalView
 
     self.setupLayoutConstraint()
@@ -141,9 +139,9 @@ class MainViewController(UIViewController):
   def setupLayoutConstraint(self):
     #from objc_frameworks.UIKit import UILayoutPriorityDefaultHigh
     NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
-    
+
     self.view.addSubview_(self.verticalView)
-    
+
     safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
 
     self.verticalView.translatesAutoresizingMaskIntoConstraints = False
@@ -161,7 +159,6 @@ class MainViewController(UIViewController):
         0.92,
       ),
     ])
-
 
 
 if __name__ == '__main__':
