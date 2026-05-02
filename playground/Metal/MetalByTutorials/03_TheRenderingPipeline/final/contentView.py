@@ -65,7 +65,7 @@ class MainViewController(UIViewController):
     self.navigationItem.title = NSStringFromClass(__class__)
 
     metalView = UIView.new()
-    metalView.layer.borderWidth = 1.0
+    metalView.layer.borderWidth = 2.0
     metalView.layer.borderColor = UIColor.labelColor().CGColor
     #separatorColor
     metalView.backgroundColor = UIColor.systemDarkRedColor()
