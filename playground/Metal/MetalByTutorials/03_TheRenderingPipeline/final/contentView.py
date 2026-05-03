@@ -42,15 +42,16 @@ UILabel = ObjCClass('UILabel')
 UIColor = ObjCClass('UIColor')
 UIView = ObjCClass('UIView')
 
+
 class ContentView(UIView):
+
   @objc_method
   def init(self):
     send_super(__class__, self, 'init')
-    print('ini')
-    
-    #self.setup()
+
+    self.setup()
     return self
-    
+
   @objc_method
   def setup(self):
     metalView = UIView.new()
@@ -74,9 +75,8 @@ class ContentView(UIView):
     verticalView.setLayoutMarginsRelativeArrangement_(True)
 
     verticalView.backgroundColor = UIColor.secondarySystemBackgroundColor()
-    
-    self.view.addSubview_(verticalView)
 
+    self.addSubview_(verticalView)
 
 
 class MainViewController(UIViewController):
@@ -99,7 +99,6 @@ class MainViewController(UIViewController):
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     self.navigationItem.title = NSStringFromClass(__class__)
-
     '''
     metalView = UIView.new()
     metalView.layer.borderWidth = 2.0
@@ -125,7 +124,8 @@ class MainViewController(UIViewController):
     '''
 
     #self.verticalView = verticalView
-    self.verticalView=ContentView.new()
+    self.verticalView = ContentView.new()
+    #pdbr.state(self.verticalView)
     self.setupLayoutConstraint()
 
   @objc_method
