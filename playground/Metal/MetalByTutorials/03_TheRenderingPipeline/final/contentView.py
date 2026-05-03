@@ -55,6 +55,7 @@ class ContentView(UIView):
 
   @objc_method
   def setup(self):
+    
     metalView = UIView.new()
     metalView.layer.borderWidth = 2.0
     metalView.layer.borderColor = UIColor.separatorColor().CGColor
@@ -76,8 +77,7 @@ class ContentView(UIView):
     verticalView.setLayoutMarginsRelativeArrangement_(True)
 
     verticalView.backgroundColor = UIColor.secondarySystemBackgroundColor()
-    #autoresizingMask
-    #verticalView.setAutoresizingMask_((1 << 1) | (1 << 4))
+
     verticalView.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
 
     self.addSubview_(verticalView)
@@ -85,9 +85,7 @@ class ContentView(UIView):
 
 class MainViewController(UIViewController):
 
-  verticalView: UIStackView = objc_property()
-  #metalView: UIView = objc_property()
-  #text: UILabel = objc_property()
+  contentView: ContentView = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -128,7 +126,7 @@ class MainViewController(UIViewController):
     '''
 
     #self.verticalView = verticalView
-    self.verticalView = ContentView.new()
+    self.contentView = ContentView.new()
     #pdbr.state(self.verticalView)
     self.setupLayoutConstraint()
 
@@ -182,21 +180,21 @@ class MainViewController(UIViewController):
   def setupLayoutConstraint(self):
     NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
-    self.view.addSubview_(self.verticalView)
+    self.view.addSubview_(self.contentView)
 
     safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
 
-    self.verticalView.translatesAutoresizingMaskIntoConstraints = False
+    self.contentView.translatesAutoresizingMaskIntoConstraints = False
     NSLayoutConstraint.activateConstraints_([
-      self.verticalView.centerXAnchor.constraintEqualToAnchor_(
+      self.contentView.centerXAnchor.constraintEqualToAnchor_(
         safeAreaLayoutGuide.centerXAnchor),
-      self.verticalView.centerYAnchor.constraintEqualToAnchor_(
+      self.contentView.centerYAnchor.constraintEqualToAnchor_(
         safeAreaLayoutGuide.centerYAnchor),
-      self.verticalView.widthAnchor.constraintEqualToAnchor_multiplier_(
+      self.contentView.widthAnchor.constraintEqualToAnchor_multiplier_(
         safeAreaLayoutGuide.widthAnchor,
         0.88,
       ),
-      self.verticalView.heightAnchor.constraintEqualToAnchor_multiplier_(
+      self.contentView.heightAnchor.constraintEqualToAnchor_multiplier_(
         safeAreaLayoutGuide.heightAnchor,
         0.88,
       ),
