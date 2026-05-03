@@ -66,14 +66,13 @@ class MainViewController(UIViewController):
 
     metalView = UIView.new()
     metalView.layer.borderWidth = 2.0
-    metalView.layer.borderColor = UIColor.labelColor().CGColor
-    #separatorColor
+    metalView.layer.borderColor = UIColor.separatorColor().CGColor
+
     metalView.backgroundColor = UIColor.systemDarkRedColor()
 
     text = UILabel.new()
     text.text = 'Hello, Metal!'
     text.textAlignment = NSTextAlignment.center
-    #text.backgroundColor = UIColor.systemDarkOrangeColor()
 
     verticalView = UIStackView.alloc().initWithArrangedSubviews_([
       metalView,
@@ -85,11 +84,9 @@ class MainViewController(UIViewController):
     verticalView.layoutMargins = UIEdgeInsetsMake(16.0, 16.0, 16.0, 16.0)
     verticalView.setLayoutMarginsRelativeArrangement_(True)
 
-    verticalView.backgroundColor = UIColor.systemFillColor()
-    #systemBackgroundColor
+    verticalView.backgroundColor = UIColor.secondarySystemBackgroundColor()
 
     self.verticalView = verticalView
-
     self.setupLayoutConstraint()
 
   @objc_method
