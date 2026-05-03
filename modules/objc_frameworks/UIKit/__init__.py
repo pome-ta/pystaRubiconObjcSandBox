@@ -13,7 +13,7 @@ from .NSLayoutConstraint import (
   UILayoutPriorityDefaultLow,
   UILayoutPriorityFittingSizeLevel,
 )
-from .UIView import UILayoutConstraintAxis
+from .UIView import UILayoutConstraintAxis, UIViewAutoresizing
 from .UIStackView import UIStackViewDistribution, UIStackViewAlignment
 from .NSText import NSTextAlignment
 

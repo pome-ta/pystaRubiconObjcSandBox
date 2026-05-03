@@ -30,6 +30,7 @@ from objc_frameworks.Foundation import NSStringFromClass
 from objc_frameworks.UIKit import (
   UILayoutConstraintAxis,
   NSTextAlignment,
+  UIViewAutoresizing,
 )
 
 from rbedge import pdbr
@@ -75,6 +76,9 @@ class ContentView(UIView):
     verticalView.setLayoutMarginsRelativeArrangement_(True)
 
     verticalView.backgroundColor = UIColor.secondarySystemBackgroundColor()
+    #autoresizingMask
+    #verticalView.setAutoresizingMask_((1 << 1) | (1 << 4))
+    verticalView.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
 
     self.addSubview_(verticalView)
 
