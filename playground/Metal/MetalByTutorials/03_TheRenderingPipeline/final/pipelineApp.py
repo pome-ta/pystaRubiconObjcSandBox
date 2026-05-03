@@ -42,42 +42,6 @@ UILabel = ObjCClass('UILabel')
 UIColor = ObjCClass('UIColor')
 UIView = ObjCClass('UIView')
 
-class ContentView(UIView):
-  @objc_method
-  def init(self):
-    send_super(__class__, self, 'init')
-    print('ini')
-    
-    #self.setup()
-    return self
-    
-  @objc_method
-  def setup(self):
-    metalView = UIView.new()
-    metalView.layer.borderWidth = 2.0
-    metalView.layer.borderColor = UIColor.separatorColor().CGColor
-
-    metalView.backgroundColor = UIColor.systemDarkRedColor()
-
-    text = UILabel.new()
-    text.text = 'Hello, Metal!'
-    text.textAlignment = NSTextAlignment.center
-
-    verticalView = UIStackView.alloc().initWithArrangedSubviews_([
-      metalView,
-      text,
-    ])
-
-    verticalView.axis = UILayoutConstraintAxis.vertical
-    #verticalView.spacing = 16.0
-    verticalView.layoutMargins = UIEdgeInsetsMake(16.0, 16.0, 16.0, 16.0)
-    verticalView.setLayoutMarginsRelativeArrangement_(True)
-
-    verticalView.backgroundColor = UIColor.secondarySystemBackgroundColor()
-    
-    self.view.addSubview_(verticalView)
-
-
 
 class MainViewController(UIViewController):
 
@@ -99,8 +63,8 @@ class MainViewController(UIViewController):
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     self.navigationItem.title = NSStringFromClass(__class__)
+    self.navigationItem.subtitle = 'The Rendering Pipeline'
 
-    '''
     metalView = UIView.new()
     metalView.layer.borderWidth = 2.0
     metalView.layer.borderColor = UIColor.separatorColor().CGColor
@@ -122,10 +86,8 @@ class MainViewController(UIViewController):
     verticalView.setLayoutMarginsRelativeArrangement_(True)
 
     verticalView.backgroundColor = UIColor.secondarySystemBackgroundColor()
-    '''
 
-    #self.verticalView = verticalView
-    self.verticalView=ContentView.new()
+    self.verticalView = verticalView
     self.setupLayoutConstraint()
 
   @objc_method
@@ -210,4 +172,5 @@ if __name__ == '__main__':
 
   app = App(main_vc, presentation_style)
   app.present()
+
 
