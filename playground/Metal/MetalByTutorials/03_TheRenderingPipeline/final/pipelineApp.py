@@ -24,30 +24,18 @@ import ctypes
 from pyrubicon.objc.api import ObjCClass
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
-from pyrubicon.objc.types import CGSize, UIEdgeInsetsMake
 
 from objc_frameworks.Foundation import NSStringFromClass
-from objc_frameworks.UIKit import (
-  UILayoutConstraintAxis,
-  NSTextAlignment,
-)
 
 from rbedge import pdbr
+from contentView import ContentView
 
 UIViewController = ObjCClass('UIViewController')
-
-UIStackView = ObjCClass('UIStackView')
-UILabel = ObjCClass('UILabel')
-
-UIColor = ObjCClass('UIColor')
-UIView = ObjCClass('UIView')
 
 
 class MainViewController(UIViewController):
 
-  verticalView: UIStackView = objc_property()
-  #metalView: UIView = objc_property()
-  #text: UILabel = objc_property()
+  contentView: ContentView = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -65,29 +53,7 @@ class MainViewController(UIViewController):
     self.navigationItem.title = NSStringFromClass(__class__)
     self.navigationItem.subtitle = 'The Rendering Pipeline'
 
-    metalView = UIView.new()
-    metalView.layer.borderWidth = 2.0
-    metalView.layer.borderColor = UIColor.separatorColor().CGColor
-
-    metalView.backgroundColor = UIColor.systemDarkRedColor()
-
-    text = UILabel.new()
-    text.text = 'Hello, Metal!'
-    text.textAlignment = NSTextAlignment.center
-
-    verticalView = UIStackView.alloc().initWithArrangedSubviews_([
-      metalView,
-      text,
-    ])
-
-    verticalView.axis = UILayoutConstraintAxis.vertical
-    #verticalView.spacing = 16.0
-    verticalView.layoutMargins = UIEdgeInsetsMake(16.0, 16.0, 16.0, 16.0)
-    verticalView.setLayoutMarginsRelativeArrangement_(True)
-
-    verticalView.backgroundColor = UIColor.secondarySystemBackgroundColor()
-
-    self.verticalView = verticalView
+    self.contentView = ContentView.new()
     self.setupLayoutConstraint()
 
   @objc_method
@@ -140,21 +106,21 @@ class MainViewController(UIViewController):
   def setupLayoutConstraint(self):
     NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
-    self.view.addSubview_(self.verticalView)
+    self.view.addSubview_(self.contentView)
 
     safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
 
-    self.verticalView.translatesAutoresizingMaskIntoConstraints = False
+    self.contentView.translatesAutoresizingMaskIntoConstraints = False
     NSLayoutConstraint.activateConstraints_([
-      self.verticalView.centerXAnchor.constraintEqualToAnchor_(
+      self.contentView.centerXAnchor.constraintEqualToAnchor_(
         safeAreaLayoutGuide.centerXAnchor),
-      self.verticalView.centerYAnchor.constraintEqualToAnchor_(
+      self.contentView.centerYAnchor.constraintEqualToAnchor_(
         safeAreaLayoutGuide.centerYAnchor),
-      self.verticalView.widthAnchor.constraintEqualToAnchor_multiplier_(
+      self.contentView.widthAnchor.constraintEqualToAnchor_multiplier_(
         safeAreaLayoutGuide.widthAnchor,
         0.88,
       ),
-      self.verticalView.heightAnchor.constraintEqualToAnchor_multiplier_(
+      self.contentView.heightAnchor.constraintEqualToAnchor_multiplier_(
         safeAreaLayoutGuide.heightAnchor,
         0.88,
       ),
@@ -172,5 +138,4 @@ if __name__ == '__main__':
 
   app = App(main_vc, presentation_style)
   app.present()
-
 
