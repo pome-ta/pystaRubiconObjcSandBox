@@ -1,39 +1,66 @@
-_TOP_DIR_NAME = 'pystaRubiconObjcSandBox'
-_MODULES_DIR_NAME = 'modules'
+from pyrubicon.objc.api import NSObject
+#from pyrubicon.objc.api import ObjCClass
+from pyrubicon.objc.api import ObjCProtocol
+from pyrubicon.objc.api import objc_method, objc_property
+from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.types import CGSize
 
-# todo: `./{_TOP_DIR_NAME}/{_MODULES_DIR_NAME}` にあるpackage のimport 準備
-if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
-    _TOP_DIR_NAME):
-  import pathlib
-  import sys
-  __parents = pathlib.Path(__file__).resolve().parents
-  for __dir_path in __parents:
-    if __dir_path.name == _TOP_DIR_NAME and (__modules_path := __dir_path /
-                                             _MODULES_DIR_NAME).exists():
-      sys.path.insert(0, str(__modules_path))
-      break
-  else:
-    import warnings
-    with warnings.catch_warnings():
-      warnings.simplefilter('always', ImportWarning)
-      __warning_message = f'./{_TOP_DIR_NAME}/{_MODULES_DIR_NAME} not found in parent directories'
-      warnings.warn(__warning_message, ImportWarning)
+from objc_frameworks.Metal import (
+  MTLCreateSystemDefaultDevice,
+  MTLClearColorMake,
+)
 
-import ctypes
-from pathlib import Path
-
-from pyrubicon.objc.api import ObjCClass, ObjCProtocol, NSObject
-
+#NSObject = ObjCClass('NSObject')
 MTKViewDelegate = ObjCProtocol('MTKViewDelegate')
 
-ROOT_PATH = Path(__file__).parents[0]
-shader_path = ROOT_PATH / 'Shaders.metal'
+MTKMeshBufferAllocator = ObjCClass('MTKMeshBufferAllocator')
+MDLMesh = ObjCClass('MDLMesh')
+
 
 #class Renderer(NSObject, auto_rename=True):
-class Renderer(NSObject):
-  pass
+class Renderer(NSObject, protocols=[MTKViewDelegate]):
 
-if __name__ == '__main__':
-  #print(shader_path.exists())
-  #Renderer.auto_rename = True
-  pass
+  device: 'MTLDevice' = objc_property()
+  commandQueue: 'MTLCommandQueue' = objc_property()
+
+  @objc_method
+  def initWithMetalView_(self, metalView):
+
+    if (device := MTLCreateSystemDefaultDevice()) is None and (
+        commandQueue := device.newCommandQueue()) is None:
+      raise ValueError('GPU not available')
+
+    self.device = device
+    self.commandQueue = commandQueue
+    metalView.device = device
+    
+    allocator = MTKMeshBufferAllocator.alloc().initWithDevice_(device)
+
+    send_super(__class__, self, 'init')
+    metalView.clearColor = MTLClearColorMake(
+      red=1,
+      green=1,
+      blue=0.8,
+      alpha=1,
+    )
+    metalView.delegate = self
+
+    return self
+
+  # --- MTKViewDelegate
+  @objc_method
+  def mtkView_drawableSizeWillChange_(self, view, size: CGSize):
+    pass
+
+  @objc_method
+  def drawInMTKView_(self, view):
+    if not ((drawable := view.currentDrawable) and
+            (descriptor := view.currentRenderPassDescriptor)):
+      return
+    commandBuffer = self.commandQueue.commandBuffer()
+    commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
+      descriptor)
+    commandEncoder.endEncoding()
+    commandBuffer.presentDrawable_(drawable)
+    commandBuffer.commit()
+
