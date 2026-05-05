@@ -34,7 +34,7 @@ MTKView = ObjCClass('MTKView')
 
 class MetalView(UIView):
 
-  view: MTKView = objc_property
+  view: MTKView = objc_property()
 
   @objc_method
   def init(self):
@@ -42,6 +42,8 @@ class MetalView(UIView):
     send_super(__class__, self, 'init')
 
     self.makeMetalView()
+
+    self.addSubview_(self.view)
     return self
 
   @objc_method
@@ -53,18 +55,18 @@ class MetalView(UIView):
     view = MTKView.new()
     view.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
 
-    self.addSubview_(view)
     self.view = view
 
   @objc_method
   def updateMetalView(self):
     pass
 
+
 if __name__ == '__main__':
 
   from objc_frameworks.Foundation import NSStringFromClass
   from objc_frameworks.UIKit import UIModalPresentationStyle
-  
+
   from pyrubicon.objc.types import UIEdgeInsetsMake
 
   from objc_frameworks.UIKit import (
@@ -82,36 +84,39 @@ if __name__ == '__main__':
 
   class TestMetalViewController(UIViewController):
 
-    contentView: ContentView = objc_property()
+    verticalView: UIStackView = objc_property()
 
     @objc_method
     def viewDidLoad(self):
       send_super(__class__, self, 'viewDidLoad')
       self.navigationItem.title = NSStringFromClass(__class__)
 
-      metalView = UIView.new()
+      text = UILabel.new()
+      text.text = 'Metal View'
+      text.textAlignment = NSTextAlignment.center
+
+      #metalView = UIView.new()
+      metalView = MetalView.new()
       metalView.layer.borderWidth = 2.0
       metalView.layer.borderColor = UIColor.separatorColor().CGColor
-  
-      metalView.backgroundColor = UIColor.systemDarkRedColor()
-  
-      text = UILabel.new()
-      text.text = 'Hello, Metal!'
-      text.textAlignment = NSTextAlignment.center
-  
+
+      #metalView.backgroundColor = UIColor.systemDarkRedColor()
+
       verticalView = UIStackView.alloc().initWithArrangedSubviews_([
-        metalView,
         text,
+        metalView,
       ])
-  
+
       verticalView.axis = UILayoutConstraintAxis.vertical
-      #verticalView.spacing = 16.0
+      verticalView.spacing = 16.0
       verticalView.layoutMargins = UIEdgeInsetsMake(16.0, 16.0, 16.0, 16.0)
       verticalView.setLayoutMarginsRelativeArrangement_(True)
-  
+
       verticalView.backgroundColor = UIColor.secondarySystemBackgroundColor()
-  
+
       verticalView.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
+
+      self.verticalView = verticalView
 
       self.setupLayoutConstraint()
 
@@ -125,22 +130,22 @@ if __name__ == '__main__':
     def setupLayoutConstraint(self):
       NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
-      self.view.addSubview_(self.contentView)
+      self.view.addSubview_(self.verticalView)
 
       safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
 
-      self.contentView.translatesAutoresizingMaskIntoConstraints = False
+      self.verticalView.translatesAutoresizingMaskIntoConstraints = False
 
-      centerXAnchor = self.contentView.centerXAnchor.constraintEqualToAnchor_(
+      centerXAnchor = self.verticalView.centerXAnchor.constraintEqualToAnchor_(
         safeAreaLayoutGuide.centerXAnchor)
-      centerYAnchor = self.contentView.centerYAnchor.constraintEqualToAnchor_(
+      centerYAnchor = self.verticalView.centerYAnchor.constraintEqualToAnchor_(
         safeAreaLayoutGuide.centerYAnchor)
 
-      widthAnchor = self.contentView.widthAnchor.constraintEqualToAnchor_multiplier_(
+      widthAnchor = self.verticalView.widthAnchor.constraintEqualToAnchor_multiplier_(
         safeAreaLayoutGuide.widthAnchor,
         0.88,
       )
-      heightAnchor = self.contentView.heightAnchor.constraintEqualToAnchor_multiplier_(
+      heightAnchor = self.verticalView.heightAnchor.constraintEqualToAnchor_multiplier_(
         safeAreaLayoutGuide.heightAnchor,
         0.88,
       )
@@ -152,7 +157,7 @@ if __name__ == '__main__':
         heightAnchor,
       ])
 
-  main_vc = TestContentViewController.new()
+  main_vc = TestMetalViewController.new()
 
   presentation_style = UIModalPresentationStyle.fullScreen
   #presentation_style = UIModalPresentationStyle.pageSheet
