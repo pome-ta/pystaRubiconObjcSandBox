@@ -32,6 +32,8 @@ from objc_frameworks.UIKit import (
 
 from rbedge import pdbr
 
+from metalView import MetalView
+
 UIView = ObjCClass('UIView')
 UIStackView = ObjCClass('UIStackView')
 UILabel = ObjCClass('UILabel')
@@ -51,11 +53,12 @@ class ContentView(UIView):
   @objc_method
   def setup(self):
 
-    metalView = UIView.new()
+    #metalView = UIView.new()
+    metalView = MetalView.new()
     metalView.layer.borderWidth = 2.0
     metalView.layer.borderColor = UIColor.separatorColor().CGColor
 
-    metalView.backgroundColor = UIColor.systemDarkRedColor()
+    #metalView.backgroundColor = UIColor.systemDarkRedColor()
 
     text = UILabel.new()
     text.text = 'Hello, Metal!'
