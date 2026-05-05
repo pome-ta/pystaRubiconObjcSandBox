@@ -33,7 +33,7 @@ class Renderer(NSObject, protocols=[MTKViewDelegate]):
     self.device = device
     self.commandQueue = commandQueue
     metalView.device = device
-    
+
     allocator = MTKMeshBufferAllocator.alloc().initWithDevice_(device)
 
     send_super(__class__, self, 'init')
