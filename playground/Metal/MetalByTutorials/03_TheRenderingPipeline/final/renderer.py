@@ -49,7 +49,8 @@ class Renderer(NSObject, protocols=[MTKViewDelegate]):
 
     self.device = device
     self.commandQueue = commandQueue
-    metalView.device = device
+    metalView.setDevice_(device)
+    print('i')
     print(device)
     print(commandQueue)
     

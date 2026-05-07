@@ -134,6 +134,8 @@ if __name__ == '__main__':
       renderer = Renderer.alloc().initWithMetalView_(verticalView)
 
       self.verticalView = verticalView
+      #pdbr.state(verticalView)
+      print(verticalView.device)
 
       self.setupLayoutConstraint()
 
