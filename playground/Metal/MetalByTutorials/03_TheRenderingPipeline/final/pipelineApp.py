@@ -21,13 +21,18 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
 
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass
+from pyrubicon.objc.api import ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
-from pyrubicon.objc.types import CGSize
+from pyrubicon.objc.types import CGSize, UIEdgeInsetsMake
 
 from objc_frameworks.Foundation import NSStringFromClass
 from objc_frameworks.CoreGraphics import CGRectZero
+from objc_frameworks.UIKit import (
+  UILayoutConstraintAxis,
+  NSTextAlignment,
+  UIViewAutoresizing,
+)
 from objc_frameworks.Metal import (
   MTLCreateSystemDefaultDevice,
   MTLClearColorMake,
@@ -35,13 +40,18 @@ from objc_frameworks.Metal import (
 
 from rbedge import pdbr
 
+MTKViewDelegate = ObjCProtocol('MTKViewDelegate')
+
 UIViewController = ObjCClass('UIViewController')
 MTKView = ObjCClass('MTKView')
+UIStackView = ObjCClass('UIStackView')
+UIColor = ObjCClass('UIColor')
+UIView = ObjCClass('UIView')
 
 
-class MainViewController(UIViewController):
+class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
 
-  metalView: MTKView = objc_property()
+  verticalView: UIStackView = objc_property()
   commandQueue: 'MTLCommandQueue' = objc_property()
 
   @objc_method
@@ -50,12 +60,12 @@ class MainViewController(UIViewController):
     self.navigationItem.title = NSStringFromClass(__class__)
 
     device = MTLCreateSystemDefaultDevice()
+    commandQueue = device.newCommandQueue()
 
     #metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
     metalView = MTKView.new()
     metalView.device = device
     #metalView.setDevice_(device)
-
 
     metalView.clearColor = MTLClearColorMake(
       red=1,
@@ -65,12 +75,24 @@ class MainViewController(UIViewController):
     )
 
     metalView.delegate = self
-    commandQueue = device.newCommandQueue()
+    metalView.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
 
     metalView.enableSetNeedsDisplay = True
     metalView.setNeedsDisplay()
 
-    self.metalView = metalView
+    view = UIView.new()
+    view.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
+    view.addSubview_(metalView)
+
+    verticalView = UIStackView.alloc().initWithArrangedSubviews_([
+      view,
+    ])
+    verticalView.layoutMargins = UIEdgeInsetsMake(16.0, 16.0, 16.0, 16.0)
+    verticalView.setLayoutMarginsRelativeArrangement_(True)
+
+    verticalView.backgroundColor = UIColor.secondarySystemBackgroundColor()
+
+    self.verticalView = verticalView
     self.commandQueue = commandQueue
 
     self.setupLayoutConstraint()
@@ -85,21 +107,21 @@ class MainViewController(UIViewController):
   def setupLayoutConstraint(self):
     NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
-    self.view.addSubview_(self.metalView)
+    self.view.addSubview_(self.verticalView)
 
     safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
 
-    self.metalView.translatesAutoresizingMaskIntoConstraints = False
+    self.verticalView.translatesAutoresizingMaskIntoConstraints = False
     NSLayoutConstraint.activateConstraints_([
-      self.metalView.centerXAnchor.constraintEqualToAnchor_(
+      self.verticalView.centerXAnchor.constraintEqualToAnchor_(
         safeAreaLayoutGuide.centerXAnchor),
-      self.metalView.centerYAnchor.constraintEqualToAnchor_(
+      self.verticalView.centerYAnchor.constraintEqualToAnchor_(
         safeAreaLayoutGuide.centerYAnchor),
-      self.metalView.widthAnchor.constraintEqualToAnchor_multiplier_(
+      self.verticalView.widthAnchor.constraintEqualToAnchor_multiplier_(
         safeAreaLayoutGuide.widthAnchor,
         0.88,
       ),
-      self.metalView.heightAnchor.constraintEqualToAnchor_multiplier_(
+      self.verticalView.heightAnchor.constraintEqualToAnchor_multiplier_(
         safeAreaLayoutGuide.heightAnchor,
         0.88,
       ),
