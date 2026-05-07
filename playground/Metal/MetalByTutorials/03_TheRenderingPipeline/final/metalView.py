@@ -23,10 +23,13 @@ import ctypes
 from pyrubicon.objc.api import ObjCClass
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.types import CGRectMake
 
 from objc_frameworks.UIKit import UIViewAutoresizing
 
 from rbedge import pdbr
+
+from renderer import Renderer
 
 UIView = ObjCClass('UIView')
 MTKView = ObjCClass('MTKView')
@@ -42,20 +45,26 @@ class MetalView(UIView):
     send_super(__class__, self, 'init')
 
     self.makeMetalView()
+    self.makeCoordinator()
 
     self.addSubview_(self.view)
     return self
 
   @objc_method
   def makeCoordinator(self):
-    pass
+    renderer = Renderer.alloc().initWithMetalView_(self.view)
 
   @objc_method
   def makeMetalView(self):
-    view = MTKView.new()
+    #view = MTKView.new()
+    #initWithFrame_
+    view = MTKView.alloc().initWithFrame_(CGRectMake(0, 0, 100, 100))
+    #pdbr.state(view)
     view.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
+    view.backgroundColor = UIColor.systemDarkRedColor()
 
     self.view = view
+    pdbr.state(view)
 
   @objc_method
   def updateMetalView(self):
@@ -87,10 +96,13 @@ if __name__ == '__main__':
     verticalView: UIStackView = objc_property()
 
     @objc_method
+    def loadView(self):
+      send_super(__class__, self, 'loadView')
+    @objc_method
     def viewDidLoad(self):
       send_super(__class__, self, 'viewDidLoad')
       self.navigationItem.title = NSStringFromClass(__class__)
-
+      '''
       text = UILabel.new()
       text.text = 'Metal View'
       text.textAlignment = NSTextAlignment.center
@@ -117,8 +129,15 @@ if __name__ == '__main__':
       verticalView.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
 
       self.verticalView = verticalView
+      '''
+      verticalView = MTKView.new()
+      renderer = Renderer.alloc().initWithMetalView_(verticalView)
+
+      self.verticalView = verticalView
 
       self.setupLayoutConstraint()
+
+
 
     @objc_method
     def didReceiveMemoryWarning(self):
@@ -156,6 +175,8 @@ if __name__ == '__main__':
         widthAnchor,
         heightAnchor,
       ])
+
+      #pdbr.state(self.verticalView)
 
   main_vc = TestMetalViewController.new()
 
