@@ -24,36 +24,48 @@ import ctypes
 from pyrubicon.objc.api import ObjCClass
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.types import CGSize
 
 from objc_frameworks.Foundation import NSStringFromClass
+from objc_frameworks.CoreGraphics import CGRectZero
+from objc_frameworks.Metal import (
+  MTLCreateSystemDefaultDevice,
+  MTLClearColorMake,
+)
 
 from rbedge import pdbr
-from contentView import ContentView
+#from contentView import ContentView
 
 UIViewController = ObjCClass('UIViewController')
+MTKView = ObjCClass('MTKView')
 
 
 class MainViewController(UIViewController):
 
-  contentView: ContentView = objc_property()
-
-  @objc_method
-  def dealloc(self):
-    # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
-    #print(f'	 - {NSStringFromClass(__class__)}: dealloc')
-    pass
-
-  @objc_method
-  def loadView(self):
-    send_super(__class__, self, 'loadView')
+  metalView: MTKView = objc_property()
+  commandQueue: 'MTLCommandQueue' = objc_property()
 
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     self.navigationItem.title = NSStringFromClass(__class__)
-    self.navigationItem.subtitle = 'The Rendering Pipeline'
 
-    self.contentView = ContentView.new()
+    device = MTLCreateSystemDefaultDevice()
+
+    metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
+    metalView.clearColor = MTLClearColorMake(
+      red=1,
+      green=1,
+      blue=0.8,
+      alpha=1,
+    )
+
+    metalView.delegate = self
+    commandQueue = device.newCommandQueue()
+
+    self.metalView = metalView
+    self.commandQueue = commandQueue
+
     self.setupLayoutConstraint()
 
   @objc_method
@@ -106,25 +118,43 @@ class MainViewController(UIViewController):
   def setupLayoutConstraint(self):
     NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
-    self.view.addSubview_(self.contentView)
+    self.view.addSubview_(self.metalView)
 
     safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
 
-    self.contentView.translatesAutoresizingMaskIntoConstraints = False
+    self.metalView.translatesAutoresizingMaskIntoConstraints = False
     NSLayoutConstraint.activateConstraints_([
-      self.contentView.centerXAnchor.constraintEqualToAnchor_(
+      self.metalView.centerXAnchor.constraintEqualToAnchor_(
         safeAreaLayoutGuide.centerXAnchor),
-      self.contentView.centerYAnchor.constraintEqualToAnchor_(
+      self.metalView.centerYAnchor.constraintEqualToAnchor_(
         safeAreaLayoutGuide.centerYAnchor),
-      self.contentView.widthAnchor.constraintEqualToAnchor_multiplier_(
+      self.metalView.widthAnchor.constraintEqualToAnchor_multiplier_(
         safeAreaLayoutGuide.widthAnchor,
         0.88,
       ),
-      self.contentView.heightAnchor.constraintEqualToAnchor_multiplier_(
+      self.metalView.heightAnchor.constraintEqualToAnchor_multiplier_(
         safeAreaLayoutGuide.heightAnchor,
         0.88,
       ),
     ])
+
+  # --- MTKViewDelegate
+  @objc_method
+  def mtkView_drawableSizeWillChange_(self, view, size: CGSize):
+    pass
+
+  @objc_method
+  def drawInMTKView_(self, view):
+    if not ((drawable := view.currentDrawable) and
+            (descriptor := view.currentRenderPassDescriptor)):
+      return
+
+    commandBuffer = self.commandQueue.commandBuffer()
+    commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
+      descriptor)
+    commandEncoder.endEncoding()
+    commandBuffer.presentDrawable_(drawable)
+    commandBuffer.commit()
 
 
 if __name__ == '__main__':
