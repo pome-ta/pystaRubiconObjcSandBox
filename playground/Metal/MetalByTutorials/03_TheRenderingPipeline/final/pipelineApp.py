@@ -34,7 +34,6 @@ from objc_frameworks.Metal import (
 )
 
 from rbedge import pdbr
-#from contentView import ContentView
 
 UIViewController = ObjCClass('UIViewController')
 MTKView = ObjCClass('MTKView')
@@ -52,7 +51,12 @@ class MainViewController(UIViewController):
 
     device = MTLCreateSystemDefaultDevice()
 
-    metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
+    #metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
+    metalView = MTKView.new()
+    metalView.device = device
+    #metalView.setDevice_(device)
+
+
     metalView.clearColor = MTLClearColorMake(
       red=1,
       green=1,
@@ -63,50 +67,13 @@ class MainViewController(UIViewController):
     metalView.delegate = self
     commandQueue = device.newCommandQueue()
 
+    metalView.enableSetNeedsDisplay = True
+    metalView.setNeedsDisplay()
+
     self.metalView = metalView
     self.commandQueue = commandQueue
 
     self.setupLayoutConstraint()
-
-  @objc_method
-  def viewWillAppear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewWillAppear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
-
-  @objc_method
-  def viewDidAppear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewDidAppear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
-
-  @objc_method
-  def viewWillDisappear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewWillDisappear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
-
-  @objc_method
-  def viewDidDisappear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewDidDisappear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
 
   @objc_method
   def didReceiveMemoryWarning(self):
@@ -145,6 +112,8 @@ class MainViewController(UIViewController):
 
   @objc_method
   def drawInMTKView_(self, view):
+    print('d')
+
     if not ((drawable := view.currentDrawable) and
             (descriptor := view.currentRenderPassDescriptor)):
       return
