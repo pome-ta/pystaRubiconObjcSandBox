@@ -1,7 +1,6 @@
 from pathlib import Path
 
 from pyrubicon.objc.api import NSObject
-#from pyrubicon.objc.api import ObjCClass
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
@@ -16,7 +15,6 @@ from objc_frameworks.MetalKit import MTKMetalVertexDescriptorFromModelIO
 
 from rbedge import pdbr
 
-#NSObject = ObjCClass('NSObject')
 MTKViewDelegate = ObjCProtocol('MTKViewDelegate')
 
 MTKMeshBufferAllocator = ObjCClass('MTKMeshBufferAllocator')
@@ -29,7 +27,6 @@ MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 shader_path = Path(__file__).parent / 'Shaders.metal'
 
 
-#class Renderer(NSObject, auto_rename=True):
 class Renderer(NSObject, protocols=[MTKViewDelegate]):
 
   device: 'MTLDevice' = objc_property()
@@ -42,25 +39,21 @@ class Renderer(NSObject, protocols=[MTKViewDelegate]):
   @objc_method
   def initWithMetalView_(self, metalView):
 
-
     if not ((device := MTLCreateSystemDefaultDevice()) and
             (commandQueue := device.newCommandQueue())):
       raise ValueError('GPU not available')
 
     self.device = device
     self.commandQueue = commandQueue
-    metalView.setDevice_(device)
-    print('i')
-    print(device)
-    print(commandQueue)
-    
-    
+    metalView.device = device
+
     # create the mesh
     allocator = MTKMeshBufferAllocator.alloc().initWithDevice_(device)
     size = 0.8
-    mdlMesh = MDLMesh.meshWithSCNGeometry_bufferAllocator_(
+    mdlMesh = MDLMesh.meshWithSCNGeometry(
       SCNBox.boxWithWidth_height_length_chamferRadius_(size, size, size, 0),
-      allocator)
+      bufferAllocator=allocator,
+    )
 
     try:
       mesh = MTKMesh.alloc().initWithMesh(
@@ -97,8 +90,7 @@ class Renderer(NSObject, protocols=[MTKViewDelegate]):
         pipelineDescriptor, None)
     except Exception as e:
       print(f'{e}')
-    
-    
+
     send_super(__class__, self, 'init')
     metalView.clearColor = MTLClearColorMake(
       red=1,
@@ -107,8 +99,6 @@ class Renderer(NSObject, protocols=[MTKViewDelegate]):
       alpha=1,
     )
     metalView.delegate = self
-    #metalView.enableSetNeedsDisplay = True
-    #metalView.setNeedsDisplay()
 
     self.mesh = mesh
     self.vertexBuffer = vertexBuffer
@@ -119,13 +109,10 @@ class Renderer(NSObject, protocols=[MTKViewDelegate]):
   # --- MTKViewDelegate
   @objc_method
   def mtkView_drawableSizeWillChange_(self, view, size: CGSize):
-    print('m')
     pass
 
   @objc_method
   def drawInMTKView_(self, view):
-    print('d')
-    '''
     if not ((commandBuffer := self.commandQueue.commandBuffer()) and
             (descriptor := view.currentRenderPassDescriptor) and
             (renderEncoder :=
@@ -151,17 +138,6 @@ class Renderer(NSObject, protocols=[MTKViewDelegate]):
     renderEncoder.endEncoding()
     if not (drawable := view.currentDrawable):
       return
-    commandBuffer.presentDrawable_(drawable)
-    commandBuffer.commit()
-    '''
-    if not ((drawable := view.currentDrawable) and
-            (descriptor := view.currentRenderPassDescriptor)):
-      return
-
-    commandBuffer = self.commandQueue.commandBuffer()
-    commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
-      descriptor)
-    commandEncoder.endEncoding()
     commandBuffer.presentDrawable_(drawable)
     commandBuffer.commit()
 

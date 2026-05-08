@@ -20,10 +20,9 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
       warnings.warn(__warning_message, ImportWarning)
 
 import ctypes
-from pyrubicon.objc.api import ObjCClass
+from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
-from pyrubicon.objc.types import CGRectMake
 
 from objc_frameworks.UIKit import UIViewAutoresizing
 
@@ -38,33 +37,34 @@ MTKView = ObjCClass('MTKView')
 class MetalView(UIView):
 
   view: MTKView = objc_property()
+  renderer: Renderer = objc_property()
 
   @objc_method
   def init(self):
 
     send_super(__class__, self, 'init')
 
-    self.makeMetalView()
-    self.makeCoordinator()
+    self.view = self.makeMetalView()
+    self.renderer = self.makeCoordinator()
 
     self.addSubview_(self.view)
     return self
 
   @objc_method
-  def makeCoordinator(self):
+  def makeCoordinator(self) -> ObjCInstance:
     renderer = Renderer.alloc().initWithMetalView_(self.view)
+    return renderer
 
   @objc_method
-  def makeMetalView(self):
-    #view = MTKView.new()
-    #initWithFrame_
-    view = MTKView.alloc().initWithFrame_(CGRectMake(0, 0, 100, 100))
-    #pdbr.state(view)
-    view.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
-    view.backgroundColor = UIColor.systemDarkRedColor()
+  def makeMetalView(self) -> ObjCInstance:
+    view = MTKView.new()
 
-    self.view = view
-    pdbr.state(view)
+    view.enableSetNeedsDisplay = True
+    view.setNeedsDisplay()
+
+    view.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
+
+    return view
 
   @objc_method
   def updateMetalView(self):
@@ -96,23 +96,17 @@ if __name__ == '__main__':
     verticalView: UIStackView = objc_property()
 
     @objc_method
-    def loadView(self):
-      send_super(__class__, self, 'loadView')
-    @objc_method
     def viewDidLoad(self):
       send_super(__class__, self, 'viewDidLoad')
       self.navigationItem.title = NSStringFromClass(__class__)
-      '''
+
       text = UILabel.new()
       text.text = 'Metal View'
       text.textAlignment = NSTextAlignment.center
 
-      #metalView = UIView.new()
       metalView = MetalView.new()
       metalView.layer.borderWidth = 2.0
       metalView.layer.borderColor = UIColor.separatorColor().CGColor
-
-      #metalView.backgroundColor = UIColor.systemDarkRedColor()
 
       verticalView = UIStackView.alloc().initWithArrangedSubviews_([
         text,
@@ -129,17 +123,10 @@ if __name__ == '__main__':
       verticalView.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
 
       self.verticalView = verticalView
-      '''
-      verticalView = MTKView.new()
-      renderer = Renderer.alloc().initWithMetalView_(verticalView)
 
       self.verticalView = verticalView
-      #pdbr.state(verticalView)
-      print(verticalView.device)
 
       self.setupLayoutConstraint()
-
-
 
     @objc_method
     def didReceiveMemoryWarning(self):
@@ -177,8 +164,6 @@ if __name__ == '__main__':
         widthAnchor,
         heightAnchor,
       ])
-
-      #pdbr.state(self.verticalView)
 
   main_vc = TestMetalViewController.new()
 
