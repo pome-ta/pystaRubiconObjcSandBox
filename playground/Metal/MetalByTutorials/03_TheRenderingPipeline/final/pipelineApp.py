@@ -79,7 +79,7 @@ class Renderer(NSObject):
       alpha=1,
     )
 
-    #metalView.delegate = self
+    metalView.delegate = self
     metalView.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
 
     return self
@@ -108,7 +108,7 @@ class Renderer(NSObject):
 class MainViewController(UIViewController):
 
   verticalView: UIStackView = objc_property()
-  commandQueue: 'MTLCommandQueue' = objc_property()
+  renderer:Renderer = objc_property()
 
   @objc_method
   def viewDidLoad(self):
@@ -121,9 +121,9 @@ class MainViewController(UIViewController):
     #metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
     metalView = MTKView.new()
 
-    renderer = Renderer.alloc().initWithMetalView_(metalView)
+    self.renderer = Renderer.alloc().initWithMetalView_(metalView)
     #pdbr.state(renderer)
-    metalView.delegate = renderer
+    #metalView.delegate = renderer
     metalView.enableSetNeedsDisplay = True
     metalView.setNeedsDisplay()
 
@@ -140,6 +140,7 @@ class MainViewController(UIViewController):
     verticalView.backgroundColor = UIColor.secondarySystemBackgroundColor()
 
     self.verticalView = verticalView
+    #self.renderer = renderer
 
     self.setupLayoutConstraint()
 
