@@ -50,8 +50,8 @@ UIColor = ObjCClass('UIColor')
 UIView = ObjCClass('UIView')
 
 
-class Renderer(NSObject, protocols=[MTKViewDelegate]):
-
+#class Renderer(NSObject, protocols=[MTKViewDelegate]):
+class Renderer(NSObject):
   device: 'MTLDevice' = objc_property()
   commandQueue: 'MTLCommandQueue' = objc_property()
   library: 'MTLLibrary!' = objc_property()
@@ -61,15 +61,13 @@ class Renderer(NSObject, protocols=[MTKViewDelegate]):
 
   @objc_method
   def initWithMetalView_(self, metalView):
-
-
+    send_super(__class__, self, 'init')
     if not ((device := MTLCreateSystemDefaultDevice()) and
             (commandQueue := device.newCommandQueue())):
       raise ValueError('GPU not available')
 
     self.device = device
     self.commandQueue = commandQueue
-    
 
     metalView.device = device
     #metalView.setDevice_(device)
@@ -81,16 +79,11 @@ class Renderer(NSObject, protocols=[MTKViewDelegate]):
       alpha=1,
     )
 
-    metalView.delegate = self
+    #metalView.delegate = self
     metalView.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
-    
-    send_super(__class__, self, 'init')
-    metalView.enableSetNeedsDisplay = True
-    metalView.setNeedsDisplay()
-    
+
     return self
 
-    
   # --- MTKViewDelegate
   @objc_method
   def mtkView_drawableSizeWillChange_(self, view, size: CGSize):
@@ -112,7 +105,6 @@ class Renderer(NSObject, protocols=[MTKViewDelegate]):
     commandBuffer.commit()
 
 
-
 class MainViewController(UIViewController):
 
   verticalView: UIStackView = objc_property()
@@ -128,10 +120,12 @@ class MainViewController(UIViewController):
 
     #metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
     metalView = MTKView.new()
-    
-    Renderer.alloc().initWithMetalView_(metalView)
-    
 
+    renderer = Renderer.alloc().initWithMetalView_(metalView)
+    #pdbr.state(renderer)
+    metalView.delegate = renderer
+    metalView.enableSetNeedsDisplay = True
+    metalView.setNeedsDisplay()
 
     view = UIView.new()
     view.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
@@ -146,7 +140,6 @@ class MainViewController(UIViewController):
     verticalView.backgroundColor = UIColor.secondarySystemBackgroundColor()
 
     self.verticalView = verticalView
-
 
     self.setupLayoutConstraint()
 
@@ -179,7 +172,6 @@ class MainViewController(UIViewController):
         0.88,
       ),
     ])
-
 
 
 if __name__ == '__main__':
