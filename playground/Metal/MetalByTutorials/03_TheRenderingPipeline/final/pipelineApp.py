@@ -21,6 +21,7 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
 
 import ctypes
 
+from pyrubicon.objc.api import NSObject
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
@@ -49,21 +50,27 @@ UIColor = ObjCClass('UIColor')
 UIView = ObjCClass('UIView')
 
 
-class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
+class Renderer(NSObject, protocols=[MTKViewDelegate]):
 
-  verticalView: UIStackView = objc_property()
+  device: 'MTLDevice' = objc_property()
   commandQueue: 'MTLCommandQueue' = objc_property()
+  library: 'MTLLibrary!' = objc_property()
+  mesh: 'MTKMesh!' = objc_property()
+  vertexBuffer: 'MTLBuffer!' = objc_property()
+  pipelineState: 'MTLRenderPipelineState!' = objc_property()
 
   @objc_method
-  def viewDidLoad(self):
-    send_super(__class__, self, 'viewDidLoad')
-    self.navigationItem.title = NSStringFromClass(__class__)
+  def initWithMetalView_(self, metalView):
 
-    device = MTLCreateSystemDefaultDevice()
-    commandQueue = device.newCommandQueue()
 
-    #metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
-    metalView = MTKView.new()
+    if not ((device := MTLCreateSystemDefaultDevice()) and
+            (commandQueue := device.newCommandQueue())):
+      raise ValueError('GPU not available')
+
+    self.device = device
+    self.commandQueue = commandQueue
+    
+
     metalView.device = device
     #metalView.setDevice_(device)
 
@@ -76,9 +83,55 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
 
     metalView.delegate = self
     metalView.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
-
+    
+    send_super(__class__, self, 'init')
     metalView.enableSetNeedsDisplay = True
     metalView.setNeedsDisplay()
+    
+    return self
+
+    
+  # --- MTKViewDelegate
+  @objc_method
+  def mtkView_drawableSizeWillChange_(self, view, size: CGSize):
+    pass
+
+  @objc_method
+  def drawInMTKView_(self, view):
+    print('d')
+
+    if not ((drawable := view.currentDrawable) and
+            (descriptor := view.currentRenderPassDescriptor)):
+      return
+
+    commandBuffer = self.commandQueue.commandBuffer()
+    commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
+      descriptor)
+    commandEncoder.endEncoding()
+    commandBuffer.presentDrawable_(drawable)
+    commandBuffer.commit()
+
+
+
+class MainViewController(UIViewController):
+
+  verticalView: UIStackView = objc_property()
+  commandQueue: 'MTLCommandQueue' = objc_property()
+
+  @objc_method
+  def viewDidLoad(self):
+    send_super(__class__, self, 'viewDidLoad')
+    self.navigationItem.title = NSStringFromClass(__class__)
+
+    #device = MTLCreateSystemDefaultDevice()
+    #commandQueue = device.newCommandQueue()
+
+    #metalView = MTKView.alloc().initWithFrame_device_(CGRectZero, device)
+    metalView = MTKView.new()
+    
+    Renderer.alloc().initWithMetalView_(metalView)
+    
+
 
     view = UIView.new()
     view.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
@@ -93,7 +146,7 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
     verticalView.backgroundColor = UIColor.secondarySystemBackgroundColor()
 
     self.verticalView = verticalView
-    self.commandQueue = commandQueue
+
 
     self.setupLayoutConstraint()
 
@@ -127,25 +180,6 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
       ),
     ])
 
-  # --- MTKViewDelegate
-  @objc_method
-  def mtkView_drawableSizeWillChange_(self, view, size: CGSize):
-    pass
-
-  @objc_method
-  def drawInMTKView_(self, view):
-    print('d')
-
-    if not ((drawable := view.currentDrawable) and
-            (descriptor := view.currentRenderPassDescriptor)):
-      return
-
-    commandBuffer = self.commandQueue.commandBuffer()
-    commandEncoder = commandBuffer.renderCommandEncoderWithDescriptor_(
-      descriptor)
-    commandEncoder.endEncoding()
-    commandBuffer.presentDrawable_(drawable)
-    commandBuffer.commit()
 
 
 if __name__ == '__main__':
