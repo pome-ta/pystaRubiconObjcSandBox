@@ -38,6 +38,7 @@ UIView = ObjCClass('UIView')
 UIStackView = ObjCClass('UIStackView')
 UILabel = ObjCClass('UILabel')
 
+UIColor = ObjCClass('UIColor')
 
 class ContentView(UIView):
 
