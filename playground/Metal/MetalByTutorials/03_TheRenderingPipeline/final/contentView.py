@@ -38,8 +38,6 @@ UIView = ObjCClass('UIView')
 UIStackView = ObjCClass('UIStackView')
 UILabel = ObjCClass('UILabel')
 
-UIColor = ObjCClass('UIColor')
-
 
 class ContentView(UIView):
 
@@ -53,12 +51,9 @@ class ContentView(UIView):
   @objc_method
   def setup(self):
 
-    #metalView = UIView.new()
     metalView = MetalView.new()
     metalView.layer.borderWidth = 2.0
     metalView.layer.borderColor = UIColor.separatorColor().CGColor
-
-    #metalView.backgroundColor = UIColor.systemDarkRedColor()
 
     text = UILabel.new()
     text.text = 'Hello, Metal!'
