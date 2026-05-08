@@ -13,6 +13,8 @@ from objc_frameworks.Metal import (
 )
 from objc_frameworks.MetalKit import MTKMetalVertexDescriptorFromModelIO
 
+from rbedge.utils import nsurl, get_str_filepath
+
 from rbedge import pdbr
 
 MTKViewDelegate = ObjCProtocol('MTKViewDelegate')
@@ -24,7 +26,24 @@ MTKMesh = ObjCClass('MTKMesh')
 MTLCompileOptions = ObjCClass('MTLCompileOptions')
 MTLRenderPipelineDescriptor = ObjCClass('MTLRenderPipelineDescriptor')
 
-shader_path = Path(__file__).parent / 'Shaders.metal'
+ROOT_PATH = Path(__file__).parents[0]
+
+# wip: 雑
+def _get_filepath(file_name: str) -> str | None:
+  root = ROOT_PATH.parents[0] / 'resources'
+  return get_str_filepath(root, file_name)
+
+
+def get_model_path(
+  modelName: str,
+  extension: str = '',
+) -> str | None:
+  return _get_filepath(f'{modelName}.{extension}')
+
+
+
+
+shader_path = ROOT_PATH / 'Shaders.metal'
 
 
 class Renderer(NSObject, protocols=[MTKViewDelegate]):
