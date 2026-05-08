@@ -111,19 +111,26 @@ class MainViewController(UIViewController):
     safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
 
     self.contentView.translatesAutoresizingMaskIntoConstraints = False
+
+    centerXAnchor = self.contentView.centerXAnchor.constraintEqualToAnchor_(
+      safeAreaLayoutGuide.centerXAnchor)
+    centerYAnchor = self.contentView.centerYAnchor.constraintEqualToAnchor_(
+      safeAreaLayoutGuide.centerYAnchor)
+
+    widthAnchor = self.contentView.widthAnchor.constraintEqualToAnchor_multiplier_(
+      safeAreaLayoutGuide.widthAnchor,
+      0.96,
+    )
+    heightAnchor = self.contentView.heightAnchor.constraintEqualToAnchor_multiplier_(
+      safeAreaLayoutGuide.heightAnchor,
+      0.96,
+    )
+
     NSLayoutConstraint.activateConstraints_([
-      self.contentView.centerXAnchor.constraintEqualToAnchor_(
-        safeAreaLayoutGuide.centerXAnchor),
-      self.contentView.centerYAnchor.constraintEqualToAnchor_(
-        safeAreaLayoutGuide.centerYAnchor),
-      self.contentView.widthAnchor.constraintEqualToAnchor_multiplier_(
-        safeAreaLayoutGuide.widthAnchor,
-        0.88,
-      ),
-      self.contentView.heightAnchor.constraintEqualToAnchor_multiplier_(
-        safeAreaLayoutGuide.heightAnchor,
-        0.88,
-      ),
+      centerXAnchor,
+      centerYAnchor,
+      widthAnchor,
+      heightAnchor,
     ])
 
 
@@ -138,3 +145,4 @@ if __name__ == '__main__':
 
   app = App(main_vc, presentation_style)
   app.present()
+
