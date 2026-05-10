@@ -32,9 +32,14 @@ from objc_frameworks.UIKit import UIViewAutoresizing
 from rbedge import pdbr
 
 UIViewController = ObjCClass('UIViewController')
+
+UIView = ObjCClass('UIView')
 WKWebView = ObjCClass('WKWebView')
 
 UIColor = ObjCClass('UIColor')
+
+class WebView(UIView):
+  pass
 
 class MainViewController(UIViewController):
 
@@ -55,16 +60,16 @@ class MainViewController(UIViewController):
     send_super(__class__, self, 'viewDidLoad')
     self.navigationItem.title = NSStringFromClass(__class__)
     
-    self.view.backgroundColor = UIColor.secondarySystemBackgroundColor()
+    #self.view.backgroundColor = UIColor.secondarySystemBackgroundColor()
     
     wkWebView = WKWebView.new()
     print(self.view.bounds)
     
 
     self.wkWebView = wkWebView
-    #self.view.addSubview_(self.wkWebView)
+    self.view.addSubview_(self.wkWebView)
     
-    self.setupLayoutConstraint()
+    #self.setupLayoutConstraint()
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
