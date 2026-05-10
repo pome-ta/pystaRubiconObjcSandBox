@@ -58,12 +58,13 @@ class MainViewController(UIViewController):
     self.view.backgroundColor = UIColor.secondarySystemBackgroundColor()
     
     wkWebView = WKWebView.new()
-    wkWebView.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
+    print(self.view.bounds)
+    
 
     self.wkWebView = wkWebView
-    self.view.addSubview_(self.wkWebView)
+    #self.view.addSubview_(self.wkWebView)
     
-    #self.setupLayoutConstraint()
+    self.setupLayoutConstraint()
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -74,6 +75,7 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
+    #self.wkWebView.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -85,6 +87,7 @@ class MainViewController(UIViewController):
                  ctypes.c_bool,
                ])
     print(self.wkWebView)
+    print(self.view.bounds)
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
