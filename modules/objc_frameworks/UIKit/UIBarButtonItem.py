@@ -1,6 +1,37 @@
 from enum import IntEnum, IntFlag
 
 
+class UIBarButtonItemStyle(IntEnum):
+  #[doc(alias = "UIBarButtonItemStylePlain")]
+  plain = 0
+  # A button item style for a prominent button.
+  #
+  # For example, use this for a button that completes or finalizes some task.
+  # Buttons with this style will not be visually grouped with other items
+  # in a navigation bar or toolbar, and will also have other styling changes
+  # appropriate to their context to indicate their prominence.
+  #[doc(alias = "UIBarButtonItemStyleProminent")]
+  prominent = 2
+  # A button item style for a prominent button.
+  #
+  # For example, use this for a button that completes or finalizes some task.
+  # Buttons with this style will not be visually grouped with other items
+  # in a navigation bar or toolbar, and will also have other styling changes
+  # appropriate to their context to indicate their prominence.
+  #[doc(alias = "UIBarButtonItemStyleBordered")]
+  #[deprecated]
+  bordered = 1
+  # A button item style for a prominent button.
+  #
+  # For example, use this for a button that completes or finalizes some task.
+  # Buttons with this style will not be visually grouped with other items
+  # in a navigation bar or toolbar, and will also have other styling changes
+  # appropriate to their context to indicate their prominence.
+  #[doc(alias = "UIBarButtonItemStyleDone")]
+  #[deprecated]
+  done = prominent
+
+
 # ref: [UIBarButtonSystemItem | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uibarbuttonsystemitem?language=objc)
 class UIBarButtonSystemItem(IntEnum):
 

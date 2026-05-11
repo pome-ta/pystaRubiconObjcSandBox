@@ -1,4 +1,4 @@
-from .UIBarButtonItem import UIBarButtonSystemItem
+from .UIBarButtonItem import UIBarButtonSystemItem, UIBarButtonItemStyle
 from .UIGeometry import UIRectEdge
 from .UISceneDefinitions import UISceneActivationState
 from .UIViewController import UIModalPresentationStyle
