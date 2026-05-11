@@ -27,7 +27,8 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 
 from objc_frameworks.Foundation import NSStringFromClass
-from objc_frameworks.UIKit import UIViewAutoresizing
+from objc_frameworks.Foundation import NSURLRequestCachePolicy
+from objc_frameworks.UIKit import UIViewAutoresizing, UIControlEvents
 
 from rbedge import pdbr
 
