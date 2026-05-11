@@ -41,22 +41,46 @@ UIViewController = ObjCClass('UIViewController')
 
 UIView = ObjCClass('UIView')
 WKWebView = ObjCClass('WKWebView')
+WKWebViewConfiguration = ObjCClass('WKWebViewConfiguration')
+WKWebsiteDataStore = ObjCClass('WKWebsiteDataStore')
 
 UIColor = ObjCClass('UIColor')
 
 
-class WebView(UIView):
+class WebView(WKWebView):
 
-  wkWebView: WKWebView = objc_property()
-
+  #wkWebView: WKWebView = objc_property()
+    
   @objc_method
-  def initWithIndexPath_(self, index_path: object):
-    pass
+  def init(self):
+    send_super(__class__, self, 'init')
+    
+    #self = self.makeWeblView()
+    
+    #self.addSubview_(self.wkWebView)
+    return self
+  
+  @objc_method
+  def makeWeblView(self) -> ObjCInstance:
+
+    webConfiguration = WKWebViewConfiguration.new()
+    websiteDataStore = WKWebsiteDataStore.nonPersistentDataStore()
+    webConfiguration.websiteDataStore = websiteDataStore
+    webConfiguration.preferences.setValue_forKey_(
+      True, 'allowFileAccessFromFileURLs')
+    
+    wkWebView = WKWebView.new()
+    wkWebView.configuration = webConfiguration
+    
+    wkWebView.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
+    
+    
+    return wkWebView
 
 
 class MainViewController(UIViewController):
 
-  wkWebView: WKWebView = objc_property()
+  wkWebView: WebView = objc_property()
 
   @objc_method
   def dealloc(self):
@@ -75,13 +99,14 @@ class MainViewController(UIViewController):
 
     #self.view.backgroundColor = UIColor.secondarySystemBackgroundColor()
 
-    wkWebView = WKWebView.new()
-    print(self.view.bounds)
+    wkWebView = WebView.new()
+    pdbr.state(wkWebView)
+
 
     self.wkWebView = wkWebView
-    self.view.addSubview_(self.wkWebView)
+    
 
-    #self.setupLayoutConstraint()
+    self.setupLayoutConstraint()
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -92,7 +117,7 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #self.wkWebView.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
+
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -103,8 +128,7 @@ class MainViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    print(self.wkWebView)
-    print(self.view.bounds)
+
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
