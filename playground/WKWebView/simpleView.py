@@ -26,7 +26,7 @@ from pyrubicon.objc.api import ObjCClass, ObjCInstance
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 
-from objc_frameworks.Foundation import NSStringFromClass
+
 from objc_frameworks.Foundation import NSURLRequestCachePolicy
 from objc_frameworks.UIKit import (
   UIViewAutoresizing,
@@ -47,22 +47,26 @@ WKWebsiteDataStore = ObjCClass('WKWebsiteDataStore')
 UIColor = ObjCClass('UIColor')
 
 
-class WebView(WKWebView):
 
-  #wkWebView: WKWebView = objc_property()
-    
+
+class WebViewController(UIViewController):
+
+  wkWebView: WKWebView = objc_property()
+
   @objc_method
-  def init(self):
-    send_super(__class__, self, 'init')
-    
-    #self = self.makeWeblView()
-    
-    #self.addSubview_(self.wkWebView)
-    return self
-  
+  def dealloc(self):
+    # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
+    #print(f'	 - {NSStringFromClass(__class__)}: dealloc')
+    pass
+
+  @objc_method
+  def loadView(self):
+    send_super(__class__, self, 'loadView')
+    self.wkWebView = self.makeWeblView()
+
+
   @objc_method
   def makeWeblView(self) -> ObjCInstance:
-
     webConfiguration = WKWebViewConfiguration.new()
     websiteDataStore = WKWebsiteDataStore.nonPersistentDataStore()
     webConfiguration.websiteDataStore = websiteDataStore
@@ -78,32 +82,13 @@ class WebView(WKWebView):
     return wkWebView
 
 
-class MainViewController(UIViewController):
-
-  wkWebView: WebView = objc_property()
-
-  @objc_method
-  def dealloc(self):
-    # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
-    #print(f'	 - {NSStringFromClass(__class__)}: dealloc')
-    pass
-
-  @objc_method
-  def loadView(self):
-    send_super(__class__, self, 'loadView')
-
   @objc_method
   def viewDidLoad(self):
+    from objc_frameworks.Foundation import NSStringFromClass
+    
     send_super(__class__, self, 'viewDidLoad')
     self.navigationItem.title = NSStringFromClass(__class__)
 
-    #self.view.backgroundColor = UIColor.secondarySystemBackgroundColor()
-
-    wkWebView = WebView.new()
-    pdbr.state(wkWebView)
-
-
-    self.wkWebView = wkWebView
     
 
     self.setupLayoutConstraint()
@@ -192,7 +177,7 @@ if __name__ == '__main__':
   from rbedge.app import App
   from objc_frameworks.UIKit import UIModalPresentationStyle
 
-  main_vc = MainViewController.new()
+  main_vc = WebViewController.new()
 
   presentation_style = UIModalPresentationStyle.fullScreen
   #presentation_style = UIModalPresentationStyle.pageSheet
