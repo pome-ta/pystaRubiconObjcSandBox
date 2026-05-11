@@ -39,7 +39,14 @@ WKWebView = ObjCClass('WKWebView')
 UIColor = ObjCClass('UIColor')
 
 class WebView(UIView):
-  pass
+  
+  wkWebView: WKWebView = objc_property()
+  
+  @objc_method
+  def initWithIndexPath_(self, index_path: object):
+    pass
+  
+  
 
 class MainViewController(UIViewController):
 
