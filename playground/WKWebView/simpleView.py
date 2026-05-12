@@ -22,7 +22,8 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
 import ctypes
 from pathlib import Path
 
-from pyrubicon.objc.api import ObjCClass, ObjCInstance
+from pyrubicon.objc.api import ObjCClass, ObjCProtocol
+from pyrubicon.objc.api import ObjCInstance, NSObject
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super
 
@@ -44,13 +45,63 @@ WKWebViewConfiguration = ObjCClass('WKWebViewConfiguration')
 WKWebsiteDataStore = ObjCClass('WKWebsiteDataStore')
 NSURL = ObjCClass('NSURL')
 
-UIColor = ObjCClass('UIColor')
+WKNavigationDelegate = ObjCProtocol('WKNavigationDelegate')
+
+
+class WebDelegate(NSObject, protocols=[WKNavigationDelegate]):
+
+  @objc_method
+  def init(self):
+    send_super(__class__, self, 'init')
+    return self
+
+  # --- WKUIDelegate
+  # --- WKNavigationDelegate
+  @objc_method
+  def webView_didCommitNavigation_(self, webView, navigation):
+    # 遷移開始時
+    print('遷移開始時')
+    pass
+
+  @objc_method
+  def webView_didFailNavigation_withError_(self, webView, navigation, error):
+    # 遷移中にエラーが発生した時
+    # xxx: 未確認
+    print('didFailNavigation_withError')
+    print(error)
+
+  @objc_method
+  def webView_didFailProvisionalNavigation_withError_(self, webView,
+                                                      navigation, error):
+    # ページ読み込み時にエラーが発生した時
+    print('didFailProvisionalNavigation_withError')
+    print(error)
+
+  @objc_method
+  def webView_didFinishNavigation_(self, webView, navigation):
+    # ページ読み込みが完了した時
+    print('ページ読み込みが完了した時')
+    title = webView.title
+
+  @objc_method
+  def webView_didReceiveServerRedirectForProvisionalNavigation_(
+      self, webView, navigation):
+    # リダイレクトされた時
+    # xxx: 未確認
+    print('didReceiveServerRedirectForProvisionalNavigation')
+
+  @objc_method
+  def webView_didStartProvisionalNavigation_(self, webView, navigation):
+    # ページ読み込みが開始された時
+    print('ページ読み込みが開始された時')
+    pass
 
 
 class WebViewController(UIViewController):
 
-  webView: WKWebView = objc_property()
   indexPath: Path = objc_property(object)
+  webView: WKWebView = objc_property()
+  webDelegate: WebDelegate = objc_property()
 
   @objc_method
   def initWithIndexPath_(self, indexPath: object):
@@ -65,7 +116,6 @@ class WebViewController(UIViewController):
   @objc_method
   def makeWeblView(self) -> ObjCInstance:
     websiteDataStore = WKWebsiteDataStore.nonPersistentDataStore()
-
     webConfiguration = WKWebViewConfiguration.new()
     webConfiguration.websiteDataStore = websiteDataStore
     webConfiguration.preferences.setValue_forKey_(
@@ -85,7 +135,13 @@ class WebViewController(UIViewController):
   @objc_method
   def loadView(self):
     send_super(__class__, self, 'loadView')
-    self.webView = self.makeWeblView()
+
+    webDelegate = WebDelegate.new()
+    webView = self.makeWeblView()
+    webView.navigationDelegate = webDelegate
+
+    self.webView = webView
+    self.webDelegate = webDelegate
 
   @objc_method
   def viewDidLoad(self):
@@ -162,6 +218,7 @@ class WebViewController(UIViewController):
     self.view.addSubview_(self.webView)
 
     safeAreaLayoutGuide = self.view.safeAreaLayoutGuide
+    #safeAreaLayoutGuide = self.view
 
     self.webView.translatesAutoresizingMaskIntoConstraints = False
 
@@ -172,11 +229,11 @@ class WebViewController(UIViewController):
 
     widthAnchor = self.webView.widthAnchor.constraintEqualToAnchor_multiplier_(
       safeAreaLayoutGuide.widthAnchor,
-      0.96,
+      1,
     )
     heightAnchor = self.webView.heightAnchor.constraintEqualToAnchor_multiplier_(
       safeAreaLayoutGuide.heightAnchor,
-      0.96,
+      1,
     )
 
     NSLayoutConstraint.activateConstraints_([
@@ -191,8 +248,9 @@ if __name__ == '__main__':
   from rbedge.app import App
   from objc_frameworks.UIKit import UIModalPresentationStyle
 
-  index_path = Path('./docs/index.html')
+  ROOT_PATH = Path(__file__).parents[0]
 
+  index_path = ROOT_PATH / 'docs/index.html'
   #main_vc = WebViewController.new()
   main_vc = WebViewController.alloc().initWithIndexPath_(index_path)
 
