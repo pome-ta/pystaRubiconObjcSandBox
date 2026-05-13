@@ -44,13 +44,13 @@ class App:
     rootViewController = windowScene.keyWindow.rootViewController
     self.rootViewController = rootViewController
 
-  def present(self) -> None:
+  def present(self, NavigationController=RootNavigationController) -> None:
 
     @onMainThread(sync=False)
     def present_viewController(viewController: UIViewController,
                                style: int) -> None:
 
-      presentViewController = RootNavigationController.alloc(
+      presentViewController = NavigationController.alloc(
       ).initWithRootViewController_(viewController)
 
       presentViewController.setModalPresentationStyle_(style)

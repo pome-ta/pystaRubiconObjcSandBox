@@ -25,7 +25,7 @@ from pathlib import Path
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import ObjCInstance, NSObject
 from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super
+from pyrubicon.objc.runtime import send_super, SEL
 
 from objc_frameworks.CoreGraphics import CGRectZero
 from objc_frameworks.Foundation import NSURLRequestCachePolicy
@@ -36,8 +36,12 @@ from objc_frameworks.UIKit import (
   UIBarButtonItemStyle,
 )
 
+from objc_frameworks.UIKit import UIRectEdge, UIBarButtonSystemItem
+
+from rbedge.lifeCycle import loop
 from rbedge import pdbr
 
+UINavigationController = ObjCClass('UINavigationController')
 UIViewController = ObjCClass('UIViewController')
 
 WKWebView = ObjCClass('WKWebView')
@@ -46,9 +50,18 @@ WKWebsiteDataStore = ObjCClass('WKWebsiteDataStore')
 NSURL = ObjCClass('NSURL')
 
 WKNavigationDelegate = ObjCProtocol('WKNavigationDelegate')
+WKUIDelegate = ObjCProtocol('WKUIDelegate')
 
+UIBarButtonItem = ObjCClass('UIBarButtonItem')
+UINavigationBarAppearance = ObjCClass('UINavigationBarAppearance')
+UIToolbarAppearance = ObjCClass('UIToolbarAppearance')
 
-class WebDelegate(NSObject, protocols=[WKNavigationDelegate]):
+class WebDelegate(
+    NSObject,
+    protocols=[
+      WKNavigationDelegate,
+      #WKUIDelegate,
+    ]):
 
   @objc_method
   def init(self):
@@ -136,7 +149,7 @@ class WebViewController(UIViewController):
     webDelegate = WebDelegate.new()
     webView = self.makeWeblView()
     webView.navigationDelegate = webDelegate
-    webView.uiDelegate = webDelegate  # xxx: ?
+    #webView.uiDelegate = webDelegate  # xxx: ?
 
     self.webView = webView
     self.webDelegate = webDelegate
@@ -242,6 +255,113 @@ class WebViewController(UIViewController):
     ])
 
 
+class NavigationController(UINavigationController):
+  
+  @objc_method
+  def dealloc(self):
+    # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
+    #print(f'- {NSStringFromClass(__class__)}: dealloc')
+    loop.stop()
+
+  @objc_method
+  def loadView(self):
+    send_super(__class__, self, 'loadView')
+    #print(f'{NSStringFromClass(__class__)}: loadView')
+
+    navigationBarAppearance = UINavigationBarAppearance.new()
+    navigationBarAppearance.configureWithDefaultBackground()
+
+    self.navigationBar.standardAppearance = navigationBarAppearance
+    self.navigationBar.scrollEdgeAppearance = navigationBarAppearance
+    self.navigationBar.compactAppearance = navigationBarAppearance
+    self.navigationBar.compactScrollEdgeAppearance = navigationBarAppearance
+    '''
+
+    toolbarAppearance = UIToolbarAppearance.new()
+    toolbarAppearance.configureWithDefaultBackground()
+
+    self.toolbar.standardAppearance = toolbarAppearance
+    self.toolbar.scrollEdgeAppearance = toolbarAppearance
+    self.toolbar.compactAppearance = toolbarAppearance
+    self.toolbar.compactScrollEdgeAppearance = toolbarAppearance
+    '''
+
+  @objc_method
+  def viewDidLoad(self):
+    send_super(__class__, self, 'viewDidLoad')
+    #print(f'{NSStringFromClass(__class__)}: viewDidLoad')
+    self.delegate = self
+
+  @objc_method
+  def viewWillAppear_(self, animated: bool):
+    send_super(__class__,
+               self,
+               'viewWillAppear:',
+               animated,
+               argtypes=[
+                 ctypes.c_bool,
+               ])
+    #print(f'{NSStringFromClass(__class__)}: viewWillAppear_')
+
+  @objc_method
+  def viewDidAppear_(self, animated: bool):
+    send_super(__class__,
+               self,
+               'viewDidAppear:',
+               animated,
+               argtypes=[
+                 ctypes.c_bool,
+               ])
+    #print(f'{NSStringFromClass(__class__)}: viewDidAppear_')
+
+  @objc_method
+  def viewWillDisappear_(self, animated: bool):
+    send_super(__class__,
+               self,
+               'viewWillDisappear:',
+               animated,
+               argtypes=[
+                 ctypes.c_bool,
+               ])
+    #print(f'{NSStringFromClass(__class__)}: viewWillDisappear_')
+
+  @objc_method
+  def viewDidDisappear_(self, animated: bool):
+    send_super(__class__,
+               self,
+               'viewDidDisappear:',
+               animated,
+               argtypes=[
+                 ctypes.c_bool,
+               ])
+    #print(f'{NSStringFromClass(__class__)}: viewDidDisappear_')
+
+  @objc_method
+  def didReceiveMemoryWarning(self):
+    send_super(__class__, self, 'didReceiveMemoryWarning')
+    print(f'{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
+
+  @objc_method
+  def navigationController_willShowViewController_animated_(
+      self, navigationController, viewController, animated: bool):
+    # xxx: layout 範囲の制限
+    extendedLayout = UIRectEdge.none
+    #viewController.setEdgesForExtendedLayout_(extendedLayout)
+
+    closeButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItem(
+      UIBarButtonSystemItem.close,
+      target=navigationController,
+      action=SEL('doneButtonTapped:'))
+
+    # todo: view 遷移でのButton 重複を判別
+    visibleViewController = navigationController.visibleViewController
+    navigationItem = visibleViewController.navigationItem
+    navigationItem.leftBarButtonItem = closeButtonItem
+
+  @objc_method
+  def doneButtonTapped_(self, sender):
+    self.dismissViewControllerAnimated_completion_(True, None)
+
 if __name__ == '__main__':
   from rbedge.app import App
   from objc_frameworks.UIKit import UIModalPresentationStyle
@@ -256,5 +376,7 @@ if __name__ == '__main__':
   #presentation_style = UIModalPresentationStyle.pageSheet
 
   app = App(main_vc, presentation_style)
-  app.present()
+  app.present(NavigationController)
+
+  
 
