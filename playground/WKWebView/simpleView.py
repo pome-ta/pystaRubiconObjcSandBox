@@ -51,10 +51,12 @@ NSURL = ObjCClass('NSURL')
 
 WKNavigationDelegate = ObjCProtocol('WKNavigationDelegate')
 WKUIDelegate = ObjCProtocol('WKUIDelegate')
+UINavigationControllerDelegate = ObjCProtocol('UINavigationControllerDelegate')
 
 UIBarButtonItem = ObjCClass('UIBarButtonItem')
 UINavigationBarAppearance = ObjCClass('UINavigationBarAppearance')
 UIToolbarAppearance = ObjCClass('UIToolbarAppearance')
+
 
 class WebDelegate(
     NSObject,
@@ -255,8 +257,13 @@ class WebViewController(UIViewController):
     ])
 
 
-class NavigationController(UINavigationController):
-  
+class NavigationController(
+    UINavigationController,
+    protocols=[
+      UINavigationControllerDelegate,
+    ],
+):
+
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
@@ -267,7 +274,7 @@ class NavigationController(UINavigationController):
   def loadView(self):
     send_super(__class__, self, 'loadView')
     #print(f'{NSStringFromClass(__class__)}: loadView')
-
+    '''
     navigationBarAppearance = UINavigationBarAppearance.new()
     navigationBarAppearance.configureWithDefaultBackground()
 
@@ -275,6 +282,7 @@ class NavigationController(UINavigationController):
     self.navigationBar.scrollEdgeAppearance = navigationBarAppearance
     self.navigationBar.compactAppearance = navigationBarAppearance
     self.navigationBar.compactScrollEdgeAppearance = navigationBarAppearance
+    '''
     '''
 
     toolbarAppearance = UIToolbarAppearance.new()
@@ -362,6 +370,7 @@ class NavigationController(UINavigationController):
   def doneButtonTapped_(self, sender):
     self.dismissViewControllerAnimated_completion_(True, None)
 
+
 if __name__ == '__main__':
   from rbedge.app import App
   from objc_frameworks.UIKit import UIModalPresentationStyle
@@ -377,6 +386,4 @@ if __name__ == '__main__':
 
   app = App(main_vc, presentation_style)
   app.present(NavigationController)
-
-  
 
