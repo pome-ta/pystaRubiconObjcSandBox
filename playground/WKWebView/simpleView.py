@@ -60,7 +60,6 @@ class WebDelegate(NSObject, protocols=[WKNavigationDelegate]):
   @objc_method
   def webView_didCommitNavigation_(self, webView, navigation):
     # 遷移開始時
-    print('遷移開始時')
     pass
 
   @objc_method
@@ -80,7 +79,6 @@ class WebDelegate(NSObject, protocols=[WKNavigationDelegate]):
   @objc_method
   def webView_didFinishNavigation_(self, webView, navigation):
     # ページ読み込みが完了した時
-    print('ページ読み込みが完了した時')
     title = webView.title
 
   @objc_method
@@ -93,7 +91,6 @@ class WebDelegate(NSObject, protocols=[WKNavigationDelegate]):
   @objc_method
   def webView_didStartProvisionalNavigation_(self, webView, navigation):
     # ページ読み込みが開始された時
-    print('ページ読み込みが開始された時')
     pass
 
 
@@ -139,6 +136,7 @@ class WebViewController(UIViewController):
     webDelegate = WebDelegate.new()
     webView = self.makeWeblView()
     webView.navigationDelegate = webDelegate
+    webView.uiDelegate = webDelegate  # xxx: ?
 
     self.webView = webView
     self.webDelegate = webDelegate
