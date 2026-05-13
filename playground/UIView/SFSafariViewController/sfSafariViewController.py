@@ -19,12 +19,13 @@ if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
       __warning_message = f'./{_TOP_DIR_NAME}/{_MODULES_DIR_NAME} not found in parent directories'
       warnings.warn(__warning_message, ImportWarning)
 
-import ctypes
-
 from pyrubicon.objc.api import ObjCClass
+
+from objc_frameworks.UIKit import UIModalPresentationStyle
 
 from rbedge.lifeCycle import loop
 from rbedge.objcMainThread import onMainThread
+from rbedge.utils import nsurl
 
 SFSafariViewController = ObjCClass('SFSafariViewController')
 UIApplication = ObjCClass('UIApplication')
@@ -39,7 +40,44 @@ def get_rootViewController() -> None:
     if windowScene.activationState == 0:
       break
   rootViewController = windowScene.keyWindow.rootViewController
-  return  rootViewController
+  return rootViewController
 
 
-rv =get_rootViewController()
+def main_loop() -> None:
+  try:
+    loop.run_forever()
+  except Exception as e:
+    loop.stop()
+  finally:
+    loop.close()
+
+
+def main(url, modalPresentationStyle):
+
+  rootViewController = get_rootViewController()
+
+  @onMainThread(sync=False)
+  def present_viewController(url, style: int) -> None:
+
+    presentViewController = SFSafariViewController.alloc().initWithURL_(
+      nsurl(url))
+    presentViewController.setModalPresentationStyle_(style)
+
+    rootViewController.presentViewController(
+      presentViewController,
+      animated=True,
+      completion=None,
+    )
+    #rootViewController.release()
+
+  present_viewController(url, modalPresentationStyle)
+  main_loop()
+
+
+if __name__ == '__main__':
+
+  url = 'https://developer.mozilla.org/ja/docs/Web/HTML/Reference/Elements/textarea'
+  presentation_style = UIModalPresentationStyle.fullScreen
+
+  main(url, presentation_style)
+
