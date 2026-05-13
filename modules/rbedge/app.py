@@ -2,7 +2,7 @@ from typing import Union
 
 from pyrubicon.objc.api import ObjCClass
 
-from objc_frameworks.UIKit import UISceneActivationState, UIModalPresentationStyle
+from objc_frameworks.UIKit import UIModalPresentationStyle
 
 from .lifeCycle import loop
 from .objcMainThread import onMainThread
