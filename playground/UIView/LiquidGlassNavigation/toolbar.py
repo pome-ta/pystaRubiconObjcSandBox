@@ -23,7 +23,7 @@ import ctypes
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super, SEL
+from pyrubicon.objc.runtime import send_super, objc_id, SEL
 
 from objc_frameworks.UIKit import UIViewAutoresizing
 from objc_frameworks.UIKit import UIBarButtonSystemItem
@@ -34,21 +34,31 @@ from rbedge import pdbr
 UINavigationControllerDelegate = ObjCProtocol('UINavigationControllerDelegate')
 
 UINavigationController = ObjCClass('UINavigationController')
-UINavigationBarAppearance = ObjCClass('UINavigationBarAppearance')
-UIToolbarAppearance = ObjCClass('UIToolbarAppearance')
+#UINavigationBarAppearance = ObjCClass('UINavigationBarAppearance')
+#UIToolbarAppearance = ObjCClass('UIToolbarAppearance')
 UIViewController = ObjCClass('UIViewController')
 
 UIView = ObjCClass('UIView')
+UITextView = ObjCClass('UITextView')
 UIColor = ObjCClass('UIColor')
 UIBarButtonItem = ObjCClass('UIBarButtonItem')
 
 
 class NavigationController(
     UINavigationController,
-    protocols=[
-      UINavigationControllerDelegate,
-    ],
+    protocols=[UINavigationControllerDelegate],
 ):
+
+  @objc_method
+  def initWithRootViewController_(self, rootViewController):
+    send_super(__class__,
+               self,
+               'initWithRootViewController:',
+               rootViewController,
+               argtypes=[
+                 objc_id,
+               ])
+    return self
 
   @objc_method
   def dealloc(self):
@@ -60,7 +70,7 @@ class NavigationController(
   def loadView(self):
     send_super(__class__, self, 'loadView')
     #print(f'{NSStringFromClass(__class__)}: loadView')
-    
+    '''
     navigationBarAppearance = UINavigationBarAppearance.new()
     navigationBarAppearance.configureWithDefaultBackground()
 
@@ -68,8 +78,7 @@ class NavigationController(
     self.navigationBar.scrollEdgeAppearance = navigationBarAppearance
     self.navigationBar.compactAppearance = navigationBarAppearance
     self.navigationBar.compactScrollEdgeAppearance = navigationBarAppearance
-    
-    
+    '''
     '''
     toolbarAppearance = UIToolbarAppearance.new()
     toolbarAppearance.configureWithDefaultBackground()
@@ -79,7 +88,7 @@ class NavigationController(
     self.toolbar.compactAppearance = toolbarAppearance
     self.toolbar.compactScrollEdgeAppearance = toolbarAppearance
     '''
-    
+
     #
     #self.setToolbarHidden_animated_(False, True)
     #self.setNavigationBarHidden_animated_(True, True)
@@ -91,7 +100,7 @@ class NavigationController(
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     #print(f'{NSStringFromClass(__class__)}: viewDidLoad')
-    self.delegate = self
+    #self.delegate = self
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -147,25 +156,18 @@ class NavigationController(
   def navigationController_willShowViewController_animated_(
       self, navigationController, viewController, animated: bool):
     # xxx: layout 範囲の制限
-    #extendedLayout = UIRectEdge.none
+    extendedLayout = UIRectEdge.none
     #viewController.setEdgesForExtendedLayout_(extendedLayout)
 
     closeButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItem(
       UIBarButtonSystemItem.close,
       target=navigationController,
-      action=SEL('doneButtonTapped:'),
-    )
+      action=SEL('doneButtonTapped:'))
 
     # todo: view 遷移でのButton 重複を判別
-
     visibleViewController = navigationController.visibleViewController
-
-    #pdbr.state(visibleViewController)
-
     navigationItem = visibleViewController.navigationItem
     navigationItem.leftBarButtonItem = closeButtonItem
-
-    #navigationController.setToolbarItems_animated_([closeButtonItem] ,True)
 
   @objc_method
   def doneButtonTapped_(self, sender):
@@ -193,7 +195,7 @@ class MainViewController(ObjCClass('UIViewController')):
     #self.navigationItem.title = NSStringFromClass(__class__)
     self.view.backgroundColor = UIColor.systemDarkPinkColor()
 
-    subView = UIView.new()
+    subView = UITextView.new()
     subView.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
 
     subView.backgroundColor = UIColor.systemDarkTealColor()
@@ -205,7 +207,22 @@ class MainViewController(ObjCClass('UIViewController')):
       target=self.navigationController,
       action=SEL('doneButtonTapped:'),
     )
-    self.toolbarItems = [closeButtonItem]
+
+    flexibleSpaceItem = UIBarButtonItem.flexibleSpaceItem()
+    fixedSpaceItem = UIBarButtonItem.fixedSpaceItem()
+    #flexibleSpaceItem
+    #fixedSpaceItem
+    self.toolbarItems = [
+      closeButtonItem,
+      flexibleSpaceItem,
+      closeButtonItem,
+      flexibleSpaceItem,
+      closeButtonItem,
+      fixedSpaceItem,
+      closeButtonItem,
+      flexibleSpaceItem,
+    ]
+    pdbr.state(self)
 
     self.setupLayoutConstraint()
 
