@@ -31,7 +31,7 @@ from objc_frameworks.UIKit import UIBarButtonSystemItem
 from rbedge.lifeCycle import loop
 from rbedge import pdbr
 
-UINavigationControllerDelegate = ObjCProtocol('UINavigationControllerDelegate')
+#UINavigationControllerDelegate = ObjCProtocol('UINavigationControllerDelegate')
 
 UINavigationController = ObjCClass('UINavigationController')
 #UINavigationBarAppearance = ObjCClass('UINavigationBarAppearance')
@@ -44,10 +44,7 @@ UIColor = ObjCClass('UIColor')
 UIBarButtonItem = ObjCClass('UIBarButtonItem')
 
 
-class NavigationController(
-    UINavigationController,
-    protocols=[UINavigationControllerDelegate],
-):
+class NavigationController(UINavigationController):
 
   @objc_method
   def initWithRootViewController_(self, rootViewController):
@@ -153,25 +150,7 @@ class NavigationController(
     print(f'{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
 
   @objc_method
-  def navigationController_willShowViewController_animated_(
-      self, navigationController, viewController, animated: bool):
-    # xxx: layout 範囲の制限
-    extendedLayout = UIRectEdge.none
-    #viewController.setEdgesForExtendedLayout_(extendedLayout)
-
-    closeButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItem(
-      UIBarButtonSystemItem.close,
-      target=navigationController,
-      action=SEL('doneButtonTapped:'))
-
-    # todo: view 遷移でのButton 重複を判別
-    visibleViewController = navigationController.visibleViewController
-    navigationItem = visibleViewController.navigationItem
-    navigationItem.leftBarButtonItem = closeButtonItem
-
-  @objc_method
   def doneButtonTapped_(self, sender):
-    print('n')
     self.dismissViewControllerAnimated_completion_(True, None)
 
 
@@ -196,7 +175,8 @@ class MainViewController(ObjCClass('UIViewController')):
     #self.navigationItem.title = NSStringFromClass(__class__)
     self.view.backgroundColor = UIColor.systemDarkPinkColor()
 
-    subView = UITextView.new()
+    #subView = UITextView.new()
+    subView = UIView.new()
     subView.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
 
     subView.backgroundColor = UIColor.systemDarkTealColor()
@@ -205,7 +185,7 @@ class MainViewController(ObjCClass('UIViewController')):
     #pdbr.state(self)
     closeButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItem(
       UIBarButtonSystemItem.close,
-      target=self,
+      target=self.navigationController,
       action=SEL('doneButtonTapped:'),
     )
 
@@ -213,27 +193,11 @@ class MainViewController(ObjCClass('UIViewController')):
     fixedSpaceItem = UIBarButtonItem.fixedSpaceItem()
     #flexibleSpaceItem
     #fixedSpaceItem
-    self.toolbarItems = [
-      closeButtonItem,
-      flexibleSpaceItem,
-      closeButtonItem,
-      flexibleSpaceItem,
-      closeButtonItem,
-      fixedSpaceItem,
-      closeButtonItem,
-      flexibleSpaceItem,
-    ]
-    pdbr.state(self)
+    self.toolbarItems = [closeButtonItem, flexibleSpaceItem, closeButtonItem]
+    #pdbr.state(self)
+    #setToolbarItems_animated_
 
     self.setupLayoutConstraint()
-
-  @objc_method
-  def doneButtonTapped_(self, sender):
-    print('v')
-    self.navigationController.dismissViewControllerAnimated(
-      True,
-      completion=None,
-    )
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -244,6 +208,8 @@ class MainViewController(ObjCClass('UIViewController')):
                argtypes=[
                  ctypes.c_bool,
                ])
+    #pdbr.state(self.navigationController)
+    self.navigationController.setNavigationBarHidden_animated_(True, animated)
     self.navigationController.setToolbarHidden_animated_(False, animated)
 
   @objc_method
@@ -300,11 +266,11 @@ class MainViewController(ObjCClass('UIViewController')):
 
     widthAnchor = self.subView.widthAnchor.constraintEqualToAnchor_multiplier_(
       safeAreaLayoutGuide.widthAnchor,
-      0.88,
+      0.92,
     )
     heightAnchor = self.subView.heightAnchor.constraintEqualToAnchor_multiplier_(
       safeAreaLayoutGuide.heightAnchor,
-      0.88,
+      0.92,
     )
 
     NSLayoutConstraint.activateConstraints_([
