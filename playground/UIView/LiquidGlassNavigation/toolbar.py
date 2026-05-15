@@ -171,6 +171,7 @@ class NavigationController(
 
   @objc_method
   def doneButtonTapped_(self, sender):
+    print('n')
     self.dismissViewControllerAnimated_completion_(True, None)
 
 
@@ -204,7 +205,7 @@ class MainViewController(ObjCClass('UIViewController')):
     #pdbr.state(self)
     closeButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItem(
       UIBarButtonSystemItem.close,
-      target=self.navigationController,
+      target=self,
       action=SEL('doneButtonTapped:'),
     )
 
@@ -228,6 +229,7 @@ class MainViewController(ObjCClass('UIViewController')):
 
   @objc_method
   def doneButtonTapped_(self, sender):
+    print('v')
     self.navigationController.dismissViewControllerAnimated(
       True,
       completion=None,
