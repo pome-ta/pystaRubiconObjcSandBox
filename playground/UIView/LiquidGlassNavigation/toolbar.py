@@ -86,18 +86,10 @@ class NavigationController(UINavigationController):
     self.toolbar.compactScrollEdgeAppearance = toolbarAppearance
     '''
 
-    #
-    #self.setToolbarHidden_animated_(False, True)
-    #self.setNavigationBarHidden_animated_(True, True)
-    #self.setToolbarHidden_(False)
-    #pdbr.state(self)
-    #print(self.toolbarHidden)
-
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
     #print(f'{NSStringFromClass(__class__)}: viewDidLoad')
-    #self.delegate = self
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -131,7 +123,6 @@ class NavigationController(UINavigationController):
                  ctypes.c_bool,
                ])
     #print(f'{NSStringFromClass(__class__)}: viewWillDisappear_')
-    #self.setToolbarHidden_(True)
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
@@ -181,8 +172,8 @@ class MainViewController(ObjCClass('UIViewController')):
 
     subView.backgroundColor = UIColor.systemDarkTealColor()
 
-    self.subView = subView
-    #pdbr.state(self)
+
+
     closeButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItem(
       UIBarButtonSystemItem.close,
       target=self.navigationController,
@@ -193,9 +184,12 @@ class MainViewController(ObjCClass('UIViewController')):
     fixedSpaceItem = UIBarButtonItem.fixedSpaceItem()
     #flexibleSpaceItem
     #fixedSpaceItem
-    self.toolbarItems = [closeButtonItem, flexibleSpaceItem, closeButtonItem]
+    toolbarItems = [closeButtonItem, flexibleSpaceItem, closeButtonItem,]
+    self.setToolbarItems_animated_(toolbarItems, True)
     #pdbr.state(self)
     #setToolbarItems_animated_
+    
+    self.subView = subView
 
     self.setupLayoutConstraint()
 
