@@ -42,7 +42,7 @@ UIView = ObjCClass('UIView')
 UITextView = ObjCClass('UITextView')
 UIColor = ObjCClass('UIColor')
 UIBarButtonItem = ObjCClass('UIBarButtonItem')
-
+UIStackView = ObjCClass('UIStackView')
 
 class NavigationController(UINavigationController):
 
@@ -66,25 +66,6 @@ class NavigationController(UINavigationController):
   @objc_method
   def loadView(self):
     send_super(__class__, self, 'loadView')
-    #print(f'{NSStringFromClass(__class__)}: loadView')
-    '''
-    navigationBarAppearance = UINavigationBarAppearance.new()
-    navigationBarAppearance.configureWithDefaultBackground()
-
-    self.navigationBar.standardAppearance = navigationBarAppearance
-    self.navigationBar.scrollEdgeAppearance = navigationBarAppearance
-    self.navigationBar.compactAppearance = navigationBarAppearance
-    self.navigationBar.compactScrollEdgeAppearance = navigationBarAppearance
-    '''
-    '''
-    toolbarAppearance = UIToolbarAppearance.new()
-    toolbarAppearance.configureWithDefaultBackground()
-
-    self.toolbar.standardAppearance = toolbarAppearance
-    self.toolbar.scrollEdgeAppearance = toolbarAppearance
-    self.toolbar.compactAppearance = toolbarAppearance
-    self.toolbar.compactScrollEdgeAppearance = toolbarAppearance
-    '''
 
   @objc_method
   def viewDidLoad(self):
@@ -172,8 +153,6 @@ class MainViewController(ObjCClass('UIViewController')):
 
     subView.backgroundColor = UIColor.systemDarkTealColor()
 
-
-
     closeButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItem(
       UIBarButtonSystemItem.close,
       target=self.navigationController,
@@ -184,11 +163,15 @@ class MainViewController(ObjCClass('UIViewController')):
     fixedSpaceItem = UIBarButtonItem.fixedSpaceItem()
     #flexibleSpaceItem
     #fixedSpaceItem
-    toolbarItems = [closeButtonItem, flexibleSpaceItem, closeButtonItem,]
+    toolbarItems = [
+      closeButtonItem,
+      flexibleSpaceItem,
+      closeButtonItem,
+    ]
     self.setToolbarItems_animated_(toolbarItems, True)
     #pdbr.state(self)
     #setToolbarItems_animated_
-    
+
     self.subView = subView
 
     self.setupLayoutConstraint()
@@ -202,9 +185,14 @@ class MainViewController(ObjCClass('UIViewController')):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #pdbr.state(self.navigationController)
-    self.navigationController.setNavigationBarHidden_animated_(True, animated)
-    self.navigationController.setToolbarHidden_animated_(False, animated)
+    self.navigationController.setNavigationBarHidden(
+      True,
+      animated=animated,
+    )
+    self.navigationController.setToolbarHidden(
+      False,
+      animated=animated,
+    )
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
