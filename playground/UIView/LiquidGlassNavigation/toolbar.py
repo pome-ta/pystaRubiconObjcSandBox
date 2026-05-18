@@ -26,7 +26,13 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id, SEL
 
 from objc_frameworks.UIKit import UIViewAutoresizing
-from objc_frameworks.UIKit import UIBarButtonSystemItem
+from objc_frameworks.UIKit import (
+  UIBarButtonSystemItem,
+  UIFontTextStyle,
+  NSTextAlignment,
+  UIStackViewDistribution,
+  UILayoutConstraintAxis,
+)
 
 from rbedge.lifeCycle import loop
 from rbedge import pdbr
@@ -42,7 +48,10 @@ UIView = ObjCClass('UIView')
 UITextView = ObjCClass('UITextView')
 UIColor = ObjCClass('UIColor')
 UIBarButtonItem = ObjCClass('UIBarButtonItem')
+UILabel = ObjCClass('UILabel')
+UIFont = ObjCClass('UIFont')
 UIStackView = ObjCClass('UIStackView')
+
 
 class NavigationController(UINavigationController):
 
@@ -129,6 +138,8 @@ class NavigationController(UINavigationController):
 class MainViewController(ObjCClass('UIViewController')):
 
   subView: UIView = objc_property()
+  mainTitle: str = objc_property(object)
+  subTitle: str = objc_property(object)
 
   @objc_method
   def dealloc(self):
@@ -153,6 +164,44 @@ class MainViewController(ObjCClass('UIViewController')):
 
     subView.backgroundColor = UIColor.systemDarkTealColor()
 
+    #self.mainTitle = NSStringFromClass(__class__)
+    #self.subTitle = NSStringFromClass(__class__)
+
+    headline = UIFont.preferredFontForTextStyle_(UIFontTextStyle.headline)
+    caption1 = UIFont.preferredFontForTextStyle_(UIFontTextStyle.caption1)
+
+    mainLabel = UILabel.new()
+    mainLabel.setTextAlignment_(NSTextAlignment.center)
+    mainLabel.setFont_(headline)
+    mainLabel.text = NSStringFromClass(__class__)
+    
+
+    subLabel = UILabel.new()
+    subLabel.setTextAlignment_(NSTextAlignment.center)
+    subLabel.setFont_(caption1)
+    subLabel.text = NSStringFromClass(__class__)
+
+    stackTitleView = UIStackView.alloc().initWithArrangedSubviews_([
+      mainLabel,
+      subLabel,
+    ])
+    
+    #distribution = UIStackViewDistribution.equalCentering
+    #distribution = UIStackViewDistribution.fillProportionally
+    distribution = UIStackViewDistribution.equalSpacing
+    
+    stackTitleView.setDistribution_(distribution)
+    stackTitleView.setAxis_(UILayoutConstraintAxis.vertical)
+    #stackTitleView.autoresizingMask = UIViewAutoresizing.flexibleWidth
+    
+    
+    
+    
+
+    titlesButtonItem = UIBarButtonItem.alloc().initWithCustomView_(
+      stackTitleView)
+    
+
     closeButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItem(
       UIBarButtonSystemItem.close,
       target=self.navigationController,
@@ -165,6 +214,9 @@ class MainViewController(ObjCClass('UIViewController')):
     #fixedSpaceItem
     toolbarItems = [
       closeButtonItem,
+      flexibleSpaceItem,
+      
+      titlesButtonItem,
       flexibleSpaceItem,
       closeButtonItem,
     ]
@@ -269,8 +321,8 @@ if __name__ == '__main__':
 
   main_vc = MainViewController.new()
 
-  presentation_style = UIModalPresentationStyle.fullScreen
-  #presentation_style = UIModalPresentationStyle.pageSheet
+  #presentation_style = UIModalPresentationStyle.fullScreen
+  presentation_style = UIModalPresentationStyle.pageSheet
 
   app = App(main_vc, presentation_style)
   app.present(NavigationController)
