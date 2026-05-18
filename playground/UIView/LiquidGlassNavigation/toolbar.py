@@ -24,10 +24,14 @@ import ctypes
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id, SEL
+from pyrubicon.objc.types import UIEdgeInsetsMake
+
+
 
 from objc_frameworks.UIKit import UIViewAutoresizing
 from objc_frameworks.UIKit import (
   UIBarButtonSystemItem,
+  UIBarButtonItemStyle,
   UIFontTextStyle,
   NSTextAlignment,
   UIStackViewDistribution,
@@ -46,11 +50,14 @@ UIViewController = ObjCClass('UIViewController')
 
 UIView = ObjCClass('UIView')
 UITextView = ObjCClass('UITextView')
-UIColor = ObjCClass('UIColor')
+
 UIBarButtonItem = ObjCClass('UIBarButtonItem')
 UILabel = ObjCClass('UILabel')
 UIFont = ObjCClass('UIFont')
 UIStackView = ObjCClass('UIStackView')
+
+UIColor = ObjCClass('UIColor')
+
 
 
 class NavigationController(UINavigationController):
@@ -179,20 +186,22 @@ class MainViewController(ObjCClass('UIViewController')):
     subLabel = UILabel.new()
     subLabel.setTextAlignment_(NSTextAlignment.center)
     subLabel.setFont_(caption1)
-    subLabel.text = NSStringFromClass(__class__)
+    subLabel.text = f'{NSStringFromClass(__class__)}:{NSStringFromClass(__class__)}'
 
     stackTitleView = UIStackView.alloc().initWithArrangedSubviews_([
       mainLabel,
       subLabel,
     ])
     
-    #distribution = UIStackViewDistribution.equalCentering
+    distribution = UIStackViewDistribution.equalCentering
     #distribution = UIStackViewDistribution.fillProportionally
-    distribution = UIStackViewDistribution.equalSpacing
+    #distribution = UIStackViewDistribution.equalSpacing
     
     stackTitleView.setDistribution_(distribution)
     stackTitleView.setAxis_(UILayoutConstraintAxis.vertical)
     #stackTitleView.autoresizingMask = UIViewAutoresizing.flexibleWidth
+    #stackTitleView.layoutMargins = UIEdgeInsetsMake(0, 16.0, 0, 16.0)
+    stackTitleView.setLayoutMarginsRelativeArrangement_(True)
     
     
     
@@ -200,6 +209,11 @@ class MainViewController(ObjCClass('UIViewController')):
 
     titlesButtonItem = UIBarButtonItem.alloc().initWithCustomView_(
       stackTitleView)
+      
+    titlesButtonItem.tintColor = UIColor.systemOrangeColor()
+    titlesButtonItem.style=UIBarButtonItemStyle.prominent
+    #systemOrangeColor
+    titlesButtonItem.layoutMargins = UIEdgeInsetsMake(0, 16.0, 0, 16.0)
     
 
     closeButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItem(
@@ -213,8 +227,8 @@ class MainViewController(ObjCClass('UIViewController')):
     #flexibleSpaceItem
     #fixedSpaceItem
     toolbarItems = [
-      closeButtonItem,
-      flexibleSpaceItem,
+      #closeButtonItem,
+      #flexibleSpaceItem,
       
       titlesButtonItem,
       flexibleSpaceItem,
