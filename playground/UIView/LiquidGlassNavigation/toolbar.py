@@ -24,7 +24,6 @@ import ctypes
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id, SEL
-from pyrubicon.objc.types import UIEdgeInsetsMake
 
 from objc_frameworks.UIKit import UIViewAutoresizing
 from objc_frameworks.UIKit import (
@@ -50,6 +49,7 @@ UIView = ObjCClass('UIView')
 UITextView = ObjCClass('UITextView')
 
 UIBarButtonItem = ObjCClass('UIBarButtonItem')
+UIImage = ObjCClass('UIImage')
 UILabel = ObjCClass('UILabel')
 UIFont = ObjCClass('UIFont')
 UIStackView = ObjCClass('UIStackView')
@@ -177,12 +177,12 @@ class MainViewController(ObjCClass('UIViewController')):
     mainLabel = UILabel.new()
     mainLabel.setTextAlignment_(NSTextAlignment.center)
     mainLabel.setFont_(headline)
-    mainLabel.text = f'{NSStringFromClass(__class__)}:{NSStringFromClass(__class__)}'
+    mainLabel.text = f'{NSStringFromClass(__class__)}'
 
     subLabel = UILabel.new()
     subLabel.setTextAlignment_(NSTextAlignment.center)
     subLabel.setFont_(caption1)
-    subLabel.text = f'{NSStringFromClass(__class__)}:{NSStringFromClass(__class__)}'
+    subLabel.text = f'{NSStringFromClass(__class__)}'
 
     stackTitleView = UIStackView.alloc().initWithArrangedSubviews_([
       mainLabel,
@@ -200,31 +200,45 @@ class MainViewController(ObjCClass('UIViewController')):
     #titlesButtonItem.tintColor = UIColor.systemOrangeColor()
     #titlesButtonItem.style = UIBarButtonItemStyle.prominent
 
+    # --- Button
 
-    closeButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItem(
-      UIBarButtonSystemItem.close,
-      target=self.navigationController,
-      action=SEL('doneButtonTapped:'),
-    )
-    
-    saveButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItem(
-      UIBarButtonSystemItem.save,
+    saveUpdateImage = UIImage.systemImageNamed_('text.badge.checkmark.rtl')
+    saveUpdateButtonItem = UIBarButtonItem.alloc().initWithImage(
+      saveUpdateImage,
+      style=UIBarButtonItemStyle.plain,
       target=None,
       action=None,
+    )
+
+    refreshImage = UIImage.systemImageNamed_('arrow.clockwise.circle')
+    refreshButtonItem = UIBarButtonItem.alloc().initWithImage(
+      refreshImage,
+      style=UIBarButtonItemStyle.plain,
+      target=None,
+      action=None,
+    )
+    
+    closeImage = UIImage.systemImageNamed_('xmark')
+    closeButtonItem = UIBarButtonItem.alloc().initWithImage(
+      closeImage,
+      style=UIBarButtonItemStyle.plain,
+      target=self.navigationController,
+      action=SEL('doneButtonTapped:'),
     )
 
     flexibleSpaceItem = UIBarButtonItem.flexibleSpaceItem()
     fixedSpaceItem = UIBarButtonItem.fixedSpaceItem()
 
     toolbarItems = [
-      saveButtonItem,
+      saveUpdateButtonItem,
       flexibleSpaceItem,
       titlesButtonItem,
       flexibleSpaceItem,
+      refreshButtonItem,
+      fixedSpaceItem,
       closeButtonItem,
     ]
     self.setToolbarItems_animated_(toolbarItems, True)
-
 
     self.subView = subView
 
