@@ -26,8 +26,6 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id, SEL
 from pyrubicon.objc.types import UIEdgeInsetsMake
 
-
-
 from objc_frameworks.UIKit import UIViewAutoresizing
 from objc_frameworks.UIKit import (
   UIBarButtonSystemItem,
@@ -57,7 +55,6 @@ UIFont = ObjCClass('UIFont')
 UIStackView = ObjCClass('UIStackView')
 
 UIColor = ObjCClass('UIColor')
-
 
 
 class NavigationController(UINavigationController):
@@ -180,8 +177,7 @@ class MainViewController(ObjCClass('UIViewController')):
     mainLabel = UILabel.new()
     mainLabel.setTextAlignment_(NSTextAlignment.center)
     mainLabel.setFont_(headline)
-    mainLabel.text = NSStringFromClass(__class__)
-    
+    mainLabel.text = f'{NSStringFromClass(__class__)}:{NSStringFromClass(__class__)}'
 
     subLabel = UILabel.new()
     subLabel.setTextAlignment_(NSTextAlignment.center)
@@ -192,51 +188,43 @@ class MainViewController(ObjCClass('UIViewController')):
       mainLabel,
       subLabel,
     ])
-    
-    distribution = UIStackViewDistribution.equalCentering
-    #distribution = UIStackViewDistribution.fillProportionally
-    #distribution = UIStackViewDistribution.equalSpacing
-    
+
+    distribution = UIStackViewDistribution.equalSpacing
+
     stackTitleView.setDistribution_(distribution)
     stackTitleView.setAxis_(UILayoutConstraintAxis.vertical)
-    #stackTitleView.autoresizingMask = UIViewAutoresizing.flexibleWidth
-    #stackTitleView.layoutMargins = UIEdgeInsetsMake(0, 16.0, 0, 16.0)
     stackTitleView.setLayoutMarginsRelativeArrangement_(True)
-    
-    
-    
-    
 
     titlesButtonItem = UIBarButtonItem.alloc().initWithCustomView_(
       stackTitleView)
-      
-    titlesButtonItem.tintColor = UIColor.systemOrangeColor()
-    titlesButtonItem.style=UIBarButtonItemStyle.prominent
-    #systemOrangeColor
-    titlesButtonItem.layoutMargins = UIEdgeInsetsMake(0, 16.0, 0, 16.0)
-    
+    #titlesButtonItem.tintColor = UIColor.systemOrangeColor()
+    #titlesButtonItem.style = UIBarButtonItemStyle.prominent
+
 
     closeButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItem(
       UIBarButtonSystemItem.close,
       target=self.navigationController,
       action=SEL('doneButtonTapped:'),
     )
+    
+    saveButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItem(
+      UIBarButtonSystemItem.save,
+      target=None,
+      action=None,
+    )
 
     flexibleSpaceItem = UIBarButtonItem.flexibleSpaceItem()
     fixedSpaceItem = UIBarButtonItem.fixedSpaceItem()
-    #flexibleSpaceItem
-    #fixedSpaceItem
+
     toolbarItems = [
-      #closeButtonItem,
-      #flexibleSpaceItem,
-      
+      saveButtonItem,
+      flexibleSpaceItem,
       titlesButtonItem,
       flexibleSpaceItem,
       closeButtonItem,
     ]
     self.setToolbarItems_animated_(toolbarItems, True)
-    #pdbr.state(self)
-    #setToolbarItems_animated_
+
 
     self.subView = subView
 
