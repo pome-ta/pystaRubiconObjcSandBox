@@ -162,8 +162,8 @@ class MainViewController(ObjCClass('UIViewController')):
     #self.navigationItem.title = NSStringFromClass(__class__)
     self.view.backgroundColor = UIColor.systemDarkPinkColor()
 
-    #subView = UITextView.new()
-    subView = UIView.new()
+    subView = UITextView.new()
+    #subView = UIView.new()
     subView.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
 
     subView.backgroundColor = UIColor.systemDarkTealColor()

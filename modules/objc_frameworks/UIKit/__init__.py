@@ -18,4 +18,5 @@ from .UIStackView import UIStackViewDistribution, UIStackViewAlignment
 from .NSText import NSTextAlignment
 from .UIControl import UIControlEvents
 from .UIFontDescriptor import UIFontTextStyle
+from .UIScrollView import UIScrollViewKeyboardDismissMode
 
