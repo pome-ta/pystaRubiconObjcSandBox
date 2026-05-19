@@ -171,18 +171,21 @@ class MainViewController(ObjCClass('UIViewController')):
     #self.mainTitle = NSStringFromClass(__class__)
     #self.subTitle = NSStringFromClass(__class__)
 
-    headline = UIFont.preferredFontForTextStyle_(UIFontTextStyle.headline)
-    caption1 = UIFont.preferredFontForTextStyle_(UIFontTextStyle.caption1)
+    main = UIFont.preferredFontForTextStyle_(UIFontTextStyle.subheadline)
+    sub = UIFont.preferredFontForTextStyle_(UIFontTextStyle.caption2)
 
     mainLabel = UILabel.new()
     mainLabel.setTextAlignment_(NSTextAlignment.center)
-    mainLabel.setFont_(headline)
+    mainLabel.setFont_(main)
+    mainLabel.setAdjustsFontSizeToFitWidth_(True)
     mainLabel.text = f'{NSStringFromClass(__class__)}'
 
     subLabel = UILabel.new()
     subLabel.setTextAlignment_(NSTextAlignment.center)
-    subLabel.setFont_(caption1)
+    subLabel.setFont_(sub)
+    subLabel.setAdjustsFontSizeToFitWidth_(True)
     subLabel.text = f'{NSStringFromClass(__class__)}'
+    #pdbr.state(subLabel)
 
     stackTitleView = UIStackView.alloc().initWithArrangedSubviews_([
       mainLabel,
@@ -217,7 +220,7 @@ class MainViewController(ObjCClass('UIViewController')):
       target=None,
       action=None,
     )
-    
+
     closeImage = UIImage.systemImageNamed_('xmark')
     closeButtonItem = UIBarButtonItem.alloc().initWithImage(
       closeImage,
@@ -228,14 +231,17 @@ class MainViewController(ObjCClass('UIViewController')):
 
     flexibleSpaceItem = UIBarButtonItem.flexibleSpaceItem()
     fixedSpaceItem = UIBarButtonItem.fixedSpaceItem()
+    fixedSpaceItemOfWidth = UIBarButtonItem.fixedSpaceItemOfWidth_(1)
 
     toolbarItems = [
       saveUpdateButtonItem,
       flexibleSpaceItem,
+      #fixedSpaceItem,
       titlesButtonItem,
       flexibleSpaceItem,
+      #fixedSpaceItem,
+      fixedSpaceItemOfWidth,
       refreshButtonItem,
-      fixedSpaceItem,
       closeButtonItem,
     ]
     self.setToolbarItems_animated_(toolbarItems, True)
