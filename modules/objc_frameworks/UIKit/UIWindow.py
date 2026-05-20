@@ -12,4 +12,8 @@ class NSNotificationName:
   keyboardDidShowNotification = _get_const('UIKeyboardDidShowNotification')
   keyboardWillHideNotification = _get_const('UIKeyboardWillHideNotification')
   keyboardDidHideNotification = _get_const('UIKeyboardDidHideNotification')
+  keyboardWillChangeFrameNotification = _get_const(
+    'UIKeyboardWillChangeFrameNotification')
+  keyboardDidChangeFrameNotification = _get_const(
+    'UIKeyboardDidChangeFrameNotification')
 

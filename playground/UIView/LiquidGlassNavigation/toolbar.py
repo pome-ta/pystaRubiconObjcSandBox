@@ -339,11 +339,14 @@ class MainViewController(ObjCClass('UIViewController')):
 
   @objc_method
   def keyboardWillShow_(self, notification):
-    print('keyboardWillShow')
+    print('s: keyboardWillShow')
+    #pdbr.state(self.subView)
 
   @objc_method
   def keyboardWillHide_(self, notification):
-    pass
+    print('h: keyboardWillHide')
+
+
 
   # --- private
   @objc_method
@@ -385,8 +388,8 @@ if __name__ == '__main__':
 
   main_vc = MainViewController.new()
 
-  presentation_style = UIModalPresentationStyle.fullScreen
-  #presentation_style = UIModalPresentationStyle.pageSheet
+  #presentation_style = UIModalPresentationStyle.fullScreen
+  presentation_style = UIModalPresentationStyle.pageSheet
 
   app = App(main_vc, presentation_style)
   app.present(NavigationController)
