@@ -25,14 +25,16 @@ from pyrubicon.objc.api import ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id, SEL
 
-from objc_frameworks.UIKit import UIViewAutoresizing
 from objc_frameworks.UIKit import (
+  UIViewAutoresizing,
   UIBarButtonSystemItem,
   UIBarButtonItemStyle,
   UIFontTextStyle,
   NSTextAlignment,
   UIStackViewDistribution,
   UILayoutConstraintAxis,
+  UIScrollViewKeyboardDismissMode,
+  NSNotificationName,
 )
 
 from rbedge.lifeCycle import loop
@@ -53,6 +55,7 @@ UIImage = ObjCClass('UIImage')
 UILabel = ObjCClass('UILabel')
 UIFont = ObjCClass('UIFont')
 UIStackView = ObjCClass('UIStackView')
+NSNotificationCenter = ObjCClass('NSNotificationCenter')
 
 UIColor = ObjCClass('UIColor')
 
@@ -163,6 +166,8 @@ class MainViewController(ObjCClass('UIViewController')):
     self.view.backgroundColor = UIColor.systemDarkPinkColor()
 
     subView = UITextView.new()
+    subView.keyboardDismissMode = UIScrollViewKeyboardDismissMode.interactive
+    #pdbr.state(subView)
     #subView = UIView.new()
     subView.autoresizingMask = UIViewAutoresizing.flexibleWidth | UIViewAutoresizing.flexibleHeight
 
@@ -245,6 +250,7 @@ class MainViewController(ObjCClass('UIViewController')):
       closeButtonItem,
     ]
     self.setToolbarItems_animated_(toolbarItems, True)
+    self.navigationItem.setRightBarButtonItem_animated_(closeButtonItem, True)
 
     self.subView = subView
 
@@ -259,13 +265,30 @@ class MainViewController(ObjCClass('UIViewController')):
                argtypes=[
                  ctypes.c_bool,
                ])
+    '''
     self.navigationController.setNavigationBarHidden(
       True,
       animated=animated,
     )
+    '''
     self.navigationController.setToolbarHidden(
       False,
       animated=animated,
+    )
+
+    notificationCenter = NSNotificationCenter.defaultCenter
+
+    notificationCenter.addObserver(
+      self,
+      selector=SEL('keyboardWillShow:'),
+      name=NSNotificationName.keyboardWillShowNotification,
+      object=None,
+    )
+    notificationCenter.addObserver(
+      self,
+      selector=SEL('keyboardWillHide:'),
+      name=NSNotificationName.keyboardWillHideNotification,
+      object=None,
     )
 
   @objc_method
@@ -297,11 +320,30 @@ class MainViewController(ObjCClass('UIViewController')):
                argtypes=[
                  ctypes.c_bool,
                ])
+    notificationCenter = NSNotificationCenter.defaultCenter
+    notificationCenter.removeObserver(
+      self,
+      name=NSNotificationName.keyboardWillShowNotification,
+      object=None,
+    )
+    notificationCenter.removeObserver(
+      self,
+      name=NSNotificationName.keyboardWillHideNotification,
+      object=None,
+    )
 
   @objc_method
   def didReceiveMemoryWarning(self):
     send_super(__class__, self, 'didReceiveMemoryWarning')
     print(f'\t{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
+
+  @objc_method
+  def keyboardWillShow_(self, notification):
+    print('keyboardWillShow')
+
+  @objc_method
+  def keyboardWillHide_(self, notification):
+    pass
 
   # --- private
   @objc_method
@@ -343,8 +385,8 @@ if __name__ == '__main__':
 
   main_vc = MainViewController.new()
 
-  #presentation_style = UIModalPresentationStyle.fullScreen
-  presentation_style = UIModalPresentationStyle.pageSheet
+  presentation_style = UIModalPresentationStyle.fullScreen
+  #presentation_style = UIModalPresentationStyle.pageSheet
 
   app = App(main_vc, presentation_style)
   app.present(NavigationController)

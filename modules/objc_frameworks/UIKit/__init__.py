@@ -19,4 +19,4 @@ from .NSText import NSTextAlignment
 from .UIControl import UIControlEvents
 from .UIFontDescriptor import UIFontTextStyle
 from .UIScrollView import UIScrollViewKeyboardDismissMode
-
+from .UIWindow import NSNotificationName
