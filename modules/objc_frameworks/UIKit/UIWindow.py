@@ -1,5 +1,17 @@
 from .constants import _get_const
 
+UIKeyboardFrameBeginUserInfoKey = _get_const('UIKeyboardFrameBeginUserInfoKey')
+UIKeyboardFrameEndUserInfoKey = _get_const('UIKeyboardFrameEndUserInfoKey')
+UIKeyboardAnimationDurationUserInfoKey = _get_const(
+  'UIKeyboardAnimationDurationUserInfoKey')
+UIKeyboardAnimationCurveUserInfoKey = _get_const(
+  'UIKeyboardAnimationCurveUserInfoKey')
+UIKeyboardIsLocalUserInfoKey = _get_const('UIKeyboardIsLocalUserInfoKey')
+UIKeyboardCenterBeginUserInfoKey = _get_const(
+  'UIKeyboardCenterBeginUserInfoKey')
+UIKeyboardCenterEndUserInfoKey = _get_const('UIKeyboardCenterEndUserInfoKey')
+UIKeyboardBoundsUserInfoKey = _get_const('UIKeyboardBoundsUserInfoKey')
+
 
 class NSNotificationName:
   didBecomeVisibleNotification = _get_const(

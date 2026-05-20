@@ -281,14 +281,8 @@ class WebViewController(UIViewController):
 
     notificationCenter.addObserver(
       self,
-      selector=SEL('keyboardWillShow:'),
-      name=NSNotificationName.keyboardWillShowNotification,
-      object=None,
-    )
-    notificationCenter.addObserver(
-      self,
-      selector=SEL('keyboardWillHide:'),
-      name=NSNotificationName.keyboardWillHideNotification,
+      selector=SEL('keyboardWillChangeFrame:'),
+      name=NSNotificationName.keyboardWillChangeFrameNotification,
       object=None,
     )
 
@@ -325,12 +319,7 @@ class WebViewController(UIViewController):
     notificationCenter = NSNotificationCenter.defaultCenter
     notificationCenter.removeObserver(
       self,
-      name=NSNotificationName.keyboardWillShowNotification,
-      object=None,
-    )
-    notificationCenter.removeObserver(
-      self,
-      name=NSNotificationName.keyboardWillHideNotification,
+      name=NSNotificationName.keyboardWillChangeFrameNotification,
       object=None,
     )
 
@@ -338,6 +327,15 @@ class WebViewController(UIViewController):
   def didReceiveMemoryWarning(self):
     send_super(__class__, self, 'didReceiveMemoryWarning')
     print(f'	{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
+
+  @objc_method
+  def keyboardWillChangeFrame_(self, notification):
+    #print('keyboardWillChangeFrame')
+    self.handleKeyboardFrameChange_(notification)
+    
+  @objc_method
+  def handleKeyboardFrameChange_(self, notification):
+    print('handleKeyboardFrameChange')
 
   @objc_method
   def keyboardWillShow_(self, notification):

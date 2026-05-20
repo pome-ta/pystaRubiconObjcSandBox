@@ -11,4 +11,15 @@ from .NSText import NSTextAlignment
 from .UIControl import UIControlEvents
 from .UIFontDescriptor import UIFontTextStyle
 from .UIScrollView import UIScrollViewKeyboardDismissMode
-from .UIWindow import NSNotificationName
+from .UIWindow import (
+  NSNotificationName,
+  UIKeyboardFrameBeginUserInfoKey,
+  UIKeyboardFrameEndUserInfoKey,
+  UIKeyboardAnimationDurationUserInfoKey,
+  UIKeyboardAnimationCurveUserInfoKey,
+  UIKeyboardIsLocalUserInfoKey,
+  UIKeyboardCenterBeginUserInfoKey,
+  UIKeyboardCenterEndUserInfoKey,
+  UIKeyboardBoundsUserInfoKey,
+)
+
