@@ -300,7 +300,7 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
   # --- private
   @objc_method
   def setupLayoutConstraint(self):
-    from objc_frameworks.UIKit import UILayoutPriorityDefaultHigh
+    from objc_frameworks.UIKit import UILayoutPriority
     NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
     self.metalView.translatesAutoresizingMaskIntoConstraints = False
@@ -315,9 +315,9 @@ class MainViewController(UIViewController, protocols=[MTKViewDelegate]):
 
     # 固定サイズ(500)
     fixedWidth = self.metalView.widthAnchor.constraintEqualToConstant_(500)
-    fixedWidth.setPriority_(UILayoutPriorityDefaultHigh)
+    fixedWidth.setPriority_(UILayoutPriority.defaultHigh)
     fixedHeight = self.metalView.heightAnchor.constraintEqualToConstant_(500)
-    fixedHeight.setPriority_(UILayoutPriorityDefaultHigh)
+    fixedHeight.setPriority_(UILayoutPriority.defaultHigh)
 
     # safeArea に対する88%
     maxWidth = self.metalView.widthAnchor.constraintLessThanOrEqualToAnchor_multiplier_(
