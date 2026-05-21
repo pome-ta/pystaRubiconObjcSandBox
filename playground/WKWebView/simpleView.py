@@ -24,8 +24,10 @@ from pathlib import Path
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import ObjCInstance, NSObject
-from pyrubicon.objc.api import objc_method, objc_property
+from pyrubicon.objc.api import objc_method, objc_property, at, py_from_ns, ns_from_py
 from pyrubicon.objc.runtime import send_super, objc_id, SEL
+
+from pyrubicon.objc.types import CGRect
 
 from objc_frameworks.CoreGraphics import CGRectZero
 from objc_frameworks.Foundation import NSURLRequestCachePolicy
@@ -33,6 +35,9 @@ from objc_frameworks.UIKit import (
   UIViewAutoresizing,
   UIBarButtonItemStyle,
   NSNotificationName,
+  UIKeyboardAnimationDurationUserInfoKey,
+  UIKeyboardFrameBeginUserInfoKey,
+  UIKeyboardFrameEndUserInfoKey,
 )
 
 from rbedge.lifeCycle import loop
@@ -54,6 +59,8 @@ UIBarButtonItem = ObjCClass('UIBarButtonItem')
 UIImage = ObjCClass('UIImage')
 
 NSNotificationCenter = ObjCClass('NSNotificationCenter')
+
+UIScreen = ObjCClass('UIScreen')
 
 
 class NavigationController(UINavigationController):
@@ -195,6 +202,8 @@ class WebViewController(UIViewController):
   webView: WKWebView = objc_property()
   webDelegate: WebDelegate = objc_property()
 
+  isKeyboardVisible: bool = objc_property(object)
+
   @objc_method
   def initWithIndexPath_(self, indexPath: object):
     send_super(__class__, self, 'init')
@@ -235,6 +244,7 @@ class WebViewController(UIViewController):
 
     self.webView = webView
     self.webDelegate = webDelegate
+    self.isKeyboardVisible = False
 
   @objc_method
   def viewDidLoad(self):
@@ -305,7 +315,7 @@ class WebViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #self.webView.reloadFromOrigin()
+    self.webView.reloadFromOrigin()
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
@@ -331,11 +341,39 @@ class WebViewController(UIViewController):
   @objc_method
   def keyboardWillChangeFrame_(self, notification):
     #print('keyboardWillChangeFrame')
+    duration = notification.userInfo[UIKeyboardAnimationDurationUserInfoKey]
+
+    if duration.doubleValue == 0:
+      return
+
     self.handleKeyboardFrameChange_(notification)
-    
+
   @objc_method
   def handleKeyboardFrameChange_(self, notification):
-    print('handleKeyboardFrameChange')
+    #print('handleKeyboardFrameChange')
+
+    end = notification.userInfo[UIKeyboardFrameEndUserInfoKey]
+
+    if not ((window := self.view.window())):
+      return
+
+    keyboardFrameInWindow = window.convertRect_fromWindow_(
+      end.CGRectValue, None)
+
+    #pdbr.state(self.view.window())
+    #print(window)
+    print(keyboardFrameInWindow)
+
+    screenHeight = UIScreen.mainScreen.bounds.size.height
+
+    nowVisible = end.CGRectValue.origin.y < screenHeight
+
+    if nowVisible and not self.isKeyboardVisible:
+      self.isKeyboardVisible = True
+      print('show')
+    if not nowVisible and self.isKeyboardVisible:
+      self.isKeyboardVisible = False
+      print('hide')
 
   @objc_method
   def keyboardWillShow_(self, notification):
