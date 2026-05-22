@@ -29,7 +29,7 @@ from pyrubicon.objc.runtime import send_super, objc_id, SEL
 
 from pyrubicon.objc.types import CGRect
 
-from objc_frameworks.CoreGraphics import CGRectZero
+from objc_frameworks.CoreGraphics import CGRectZero, CGRectGetMinY, CGRectGetMinX,CGRectGetMaxX
 from objc_frameworks.Foundation import NSURLRequestCachePolicy
 from objc_frameworks.UIKit import (
   UIViewAutoresizing,
@@ -362,7 +362,9 @@ class WebViewController(UIViewController):
 
     #pdbr.state(self.view.window())
     #print(window)
-    print(keyboardFrameInWindow)
+    #print(CGRect(keyboardFrameInWindow))
+    #print(CGRectGetMaxX(keyboardFrameInWindow))
+    pdbr.state(keyboardFrameInWindow)
 
     screenHeight = UIScreen.mainScreen.bounds.size.height
 
