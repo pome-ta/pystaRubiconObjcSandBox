@@ -37,6 +37,7 @@ from objc_frameworks.UIKit import (
   UIKeyboardAnimationDurationUserInfoKey,
   UIKeyboardFrameBeginUserInfoKey,
   UIKeyboardFrameEndUserInfoKey,
+  UIScrollViewKeyboardDismissMode,
 )
 
 from rbedge.lifeCycle import loop
@@ -56,6 +57,7 @@ UINavigationControllerDelegate = ObjCProtocol('UINavigationControllerDelegate')
 
 UIBarButtonItem = ObjCClass('UIBarButtonItem')
 UIImage = ObjCClass('UIImage')
+UIColor = ObjCClass('UIColor')
 
 NSNotificationCenter = ObjCClass('NSNotificationCenter')
 
@@ -203,6 +205,9 @@ class WebViewController(UIViewController):
 
   isKeyboardVisible: bool = objc_property(object)
 
+  showKeyboardRightBarButtonItems: list = objc_property(object)
+  hideKeyboardRightBarButtonItems: list = objc_property(object)
+
   @objc_method
   def initWithIndexPath_(self, indexPath: object):
     send_super(__class__, self, 'init')
@@ -224,7 +229,58 @@ class WebViewController(UIViewController):
     webView = WKWebView.alloc().initWithFrame_configuration_(
       CGRectZero, webConfiguration)
 
+    webView.scrollView.bounces = True
+    webView.scrollView.keyboardDismissMode = UIScrollViewKeyboardDismissMode.interactive
+
     return webView
+
+  @objc_method
+  def setupBarButtonItems(self):
+    closeImage = UIImage.systemImageNamed_('xmark')
+    closeButtonItem = UIBarButtonItem.alloc().initWithImage(
+      closeImage,
+      style=UIBarButtonItemStyle.plain,
+      target=self.navigationController,
+      action=SEL('doneButtonTapped:'),
+    )
+
+    refreshImage = UIImage.systemImageNamed_('arrow.clockwise.circle')
+    refreshButtonItem = UIBarButtonItem.alloc().initWithImage(
+      refreshImage,
+      style=UIBarButtonItemStyle.plain,
+      target=None,
+      action=None,
+    )
+
+    checkmarkImage = UIImage.systemImageNamed_('checkmark')
+    checkmarkButtonItem = UIBarButtonItem.alloc().initWithImage(
+      checkmarkImage,
+      style=UIBarButtonItemStyle.plain,
+      target=self,
+      action=SEL('webViewResignFirstResponder'),
+    )
+    checkmarkButtonItem.tintColor = UIColor.tintColor()
+    checkmarkButtonItem.style = UIBarButtonItemStyle.prominent
+
+    flexibleSpaceItem = UIBarButtonItem.flexibleSpaceItem()
+    fixedSpaceItem = UIBarButtonItem.fixedSpaceItem()
+
+    self.showKeyboardRightBarButtonItems = [
+      checkmarkButtonItem,
+      flexibleSpaceItem,
+      closeButtonItem,
+      refreshButtonItem,
+    ]
+
+    self.hideKeyboardRightBarButtonItems = [
+      closeButtonItem,
+      fixedSpaceItem,
+      refreshButtonItem,
+    ]
+
+    #self.navigationItem.setRightBarButtonItem_animated_(closeButtonItem, True)
+    #setRightBarButtonItems_animated_
+    #pdbr.state(self.navigationItem)
 
   @objc_method
   def dealloc(self):
@@ -264,16 +320,7 @@ class WebViewController(UIViewController):
       allowingReadAccessToURL=allowingReadAccessToURL,
     )
 
-    closeImage = UIImage.systemImageNamed_('xmark')
-    closeButtonItem = UIBarButtonItem.alloc().initWithImage(
-      closeImage,
-      style=UIBarButtonItemStyle.plain,
-      target=self.navigationController,
-      action=SEL('doneButtonTapped:'),
-    )
-
-    self.navigationItem.setRightBarButtonItem_animated_(closeButtonItem, True)
-
+    self.setupBarButtonItems()
     self.setupLayoutConstraint()
 
   @objc_method
@@ -285,6 +332,9 @@ class WebViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
+
+    self.navigationItem.setRightBarButtonItems_animated_(
+      self.hideKeyboardRightBarButtonItems, animated)
 
     notificationCenter = NSNotificationCenter.defaultCenter
     notificationCenter.addObserver_selector_name_object_(
@@ -359,17 +409,21 @@ class WebViewController(UIViewController):
   def keyboardWillShow_(self, notification):
     if not self.isKeyboardVisible:
       print('--- keyboardWillShow')
+      self.navigationItem.setRightBarButtonItems_animated_(
+      self.showKeyboardRightBarButtonItems, True)
       self.isKeyboardVisible = True
 
   @objc_method
   def keyboardWillHide_(self, notification):
     if self.isKeyboardVisible:
       print('--- keyboardWillHide')
+      self.navigationItem.setRightBarButtonItems_animated_(
+      self.hideKeyboardRightBarButtonItems, True)
       self.isKeyboardVisible = False
 
   @objc_method
   def keyboardWillChangeFrame_(self, notification):
-    print('keyboardWillChangeFrame')
+    #print('keyboardWillChangeFrame')
     duration = notification.userInfo[UIKeyboardAnimationDurationUserInfoKey]
 
     if duration.doubleValue == 0:
@@ -379,7 +433,7 @@ class WebViewController(UIViewController):
 
   @objc_method
   def handleKeyboardFrameChange_(self, notification):
-    print('handleKeyboardFrameChange')
+    #print('handleKeyboardFrameChange')
 
     end = notification.userInfo[UIKeyboardFrameEndUserInfoKey]
 
@@ -391,11 +445,13 @@ class WebViewController(UIViewController):
 
     windowHeight = window.bounds.size.height
     nowVisible = CGRectGetMinY(keyboardFrameInWindow) < windowHeight
+    '''
 
     if nowVisible:
       print('ひらき')
     else:
       print('とじ')
+    '''
 
     #print(windowHeight)
 
@@ -407,10 +463,17 @@ class WebViewController(UIViewController):
     #print(keyboardFrameInWindow)
     #print(CGRectGetMinY(keyboardFrameInWindow))
     #print(type(CGRectGetMinY(keyboardFrameInWindow)))
+    '''
 
     screenHeight = UIScreen.mainScreen.bounds.size.height
+    cRectGetMinY = CGRectGetMinY(keyboardFrameInWindow)
+    print('---')
+    print(f'{windowHeight=}')
+    print(f'{screenHeight=}')
+    print(f'{cRectGetMinY=}')
 
     nowVisible = end.CGRectValue.origin.y < screenHeight
+    '''
     '''
 
     if nowVisible and not self.isKeyboardVisible:
@@ -420,6 +483,11 @@ class WebViewController(UIViewController):
       self.isKeyboardVisible = False
       print('hide')
     '''
+
+  @objc_method
+  def webViewResignFirstResponder(self):
+    js = 'document.activeElement?.blur();'
+    self.webView.evaluateJavaScript_completionHandler_(js, None)
 
   # --- private
   @objc_method
