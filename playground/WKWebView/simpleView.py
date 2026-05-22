@@ -24,12 +24,11 @@ from pathlib import Path
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import ObjCInstance, NSObject
-from pyrubicon.objc.api import objc_method, objc_property, at, py_from_ns, ns_from_py
+from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id, SEL
-
 from pyrubicon.objc.types import CGRect
 
-from objc_frameworks.CoreGraphics import CGRectZero, CGRectGetMinY, CGRectGetMinX,CGRectGetMaxX
+from objc_frameworks.CoreGraphics import CGRectZero, CGRectGetMinY
 from objc_frameworks.Foundation import NSURLRequestCachePolicy
 from objc_frameworks.UIKit import (
   UIViewAutoresizing,
@@ -364,7 +363,10 @@ class WebViewController(UIViewController):
     #print(window)
     #print(CGRect(keyboardFrameInWindow))
     #print(CGRectGetMaxX(keyboardFrameInWindow))
-    pdbr.state(keyboardFrameInWindow)
+    #pdbr.state(keyboardFrameInWindow)
+    print(keyboardFrameInWindow)
+    print(CGRectGetMinY(keyboardFrameInWindow))
+    print(type(CGRectGetMinY(keyboardFrameInWindow)))
 
     screenHeight = UIScreen.mainScreen.bounds.size.height
 
