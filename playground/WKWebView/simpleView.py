@@ -287,7 +287,19 @@ class WebViewController(UIViewController):
                ])
 
     notificationCenter = NSNotificationCenter.defaultCenter
+    notificationCenter.addObserver_selector_name_object_(
+      self, SEL('keyboardWillShow:'),
+      NSNotificationName.keyboardWillShowNotification, None)
+    notificationCenter.addObserver_selector_name_object_(
+      self, SEL('keyboardWillHide:'),
+      NSNotificationName.keyboardWillHideNotification, None)
 
+    notificationCenter.addObserver(
+      self,
+      selector=SEL('keyboardWillChangeFrame:'),
+      name=NSNotificationName.keyboardWillChangeFrameNotification,
+      object=None,
+    )
     notificationCenter.addObserver(
       self,
       selector=SEL('keyboardWillChangeFrame:'),
@@ -326,6 +338,12 @@ class WebViewController(UIViewController):
                  ctypes.c_bool,
                ])
     notificationCenter = NSNotificationCenter.defaultCenter
+
+    notificationCenter.removeObserver_name_object_(
+      self, NSNotificationName.keyboardWillShowNotification, None)
+    notificationCenter.removeObserver_name_object_(
+      self, NSNotificationName.keyboardWillHideNotification, None)
+
     notificationCenter.removeObserver(
       self,
       name=NSNotificationName.keyboardWillChangeFrameNotification,
@@ -338,8 +356,20 @@ class WebViewController(UIViewController):
     print(f'	{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
 
   @objc_method
+  def keyboardWillShow_(self, notification):
+    if not self.isKeyboardVisible:
+      print('--- keyboardWillShow')
+      self.isKeyboardVisible = True
+
+  @objc_method
+  def keyboardWillHide_(self, notification):
+    if self.isKeyboardVisible:
+      print('--- keyboardWillHide')
+      self.isKeyboardVisible = False
+
+  @objc_method
   def keyboardWillChangeFrame_(self, notification):
-    #print('keyboardWillChangeFrame')
+    print('keyboardWillChangeFrame')
     duration = notification.userInfo[UIKeyboardAnimationDurationUserInfoKey]
 
     if duration.doubleValue == 0:
@@ -349,7 +379,7 @@ class WebViewController(UIViewController):
 
   @objc_method
   def handleKeyboardFrameChange_(self, notification):
-    #print('handleKeyboardFrameChange')
+    print('handleKeyboardFrameChange')
 
     end = notification.userInfo[UIKeyboardFrameEndUserInfoKey]
 
@@ -359,18 +389,29 @@ class WebViewController(UIViewController):
     keyboardFrameInWindow = window.convertRect_fromWindow_(
       end.CGRectValue, None)
 
+    windowHeight = window.bounds.size.height
+    nowVisible = CGRectGetMinY(keyboardFrameInWindow) < windowHeight
+
+    if nowVisible:
+      print('ひらき')
+    else:
+      print('とじ')
+
+    #print(windowHeight)
+
     #pdbr.state(self.view.window())
     #print(window)
     #print(CGRect(keyboardFrameInWindow))
     #print(CGRectGetMaxX(keyboardFrameInWindow))
     #pdbr.state(keyboardFrameInWindow)
-    print(keyboardFrameInWindow)
-    print(CGRectGetMinY(keyboardFrameInWindow))
-    print(type(CGRectGetMinY(keyboardFrameInWindow)))
+    #print(keyboardFrameInWindow)
+    #print(CGRectGetMinY(keyboardFrameInWindow))
+    #print(type(CGRectGetMinY(keyboardFrameInWindow)))
 
     screenHeight = UIScreen.mainScreen.bounds.size.height
 
     nowVisible = end.CGRectValue.origin.y < screenHeight
+    '''
 
     if nowVisible and not self.isKeyboardVisible:
       self.isKeyboardVisible = True
@@ -378,16 +419,7 @@ class WebViewController(UIViewController):
     if not nowVisible and self.isKeyboardVisible:
       self.isKeyboardVisible = False
       print('hide')
-
-  @objc_method
-  def keyboardWillShow_(self, notification):
-    #print('s: keyboardWillShow')
-    print(notification)
-
-  @objc_method
-  def keyboardWillHide_(self, notification):
-    #print('h: keyboardWillHide')
-    pass
+    '''
 
   # --- private
   @objc_method
