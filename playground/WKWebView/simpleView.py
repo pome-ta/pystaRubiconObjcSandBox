@@ -28,10 +28,9 @@ from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id, SEL
 from pyrubicon.objc.types import CGRect
 
-from objc_frameworks.CoreGraphics import CGRectZero, CGRectGetMinY
+from objc_frameworks.CoreGraphics import CGRectZero
 from objc_frameworks.Foundation import NSURLRequestCachePolicy
 from objc_frameworks.UIKit import (
-  UIViewAutoresizing,
   UIBarButtonItemStyle,
   NSNotificationName,
   UIKeyboardAnimationDurationUserInfoKey,
@@ -49,6 +48,7 @@ UIViewController = ObjCClass('UIViewController')
 WKWebView = ObjCClass('WKWebView')
 WKWebViewConfiguration = ObjCClass('WKWebViewConfiguration')
 WKWebsiteDataStore = ObjCClass('WKWebsiteDataStore')
+WKContentView = ObjCClass('WKContentView')
 NSURL = ObjCClass('NSURL')
 
 WKNavigationDelegate = ObjCProtocol('WKNavigationDelegate')
@@ -60,8 +60,6 @@ UIImage = ObjCClass('UIImage')
 UIColor = ObjCClass('UIColor')
 
 NSNotificationCenter = ObjCClass('NSNotificationCenter')
-
-UIScreen = ObjCClass('UIScreen')
 
 
 class NavigationController(UINavigationController):
@@ -248,8 +246,8 @@ class WebViewController(UIViewController):
     refreshButtonItem = UIBarButtonItem.alloc().initWithImage(
       refreshImage,
       style=UIBarButtonItemStyle.plain,
-      target=None,
-      action=None,
+      target=self,
+      action=SEL('getWebViewInputAccessoryView'),
     )
 
     checkmarkImage = UIImage.systemImageNamed_('checkmark')
@@ -277,10 +275,6 @@ class WebViewController(UIViewController):
       fixedSpaceItem,
       refreshButtonItem,
     ]
-
-    #self.navigationItem.setRightBarButtonItem_animated_(closeButtonItem, True)
-    #setRightBarButtonItems_animated_
-    #pdbr.state(self.navigationItem)
 
   @objc_method
   def dealloc(self):
@@ -344,18 +338,9 @@ class WebViewController(UIViewController):
       self, SEL('keyboardWillHide:'),
       NSNotificationName.keyboardWillHideNotification, None)
 
-    notificationCenter.addObserver(
-      self,
-      selector=SEL('keyboardWillChangeFrame:'),
-      name=NSNotificationName.keyboardWillChangeFrameNotification,
-      object=None,
-    )
-    notificationCenter.addObserver(
-      self,
-      selector=SEL('keyboardWillChangeFrame:'),
-      name=NSNotificationName.keyboardWillChangeFrameNotification,
-      object=None,
-    )
+    notificationCenter.addObserver_selector_name_object_(
+      self, SEL('keyboardWillChangeFrame:'),
+      NSNotificationName.keyboardWillChangeFrameNotification, None)
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -394,11 +379,8 @@ class WebViewController(UIViewController):
     notificationCenter.removeObserver_name_object_(
       self, NSNotificationName.keyboardWillHideNotification, None)
 
-    notificationCenter.removeObserver(
-      self,
-      name=NSNotificationName.keyboardWillChangeFrameNotification,
-      object=None,
-    )
+    notificationCenter.removeObserver_name_object_(
+      self, NSNotificationName.keyboardWillChangeFrameNotification, None)
 
   @objc_method
   def didReceiveMemoryWarning(self):
@@ -408,22 +390,19 @@ class WebViewController(UIViewController):
   @objc_method
   def keyboardWillShow_(self, notification):
     if not self.isKeyboardVisible:
-      print('--- keyboardWillShow')
       self.navigationItem.setRightBarButtonItems_animated_(
-      self.showKeyboardRightBarButtonItems, True)
+        self.showKeyboardRightBarButtonItems, True)
       self.isKeyboardVisible = True
 
   @objc_method
   def keyboardWillHide_(self, notification):
     if self.isKeyboardVisible:
-      print('--- keyboardWillHide')
       self.navigationItem.setRightBarButtonItems_animated_(
-      self.hideKeyboardRightBarButtonItems, True)
+        self.hideKeyboardRightBarButtonItems, True)
       self.isKeyboardVisible = False
 
   @objc_method
   def keyboardWillChangeFrame_(self, notification):
-    #print('keyboardWillChangeFrame')
     duration = notification.userInfo[UIKeyboardAnimationDurationUserInfoKey]
 
     if duration.doubleValue == 0:
@@ -443,51 +422,24 @@ class WebViewController(UIViewController):
     keyboardFrameInWindow = window.convertRect_fromWindow_(
       end.CGRectValue, None)
 
-    windowHeight = window.bounds.size.height
-    nowVisible = CGRectGetMinY(keyboardFrameInWindow) < windowHeight
-    '''
-
-    if nowVisible:
-      print('ひらき')
-    else:
-      print('とじ')
-    '''
-
-    #print(windowHeight)
-
-    #pdbr.state(self.view.window())
-    #print(window)
-    #print(CGRect(keyboardFrameInWindow))
-    #print(CGRectGetMaxX(keyboardFrameInWindow))
-    #pdbr.state(keyboardFrameInWindow)
-    #print(keyboardFrameInWindow)
-    #print(CGRectGetMinY(keyboardFrameInWindow))
-    #print(type(CGRectGetMinY(keyboardFrameInWindow)))
-    '''
-
-    screenHeight = UIScreen.mainScreen.bounds.size.height
-    cRectGetMinY = CGRectGetMinY(keyboardFrameInWindow)
-    print('---')
-    print(f'{windowHeight=}')
-    print(f'{screenHeight=}')
-    print(f'{cRectGetMinY=}')
-
-    nowVisible = end.CGRectValue.origin.y < screenHeight
-    '''
-    '''
-
-    if nowVisible and not self.isKeyboardVisible:
-      self.isKeyboardVisible = True
-      print('show')
-    if not nowVisible and self.isKeyboardVisible:
-      self.isKeyboardVisible = False
-      print('hide')
-    '''
-
   @objc_method
   def webViewResignFirstResponder(self):
     js = 'document.activeElement?.blur();'
     self.webView.evaluateJavaScript_completionHandler_(js, None)
+
+  @objc_method
+  def getWebViewInputAccessoryView(self):
+    # ref: [Objective-Cの黒魔術がよくわからなかったので覗いてみた👻 #Swift - Qiita](https://qiita.com/mopiemon/items/8d0dd7d678c4dadeadd4)
+    candidateView: WKContentView = None
+
+    for subview in self.webView.scrollView.subviews():
+      if subview.isMemberOfClass_(WKContentView):
+        candidateView = subview
+        break
+    if (inputAccessoryView := candidateView.inputAccessoryView) is None:
+      return
+
+    inputAccessoryView.removeFromSuperview()
 
   # --- private
   @objc_method
@@ -538,4 +490,5 @@ if __name__ == '__main__':
 
   app = App(main_vc, presentation_style)
   app.present(NavigationController)
+
 
