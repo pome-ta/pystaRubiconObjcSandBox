@@ -79,7 +79,6 @@ class NavigationController(UINavigationController):
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
-    #print(f'- {NSStringFromClass(__class__)}: dealloc')
     loop.stop()
 
   @objc_method
@@ -89,7 +88,6 @@ class NavigationController(UINavigationController):
   @objc_method
   def viewDidLoad(self):
     send_super(__class__, self, 'viewDidLoad')
-    #print(f'{NSStringFromClass(__class__)}: viewDidLoad')
 
   @objc_method
   def viewWillAppear_(self, animated: bool):
@@ -100,7 +98,6 @@ class NavigationController(UINavigationController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #print(f'{NSStringFromClass(__class__)}: viewWillAppear_')
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -111,7 +108,6 @@ class NavigationController(UINavigationController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #print(f'{NSStringFromClass(__class__)}: viewDidAppear_')
 
   @objc_method
   def viewWillDisappear_(self, animated: bool):
@@ -122,7 +118,6 @@ class NavigationController(UINavigationController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #print(f'{NSStringFromClass(__class__)}: viewWillDisappear_')
 
   @objc_method
   def viewDidDisappear_(self, animated: bool):
@@ -133,7 +128,6 @@ class NavigationController(UINavigationController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    #print(f'{NSStringFromClass(__class__)}: viewDidDisappear_')
 
   @objc_method
   def didReceiveMemoryWarning(self):
@@ -210,6 +204,12 @@ class WebViewController(UIViewController):
   leftBarButtonItems: list = objc_property(object)
 
   @objc_method
+  def dealloc(self):
+    # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
+    #self.webView.removeObserver_forKeyPath_(self, at('title'))
+    pass
+
+  @objc_method
   def initWithIndexPath_(self, indexPath: object):
     send_super(__class__, self, 'init')
 
@@ -237,8 +237,9 @@ class WebViewController(UIViewController):
     refreshControl.addTarget_action_forControlEvents_(
       self, SEL('refreshWebView:'), UIControlEvents.valueChanged)
     webView.scrollView.refreshControl = refreshControl
-    '''
+
     # todo: (.js 等での) `title` 変化を監視
+    '''
     webView.addObserver_forKeyPath_options_context_(
       self, at('title'), NSKeyValueObservingOptions.new, None)
     '''
@@ -303,17 +304,12 @@ class WebViewController(UIViewController):
     ]
 
   @objc_method
-  def dealloc(self):
-    # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
-    #print(f'	 - {NSStringFromClass(__class__)}: dealloc')
-    pass
-
-  @objc_method
   def loadView(self):
     send_super(__class__, self, 'loadView')
 
-    webView = self.makeWeblView()
     webDelegate = WebDelegate.new()
+    webView = self.makeWeblView()
+
     webView.navigationDelegate = webDelegate
     #webView.uiDelegate = webDelegate  # xxx: ?
 
@@ -355,13 +351,10 @@ class WebViewController(UIViewController):
                  ctypes.c_bool,
                ])
 
-    self.navigationItem.setRightBarButtonItems_animated_(
-      self.hideKeyboardRightBarButtonItems, animated)
-
     self.navigationItem.setLeftBarButtonItems_animated_(
       self.leftBarButtonItems, animated)
-    #pdbr.state(self.navigationItem)
-    #setLeftBarButtonItems_animated_
+    self.navigationItem.setRightBarButtonItems_animated_(
+      self.hideKeyboardRightBarButtonItems, animated)
 
     notificationCenter = NSNotificationCenter.defaultCenter
     notificationCenter.addObserver_selector_name_object_(
@@ -502,11 +495,11 @@ class WebViewController(UIViewController):
 
     widthAnchor = self.webView.widthAnchor.constraintEqualToAnchor_multiplier_(
       safeAreaLayoutGuide.widthAnchor,
-      1,
+      1.0,
     )
     heightAnchor = self.webView.heightAnchor.constraintEqualToAnchor_multiplier_(
       safeAreaLayoutGuide.heightAnchor,
-      1,
+      1.0,
     )
 
     NSLayoutConstraint.activateConstraints_([
