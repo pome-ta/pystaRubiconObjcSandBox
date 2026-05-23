@@ -23,12 +23,12 @@ import ctypes
 from pathlib import Path
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol
-from pyrubicon.objc.api import ObjCInstance, NSObject
-from pyrubicon.objc.api import objc_method, objc_property, at
+from pyrubicon.objc.api import ObjCInstance, NSObject, NSString,NSDictionary
+from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id, SEL
 
 from objc_frameworks.CoreGraphics import CGRectZero
-from objc_frameworks.Foundation import NSURLRequestCachePolicy, NSKeyValueObserving
+from objc_frameworks.Foundation import NSURLRequestCachePolicy, NSKeyValueObservingOptions
 from objc_frameworks.UIKit import (
   UIControlEvents,
   UIBarButtonItemStyle,
@@ -239,10 +239,8 @@ class WebViewController(UIViewController):
     webView.scrollView.refreshControl = refreshControl
 
     # todo: (.js 等での) `title` 変化を監視
-    '''
     webView.addObserver_forKeyPath_options_context_(
-      self, at('title'), NSKeyValueObservingOptions.new, None)
-    '''
+      self, 'title', NSKeyValueObservingOptions.new, None)
 
     return webView
 
@@ -311,6 +309,7 @@ class WebViewController(UIViewController):
     webView = self.makeWeblView()
 
     webView.navigationDelegate = webDelegate
+    #webView.scrollView.delegate = webDelegate
     #webView.uiDelegate = webDelegate  # xxx: ?
 
     self.webView = webView
@@ -412,6 +411,39 @@ class WebViewController(UIViewController):
   def didReceiveMemoryWarning(self):
     send_super(__class__, self, 'didReceiveMemoryWarning')
     print(f'	{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
+
+  @objc_method
+  def observeValueForKeyPath_ofObject_change_context_(
+    self,
+    keyPath,
+    objct,
+    change,
+    context,
+  ):
+    
+    print('--')
+    print(keyPath)
+    print(type(keyPath))
+    print(objct)
+    print(change)
+    print(context)
+    #pdbr.state(keyPath)
+    print(keyPath.isEqualToString_('title'))
+    
+    send_super(__class__,
+               self,
+               'observeValueForKeyPath:ofObject:change:context:',
+               keyPath,
+               objct,
+               change,
+               context,
+               argtypes=[
+                 ObjCInstance,
+                 ObjCInstance,
+                 ObjCInstance,
+                 ctypes.c_void_p,
+               ])
+    #title = self.webView.title
 
   # --- private
   # --- keyboard
