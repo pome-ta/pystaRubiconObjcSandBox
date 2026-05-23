@@ -24,13 +24,13 @@ from pathlib import Path
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol
 from pyrubicon.objc.api import ObjCInstance, NSObject
-from pyrubicon.objc.api import objc_method, objc_property
+from pyrubicon.objc.api import objc_method, objc_property, at
 from pyrubicon.objc.runtime import send_super, objc_id, SEL
-from pyrubicon.objc.types import CGRect
 
 from objc_frameworks.CoreGraphics import CGRectZero
-from objc_frameworks.Foundation import NSURLRequestCachePolicy
+from objc_frameworks.Foundation import NSURLRequestCachePolicy, NSKeyValueObserving
 from objc_frameworks.UIKit import (
+  UIControlEvents,
   UIBarButtonItemStyle,
   NSNotificationName,
   UIKeyboardAnimationDurationUserInfoKey,
@@ -55,6 +55,7 @@ WKNavigationDelegate = ObjCProtocol('WKNavigationDelegate')
 WKUIDelegate = ObjCProtocol('WKUIDelegate')
 UINavigationControllerDelegate = ObjCProtocol('UINavigationControllerDelegate')
 
+UIRefreshControl = ObjCClass('UIRefreshControl')
 UIBarButtonItem = ObjCClass('UIBarButtonItem')
 UIImage = ObjCClass('UIImage')
 UIColor = ObjCClass('UIColor')
@@ -180,7 +181,8 @@ class WebDelegate(
   @objc_method
   def webView_didFinishNavigation_(self, webView, navigation):
     # ページ読み込みが完了した時
-    title = webView.title
+    #title = webView.title
+    pass
 
   @objc_method
   def webView_didReceiveServerRedirectForProvisionalNavigation_(
@@ -205,6 +207,7 @@ class WebViewController(UIViewController):
 
   showKeyboardRightBarButtonItems: list = objc_property(object)
   hideKeyboardRightBarButtonItems: list = objc_property(object)
+  leftBarButtonItems: list = objc_property(object)
 
   @objc_method
   def initWithIndexPath_(self, indexPath: object):
@@ -230,6 +233,16 @@ class WebViewController(UIViewController):
     webView.scrollView.bounces = True
     webView.scrollView.keyboardDismissMode = UIScrollViewKeyboardDismissMode.interactive
 
+    refreshControl = UIRefreshControl.new()
+    refreshControl.addTarget_action_forControlEvents_(
+      self, SEL('refreshWebView:'), UIControlEvents.valueChanged)
+    webView.scrollView.refreshControl = refreshControl
+    '''
+    # todo: (.js 等での) `title` 変化を監視
+    webView.addObserver_forKeyPath_options_context_(
+      self, at('title'), NSKeyValueObservingOptions.new, None)
+    '''
+
     return webView
 
   @objc_method
@@ -247,7 +260,7 @@ class WebViewController(UIViewController):
       refreshImage,
       style=UIBarButtonItemStyle.plain,
       target=self,
-      action=SEL('getWebViewInputAccessoryView'),
+      action=SEL('reLoadWebView:'),
     )
 
     checkmarkImage = UIImage.systemImageNamed_('checkmark')
@@ -259,6 +272,15 @@ class WebViewController(UIViewController):
     )
     checkmarkButtonItem.tintColor = UIColor.tintColor()
     checkmarkButtonItem.style = UIBarButtonItemStyle.prominent
+
+    saveUpdateImage = UIImage.systemImageNamed_('text.badge.checkmark.rtl')
+
+    saveUpdateButtonItem = UIBarButtonItem.alloc().initWithImage(
+      saveUpdateImage,
+      style=UIBarButtonItemStyle.plain,
+      target=None,
+      action=None,
+    )
 
     flexibleSpaceItem = UIBarButtonItem.flexibleSpaceItem()
     fixedSpaceItem = UIBarButtonItem.fixedSpaceItem()
@@ -276,6 +298,10 @@ class WebViewController(UIViewController):
       refreshButtonItem,
     ]
 
+    self.leftBarButtonItems = [
+      saveUpdateButtonItem,
+    ]
+
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
@@ -286,8 +312,8 @@ class WebViewController(UIViewController):
   def loadView(self):
     send_super(__class__, self, 'loadView')
 
-    webDelegate = WebDelegate.new()
     webView = self.makeWeblView()
+    webDelegate = WebDelegate.new()
     webView.navigationDelegate = webDelegate
     #webView.uiDelegate = webDelegate  # xxx: ?
 
@@ -314,6 +340,8 @@ class WebViewController(UIViewController):
       allowingReadAccessToURL=allowingReadAccessToURL,
     )
 
+    self.view.backgroundColor = UIColor.systemDarkPinkColor()
+
     self.setupBarButtonItems()
     self.setupLayoutConstraint()
 
@@ -329,6 +357,11 @@ class WebViewController(UIViewController):
 
     self.navigationItem.setRightBarButtonItems_animated_(
       self.hideKeyboardRightBarButtonItems, animated)
+
+    self.navigationItem.setLeftBarButtonItems_animated_(
+      self.leftBarButtonItems, animated)
+    #pdbr.state(self.navigationItem)
+    #setLeftBarButtonItems_animated_
 
     notificationCenter = NSNotificationCenter.defaultCenter
     notificationCenter.addObserver_selector_name_object_(
@@ -387,8 +420,11 @@ class WebViewController(UIViewController):
     send_super(__class__, self, 'didReceiveMemoryWarning')
     print(f'	{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
 
+  # --- private
+  # --- keyboard
   @objc_method
   def keyboardWillShow_(self, notification):
+    self.removeWebViewInputAccessoryView()
     if not self.isKeyboardVisible:
       self.navigationItem.setRightBarButtonItems_animated_(
         self.showKeyboardRightBarButtonItems, True)
@@ -422,26 +458,32 @@ class WebViewController(UIViewController):
     keyboardFrameInWindow = window.convertRect_fromWindow_(
       end.CGRectValue, None)
 
+  # --- button action
   @objc_method
   def webViewResignFirstResponder(self):
     js = 'document.activeElement?.blur();'
     self.webView.evaluateJavaScript_completionHandler_(js, None)
 
   @objc_method
-  def getWebViewInputAccessoryView(self):
+  def reLoadWebView_(self, sender):
+    self.webView.reload()
+    #self.wkWebView.reloadFromOrigin()
+
+  @objc_method
+  def refreshWebView_(self, sender):
+    self.reLoadWebView_(sender)
+    sender.endRefreshing()
+
+  @objc_method
+  def removeWebViewInputAccessoryView(self):
     # ref: [Objective-Cの黒魔術がよくわからなかったので覗いてみた👻 #Swift - Qiita](https://qiita.com/mopiemon/items/8d0dd7d678c4dadeadd4)
-    candidateView: WKContentView = None
-
+    #candidateView
     for subview in self.webView.scrollView.subviews():
-      if subview.isMemberOfClass_(WKContentView):
-        candidateView = subview
-        break
-    if (inputAccessoryView := candidateView.inputAccessoryView) is None:
-      return
+      if subview.isMemberOfClass_(WKContentView) and (
+          inputAccessoryView := subview.inputAccessoryView) is not None:
+        inputAccessoryView.removeFromSuperview()
 
-    inputAccessoryView.removeFromSuperview()
-
-  # --- private
+  # --- layout
   @objc_method
   def setupLayoutConstraint(self):
     NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
