@@ -23,7 +23,7 @@ import ctypes
 from pathlib import Path
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol
-from pyrubicon.objc.api import ObjCInstance, NSObject, NSString,NSDictionary
+from pyrubicon.objc.api import ObjCInstance, NSObject, NSString, NSDictionary
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id, SEL
 
@@ -240,7 +240,7 @@ class WebViewController(UIViewController):
 
     # todo: (.js 等での) `title` 変化を監視
     webView.addObserver_forKeyPath_options_context_(
-      self, 'title', NSKeyValueObservingOptions.new, None)
+      self, 'title', NSKeyValueObservingOptions.new, 0)
 
     return webView
 
@@ -415,35 +415,47 @@ class WebViewController(UIViewController):
   @objc_method
   def observeValueForKeyPath_ofObject_change_context_(
     self,
-    keyPath,
-    objct,
-    change,
-    context,
+    keyPath:ctypes.c_void_p,
+    obj:ctypes.c_void_p,
+    change:ctypes.c_void_p,
+    context:ctypes.c_void_p,
   ):
-    
+
     print('--')
     print(keyPath)
-    print(type(keyPath))
-    print(objct)
+    #print(type(keyPath))
+    print(obj)
     print(change)
     print(context)
+    #print(type(context))
     #pdbr.state(keyPath)
-    print(keyPath.isEqualToString_('title'))
-    
+    #print(keyPath.isEqualToString_('title'))
+
     send_super(__class__,
                self,
                'observeValueForKeyPath:ofObject:change:context:',
                keyPath,
-               objct,
+               obj,
                change,
                context,
                argtypes=[
-                 ObjCInstance,
-                 ObjCInstance,
-                 ObjCInstance,
                  ctypes.c_void_p,
+                 ctypes.c_void_p,
+                 ctypes.c_void_p,
+                 None,
                ])
     #title = self.webView.title
+    #NSString,NSDictionary
+    #ObjCInstance
+    '''
+               argtypes=[
+                 NSString,
+                 ObjCClass,
+                 NSDictionary,
+                 ObjCInstance,
+               ])
+    '''
+
 
   # --- private
   # --- keyboard
