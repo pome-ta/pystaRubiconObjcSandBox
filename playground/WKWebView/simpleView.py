@@ -42,6 +42,8 @@ from objc_frameworks.UIKit import (
 from rbedge.lifeCycle import loop
 from rbedge import pdbr
 
+#from objc_frameworks.Foundation import NSStringFromClass
+
 UINavigationController = ObjCClass('UINavigationController')
 UIViewController = ObjCClass('UIViewController')
 
@@ -74,11 +76,13 @@ class NavigationController(UINavigationController):
                argtypes=[
                  objc_id,
                ])
+
     return self
 
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
+    #print(f'- {NSStringFromClass(__class__)}: dealloc')
     loop.stop()
 
   @objc_method
@@ -203,10 +207,12 @@ class WebViewController(UIViewController):
   hideKeyboardRightBarButtonItems: list = objc_property(object)
   leftBarButtonItems: list = objc_property(object)
 
+  titleIdentifier: str = objc_property(object)
+
   @objc_method
   def dealloc(self):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
-    #self.webView.removeObserver_forKeyPath_(self, at('title'))
+    #print(f'- {NSStringFromClass(__class__)}: dealloc')
     pass
 
   @objc_method
@@ -217,6 +223,7 @@ class WebViewController(UIViewController):
       raise FileNotFoundError(f'{indexPath}')
 
     self.indexPath = indexPath
+    self.titleIdentifier = 'title'
     return self
 
   @objc_method
@@ -240,7 +247,7 @@ class WebViewController(UIViewController):
 
     # todo: (.js 等での) `title` 変化を監視
     webView.addObserver_forKeyPath_options_context_(
-      self, 'title', NSKeyValueObservingOptions.new, 0)
+      self, self.titleIdentifier, NSKeyValueObservingOptions.new, None)
 
     return webView
 
@@ -321,7 +328,9 @@ class WebViewController(UIViewController):
     from objc_frameworks.Foundation import NSStringFromClass
 
     send_super(__class__, self, 'viewDidLoad')
+    #self.navigationItem.title = NSStringFromClass(__class__)
     self.navigationItem.title = NSStringFromClass(__class__)
+    self.navigationItem.subtitle = NSStringFromClass(__class__)
 
     # --- load
     _fileURLWithPath = NSURL.fileURLWithPath_isDirectory_
@@ -338,6 +347,10 @@ class WebViewController(UIViewController):
     self.view.backgroundColor = UIColor.systemDarkPinkColor()
 
     self.setupBarButtonItems()
+    self.navigationItem.setLeftBarButtonItems_animated_(
+      self.leftBarButtonItems, True)
+    self.navigationItem.setRightBarButtonItems_animated_(
+      self.hideKeyboardRightBarButtonItems, True)
     self.setupLayoutConstraint()
 
   @objc_method
@@ -349,11 +362,12 @@ class WebViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-
+    '''
     self.navigationItem.setLeftBarButtonItems_animated_(
       self.leftBarButtonItems, animated)
     self.navigationItem.setRightBarButtonItems_animated_(
       self.hideKeyboardRightBarButtonItems, animated)
+    '''
 
     notificationCenter = NSNotificationCenter.defaultCenter
     notificationCenter.addObserver_selector_name_object_(
@@ -386,6 +400,7 @@ class WebViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
+    self.webView.removeObserver_forKeyPath_(self, self.titleIdentifier)
     self.webView.reloadFromOrigin()
 
   @objc_method
@@ -415,47 +430,15 @@ class WebViewController(UIViewController):
   @objc_method
   def observeValueForKeyPath_ofObject_change_context_(
     self,
-    keyPath:ctypes.c_void_p,
-    obj:ctypes.c_void_p,
-    change:ctypes.c_void_p,
-    context:ctypes.c_void_p,
+    keyPath,
+    obj,
+    change,
+    context,
   ):
 
-    print('--')
-    print(keyPath)
-    #print(type(keyPath))
-    print(obj)
-    print(change)
-    print(context)
-    #print(type(context))
-    #pdbr.state(keyPath)
-    #print(keyPath.isEqualToString_('title'))
-
-    send_super(__class__,
-               self,
-               'observeValueForKeyPath:ofObject:change:context:',
-               keyPath,
-               obj,
-               change,
-               context,
-               argtypes=[
-                 ctypes.c_void_p,
-                 ctypes.c_void_p,
-                 ctypes.c_void_p,
-                 None,
-               ])
-    #title = self.webView.title
-    #NSString,NSDictionary
-    #ObjCInstance
-    '''
-               argtypes=[
-                 NSString,
-                 ObjCClass,
-                 NSDictionary,
-                 ObjCInstance,
-               ])
-    '''
-
+    if keyPath.isEqualToString_(self.titleIdentifier):
+      self.navigationItem.title = obj.title
+      #print(obj)
 
   # --- private
   # --- keyboard
