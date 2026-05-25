@@ -23,12 +23,16 @@ import ctypes
 from pathlib import Path
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol
-from pyrubicon.objc.api import ObjCInstance, NSObject, NSString, NSDictionary
+from pyrubicon.objc.api import ObjCInstance, NSObject
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id, SEL
 
 from objc_frameworks.CoreGraphics import CGRectZero
-from objc_frameworks.Foundation import NSURLRequestCachePolicy, NSKeyValueObservingOptions
+from objc_frameworks.Foundation import (
+  NSStringFromClass,
+  NSURLRequestCachePolicy,
+  NSKeyValueObservingOptions,
+)
 from objc_frameworks.UIKit import (
   UIControlEvents,
   UIBarButtonItemStyle,
@@ -41,8 +45,6 @@ from objc_frameworks.UIKit import (
 
 from rbedge.lifeCycle import loop
 from rbedge import pdbr
-
-#from objc_frameworks.Foundation import NSStringFromClass
 
 UINavigationController = ObjCClass('UINavigationController')
 UIViewController = ObjCClass('UIViewController')
@@ -288,6 +290,14 @@ class WebViewController(UIViewController):
       action=None,
     )
 
+    ellipsisImage = UIImage.systemImageNamed_('ellipsis')
+    ellipsisButtonItem = UIBarButtonItem.alloc().initWithImage(
+      ellipsisImage,
+      style=UIBarButtonItemStyle.plain,
+      target=None,
+      action=None,
+    )
+
     flexibleSpaceItem = UIBarButtonItem.flexibleSpaceItem()
     fixedSpaceItem = UIBarButtonItem.fixedSpaceItem()
 
@@ -295,17 +305,15 @@ class WebViewController(UIViewController):
       checkmarkButtonItem,
       flexibleSpaceItem,
       closeButtonItem,
-      refreshButtonItem,
     ]
 
     self.hideKeyboardRightBarButtonItems = [
       closeButtonItem,
-      fixedSpaceItem,
-      refreshButtonItem,
     ]
 
     self.leftBarButtonItems = [
-      saveUpdateButtonItem,
+      refreshButtonItem,
+      ellipsisButtonItem,
     ]
 
   @objc_method
@@ -325,12 +333,10 @@ class WebViewController(UIViewController):
 
   @objc_method
   def viewDidLoad(self):
-    from objc_frameworks.Foundation import NSStringFromClass
-
     send_super(__class__, self, 'viewDidLoad')
     #self.navigationItem.title = NSStringFromClass(__class__)
-    self.navigationItem.title = NSStringFromClass(__class__)
     self.navigationItem.subtitle = NSStringFromClass(__class__)
+    #self.navigationItem.prompt = NSStringFromClass(__class__)
 
     # --- load
     _fileURLWithPath = NSURL.fileURLWithPath_isDirectory_
@@ -347,10 +353,12 @@ class WebViewController(UIViewController):
     self.view.backgroundColor = UIColor.systemDarkPinkColor()
 
     self.setupBarButtonItems()
+    '''
     self.navigationItem.setLeftBarButtonItems_animated_(
       self.leftBarButtonItems, True)
     self.navigationItem.setRightBarButtonItems_animated_(
       self.hideKeyboardRightBarButtonItems, True)
+    '''
     self.setupLayoutConstraint()
 
   @objc_method
@@ -362,12 +370,11 @@ class WebViewController(UIViewController):
                argtypes=[
                  ctypes.c_bool,
                ])
-    '''
+
     self.navigationItem.setLeftBarButtonItems_animated_(
       self.leftBarButtonItems, animated)
     self.navigationItem.setRightBarButtonItems_animated_(
       self.hideKeyboardRightBarButtonItems, animated)
-    '''
 
     notificationCenter = NSNotificationCenter.defaultCenter
     notificationCenter.addObserver_selector_name_object_(
@@ -438,7 +445,6 @@ class WebViewController(UIViewController):
 
     if keyPath.isEqualToString_(self.titleIdentifier):
       self.navigationItem.title = obj.title
-      #print(obj)
 
   # --- private
   # --- keyboard
@@ -544,7 +550,6 @@ if __name__ == '__main__':
   ROOT_PATH = Path(__file__).parents[0]
 
   index_path = ROOT_PATH / 'docs/index.html'
-  #main_vc = WebViewController.new()
   main_vc = WebViewController.alloc().initWithIndexPath_(index_path)
 
   presentation_style = UIModalPresentationStyle.fullScreen
