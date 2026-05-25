@@ -282,7 +282,6 @@ class WebViewController(UIViewController):
     checkmarkButtonItem.style = UIBarButtonItemStyle.prominent
 
     saveUpdateImage = UIImage.systemImageNamed_('text.badge.checkmark.rtl')
-
     saveUpdateButtonItem = UIBarButtonItem.alloc().initWithImage(
       saveUpdateImage,
       style=UIBarButtonItemStyle.plain,
@@ -353,12 +352,6 @@ class WebViewController(UIViewController):
     self.view.backgroundColor = UIColor.systemDarkPinkColor()
 
     self.setupBarButtonItems()
-    '''
-    self.navigationItem.setLeftBarButtonItems_animated_(
-      self.leftBarButtonItems, True)
-    self.navigationItem.setRightBarButtonItems_animated_(
-      self.hideKeyboardRightBarButtonItems, True)
-    '''
     self.setupLayoutConstraint()
 
   @objc_method
@@ -383,10 +376,6 @@ class WebViewController(UIViewController):
     notificationCenter.addObserver_selector_name_object_(
       self, SEL('keyboardWillHide:'),
       NSNotificationName.keyboardWillHideNotification, None)
-
-    notificationCenter.addObserver_selector_name_object_(
-      self, SEL('keyboardWillChangeFrame:'),
-      NSNotificationName.keyboardWillChangeFrameNotification, None)
 
   @objc_method
   def viewDidAppear_(self, animated: bool):
@@ -426,9 +415,6 @@ class WebViewController(UIViewController):
     notificationCenter.removeObserver_name_object_(
       self, NSNotificationName.keyboardWillHideNotification, None)
 
-    notificationCenter.removeObserver_name_object_(
-      self, NSNotificationName.keyboardWillChangeFrameNotification, None)
-
   @objc_method
   def didReceiveMemoryWarning(self):
     send_super(__class__, self, 'didReceiveMemoryWarning')
@@ -443,8 +429,9 @@ class WebViewController(UIViewController):
     context,
   ):
 
-    if keyPath.isEqualToString_(self.titleIdentifier):
-      self.navigationItem.title = obj.title
+    if (webView := obj) is not None and keyPath.isEqualToString_(
+        self.titleIdentifier):
+      self.navigationItem.title = webView.title
 
   # --- private
   # --- keyboard
@@ -463,28 +450,7 @@ class WebViewController(UIViewController):
         self.hideKeyboardRightBarButtonItems, True)
       self.isKeyboardVisible = False
 
-  @objc_method
-  def keyboardWillChangeFrame_(self, notification):
-    duration = notification.userInfo[UIKeyboardAnimationDurationUserInfoKey]
-
-    if duration.doubleValue == 0:
-      return
-
-    self.handleKeyboardFrameChange_(notification)
-
-  @objc_method
-  def handleKeyboardFrameChange_(self, notification):
-    #print('handleKeyboardFrameChange')
-
-    end = notification.userInfo[UIKeyboardFrameEndUserInfoKey]
-
-    if not ((window := self.view.window())):
-      return
-
-    keyboardFrameInWindow = window.convertRect_fromWindow_(
-      end.CGRectValue, None)
-
-  # --- button action
+  # --- buttons action
   @objc_method
   def webViewResignFirstResponder(self):
     js = 'document.activeElement?.blur();'
