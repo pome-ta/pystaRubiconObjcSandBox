@@ -22,4 +22,5 @@ from .UIWindow import (
   UIKeyboardCenterEndUserInfoKey,
   UIKeyboardBoundsUserInfoKey,
 )
+from .UIMenuElement import UIMenuElementAttributes
 

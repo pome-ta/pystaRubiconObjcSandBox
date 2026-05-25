@@ -23,7 +23,7 @@ import ctypes
 from pathlib import Path
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol
-from pyrubicon.objc.api import ObjCInstance, NSObject
+from pyrubicon.objc.api import ObjCInstance, NSObject, Block
 from pyrubicon.objc.api import objc_method, objc_property
 from pyrubicon.objc.runtime import send_super, objc_id, SEL
 
@@ -41,6 +41,7 @@ from objc_frameworks.UIKit import (
   UIKeyboardFrameBeginUserInfoKey,
   UIKeyboardFrameEndUserInfoKey,
   UIScrollViewKeyboardDismissMode,
+  UIMenuElementAttributes,
 )
 
 from rbedge.lifeCycle import loop
@@ -63,6 +64,9 @@ UIRefreshControl = ObjCClass('UIRefreshControl')
 UIBarButtonItem = ObjCClass('UIBarButtonItem')
 UIImage = ObjCClass('UIImage')
 UIColor = ObjCClass('UIColor')
+
+UIMenu = ObjCClass('UIMenu')
+UIAction = ObjCClass('UIAction')
 
 NSNotificationCenter = ObjCClass('NSNotificationCenter')
 
@@ -282,19 +286,32 @@ class WebViewController(UIViewController):
     checkmarkButtonItem.style = UIBarButtonItemStyle.prominent
 
     saveUpdateImage = UIImage.systemImageNamed_('text.badge.checkmark.rtl')
-    saveUpdateButtonItem = UIBarButtonItem.alloc().initWithImage(
-      saveUpdateImage,
-      style=UIBarButtonItemStyle.plain,
-      target=None,
-      action=None,
+    saveUpdateAction = UIAction.actionWithTitle(
+      'code save',
+      image=saveUpdateImage,
+      identifier=None,
+      handler=Block(self.saveFileUpdate_, None, ctypes.c_void_p),
     )
+    saveUpdateAction.attributes = UIMenuElementAttributes.disabled
+
+    superReloadImage = UIImage.systemImageNamed_(
+      'arrow.trianglehead.clockwise')
+    superReloadAction = UIAction.actionWithTitle(
+      'superReload',
+      image=superReloadImage,
+      identifier=None,
+      handler=Block(self.reloadFromOrigin_, None, ctypes.c_void_p),
+    )
+
+    buttonMenu = UIMenu.menuWithChildren_([
+      superReloadAction,
+      saveUpdateAction,
+    ])
 
     ellipsisImage = UIImage.systemImageNamed_('ellipsis')
     ellipsisButtonItem = UIBarButtonItem.alloc().initWithImage(
       ellipsisImage,
-      style=UIBarButtonItemStyle.plain,
-      target=None,
-      action=None,
+      menu=buttonMenu,
     )
 
     flexibleSpaceItem = UIBarButtonItem.flexibleSpaceItem()
@@ -465,6 +482,14 @@ class WebViewController(UIViewController):
   def refreshWebView_(self, sender):
     self.reLoadWebView_(sender)
     sender.endRefreshing()
+
+  @objc_method
+  def reloadFromOrigin_(self, _action: ctypes.c_void_p) -> None:
+    self.webView.reloadFromOrigin()
+
+  @objc_method
+  def saveFileUpdate_(self, _action: ctypes.c_void_p) -> None:
+    print(self.navigationItem.title)
 
   @objc_method
   def removeWebViewInputAccessoryView(self):
