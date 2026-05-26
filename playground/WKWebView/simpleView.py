@@ -37,9 +37,6 @@ from objc_frameworks.UIKit import (
   UIControlEvents,
   UIBarButtonItemStyle,
   NSNotificationName,
-  UIKeyboardAnimationDurationUserInfoKey,
-  UIKeyboardFrameBeginUserInfoKey,
-  UIKeyboardFrameEndUserInfoKey,
   UIScrollViewKeyboardDismissMode,
   UIMenuElementAttributes,
 )
@@ -58,15 +55,13 @@ NSURL = ObjCClass('NSURL')
 
 WKNavigationDelegate = ObjCProtocol('WKNavigationDelegate')
 WKUIDelegate = ObjCProtocol('WKUIDelegate')
-UINavigationControllerDelegate = ObjCProtocol('UINavigationControllerDelegate')
 
 UIRefreshControl = ObjCClass('UIRefreshControl')
 UIBarButtonItem = ObjCClass('UIBarButtonItem')
 UIImage = ObjCClass('UIImage')
-UIColor = ObjCClass('UIColor')
-
 UIMenu = ObjCClass('UIMenu')
 UIAction = ObjCClass('UIAction')
+UIColor = ObjCClass('UIColor')
 
 NSNotificationCenter = ObjCClass('NSNotificationCenter')
 
@@ -245,7 +240,6 @@ class WebViewController(UIViewController):
     )
     checkmarkButtonItem.tintColor = UIColor.tintColor()
     checkmarkButtonItem.style = UIBarButtonItemStyle.prominent
-
 
     superReloadAction = UIAction.actionWithTitle(
       'superReload',
@@ -435,9 +429,6 @@ class WebViewController(UIViewController):
   def reloadFromOrigin_(self, _action: ctypes.c_void_p) -> None:
     self.webView.reloadFromOrigin()
 
-  @objc_method
-  def saveFileUpdate_(self, _action: ctypes.c_void_p) -> None:
-    print(self.navigationItem.title)
 
   @objc_method
   def removeWebViewInputAccessoryView(self):
