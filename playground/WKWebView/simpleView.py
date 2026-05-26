@@ -92,54 +92,6 @@ class NavigationController(UINavigationController):
     loop.stop()
 
   @objc_method
-  def loadView(self):
-    send_super(__class__, self, 'loadView')
-
-  @objc_method
-  def viewDidLoad(self):
-    send_super(__class__, self, 'viewDidLoad')
-
-  @objc_method
-  def viewWillAppear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewWillAppear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
-
-  @objc_method
-  def viewDidAppear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewDidAppear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
-
-  @objc_method
-  def viewWillDisappear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewWillDisappear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
-
-  @objc_method
-  def viewDidDisappear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewDidDisappear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
-
-  @objc_method
   def didReceiveMemoryWarning(self):
     send_super(__class__, self, 'didReceiveMemoryWarning')
     print(f'{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
@@ -169,15 +121,23 @@ class WebDelegate(
     pass
 
   @objc_method
-  def webView_didFailNavigation_withError_(self, webView, navigation, error):
+  def webView_didFailNavigation_withError_(
+    self,
+    webView,
+    navigation,
+    error,
+  ):  # xxx: 未確認
     # 遷移中にエラーが発生した時
-    # xxx: 未確認
     print('didFailNavigation_withError')
     print(error)
 
   @objc_method
-  def webView_didFailProvisionalNavigation_withError_(self, webView,
-                                                      navigation, error):
+  def webView_didFailProvisionalNavigation_withError_(
+    self,
+    webView,
+    navigation,
+    error,
+  ):
     # ページ読み込み時にエラーが発生した時
     print('didFailProvisionalNavigation_withError')
     print(error)
@@ -185,14 +145,16 @@ class WebDelegate(
   @objc_method
   def webView_didFinishNavigation_(self, webView, navigation):
     # ページ読み込みが完了した時
-    #title = webView.title
+
     pass
 
   @objc_method
   def webView_didReceiveServerRedirectForProvisionalNavigation_(
-      self, webView, navigation):
+    self,
+    webView,
+    navigation,
+  ):  # xxx: 未確認
     # リダイレクトされた時
-    # xxx: 未確認
     print('didReceiveServerRedirectForProvisionalNavigation')
 
   @objc_method
@@ -204,6 +166,7 @@ class WebDelegate(
 class WebViewController(UIViewController):
 
   indexPath: Path = objc_property(object)
+
   webView: WKWebView = objc_property()
   webDelegate: WebDelegate = objc_property()
 
@@ -251,7 +214,7 @@ class WebViewController(UIViewController):
       self, SEL('refreshWebView:'), UIControlEvents.valueChanged)
     webView.scrollView.refreshControl = refreshControl
 
-    # todo: (.js 等での) `title` 変化を監視
+    # todo: (.js 操作等での) `title` 変化を監視
     webView.addObserver_forKeyPath_options_context_(
       self, self.titleIdentifier, NSKeyValueObservingOptions.new, None)
 
@@ -259,25 +222,23 @@ class WebViewController(UIViewController):
 
   @objc_method
   def setupBarButtonItems(self):
-    closeImage = UIImage.systemImageNamed_('xmark')
+
     closeButtonItem = UIBarButtonItem.alloc().initWithImage(
-      closeImage,
+      UIImage.systemImageNamed_('xmark'),
       style=UIBarButtonItemStyle.plain,
       target=self.navigationController,
       action=SEL('doneButtonTapped:'),
     )
 
-    refreshImage = UIImage.systemImageNamed_('arrow.clockwise.circle')
     refreshButtonItem = UIBarButtonItem.alloc().initWithImage(
-      refreshImage,
+      UIImage.systemImageNamed_('arrow.clockwise.circle'),
       style=UIBarButtonItemStyle.plain,
       target=self,
       action=SEL('reLoadWebView:'),
     )
 
-    checkmarkImage = UIImage.systemImageNamed_('checkmark')
     checkmarkButtonItem = UIBarButtonItem.alloc().initWithImage(
-      checkmarkImage,
+      UIImage.systemImageNamed_('checkmark'),
       style=UIBarButtonItemStyle.plain,
       target=self,
       action=SEL('webViewResignFirstResponder'),
@@ -285,32 +246,20 @@ class WebViewController(UIViewController):
     checkmarkButtonItem.tintColor = UIColor.tintColor()
     checkmarkButtonItem.style = UIBarButtonItemStyle.prominent
 
-    saveUpdateImage = UIImage.systemImageNamed_('text.badge.checkmark.rtl')
-    saveUpdateAction = UIAction.actionWithTitle(
-      'code save',
-      image=saveUpdateImage,
-      identifier=None,
-      handler=Block(self.saveFileUpdate_, None, ctypes.c_void_p),
-    )
-    saveUpdateAction.attributes = UIMenuElementAttributes.disabled
 
-    superReloadImage = UIImage.systemImageNamed_(
-      'arrow.trianglehead.clockwise')
     superReloadAction = UIAction.actionWithTitle(
       'superReload',
-      image=superReloadImage,
+      image=UIImage.systemImageNamed_('arrow.trianglehead.clockwise'),
       identifier=None,
       handler=Block(self.reloadFromOrigin_, None, ctypes.c_void_p),
     )
 
     buttonMenu = UIMenu.menuWithChildren_([
       superReloadAction,
-      saveUpdateAction,
     ])
 
-    ellipsisImage = UIImage.systemImageNamed_('ellipsis')
     ellipsisButtonItem = UIBarButtonItem.alloc().initWithImage(
-      ellipsisImage,
+      UIImage.systemImageNamed_('ellipsis'),
       menu=buttonMenu,
     )
 
@@ -476,7 +425,6 @@ class WebViewController(UIViewController):
   @objc_method
   def reLoadWebView_(self, sender):
     self.webView.reload()
-    #self.wkWebView.reloadFromOrigin()
 
   @objc_method
   def refreshWebView_(self, sender):
