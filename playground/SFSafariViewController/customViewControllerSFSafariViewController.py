@@ -57,6 +57,7 @@ if __name__ == '__main__':
   url = 'https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller?language=objc'
   url = 'https://github.com/ColdGrub1384/Pyto'
   #url = 'https://www.apple.com'
+  url = 'https://forest.watch.impress.co.jp/docs/news/2109336.html'
 
   main_vc = SafariViewController.alloc().initWithURL_(nsurl(url))
 

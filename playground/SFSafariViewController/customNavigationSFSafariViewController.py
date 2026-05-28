@@ -62,6 +62,7 @@ if __name__ == '__main__':
   from objc_frameworks.UIKit import UIModalPresentationStyle
 
   url = 'https://developer.mozilla.org/ja/docs/Web/HTML/Reference/Elements/textarea'
+  url = 'https://forest.watch.impress.co.jp/docs/news/2109336.html'
 
   main_vc = SFSafariViewController.alloc().initWithURL_(nsurl(url))
 
