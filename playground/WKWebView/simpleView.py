@@ -42,6 +42,7 @@ from objc_frameworks.UIKit import (
 )
 
 from rbedge.lifeCycle import loop
+from rbedge.utils import nsurl
 from rbedge import pdbr
 
 UINavigationController = ObjCClass('UINavigationController')
@@ -52,6 +53,7 @@ WKWebViewConfiguration = ObjCClass('WKWebViewConfiguration')
 WKWebsiteDataStore = ObjCClass('WKWebsiteDataStore')
 WKContentView = ObjCClass('WKContentView')
 NSURL = ObjCClass('NSURL')
+NSURLRequest = ObjCClass('NSURLRequest')
 
 WKNavigationDelegate = ObjCProtocol('WKNavigationDelegate')
 WKUIDelegate = ObjCProtocol('WKUIDelegate')
@@ -140,7 +142,6 @@ class WebDelegate(
   @objc_method
   def webView_didFinishNavigation_(self, webView, navigation):
     # ページ読み込みが完了した時
-
     pass
 
   @objc_method
@@ -148,9 +149,9 @@ class WebDelegate(
     self,
     webView,
     navigation,
-  ):  # xxx: 未確認
+  ):
     # リダイレクトされた時
-    print('didReceiveServerRedirectForProvisionalNavigation')
+    pass
 
   @objc_method
   def webView_didStartProvisionalNavigation_(self, webView, navigation):
@@ -160,7 +161,7 @@ class WebDelegate(
 
 class WebViewController(UIViewController):
 
-  indexPath: Path = objc_property(object)
+  locationResource: Path | str = objc_property(object)
 
   webView: WKWebView = objc_property()
   webDelegate: WebDelegate = objc_property()
@@ -180,13 +181,13 @@ class WebViewController(UIViewController):
     pass
 
   @objc_method
-  def initWithIndexPath_(self, indexPath: object):
+  def initWithLocationResource_(self, locationResource: object):
     send_super(__class__, self, 'init')
 
-    if not (indexPath.exists()):
+    if isinstance(locationResource, Path) and not (locationResource.exists()):
       raise FileNotFoundError(f'{indexPath}')
 
-    self.indexPath = indexPath
+    self.locationResource = locationResource
     self.titleIdentifier = 'title'
     return self
 
@@ -298,18 +299,19 @@ class WebViewController(UIViewController):
     #self.navigationItem.prompt = NSStringFromClass(__class__)
 
     # --- load
-    _fileURLWithPath = NSURL.fileURLWithPath_isDirectory_
-    _path = str(self.indexPath)
-    _parent = str(self.indexPath.parent)
-    loadFileURL = _fileURLWithPath(_path, False)
-    allowingReadAccessToURL = _fileURLWithPath(_parent, True)
+    tmp = nsurl(str(self.locationResource))
+    if (request := NSURLRequest.requestWithURL_(tmp)) and tmp.isFileURL():
+      self.webView.loadFileRequest(
+        request,
+        allowingReadAccessToURL=NSURL.fileURLWithPath(
+          str(self.locationResource.parent),
+          isDirectory=True,
+        ),
+      )
+    else:
+      self.webView.loadRequest_(request)
 
-    self.webView.loadFileURL(
-      loadFileURL,
-      allowingReadAccessToURL=allowingReadAccessToURL,
-    )
-
-    self.view.backgroundColor = UIColor.systemDarkPinkColor()
+    self.view.backgroundColor = UIColor.systemBackgroundColor()
 
     self.setupBarButtonItems()
     self.setupLayoutConstraint()
@@ -422,6 +424,7 @@ class WebViewController(UIViewController):
 
   @objc_method
   def refreshWebView_(self, sender):
+    #sender.endRefreshing()
     self.reLoadWebView_(sender)
     sender.endRefreshing()
 
@@ -429,15 +432,14 @@ class WebViewController(UIViewController):
   def reloadFromOrigin_(self, _action: ctypes.c_void_p) -> None:
     self.webView.reloadFromOrigin()
 
-
   @objc_method
   def removeWebViewInputAccessoryView(self):
     # ref: [Objective-Cの黒魔術がよくわからなかったので覗いてみた👻 #Swift - Qiita](https://qiita.com/mopiemon/items/8d0dd7d678c4dadeadd4)
-    #candidateView
     for subview in self.webView.scrollView.subviews():
       if subview.isMemberOfClass_(WKContentView) and (
           inputAccessoryView := subview.inputAccessoryView) is not None:
         inputAccessoryView.removeFromSuperview()
+        inputAccessoryView.setFrame_(CGRectZero)
 
   # --- layout
   @objc_method
@@ -453,17 +455,29 @@ class WebViewController(UIViewController):
 
     centerXAnchor = self.webView.centerXAnchor.constraintEqualToAnchor_(
       safeAreaLayoutGuide.centerXAnchor)
+
     centerYAnchor = self.webView.centerYAnchor.constraintEqualToAnchor_(
       safeAreaLayoutGuide.centerYAnchor)
+    '''
+    centerYAnchor = self.webView.centerYAnchor.constraintEqualToAnchor_(
+      self.view.centerYAnchor)
+    '''
 
     widthAnchor = self.webView.widthAnchor.constraintEqualToAnchor_multiplier_(
       safeAreaLayoutGuide.widthAnchor,
       1.0,
     )
+
     heightAnchor = self.webView.heightAnchor.constraintEqualToAnchor_multiplier_(
       safeAreaLayoutGuide.heightAnchor,
       1.0,
     )
+    '''
+    heightAnchor = self.webView.heightAnchor.constraintEqualToAnchor_multiplier_(
+      self.view.heightAnchor,
+      1.0,
+    )
+    '''
 
     NSLayoutConstraint.activateConstraints_([
       centerXAnchor,
@@ -480,7 +494,8 @@ if __name__ == '__main__':
   ROOT_PATH = Path(__file__).parents[0]
 
   index_path = ROOT_PATH / 'docs/index.html'
-  main_vc = WebViewController.alloc().initWithIndexPath_(index_path)
+  index_path = 'https://pome-ta.github.io/p5js4codemirror6/'
+  main_vc = WebViewController.alloc().initWithLocationResource_(index_path)
 
   presentation_style = UIModalPresentationStyle.fullScreen
   #presentation_style = UIModalPresentationStyle.pageSheet
