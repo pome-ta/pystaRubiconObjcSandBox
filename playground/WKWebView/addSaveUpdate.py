@@ -37,14 +37,12 @@ from objc_frameworks.UIKit import (
   UIControlEvents,
   UIBarButtonItemStyle,
   NSNotificationName,
-  UIKeyboardAnimationDurationUserInfoKey,
-  UIKeyboardFrameBeginUserInfoKey,
-  UIKeyboardFrameEndUserInfoKey,
   UIScrollViewKeyboardDismissMode,
   UIMenuElementAttributes,
 )
 
 from rbedge.lifeCycle import loop
+from rbedge.utils import nsurl
 from rbedge import pdbr
 
 UINavigationController = ObjCClass('UINavigationController')
@@ -55,18 +53,17 @@ WKWebViewConfiguration = ObjCClass('WKWebViewConfiguration')
 WKWebsiteDataStore = ObjCClass('WKWebsiteDataStore')
 WKContentView = ObjCClass('WKContentView')
 NSURL = ObjCClass('NSURL')
+NSURLRequest = ObjCClass('NSURLRequest')
 
 WKNavigationDelegate = ObjCProtocol('WKNavigationDelegate')
 WKUIDelegate = ObjCProtocol('WKUIDelegate')
-UINavigationControllerDelegate = ObjCProtocol('UINavigationControllerDelegate')
 
 UIRefreshControl = ObjCClass('UIRefreshControl')
 UIBarButtonItem = ObjCClass('UIBarButtonItem')
 UIImage = ObjCClass('UIImage')
-UIColor = ObjCClass('UIColor')
-
 UIMenu = ObjCClass('UIMenu')
 UIAction = ObjCClass('UIAction')
+UIColor = ObjCClass('UIColor')
 
 NSNotificationCenter = ObjCClass('NSNotificationCenter')
 
@@ -90,54 +87,6 @@ class NavigationController(UINavigationController):
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     #print(f'- {NSStringFromClass(__class__)}: dealloc')
     loop.stop()
-
-  @objc_method
-  def loadView(self):
-    send_super(__class__, self, 'loadView')
-
-  @objc_method
-  def viewDidLoad(self):
-    send_super(__class__, self, 'viewDidLoad')
-
-  @objc_method
-  def viewWillAppear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewWillAppear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
-
-  @objc_method
-  def viewDidAppear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewDidAppear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
-
-  @objc_method
-  def viewWillDisappear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewWillDisappear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
-
-  @objc_method
-  def viewDidDisappear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewDidDisappear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
 
   @objc_method
   def didReceiveMemoryWarning(self):
@@ -169,15 +118,23 @@ class WebDelegate(
     pass
 
   @objc_method
-  def webView_didFailNavigation_withError_(self, webView, navigation, error):
+  def webView_didFailNavigation_withError_(
+    self,
+    webView,
+    navigation,
+    error,
+  ):  # xxx: 未確認
     # 遷移中にエラーが発生した時
-    # xxx: 未確認
     print('didFailNavigation_withError')
     print(error)
 
   @objc_method
-  def webView_didFailProvisionalNavigation_withError_(self, webView,
-                                                      navigation, error):
+  def webView_didFailProvisionalNavigation_withError_(
+    self,
+    webView,
+    navigation,
+    error,
+  ):
     # ページ読み込み時にエラーが発生した時
     print('didFailProvisionalNavigation_withError')
     print(error)
@@ -185,15 +142,16 @@ class WebDelegate(
   @objc_method
   def webView_didFinishNavigation_(self, webView, navigation):
     # ページ読み込みが完了した時
-    #title = webView.title
     pass
 
   @objc_method
   def webView_didReceiveServerRedirectForProvisionalNavigation_(
-      self, webView, navigation):
+    self,
+    webView,
+    navigation,
+  ):
     # リダイレクトされた時
-    # xxx: 未確認
-    print('didReceiveServerRedirectForProvisionalNavigation')
+    pass
 
   @objc_method
   def webView_didStartProvisionalNavigation_(self, webView, navigation):
@@ -203,7 +161,8 @@ class WebDelegate(
 
 class WebViewController(UIViewController):
 
-  indexPath: Path = objc_property(object)
+  locationResource: Path | str = objc_property(object)
+
   webView: WKWebView = objc_property()
   webDelegate: WebDelegate = objc_property()
 
@@ -222,13 +181,13 @@ class WebViewController(UIViewController):
     pass
 
   @objc_method
-  def initWithIndexPath_(self, indexPath: object):
+  def initWithLocationResource_(self, locationResource: object):
     send_super(__class__, self, 'init')
 
-    if not (indexPath.exists()):
+    if isinstance(locationResource, Path) and not (locationResource.exists()):
       raise FileNotFoundError(f'{indexPath}')
 
-    self.indexPath = indexPath
+    self.locationResource = locationResource
     self.titleIdentifier = 'title'
     return self
 
@@ -251,7 +210,7 @@ class WebViewController(UIViewController):
       self, SEL('refreshWebView:'), UIControlEvents.valueChanged)
     webView.scrollView.refreshControl = refreshControl
 
-    # todo: (.js 等での) `title` 変化を監視
+    # todo: (.js 操作等での) `title` 変化を監視
     webView.addObserver_forKeyPath_options_context_(
       self, self.titleIdentifier, NSKeyValueObservingOptions.new, None)
 
@@ -259,25 +218,23 @@ class WebViewController(UIViewController):
 
   @objc_method
   def setupBarButtonItems(self):
-    closeImage = UIImage.systemImageNamed_('xmark')
+
     closeButtonItem = UIBarButtonItem.alloc().initWithImage(
-      closeImage,
+      UIImage.systemImageNamed_('xmark'),
       style=UIBarButtonItemStyle.plain,
       target=self.navigationController,
       action=SEL('doneButtonTapped:'),
     )
 
-    refreshImage = UIImage.systemImageNamed_('arrow.clockwise.circle')
     refreshButtonItem = UIBarButtonItem.alloc().initWithImage(
-      refreshImage,
+      UIImage.systemImageNamed_('arrow.clockwise.circle'),
       style=UIBarButtonItemStyle.plain,
       target=self,
       action=SEL('reLoadWebView:'),
     )
 
-    checkmarkImage = UIImage.systemImageNamed_('checkmark')
     checkmarkButtonItem = UIBarButtonItem.alloc().initWithImage(
-      checkmarkImage,
+      UIImage.systemImageNamed_('checkmark'),
       style=UIBarButtonItemStyle.plain,
       target=self,
       action=SEL('webViewResignFirstResponder'),
@@ -285,32 +242,28 @@ class WebViewController(UIViewController):
     checkmarkButtonItem.tintColor = UIColor.tintColor()
     checkmarkButtonItem.style = UIBarButtonItemStyle.prominent
 
-    saveUpdateImage = UIImage.systemImageNamed_('text.badge.checkmark.rtl')
+    superReloadAction = UIAction.actionWithTitle(
+      'superReload',
+      image=UIImage.systemImageNamed_('arrow.trianglehead.clockwise'),
+      identifier=None,
+      handler=Block(self.reloadFromOrigin_, None, ctypes.c_void_p),
+    )
+
     saveUpdateAction = UIAction.actionWithTitle(
       'code save',
-      image=saveUpdateImage,
+      image=UIImage.systemImageNamed_('text.badge.checkmark.rtl'),
       identifier=None,
       handler=Block(self.saveFileUpdate_, None, ctypes.c_void_p),
     )
     saveUpdateAction.attributes = UIMenuElementAttributes.disabled
-
-    superReloadImage = UIImage.systemImageNamed_(
-      'arrow.trianglehead.clockwise')
-    superReloadAction = UIAction.actionWithTitle(
-      'superReload',
-      image=superReloadImage,
-      identifier=None,
-      handler=Block(self.reloadFromOrigin_, None, ctypes.c_void_p),
-    )
 
     buttonMenu = UIMenu.menuWithChildren_([
       superReloadAction,
       saveUpdateAction,
     ])
 
-    ellipsisImage = UIImage.systemImageNamed_('ellipsis')
     ellipsisButtonItem = UIBarButtonItem.alloc().initWithImage(
-      ellipsisImage,
+      UIImage.systemImageNamed_('ellipsis'),
       menu=buttonMenu,
     )
 
@@ -355,18 +308,19 @@ class WebViewController(UIViewController):
     #self.navigationItem.prompt = NSStringFromClass(__class__)
 
     # --- load
-    _fileURLWithPath = NSURL.fileURLWithPath_isDirectory_
-    _path = str(self.indexPath)
-    _parent = str(self.indexPath.parent)
-    loadFileURL = _fileURLWithPath(_path, False)
-    allowingReadAccessToURL = _fileURLWithPath(_parent, True)
+    tmp = nsurl(str(self.locationResource))
+    if (request := NSURLRequest.requestWithURL_(tmp)) and tmp.isFileURL():
+      self.webView.loadFileRequest(
+        request,
+        allowingReadAccessToURL=NSURL.fileURLWithPath(
+          str(self.locationResource.parent),
+          isDirectory=True,
+        ),
+      )
+    else:
+      self.webView.loadRequest_(request)
 
-    self.webView.loadFileURL(
-      loadFileURL,
-      allowingReadAccessToURL=allowingReadAccessToURL,
-    )
-
-    self.view.backgroundColor = UIColor.systemDarkPinkColor()
+    self.view.backgroundColor = UIColor.systemBackgroundColor()
 
     self.setupBarButtonItems()
     self.setupLayoutConstraint()
@@ -476,7 +430,6 @@ class WebViewController(UIViewController):
   @objc_method
   def reLoadWebView_(self, sender):
     self.webView.reload()
-    #self.wkWebView.reloadFromOrigin()
 
   @objc_method
   def refreshWebView_(self, sender):
@@ -494,11 +447,11 @@ class WebViewController(UIViewController):
   @objc_method
   def removeWebViewInputAccessoryView(self):
     # ref: [Objective-Cの黒魔術がよくわからなかったので覗いてみた👻 #Swift - Qiita](https://qiita.com/mopiemon/items/8d0dd7d678c4dadeadd4)
-    #candidateView
     for subview in self.webView.scrollView.subviews():
       if subview.isMemberOfClass_(WKContentView) and (
           inputAccessoryView := subview.inputAccessoryView) is not None:
         inputAccessoryView.removeFromSuperview()
+        inputAccessoryView.setFrame_(CGRectZero)
 
   # --- layout
   @objc_method
@@ -514,17 +467,29 @@ class WebViewController(UIViewController):
 
     centerXAnchor = self.webView.centerXAnchor.constraintEqualToAnchor_(
       safeAreaLayoutGuide.centerXAnchor)
+
     centerYAnchor = self.webView.centerYAnchor.constraintEqualToAnchor_(
       safeAreaLayoutGuide.centerYAnchor)
+    '''
+    centerYAnchor = self.webView.centerYAnchor.constraintEqualToAnchor_(
+      self.view.centerYAnchor)
+    '''
 
     widthAnchor = self.webView.widthAnchor.constraintEqualToAnchor_multiplier_(
       safeAreaLayoutGuide.widthAnchor,
       1.0,
     )
+
     heightAnchor = self.webView.heightAnchor.constraintEqualToAnchor_multiplier_(
       safeAreaLayoutGuide.heightAnchor,
       1.0,
     )
+    '''
+    heightAnchor = self.webView.heightAnchor.constraintEqualToAnchor_multiplier_(
+      self.view.heightAnchor,
+      1.0,
+    )
+    '''
 
     NSLayoutConstraint.activateConstraints_([
       centerXAnchor,
@@ -541,7 +506,8 @@ if __name__ == '__main__':
   ROOT_PATH = Path(__file__).parents[0]
 
   index_path = ROOT_PATH / 'docs/index.html'
-  main_vc = WebViewController.alloc().initWithIndexPath_(index_path)
+  index_path = 'https://pome-ta.github.io/p5js4codemirror6/'
+  main_vc = WebViewController.alloc().initWithLocationResource_(index_path)
 
   presentation_style = UIModalPresentationStyle.fullScreen
   #presentation_style = UIModalPresentationStyle.pageSheet
@@ -550,4 +516,3 @@ if __name__ == '__main__':
   app.present(NavigationController)
 
 
-  
