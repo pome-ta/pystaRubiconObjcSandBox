@@ -1,5 +1,9 @@
 # 📝 2026/01/24
 
+
+
+
+
 ## `enumerations.py` やら`globalVariables.py` やら`functions.py`
 
 [GitHub - madsmtm/objc2: Bindings to Apple frameworks in Rust](https://github.com/madsmtm/objc2)
