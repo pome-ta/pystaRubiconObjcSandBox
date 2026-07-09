@@ -493,7 +493,7 @@ if __name__ == '__main__':
   ROOT_PATH = Path(__file__).parents[0]
 
   index_path = ROOT_PATH / 'docs/index.html'
-  index_path = 'https://pome-ta.github.io/p5js4codemirror6/'
+  #index_path = 'https://pome-ta.github.io/p5js4codemirror6/'
   main_vc = WebViewController.alloc().initWithLocationResource_(index_path)
 
   presentation_style = UIModalPresentationStyle.fullScreen
