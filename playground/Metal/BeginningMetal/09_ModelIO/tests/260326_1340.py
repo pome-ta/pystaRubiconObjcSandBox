@@ -4,7 +4,7 @@
 """
 
 _TOP_DIR_NAME = 'pystaRubiconObjcSandBox'
-_MODULES_DIR_NAME = 'modules'
+_MODULES_DIR_NAME = 'pystaRubiconModules'
 
 # todo: `./{_TOP_DIR_NAME}/{_MODULES_DIR_NAME}` にあるpackage のimport 準備
 if __name__ == '__main__' and not __file__[:__file__.rfind('/')].endswith(
