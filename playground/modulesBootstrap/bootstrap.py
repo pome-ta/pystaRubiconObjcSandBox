@@ -1,9 +1,14 @@
 # Pythonista3 直接実行用、current directory のpath を通す
 
-_CURRENT_DIR_NAME = 'modulesBootstrap'
+_ROOT_DIR_NAME = 'modulesBootstrap'
+_DEV_DIR_NAME = 'app'
 _MODULES_DIR_NAME = 'pystaRubiconModules'
+
 import sys
 
+print(sys.path)
+print('__boot')
+'''
 def hoge(file_path):
   print('hoge')
   print('file_path:')
@@ -19,3 +24,5 @@ def hoge(file_path):
     print(p)
   
   #print(sys.path)
+'''
+
