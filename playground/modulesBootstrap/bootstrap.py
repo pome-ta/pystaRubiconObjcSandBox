@@ -25,7 +25,6 @@ def _main(file_path: str) -> None:
 
   if _dir_path is None:
     raise FileNotFoundError(f'./{_ROOT_DIR_NAME} not found')
-  print(_dir_path)
 
   _setup_module(_dir_path, _MODULES_DIR_NAME)
   _setup_module(_dir_path, _DEV_DIR_NAME)
@@ -48,3 +47,5 @@ def _main(file_path: str) -> None:
 
 _main(__file__)
 
+
+[print(f'- {p}\n') for p in sys.path[:]]
