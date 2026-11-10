@@ -5,38 +5,17 @@ if __name__ == '__main__':
     import pathlib
     import importlib.util
 
-    _MODULE_NAME = 'bootstrap.py'
-    __parent = pathlib.Path(__file__).resolve().parent
-    __target = next((__p / _MODULE_NAME
-                     for __p in [__parent, *__parent.parents]
-                     if (__p / _MODULE_NAME).is_file()), None)
-    __spec = importlib.util.spec_from_file_location(_MODULE_NAME, __target)
-    bootstrap = importlib.util.module_from_spec(__spec)
-    __spec.loader.exec_module(bootstrap)
-'''
-from pathlib import Path
-import importlib.util
+    _BOOTSTRAP_NAME = 'bootstrap.py'
 
-name = 'bootstrap.py'
+    def _bootsetup(file_path: str) -> None:
 
-target = next(
-  (p / name for p in
-   [Path(__file__).resolve().parent, *Path(__file__).resolve().parent.parents]
-   if (p / name).is_file()), None)
+      _path = next((p for _p in pathlib.Path(__file__).resolve().parents
+                    if (p := _p / _BOOTSTRAP_NAME).is_file()), None)
+      _spec = importlib.util.spec_from_file_location(_BOOTSTRAP_NAME, _path)
+      bootstrap = importlib.util.module_from_spec(_spec)
+      _spec.loader.exec_module(bootstrap)
 
-#print(target)
-
-file_path = target
-
-spec = importlib.util.spec_from_file_location(name, file_path)
-bootstrap = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(bootstrap)
+    _bootsetup(__file__)
 
 
-import bootstrap
-
-bootstrap.hoge(__file__)
-'''
-print('')
-print('---main')
-
+from pyrubicon.objc.api import ObjCClass, ObjCProtocol
