@@ -1,9 +1,9 @@
-# Pythonista3 直接実行用、current directory のpath を通す
+# Pythonista3 直接実行用、もろもろのpath の依存関係を通す
 import sys
 import pathlib
 
+_SRC_DIR_NAME = 'app'
 _ROOT_DIR_NAME = 'modulesBootstrap'
-_DEV_DIR_NAME = 'app'
 _MODULES_DIR_NAME = 'pystaRubiconModules'
 
 
@@ -27,7 +27,7 @@ def _main(file_path: str) -> None:
     raise FileNotFoundError(f'./{_ROOT_DIR_NAME} not found')
 
   _setup_module(_dir_path, _MODULES_DIR_NAME)
-  _setup_module(_dir_path, _DEV_DIR_NAME)
+  _setup_module(_dir_path, _SRC_DIR_NAME)
   '''
 
   for _dir_path in pathlib.Path(file_path).resolve().parents:
@@ -44,8 +44,6 @@ def _main(file_path: str) -> None:
       warnings.warn(__warning_message, ImportWarning)
   '''
 
-
+# todo: 副作用的に実行
 _main(__file__)
 
-
-[print(f'- {p}\n') for p in sys.path[:]]
