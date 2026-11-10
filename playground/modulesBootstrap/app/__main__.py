@@ -13,15 +13,12 @@ if __name__ == '__main__':
         next((p for _p in pathlib.Path(__file__).resolve().parents
               if (p := _p / _BOOTSTRAP_NAME).is_file()), None))
       _spec.loader.exec_module(importlib.util.module_from_spec(_spec))
-      '''
-      _path = next((p for _p in pathlib.Path(__file__).resolve().parents
-                    if (p := _p / _BOOTSTRAP_NAME).is_file()), None)
-      _spec = importlib.util.spec_from_file_location(_BOOTSTRAP_NAME, _path)
-      bootstrap = importlib.util.module_from_spec(_spec)
-      _spec.loader.exec_module(bootstrap)
-      '''
 
     _bootsetup(__file__)
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol
-print(_BOOTSTRAP_NAME)
+from sub01.sub0101m import sub0101hoge
+
+#sub0101hoge()
+
+
