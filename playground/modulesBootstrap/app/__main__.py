@@ -17,8 +17,4 @@ if __name__ == '__main__':
     _bootsetup(__file__)
 
 from pyrubicon.objc.api import ObjCClass, ObjCProtocol
-from sub01.sub0101m import sub0101hoge
-
-#sub0101hoge()
-
 
