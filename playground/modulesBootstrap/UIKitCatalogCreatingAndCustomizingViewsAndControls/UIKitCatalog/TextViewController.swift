@@ -125,7 +125,7 @@ class TextViewController: UIViewController {
         let tintedRange = text.range(of: NSLocalizedString("tinted", comment: ""))
         
         // Add bold attribute. Take the current font descriptor and create a new font descriptor with an additional bold trait.
-        let boldFontDescriptor = textView.font!.fontDescriptor.withSymbolicTraits(.traitBold)
+        let boldFontDescriptor = bodyFont.fontDescriptor.withSymbolicTraits(.traitBold)
         let boldFont = UIFont(descriptor: boldFontDescriptor!, size: 0)
         attributedText.addAttribute(NSAttributedString.Key.font, value: boldFont, range: boldRange)
         
@@ -163,11 +163,14 @@ class TextViewController: UIViewController {
         }
         return NSAttributedString(attachment: symbolAttachment)
     }
-    
-    func configureTextView() {
+
+    private var bodyFont: UIFont {
         let bodyFontDescriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: UIFont.TextStyle.body)
-        let bodyFont = UIFont(descriptor: bodyFontDescriptor, size: 0)
-            
+        return UIFont(descriptor: bodyFontDescriptor, size: 0)
+    }
+
+    func configureTextView() {
+
         textView.font = bodyFont
         textView.backgroundColor = UIColor(named: "text_view_background")
         
