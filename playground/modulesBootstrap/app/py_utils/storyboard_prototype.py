@@ -17,7 +17,11 @@ class PrototypeTableViewCell(UITableViewCell):
     print(f'\t\t\t- {NSStringFromClass(__class__)}: dealloc')
 
   @objc_method
-  def initWithStyle_reuseIdentifier_(self, style: NSInteger, reuseIdentifier):
+  def initWithStyle_reuseIdentifier_(
+    self,
+    style: NSInteger,
+    reuseIdentifier,
+  ):
     #print(f'\t\t\t{NSStringFromClass(__class__)}: initWithStyle:reuseIdentifier:')
     super_args = [
       style,
