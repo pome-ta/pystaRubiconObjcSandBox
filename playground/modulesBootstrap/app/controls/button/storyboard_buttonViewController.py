@@ -1,8 +1,10 @@
 if __name__ == '__main__':
   try:
     import bootstrap
+    
   except ModuleNotFoundError:
     import pathlib, importlib.util
+    
     _BOOTSTRAP_NAME = 'bootstrap.py'
 
     def _bootsetup(file_path: str) -> None:
