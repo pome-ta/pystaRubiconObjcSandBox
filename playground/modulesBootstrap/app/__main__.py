@@ -37,7 +37,7 @@ from objc_frameworks.Foundation import NSStringFromClass
 
 from rbedge import pdbr
 
-from controls.button import storyboard_buttonViewController
+#from controls.button import storyboard_buttonViewController
 
 UIViewController = ObjCClass('UIViewController')
 NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
@@ -48,67 +48,97 @@ UIColor = ObjCClass('UIColor')
 class MainViewController(UIViewController):
 
   @objc_method
-  def dealloc(self):
+  def dealloc(self) -> None:
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print(f'\t - {NSStringFromClass(__class__)}: dealloc')
     pass
 
   @objc_method
-  def loadView(self):
-    send_super(__class__, self, 'loadView')
+  def loadView(self) -> None:
+    send_super(
+      __class__,
+      self,
+      'loadView',
+      restype=None,
+    )
 
   @objc_method
-  def viewDidLoad(self):
-    send_super(__class__, self, 'viewDidLoad')
+  def viewDidLoad(self) -> None:
+    send_super(
+      __class__,
+      self,
+      'viewDidLoad',
+      restype=None,
+    )
     self.navigationItem.title = NSStringFromClass(__class__)
 
     self.view.backgroundColor = UIColor.secondarySystemBackgroundColor()
 
   @objc_method
-  def viewWillAppear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewWillAppear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
+  def viewWillAppear_(self, animated: bool) -> None:
+    send_super(
+      __class__,
+      self,
+      'viewWillAppear:',
+      animated,
+      restype=None,
+      argtypes=[
+        ctypes.c_bool,
+      ],
+    )
+    #print(f'{NSStringFromClass(__class__)}: viewWillAppear_')
 
   @objc_method
-  def viewDidAppear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewDidAppear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
+  def viewDidAppear_(self, animated: bool) -> None:
+    send_super(
+      __class__,
+      self,
+      'viewDidAppear:',
+      animated,
+      restype=None,
+      argtypes=[
+        ctypes.c_bool,
+      ],
+    )
+    #print(f'{NSStringFromClass(__class__)}: viewDidAppear_')
 
   @objc_method
-  def viewWillDisappear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewWillDisappear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
+  def viewWillDisappear_(self, animated: bool) -> None:
+    send_super(
+      __class__,
+      self,
+      'viewWillDisappear:',
+      animated,
+      restype=None,
+      argtypes=[
+        ctypes.c_bool,
+      ],
+    )
+    #print(f'{NSStringFromClass(__class__)}: viewWillDisappear_')
 
   @objc_method
-  def viewDidDisappear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewDidDisappear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
-    print(f'\t - {NSStringFromClass(__class__)}: viewDidDisappear')
+  def viewDidDisappear_(self, animated: bool) -> None:
+    send_super(
+      __class__,
+      self,
+      'viewDidDisappear:',
+      animated,
+      restype=None,
+      argtypes=[
+        ctypes.c_bool,
+      ],
+    )
+    #print(f'{NSStringFromClass(__class__)}: viewDidDisappear_')
 
   @objc_method
-  def didReceiveMemoryWarning(self):
-    send_super(__class__, self, 'didReceiveMemoryWarning')
-    print(f'\t{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
+  def didReceiveMemoryWarning(self) -> None:
+    send_super(
+      __class__,
+      self,
+      'didReceiveMemoryWarning',
+      restype=None,
+    )
+    print(f'{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
 
 
 if __name__ == '__main__':

@@ -20,7 +20,8 @@ class App:
     self,
     viewController: UIViewController,
     modalPresentationStyle: Union[UIModalPresentationStyle,
-                                  int] = UIModalPresentationStyle.pageSheet):
+                                  int] = UIModalPresentationStyle.pageSheet,
+  ):
     self.viewController = viewController
     # xxx: style 指定を力技で確認
     _automatic = UIModalPresentationStyle.automatic  # -2
@@ -37,18 +38,23 @@ class App:
     sharedApplication = UIApplication.sharedApplication
     objectEnumerator = sharedApplication.connectedScenes.objectEnumerator()
 
-    while (windowScene := objectEnumerator.nextObject()):
+    windowScene = next(_scene
+                       for _scene in iter(objectEnumerator.nextObject, None)
+                       if _scene.activationState == 0)
 
-      if windowScene.activationState == 0:
-        break
     rootViewController = windowScene.keyWindow.rootViewController
     self.rootViewController = rootViewController
 
-  def present(self, NavigationController=RootNavigationController) -> None:
+  def present(
+    self,
+    NavigationController=RootNavigationController,
+  ) -> None:
 
     @onMainThread(sync=False)
-    def present_viewController(viewController: UIViewController,
-                               style: int) -> None:
+    def present_viewController(
+      viewController: UIViewController,
+      style: int,
+    ) -> None:
 
       presentViewController = NavigationController.alloc(
       ).initWithRootViewController_(viewController)
@@ -56,9 +62,15 @@ class App:
       presentViewController.setModalPresentationStyle_(style)
 
       self.rootViewController.presentViewController_animated_completion_(
-        presentViewController, True, None)
+        presentViewController,
+        True,
+        None,
+      )
 
-    present_viewController(self.viewController, self.modalPresentationStyle)
+    present_viewController(
+      self.viewController,
+      self.modalPresentationStyle,
+    )
     self.main_loop()
 
   def main_loop(self) -> None:

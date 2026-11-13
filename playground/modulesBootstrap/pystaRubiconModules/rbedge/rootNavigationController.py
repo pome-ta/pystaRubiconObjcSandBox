@@ -18,14 +18,19 @@ UIToolbarAppearance = ObjCClass('UIToolbarAppearance')
 class RootNavigationController(UINavigationController):
 
   @objc_method
-  def dealloc(self):
+  def dealloc(self) -> None:
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
-    #print(f'- {NSStringFromClass(__class__)}: dealloc')
+    print(f'- {NSStringFromClass(__class__)}: dealloc')
     loop.stop()
 
   @objc_method
-  def loadView(self):
-    send_super(__class__, self, 'loadView')
+  def loadView(self) -> None:
+    send_super(
+      __class__,
+      self,
+      'loadView',
+      restype=None,
+    )
     #print(f'{NSStringFromClass(__class__)}: loadView')
 
     navigationBarAppearance = UINavigationBarAppearance.new()
@@ -47,63 +52,89 @@ class RootNavigationController(UINavigationController):
     '''
 
   @objc_method
-  def viewDidLoad(self):
-    send_super(__class__, self, 'viewDidLoad')
+  def viewDidLoad(self) -> None:
+    send_super(
+      __class__,
+      self,
+      'viewDidLoad',
+      restype=None,
+    )
     #print(f'{NSStringFromClass(__class__)}: viewDidLoad')
     self.delegate = self
 
   @objc_method
-  def viewWillAppear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewWillAppear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
+  def viewWillAppear_(self, animated: bool) -> None:
+    send_super(
+      __class__,
+      self,
+      'viewWillAppear:',
+      animated,
+      restype=None,
+      argtypes=[
+        ctypes.c_bool,
+      ],
+    )
     #print(f'{NSStringFromClass(__class__)}: viewWillAppear_')
 
   @objc_method
-  def viewDidAppear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewDidAppear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
+  def viewDidAppear_(self, animated: bool) -> None:
+    send_super(
+      __class__,
+      self,
+      'viewDidAppear:',
+      animated,
+      restype=None,
+      argtypes=[
+        ctypes.c_bool,
+      ],
+    )
     #print(f'{NSStringFromClass(__class__)}: viewDidAppear_')
 
   @objc_method
-  def viewWillDisappear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewWillDisappear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
+  def viewWillDisappear_(self, animated: bool) -> None:
+    send_super(
+      __class__,
+      self,
+      'viewWillDisappear:',
+      animated,
+      restype=None,
+      argtypes=[
+        ctypes.c_bool,
+      ],
+    )
     #print(f'{NSStringFromClass(__class__)}: viewWillDisappear_')
 
   @objc_method
-  def viewDidDisappear_(self, animated: bool):
-    send_super(__class__,
-               self,
-               'viewDidDisappear:',
-               animated,
-               argtypes=[
-                 ctypes.c_bool,
-               ])
+  def viewDidDisappear_(self, animated: bool) -> None:
+    send_super(
+      __class__,
+      self,
+      'viewDidDisappear:',
+      animated,
+      restype=None,
+      argtypes=[
+        ctypes.c_bool,
+      ],
+    )
     #print(f'{NSStringFromClass(__class__)}: viewDidDisappear_')
 
   @objc_method
-  def didReceiveMemoryWarning(self):
-    send_super(__class__, self, 'didReceiveMemoryWarning')
+  def didReceiveMemoryWarning(self) -> None:
+    send_super(
+      __class__,
+      self,
+      'didReceiveMemoryWarning',
+      restype=None,
+    )
     print(f'{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
 
   @objc_method
   def navigationController_willShowViewController_animated_(
-      self, navigationController, viewController, animated: bool):
+    self,
+    navigationController,
+    viewController,
+    animated: bool,
+  ) -> None:
     # xxx: layout 範囲の制限
     extendedLayout = UIRectEdge.none
     #viewController.setEdgesForExtendedLayout_(extendedLayout)
@@ -119,6 +150,6 @@ class RootNavigationController(UINavigationController):
     navigationItem.leftBarButtonItem = closeButtonItem
 
   @objc_method
-  def doneButtonTapped_(self, sender):
+  def doneButtonTapped_(self, sender) -> None:
     self.dismissViewControllerAnimated_completion_(True, None)
 
