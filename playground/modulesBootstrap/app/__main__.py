@@ -3,11 +3,10 @@ if __name__ == '__main__':
     import bootstrap
 
   except ModuleNotFoundError:
-    import pathlib, runpy
+    import pathlib, runpy, importlib.util
 
     _BOOTSTRAP_NAME = 'bootstrap.py'
     '''
-
     def _bootsetup(file_path: str) -> None:
       _spec = importlib.util.spec_from_file_location(
         _BOOTSTRAP_NAME,
@@ -17,13 +16,18 @@ if __name__ == '__main__':
 
     _bootsetup(__file__)
     '''
-
+    '''
     try:
       p = next((p for d in pathlib.Path(__file__).resolve().parents
                 if (p := d / _BOOTSTRAP_NAME).is_file()), )
     except StopIteration:
       raise FileNotFoundError("...")
     runpy.run_path(p)
+    '''
+    runpy.run_path(
+      next((_bootstrap_path
+            for _dir_path in pathlib.Path(__file__).resolve().parents
+            if (_bootstrap_path := _dir_path / _BOOTSTRAP_NAME).is_file()), ))
 
 #from pyrubicon.objc.api import ObjCClass, ObjCProtocol
 #import sys
