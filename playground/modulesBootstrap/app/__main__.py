@@ -11,7 +11,7 @@ if __name__ == '__main__':
         (_bootstrap_path for _path in pathlib.Path(__file__).resolve().parents
          if (_bootstrap_path := _path / _BOOTSTRAP_NAME).is_file()), )
     except StopIteration:
-      raise FileNotFoundError(f'{_bootstrap_path} not found')
+      raise FileNotFoundError(f'{_BOOTSTRAP_NAME} not found')
 
     runpy.run_path(_bootstrap_path)
 
