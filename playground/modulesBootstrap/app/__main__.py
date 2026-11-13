@@ -5,19 +5,17 @@ if __name__ == '__main__':
   except ModuleNotFoundError:
     import pathlib, runpy
 
-    _BOOTSTRAP_NAME = 'bootstrap.py'
+    _SCRIPT_NAME = 'bootstrap.py'
     try:
-      next(_bootstrap_path for _dir in pathlib.Path(__file__).resolve().parents
-           if (_bootstrap_path := _dir / _BOOTSTRAP_NAME).is_file())
+      next(_script_path for _dir in pathlib.Path(__file__).resolve().parents
+           if (_script_path := _dir / _SCRIPT_NAME).is_file())
     except StopIteration:
-      raise FileNotFoundError(f'{_BOOTSTRAP_NAME} not found')
+      raise FileNotFoundError(f'{_SCRIPT_NAME} not found')
 
-    runpy.run_path(_bootstrap_path)
+    runpy.run_path(_script_path)
 
 #from pyrubicon.objc.api import ObjCClass, ObjCProtocol
 #import sys
-
-#/private/var/mobile/Containers/Shared/AppGroup/8407487D-7299-4D3D-BAA4-03D6D8587E48/File Provider Storage/Repositories/pystaRubiconObjcSandBox/playground/modulesBootstrap/app/controls/button/storyboard_buttonViewController.py
 
 #[print(f'{p}\n') for p in sys.modules]
 '''
