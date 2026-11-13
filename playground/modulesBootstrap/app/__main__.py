@@ -7,9 +7,8 @@ if __name__ == '__main__':
 
     _BOOTSTRAP_NAME = 'bootstrap.py'
     try:
-      _bootstrap_path = next(
-        (_bootstrap_path for _path in pathlib.Path(__file__).resolve().parents
-         if (_bootstrap_path := _path / _BOOTSTRAP_NAME).is_file()), )
+      next(_bootstrap_path for _dir in pathlib.Path(__file__).resolve().parents
+           if (_bootstrap_path := _dir / _BOOTSTRAP_NAME).is_file())
     except StopIteration:
       raise FileNotFoundError(f'{_BOOTSTRAP_NAME} not found')
 
