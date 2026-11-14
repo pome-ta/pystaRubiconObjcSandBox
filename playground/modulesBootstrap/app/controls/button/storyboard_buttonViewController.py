@@ -1,20 +1,18 @@
 if __name__ == '__main__':
   try:
     import bootstrap
-    
+
   except ModuleNotFoundError:
-    import pathlib, importlib.util
-    
-    _BOOTSTRAP_NAME = 'bootstrap.py'
+    import pathlib, runpy
 
-    def _bootsetup(file_path: str) -> None:
-      _spec = importlib.util.spec_from_file_location(
-        _BOOTSTRAP_NAME,
-        next((p for _p in pathlib.Path(__file__).resolve().parents
-              if (p := _p / _BOOTSTRAP_NAME).is_file()), None))
-      _spec.loader.exec_module(importlib.util.module_from_spec(_spec))
+    _SCRIPT_NAME = 'bootstrap.py'
+    try:
+      next(_script_path for _dir in pathlib.Path(__file__).resolve().parents
+           if (_script_path := _dir / _SCRIPT_NAME).is_file())
+    except StopIteration:
+      raise FileNotFoundError(f'{_SCRIPT_NAME} not found')
 
-    _bootsetup(__file__)
+    runpy.run_path(_script_path)
 
 from py_utils.add_prototype_decorator import (
   CellPrototype,
