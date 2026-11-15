@@ -1,5 +1,5 @@
 from pathlib import Path
-from pyrubicon.objc.api import ObjCClass
+from pyrubicon.objc import ObjCClass  # api
 
 NSURL = ObjCClass('NSURL')
 

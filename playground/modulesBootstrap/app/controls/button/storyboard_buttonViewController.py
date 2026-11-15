@@ -24,3 +24,5 @@ from py_utils.storyboard_prototype import PrototypeTableViewCell
 prototypes: list[CellPrototype] = []
 add_prototype = create_prototype_decorator(prototypes)
 
+
+

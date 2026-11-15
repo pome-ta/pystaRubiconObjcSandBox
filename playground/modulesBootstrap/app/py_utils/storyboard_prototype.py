@@ -36,7 +36,7 @@ class PrototypeTableViewCell(UITableViewCell):
       objc_id,
     ]
 
-    send_super(
+    self = send_super(
       __class__,
       self,
       'initWithStyle:reuseIdentifier:',

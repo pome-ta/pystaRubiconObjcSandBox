@@ -1,8 +1,11 @@
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass
-from pyrubicon.objc.api import objc_method, objc_property
-from pyrubicon.objc.runtime import send_super, SEL
+from pyrubicon.objc import (
+  ObjCClass,
+  objc_method,
+  objc_property,
+)  # api
+from pyrubicon.objc import send_super, SEL  # runtime
 
 from objc_frameworks.UIKit import UIRectEdge, UIBarButtonSystemItem
 from objc_frameworks.Foundation import NSStringFromClass
@@ -142,7 +145,8 @@ class RootNavigationController(UINavigationController):
     closeButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItem(
       UIBarButtonSystemItem.close,
       target=navigationController,
-      action=SEL('doneButtonTapped:'))
+      action=SEL('doneButtonTapped:'),
+    )
 
     # todo: view 遷移でのButton 重複を判別
     visibleViewController = navigationController.visibleViewController

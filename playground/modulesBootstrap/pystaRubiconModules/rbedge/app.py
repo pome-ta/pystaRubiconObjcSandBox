@@ -1,6 +1,6 @@
 from typing import Union
 
-from pyrubicon.objc.api import ObjCClass
+from pyrubicon.objc import ObjCClass  # api
 
 from objc_frameworks.UIKit import UIModalPresentationStyle
 

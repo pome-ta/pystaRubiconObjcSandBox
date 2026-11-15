@@ -1,7 +1,12 @@
 import functools
 
-from pyrubicon.objc.api import Block, ObjCClass, ObjCInstance
-from pyrubicon.objc.runtime import libobjc, objc_block, objc_id
+from pyrubicon.objc import (
+  Block,
+  ObjCClass,
+  ObjCInstance,
+)  # api
+from pyrubicon.objc import objc_block, objc_id  # runtime
+from pyrubicon.objc.runtime import libobjc
 
 from objc_frameworks.Dispatch import (
   dispatch_get_main_queue,

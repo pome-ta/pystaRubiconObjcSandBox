@@ -4,7 +4,11 @@ import sys
 import os
 import ctypes
 
-from pyrubicon.objc.api import ObjCClass, ObjCProtocol, ObjCInstance
+from pyrubicon.objc import (
+  ObjCClass,
+  ObjCProtocol,
+  ObjCInstance,
+)  # api
 from pyrubicon.objc.runtime import Foundation
 
 ObjCClass.auto_rename = True
