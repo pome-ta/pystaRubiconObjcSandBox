@@ -1,5 +1,3 @@
-from typing import Union
-
 from pyrubicon.objc import ObjCClass  # api
 
 from objc_frameworks.UIKit import UIModalPresentationStyle
@@ -19,8 +17,8 @@ class App:
   def __init__(
     self,
     viewController: UIViewController,
-    modalPresentationStyle: Union[UIModalPresentationStyle,
-                                  int] = UIModalPresentationStyle.pageSheet,
+    modalPresentationStyle: UIModalPresentationStyle
+    | int = UIModalPresentationStyle.pageSheet,
   ):
     self.viewController = viewController
     # xxx: style 指定を力技で確認
