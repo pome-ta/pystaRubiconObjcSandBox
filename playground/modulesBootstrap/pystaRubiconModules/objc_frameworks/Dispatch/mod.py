@@ -2,7 +2,10 @@ import ctypes
 import functools
 
 from pyrubicon.objc.api import ObjCInstance
-from pyrubicon.objc.runtime import libobjc, objc_block, objc_id
+from pyrubicon.objc.runtime import libobjc, objc_block, objc_id, load_library
+
+libSystem = load_library('System')
+
 
 dispatch_time_t = ctypes.c_uint64
 
@@ -15,8 +18,8 @@ class struct_dispatch_queue_s(ctypes.Structure):
   pass  # No _fields_, because this is an opaque structure.
 
 
-_dispatch_main_q = struct_dispatch_queue_s.in_dll(libobjc, '_dispatch_main_q')
-
+#_dispatch_main_q = struct_dispatch_queue_s.in_dll(libobjc, '_dispatch_main_q')
+_dispatch_main_q = struct_dispatch_queue_s.in_dll(libSystem, '_dispatch_main_q')
 
 def dispatch_get_main_queue():
   return ObjCInstance(ctypes.cast(ctypes.byref(_dispatch_main_q), objc_id))
@@ -26,7 +29,8 @@ def dispatch_sync(queue, block_obj:objc_block):
   try:
     _func = dispatch_sync._cfunc
   except AttributeError:
-    _func = libobjc.dispatch_sync
+    #_func = libobjc.dispatch_sync
+    _func = libSystem.dispatch_sync
     _func.restype = None
     _func.argtypes = [
       objc_id,
@@ -41,7 +45,8 @@ def dispatch_async(queue, block_obj:objc_block):
   try:
     _func = dispatch_async._cfunc
   except AttributeError:
-    _func = libobjc.dispatch_async
+    #_func = libobjc.dispatch_async
+    _func = libSystem.dispatch_async
     _func.restype = None
     _func.argtypes = [
       objc_id,
@@ -71,7 +76,8 @@ def dispatch_semaphore_wait(dsema: ObjCInstance, timeout: int = None) -> int:
   try:
     _func = dispatch_semaphore_wait._cfunc
   except AttributeError:
-    _func = libobjc.dispatch_semaphore_wait
+    #_func = libobjc.dispatch_semaphore_wait
+    _func = libSystem.dispatch_semaphore_wait
     _func.restype = ctypes.c_long
     _func.argtypes = [
       objc_id,
@@ -88,7 +94,8 @@ def dispatch_semaphore_signal(dsema: ObjCInstance) -> int:
   try:
     _func = dispatch_semaphore_signal._cfunc
   except AttributeError:
-    _func = libobjc.dispatch_semaphore_signal
+    #_func = libobjc.dispatch_semaphore_signal
+    _func = libSystem.dispatch_semaphore_signal
     _func.restype = ctypes.c_long
     _func.argtypes = [
       objc_id,
