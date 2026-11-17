@@ -39,7 +39,7 @@ import os
 # todo: mainThread ##########################################
 import functools
 from pyrubicon.objc import objc_block  # runtime
-from pyrubicon.objc.runtime import load_library
+from pyrubicon.objc.runtime import load_library, libobjc
 from rbedge import pdbr
 
 ObjCClass.auto_rename = True
@@ -54,7 +54,7 @@ loop = RubiconEventLoop()
 #############################################################
 # --- mainThread
 #############################################################
-libSystem = load_library('System')
+#libSystem = load_library('System')
 NSThread = ObjCClass('NSThread')
 
 
@@ -62,38 +62,30 @@ class struct_dispatch_queue_s(ctypes.Structure):
   pass  # No _fields_, because this is an opaque structure.
 
 
-_dispatch_main_q = struct_dispatch_queue_s.in_dll(libSystem,
-                                                  '_dispatch_main_q')
-
+_dispatch_main_q = struct_dispatch_queue_s.in_dll(libobjc, '_dispatch_main_q')
+#_dispatch_main_q = struct_dispatch_queue_s.in_dll(libSystem, '_dispatch_main_q')
 
 def dispatch_get_main_queue():
   return ObjCInstance(ctypes.cast(ctypes.byref(_dispatch_main_q), objc_id))
 
 
-'''
-libobjc.dispatch_async.restype = None
-libobjc.dispatch_async.argtypes = [
-  objc_id,
-  objc_block,
-]
-'''
 
 
-def dispatch_async(queue, block_obj: objc_block):
+def dispatch_async(queue, block_obj:objc_block):
   try:
     _func = dispatch_async._cfunc
   except AttributeError:
-    _func = libSystem.dispatch_async
+    _func = libobjc.dispatch_async
+    #_func = libSystem.dispatch_async
     _func.restype = None
     _func.argtypes = [
       objc_id,
       objc_block,
     ]
     dispatch_async._cfunc = _func
-
+  
   _func(queue, block_obj)
-
-
+  
 def onMainThread(func):
 
   @functools.wraps(func)
