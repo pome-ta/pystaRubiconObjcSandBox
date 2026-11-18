@@ -14,13 +14,13 @@ if __name__ == '__main__':
 
     runpy.run_path(_script_path)
 
-
 import ctypes
 
 from pyrubicon.objc import (
   Block,
   ObjCClass,
   ObjCInstance,
+  ObjCProtocol,
   objc_method,
 )  # api
 from pyrubicon.objc import (
@@ -169,8 +169,15 @@ UINavigationController = ObjCClass('UINavigationController')
 UINavigationBarAppearance = ObjCClass('UINavigationBarAppearance')
 UIBarButtonItem = ObjCClass('UIBarButtonItem')
 
+UINavigationControllerDelegate = ObjCProtocol('UINavigationControllerDelegate')
 
-class RootNavigationController(UINavigationController):
+
+class RootNavigationController(
+    UINavigationController,
+    protocols=[
+      UINavigationControllerDelegate,
+    ],
+):
 
   @objc_method
   def dealloc(self) -> None:
@@ -278,7 +285,6 @@ class RootNavigationController(UINavigationController):
       loop.stop()
       #loop.close()
       print('--- stop')
-
 
   @objc_method
   def didReceiveMemoryWarning(self) -> None:
@@ -407,7 +413,6 @@ class MainViewController(UIViewController):
       ],
     )
     print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
-
 
   @objc_method
   def didReceiveMemoryWarning(self) -> None:
