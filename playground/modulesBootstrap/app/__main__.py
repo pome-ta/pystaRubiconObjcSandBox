@@ -95,7 +95,7 @@ NSSetUncaughtExceptionHandler(_handler)
 #############################################################
 # --- lifeCycle
 #############################################################
-#loop = RubiconEventLoop()
+loop = RubiconEventLoop()
 
 
 @functools.lru_cache(maxsize=1)
@@ -446,7 +446,7 @@ class App:
       self.modalPresentationStyle,
     )
 
-    #self._main_loop()
+    self._main_loop()
 
   def _main_loop(self) -> None:
     # >>> (4) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -472,6 +472,7 @@ def run_present(
 
 @onMainThread
 def main_call():
+  
   print('--- run ---')
   main_vc = MainViewController.new()
   presentation_style = 1
@@ -482,5 +483,6 @@ def main_call():
 
 
 if __name__ == '__main__':
+  #get_loop()
   main_call()
 
