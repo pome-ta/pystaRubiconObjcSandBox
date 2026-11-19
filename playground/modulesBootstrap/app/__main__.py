@@ -253,7 +253,7 @@ class RootNavigationController(UINavigationController):
     if self.isBeingDismissed:
       # >>> (5) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
       #loop.stop()
-      loop.call_later(0.2, loop.stop)
+      loop.call_later(0.1, loop.stop)
       #pass
 
   @objc_method
@@ -416,6 +416,7 @@ class App:
     self.rootViewController = rootViewController
 
   def present(self) -> None:
+    print('present')
 
     # >>> (2) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     @onMainThread
@@ -436,10 +437,12 @@ class App:
       #_keep_alive.append(presentController)
 
     # >>> (3) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
     present_viewController(
       self.viewController,
       self.modalPresentationStyle,
     )
+
     self._main_loop()
 
   def _main_loop(self) -> None:
@@ -450,6 +453,7 @@ class App:
       loop.run_forever()
     except Exception as e:
       print(e)
+    print('call_later')
     #loop.close()
 
 
