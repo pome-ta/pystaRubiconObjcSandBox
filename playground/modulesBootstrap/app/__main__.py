@@ -95,7 +95,7 @@ NSSetUncaughtExceptionHandler(_handler)
 #############################################################
 # --- lifeCycle
 #############################################################
-loop = RubiconEventLoop()
+#loop = RubiconEventLoop()
 
 
 @functools.lru_cache(maxsize=1)
@@ -253,7 +253,10 @@ class RootNavigationController(UINavigationController):
     if self.isBeingDismissed:
       # >>> (5) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
       #loop.stop()
-      loop.call_later(0.1, loop.stop)
+      try:
+        loop.call_later(0.1, loop.stop)
+      except Exception as e:
+        pass
       #pass
 
   @objc_method
@@ -419,7 +422,7 @@ class App:
     print('present')
 
     # >>> (2) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    @onMainThread
+    #@onMainThread
     def present_viewController(
       viewController: UIViewController,
       style: int,
@@ -443,7 +446,7 @@ class App:
       self.modalPresentationStyle,
     )
 
-    self._main_loop()
+    #self._main_loop()
 
   def _main_loop(self) -> None:
     # >>> (4) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -457,7 +460,18 @@ class App:
     #loop.close()
 
 
-if __name__ == '__main__':
+def run_present(
+  viewControllerClass: ObjCClass,
+  modalPresentationStyle=1,
+):
+
+  @onMainThread
+  def main_thread_call():
+    pass
+
+
+@onMainThread
+def main_call():
   print('--- run ---')
   main_vc = MainViewController.new()
   presentation_style = 1
@@ -465,4 +479,8 @@ if __name__ == '__main__':
   app.present()
   print('--- end ---')
   # >>> (6) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+if __name__ == '__main__':
+  main_call()
 
