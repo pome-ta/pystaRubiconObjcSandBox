@@ -430,7 +430,7 @@ class App:
         True,
         None,
       )
-      #_keep_alive.append(self.rootViewController)
+      # _keep_alive.append(presentController)
 
     # >>> (3) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -459,11 +459,11 @@ def main_call():
 
 
 if __name__ == '__main__':
-  #main_call()
-  print('--- run ---')
-  main_vc = MainViewController.new()
-  presentation_style = 1
-  app = App(main_vc, presentation_style)
-  app.present()
-  print('--- end ---')
+  main_call()
+  # print('--- run ---')
+  # main_vc = MainViewController.new()
+  # presentation_style = 1
+  # app = App(main_vc, presentation_style)
+  # app.present()
+  # print('--- end ---')
 
