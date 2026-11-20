@@ -30,6 +30,7 @@ from pyrubicon.objc import (
 # todo: utils ###############################################
 from pyrubicon.objc.runtime import Class, Foundation
 # todo: lifeCycle ###########################################
+import threading
 from pyrubicon.objc.eventloop import RubiconEventLoop
 # todo: exception ###########################################
 import sys
@@ -102,11 +103,9 @@ NSSetUncaughtExceptionHandler(_handler)
 #############################################################
 # --- lifeCycle
 #############################################################
-
-is_get_loop = 0
-
+'''
+is_get_loop = 1
 #loop = RubiconEventLoop()
-
 if is_get_loop:
 
   @functools.lru_cache(maxsize=1)
@@ -117,6 +116,9 @@ if is_get_loop:
     return loop
 else:
   loop = RubiconEventLoop()
+'''
+
+_dismissed = threading.Event()
 
 #############################################################
 # --- mainThread
@@ -183,6 +185,7 @@ class RootNavigationController(UINavigationController):
   def dealloc(self) -> None:
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print(f'- {NSStringFromClass(__class__)}: dealloc')
+
 
   @objc_method
   def loadView(self) -> None:
@@ -264,6 +267,7 @@ class RootNavigationController(UINavigationController):
     print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
     if self.isBeingDismissed:
       # >>> (5) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+      '''
       #loop.stop()
       try:
         if is_get_loop:
@@ -274,6 +278,12 @@ class RootNavigationController(UINavigationController):
       except Exception as e:
         pass
       #pass
+      '''
+      
+      thread_block = Block(_dismissed.set, None)
+      _keep_alive.append(thread_block)  # dispatch 完了まで GC 防止
+      dispatch_async(dispatch_get_main_queue(), thread_block)
+      
 
   @objc_method
   def closeButtonTapped_(self, sender) -> None:
@@ -435,6 +445,7 @@ class App:
     self.rootViewController = rootViewController
 
   def present(self) -> None:
+
     print('present')
 
     # >>> (2) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -461,7 +472,30 @@ class App:
       self.modalPresentationStyle,
     )
 
-    self._main_loop()
+    #self._main_loop()
+    #self._wait_dismiss()
+    self._wait_dismiss()
+
+  def _wait_dismiss(self) -> None:
+    _dismissed.wait()  # コマンドスレッドを寝かせて生存維持
+
+    def release_all():
+      _keep_alive.clear()
+
+    if NSThread.isMainThread:
+      release_all()
+    else:
+      done = threading.Event()
+      done_block = Block(lambda: (release_all(), done.set()), None)
+      _keep_alive.append(done_block)  # block 自身の GC 防止
+      dispatch_async(dispatch_get_main_queue(), done_block)
+      done.wait()
+      _keep_alive.clear()  # block の掃除(dealloc 済みなので安全)
+
+    #stop_block = Block(_dismissed.set, None)
+    #_keep_alive.append(stop_block)
+    #dispatch_async(dispatch_get_main_queue(), stop_block)
+    #_dismissed.clear()
 
   def _main_loop(self) -> None:
     # >>> (4) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
