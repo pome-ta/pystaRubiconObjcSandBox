@@ -169,7 +169,6 @@ class RootNavigationController(UINavigationController):
   def dealloc(self) -> None:
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print(f'- {NSStringFromClass(__class__)}: dealloc')
-    
 
   @objc_method
   def loadView(self) -> None:
@@ -252,7 +251,6 @@ class RootNavigationController(UINavigationController):
     if self.isBeingDismissed:
       # >>> (5) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
       loop.call_later(0.2, loop.stop)
-      
 
   @objc_method
   def closeButtonTapped_(self, sender) -> None:
@@ -390,6 +388,8 @@ _keep_alive = []
 
 
 class App:
+  viewController: UIViewController
+  presentController: UINavigationController
 
   def __init__(
     self,
@@ -417,16 +417,14 @@ class App:
     print('present')
     # >>> (2) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     @onMainThread
-    def present_viewController(
-      viewController: UIViewController,
-      style: int,
-    ) -> None:
-      presentController = RootNavigationController.alloc(
-      ).initWithRootViewController_(viewController)
+    def present_viewController() -> None:
+      self.presentController = RootNavigationController.alloc(
+      ).initWithRootViewController_(self.viewController)
 
-      presentController.setModalPresentationStyle_(style)
+      self.presentController.setModalPresentationStyle_(
+        self.modalPresentationStyle)
       self.rootViewController.presentViewController_animated_completion_(
-        presentController,
+        self.presentController,
         True,
         None,
       )
@@ -434,10 +432,7 @@ class App:
 
     # >>> (3) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-    present_viewController(
-      self.viewController,
-      self.modalPresentationStyle,
-    )
+    present_viewController()
 
     self._main_loop()
 
@@ -449,12 +444,44 @@ class App:
     #_keep_alive.clear()
 
 
+def present_viewController(
+  viewController: UIViewController,
+  modalPresentationStyle: int = 1,
+  NavigationControllerClass: ObjCClass = RootNavigationController,
+) -> None:
+
+  @onMainThread
+  def main_thread_present() -> None:
+    sharedApplication = UIApplication.sharedApplication
+    objectEnumerator = sharedApplication.connectedScenes.objectEnumerator()
+
+    windowScene = next(_scene
+                       for _scene in iter(objectEnumerator.nextObject, None)
+                       if _scene.activationState == 0)
+
+    rootViewController = windowScene.keyWindow.rootViewController
+
+    presentController = NavigationControllerClass.alloc(
+    ).initWithRootViewController_(viewController)
+    presentController.setModalPresentationStyle_(modalPresentationStyle)
+    rootViewController.presentViewController_animated_completion_(
+      presentController,
+      True,
+      None,
+    )
+
+  main_thread_present()
+  print('s: --- main_loop')
+  loop.run_forever()
+  print('e: --- main_loop')
+
 def main_call():
   print('--- run ---')
-  main_vc = MainViewController.new()
+  #main_vc = MainViewController.new()
   presentation_style = 1
-  app = App(main_vc, presentation_style)
-  app.present()
+  #app = App(main_vc, presentation_style)
+  #app.present()
+  present_viewController(MainViewController.new(), presentation_style)
   print('--- end ---')
 
 
