@@ -31,7 +31,7 @@ from pyrubicon.objc import (
 from pyrubicon.objc.runtime import Class, Foundation
 # todo: lifeCycle ###########################################
 import threading
-from pyrubicon.objc.eventloop import RubiconEventLoop
+from pyrubicon.objc.eventloop import RubiconEventLoop, iOSLifecycle
 # todo: exception ###########################################
 import sys
 import os
@@ -44,6 +44,9 @@ from pyrubicon.objc.runtime import load_library
 from rbedge import pdbr
 
 ObjCClass.auto_rename = True
+
+
+
 
 
 #############################################################
@@ -103,23 +106,24 @@ NSSetUncaughtExceptionHandler(_handler)
 #############################################################
 # --- lifeCycle
 #############################################################
-'''
-is_get_loop = 1
+
+is_get_loop = 0
 #loop = RubiconEventLoop()
+#loop.run_forever_cooperatively(lifecycle=iOSLifecycle())
 if is_get_loop:
 
   @functools.lru_cache(maxsize=1)
   def get_loop():
     loop = RubiconEventLoop()
     if not loop.is_running():
-      loop.run_forever_cooperatively()
+      loop.run_forever_cooperatively(lifecycle=iOSLifecycle())
     return loop
 else:
   loop = RubiconEventLoop()
 '''
 
 _dismissed = threading.Event()
-
+'''
 #############################################################
 # --- mainThread
 #############################################################
@@ -267,7 +271,7 @@ class RootNavigationController(UINavigationController):
     print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
     if self.isBeingDismissed:
       # >>> (5) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-      '''
+      
       #loop.stop()
       try:
         if is_get_loop:
@@ -278,11 +282,11 @@ class RootNavigationController(UINavigationController):
       except Exception as e:
         pass
       #pass
-      '''
       
-      thread_block = Block(_dismissed.set, None)
-      _keep_alive.append(thread_block)  # dispatch 完了まで GC 防止
-      dispatch_async(dispatch_get_main_queue(), thread_block)
+      
+      #thread_block = Block(_dismissed.set, None)
+      #_keep_alive.append(thread_block)  # dispatch 完了まで GC 防止
+      #dispatch_async(dispatch_get_main_queue(), thread_block)
       
 
   @objc_method
@@ -445,9 +449,7 @@ class App:
     self.rootViewController = rootViewController
 
   def present(self) -> None:
-
     print('present')
-
     # >>> (2) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     @onMainThread
     def present_viewController(
@@ -463,7 +465,7 @@ class App:
         True,
         None,
       )
-      _keep_alive.append(presentController)
+      #_keep_alive.append(presentController)
 
     # >>> (3) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -472,9 +474,9 @@ class App:
       self.modalPresentationStyle,
     )
 
-    #self._main_loop()
+    self._main_loop()
     #self._wait_dismiss()
-    self._wait_dismiss()
+    #self._wait_dismiss()
 
   def _wait_dismiss(self) -> None:
     _dismissed.wait()  # コマンドスレッドを寝かせて生存維持
@@ -510,7 +512,7 @@ class App:
       print('call_later')
       #loop.close()
     print('e: --- main_loop')
-    _keep_alive.clear()
+    #_keep_alive.clear()
 
 
 def main_call():
