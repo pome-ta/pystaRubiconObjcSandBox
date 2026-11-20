@@ -38,7 +38,7 @@ import os
 import functools
 from pyrubicon.objc import Block  # api
 from pyrubicon.objc import objc_block  # runtime
-from pyrubicon.objc.runtime import load_library, autoreleasepool
+from pyrubicon.objc.runtime import load_library
 
 from rbedge import pdbr
 
@@ -62,6 +62,13 @@ def NSStringFromClass(cls: Class) -> ObjCInstance:
 #############################################################
 # --- exception
 #############################################################
+
+import faulthandler
+
+_fh_file = open(
+  os.path.expanduser('~/Documents/_rubicon_objc_faulthandler.txt'), 'w')
+faulthandler.enable(_fh_file)
+
 # todo: from objc_util.py of Pythonista3
 #  呼び出し方法と出力先を調整
 #    - `~/Documents/_objc_exception.txt`
@@ -95,16 +102,21 @@ NSSetUncaughtExceptionHandler(_handler)
 #############################################################
 # --- lifeCycle
 #############################################################
-loop = RubiconEventLoop()
 
+is_get_loop = 0
 
-@functools.lru_cache(maxsize=1)
-def get_loop():
+#loop = RubiconEventLoop()
+
+if is_get_loop:
+
+  @functools.lru_cache(maxsize=1)
+  def get_loop():
+    loop = RubiconEventLoop()
+    if not loop.is_running():
+      loop.run_forever_cooperatively()
+    return loop
+else:
   loop = RubiconEventLoop()
-  if not loop.is_running():
-    loop.run_forever_cooperatively()
-  return loop
-
 
 #############################################################
 # --- mainThread
@@ -254,7 +266,11 @@ class RootNavigationController(UINavigationController):
       # >>> (5) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
       #loop.stop()
       try:
-        loop.call_later(0.1, loop.stop)
+        if is_get_loop:
+          pass
+        else:
+          loop.call_later(0.2, loop.stop)
+
       except Exception as e:
         pass
       #pass
@@ -422,12 +438,11 @@ class App:
     print('present')
 
     # >>> (2) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    #@onMainThread
+    @onMainThread
     def present_viewController(
       viewController: UIViewController,
       style: int,
     ) -> None:
-      #self._main_loop()
       presentController = RootNavigationController.alloc(
       ).initWithRootViewController_(viewController)
 
@@ -437,7 +452,7 @@ class App:
         True,
         None,
       )
-      #_keep_alive.append(presentController)
+      _keep_alive.append(presentController)
 
     # >>> (3) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -450,39 +465,29 @@ class App:
 
   def _main_loop(self) -> None:
     # >>> (4) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    #get_loop()
-
-    try:
-      loop.run_forever()
-    except Exception as e:
-      print(e)
-    print('call_later')
-    #loop.close()
-
-
-def run_present(
-  viewControllerClass: ObjCClass,
-  modalPresentationStyle=1,
-):
-
-  @onMainThread
-  def main_thread_call():
-    pass
+    print('s: --- main_loop')
+    if is_get_loop:
+      get_loop()
+    else:
+      try:
+        loop.run_forever()
+      except Exception as e:
+        print(e)
+      print('call_later')
+      #loop.close()
+    print('e: --- main_loop')
+    _keep_alive.clear()
 
 
-@onMainThread
 def main_call():
-  
   print('--- run ---')
   main_vc = MainViewController.new()
   presentation_style = 1
   app = App(main_vc, presentation_style)
   app.present()
   print('--- end ---')
-  # >>> (6) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
 if __name__ == '__main__':
-  #get_loop()
   main_call()
 
