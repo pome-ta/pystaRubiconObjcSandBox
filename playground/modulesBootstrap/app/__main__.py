@@ -30,8 +30,7 @@ from pyrubicon.objc import (
 # todo: utils ###############################################
 from pyrubicon.objc.runtime import Class, Foundation
 # todo: lifeCycle ###########################################
-import threading
-from pyrubicon.objc.eventloop import RubiconEventLoop, iOSLifecycle
+from pyrubicon.objc.eventloop import RubiconEventLoop
 # todo: exception ###########################################
 import sys
 import os
@@ -44,9 +43,6 @@ from pyrubicon.objc.runtime import load_library
 from rbedge import pdbr
 
 ObjCClass.auto_rename = True
-
-
-
 
 
 #############################################################
@@ -106,24 +102,8 @@ NSSetUncaughtExceptionHandler(_handler)
 #############################################################
 # --- lifeCycle
 #############################################################
+loop = RubiconEventLoop()
 
-is_get_loop = 0
-#loop = RubiconEventLoop()
-#loop.run_forever_cooperatively(lifecycle=iOSLifecycle())
-if is_get_loop:
-
-  @functools.lru_cache(maxsize=1)
-  def get_loop():
-    loop = RubiconEventLoop()
-    if not loop.is_running():
-      loop.run_forever_cooperatively(lifecycle=iOSLifecycle())
-    return loop
-else:
-  loop = RubiconEventLoop()
-'''
-
-_dismissed = threading.Event()
-'''
 #############################################################
 # --- mainThread
 #############################################################
@@ -189,7 +169,7 @@ class RootNavigationController(UINavigationController):
   def dealloc(self) -> None:
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print(f'- {NSStringFromClass(__class__)}: dealloc')
-
+    
 
   @objc_method
   def loadView(self) -> None:
@@ -209,7 +189,7 @@ class RootNavigationController(UINavigationController):
       'viewDidLoad',
       restype=None,
     )
-    print(f'\t{NSStringFromClass(__class__)}: viewDidLoad')
+    print(f'{NSStringFromClass(__class__)}: viewDidLoad')
     self.delegate = self
 
   @objc_method
@@ -268,25 +248,10 @@ class RootNavigationController(UINavigationController):
         ctypes.c_bool,
       ],
     )
-    print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
+    print(f'{NSStringFromClass(__class__)}: viewDidDisappear_')
     if self.isBeingDismissed:
       # >>> (5) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-      
-      #loop.stop()
-      try:
-        if is_get_loop:
-          pass
-        else:
-          loop.call_later(0.2, loop.stop)
-
-      except Exception as e:
-        pass
-      #pass
-      
-      
-      #thread_block = Block(_dismissed.set, None)
-      #_keep_alive.append(thread_block)  # dispatch 完了まで GC 防止
-      #dispatch_async(dispatch_get_main_queue(), thread_block)
+      loop.call_later(0.2, loop.stop)
       
 
   @objc_method
@@ -465,7 +430,7 @@ class App:
         True,
         None,
       )
-      #_keep_alive.append(presentController)
+      #_keep_alive.append(self.rootViewController)
 
     # >>> (3) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -475,42 +440,11 @@ class App:
     )
 
     self._main_loop()
-    #self._wait_dismiss()
-    #self._wait_dismiss()
-
-  def _wait_dismiss(self) -> None:
-    _dismissed.wait()  # コマンドスレッドを寝かせて生存維持
-
-    def release_all():
-      _keep_alive.clear()
-
-    if NSThread.isMainThread:
-      release_all()
-    else:
-      done = threading.Event()
-      done_block = Block(lambda: (release_all(), done.set()), None)
-      _keep_alive.append(done_block)  # block 自身の GC 防止
-      dispatch_async(dispatch_get_main_queue(), done_block)
-      done.wait()
-      _keep_alive.clear()  # block の掃除(dealloc 済みなので安全)
-
-    #stop_block = Block(_dismissed.set, None)
-    #_keep_alive.append(stop_block)
-    #dispatch_async(dispatch_get_main_queue(), stop_block)
-    #_dismissed.clear()
 
   def _main_loop(self) -> None:
     # >>> (4) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     print('s: --- main_loop')
-    if is_get_loop:
-      get_loop()
-    else:
-      try:
-        loop.run_forever()
-      except Exception as e:
-        print(e)
-      print('call_later')
-      #loop.close()
+    loop.run_forever()
     print('e: --- main_loop')
     #_keep_alive.clear()
 
@@ -525,5 +459,11 @@ def main_call():
 
 
 if __name__ == '__main__':
-  main_call()
+  #main_call()
+  print('--- run ---')
+  main_vc = MainViewController.new()
+  presentation_style = 1
+  app = App(main_vc, presentation_style)
+  app.present()
+  print('--- end ---')
 
