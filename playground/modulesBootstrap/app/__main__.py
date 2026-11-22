@@ -388,10 +388,9 @@ _keep_alive = []
 
 
 class App:
-  
-  viewController: UIViewController
-  rootViewController:UIViewController
 
+  viewController: UIViewController
+  rootViewController: UIViewController
 
   def __init__(
     self,
@@ -415,7 +414,10 @@ class App:
     rootViewController = windowScene.keyWindow.rootViewController
     self.rootViewController = rootViewController
 
-  def present(self, NavigationControllerClass: ObjCClass = RootNavigationController,) -> None:
+  def present(
+    self,
+    NavigationControllerClass: ObjCClass = RootNavigationController,
+  ) -> None:
     print('present')
     # >>> (2) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     @onMainThread
@@ -423,14 +425,13 @@ class App:
       presentController = NavigationControllerClass.alloc(
       ).initWithRootViewController_(self.viewController)
 
-      presentController.setModalPresentationStyle_(
-        self.modalPresentationStyle)
+      presentController.setModalPresentationStyle_(self.modalPresentationStyle)
       self.rootViewController.presentViewController_animated_completion_(
-        self.presentController,
+        presentController,
         True,
         None,
       )
-      # _keep_alive.append(presentController)
+      _keep_alive.append(presentController)
 
     # >>> (3) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -444,6 +445,7 @@ class App:
     loop.run_forever()
     print('e: --- main_loop')
     #_keep_alive.clear()
+    
 
 
 def present_viewController(
@@ -471,11 +473,14 @@ def present_viewController(
       True,
       None,
     )
+    _keep_alive.append(presentController)
 
   main_thread_present()
   print('s: --- main_loop')
   loop.run_forever()
   print('e: --- main_loop')
+
+    
 
 
 def main_call():
