@@ -445,7 +445,6 @@ class App:
     loop.run_forever()
     print('e: --- main_loop')
     #_keep_alive.clear()
-    
 
 
 def present_viewController(
@@ -479,8 +478,6 @@ def present_viewController(
   print('s: --- main_loop')
   loop.run_forever()
   print('e: --- main_loop')
-
-    
 
 
 def main_call():
