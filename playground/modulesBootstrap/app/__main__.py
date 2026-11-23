@@ -18,9 +18,11 @@ import ctypes
 
 # todo: main ###############################################
 from pyrubicon.objc import (
+  NSObject,
   ObjCClass,
   ObjCInstance,
   objc_method,
+  objc_property,
 )  # api
 from pyrubicon.objc import (
   SEL,
@@ -480,18 +482,34 @@ def present_viewController(
   print('e: --- main_loop')
 
 
+class Application(NSObject):
+
+  viewController: UIViewController = objc_property(ObjCInstance)
+  navigationControllerClass: UIViewController = objc_property(ObjCClass)
+  rootViewController: UIViewController = objc_property(ObjCInstance)
+  presentController: UIViewController = objc_property(ObjCInstance)
+
+
+  @objc_method
+  def dealloc(self) -> None:
+    # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
+    print(f'- {NSStringFromClass(__class__)}: dealloc')
+
+
 def main_call():
   print('--- run ---')
   #main_vc = MainViewController.new()
   presentation_style = 1
   #app = App(main_vc, presentation_style)
   #app.present()
-  present_viewController(MainViewController.new(), presentation_style)
+  #present_viewController(MainViewController.new(), presentation_style)
+  app = Application.new()
   print('--- end ---')
 
 
 if __name__ == '__main__':
-  main_call()
+  #main_call()
+  Application.new()
   # print('--- run ---')
   # main_vc = MainViewController.new()
   # presentation_style = 1
