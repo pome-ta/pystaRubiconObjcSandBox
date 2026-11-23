@@ -172,6 +172,10 @@ class RootNavigationController(UINavigationController):
   def dealloc(self) -> None:
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print(f'- {NSStringFromClass(__class__)}: dealloc')
+    print('stop Call')
+    #loop.call_later(0.2, loop.stop)
+    #loop.call_soon(loop.stop)
+    loop.stop()
 
   @objc_method
   def loadView(self) -> None:
@@ -253,8 +257,9 @@ class RootNavigationController(UINavigationController):
     print(f'{NSStringFromClass(__class__)}: viewDidDisappear_')
     if self.isBeingDismissed:
       # >>> (5) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-      print('stop Call')
-      loop.call_later(0.2, loop.stop)
+      #print('stop Call')
+      #loop.call_later(0.2, loop.stop)
+      pass
 
   @objc_method
   def closeButtonTapped_(self, sender) -> None:
@@ -402,7 +407,7 @@ class Application(NSObject):
     print(f'- {NSStringFromClass(__class__)}: dealloc')
 
   @objc_method
-  def initSetupWithViewController_navigationClass_(
+  def configureWithViewController_navigationClass_(
     self,
     viewController: ObjCInstance,
     navigationClass: ObjCClass,
@@ -431,7 +436,7 @@ class Application(NSObject):
     self,
     viewController: ObjCInstance,
   ) -> ObjCInstance:
-    return self.initSetupWithViewController_navigationClass_(
+    return self.configureWithViewController_navigationClass_(
       viewController,
       RootNavigationController,
     )
@@ -442,7 +447,7 @@ class Application(NSObject):
     viewController: ObjCInstance,
     navigationClass: ObjCClass,
   ) -> ObjCInstance:
-    return self.initSetupWithViewController_navigationClass_(
+    return self.configureWithViewController_navigationClass_(
       viewController,
       navigationClass,
     )
@@ -485,16 +490,16 @@ class Application(NSObject):
     print('e: --- main_loop')
 
 
-@autoreleasepool()
+#@autoreleasepool()
 def main_call():
-  import gc
+  #import gc
   print('--- run ---')
   main_vc = MainViewController.new()
   presentation_style = 1
   app = Application.alloc().initWithViewController_(main_vc)
   app.presentWithStyle_(presentation_style)
   print('--- end ---')
-  del app, main_vc
+  #del app, main_vc
   # gc.collect()
   '''
   with autoreleasepool():
@@ -510,14 +515,18 @@ def main_call():
 
 
 if __name__ == '__main__':
-  import gc
+  #import gc
   '''
+
   print('--- run ---')
   main_vc = MainViewController.new()
   presentation_style = 1
   app = Application.alloc().initWithViewController_(main_vc)
   app.presentWithStyle_(presentation_style)
   print('--- end ---')
+  '''
+  
+  # >>> (6) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   '''
 
   with autoreleasepool():
@@ -529,10 +538,14 @@ if __name__ == '__main__':
     print('--- end ---')
     del main_vc, app
     print('--- del ---')
+  '''
 
-  # main_call()
+  main_call()
+
   print('try --- collect')
+
   try:
+    import gc
     gc.collect()
     print('--- collect: done')
   except Exception as e:
