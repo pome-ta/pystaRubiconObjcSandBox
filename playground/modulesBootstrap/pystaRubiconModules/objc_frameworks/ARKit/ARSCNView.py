@@ -1,4 +1,4 @@
-from pyrubicon.objc.types import NSUInteger
+from pyrubicon.objc import NSUInteger  #ntypes
 
 from .constants import framework as ARKit
 

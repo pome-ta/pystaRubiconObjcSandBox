@@ -24,7 +24,7 @@ class RootNavigationController(UINavigationController):
   def dealloc(self) -> None:
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print(f'- {NSStringFromClass(__class__)}: dealloc')
-    loop.stop()
+    loop.call_soon(loop.stop)
 
   @objc_method
   def loadView(self) -> None:

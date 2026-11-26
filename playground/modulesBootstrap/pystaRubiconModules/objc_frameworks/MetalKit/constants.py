@@ -1,4 +1,4 @@
-from pyrubicon.objc.api import objc_const, ObjCInstance
+from pyrubicon.objc import objc_const, ObjCInstance  # api
 from pyrubicon.objc.runtime import load_library
 
 framework = load_library('MetalKit')

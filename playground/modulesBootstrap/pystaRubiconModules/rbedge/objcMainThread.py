@@ -17,6 +17,21 @@ from objc_frameworks.Dispatch import (
 NSThread = ObjCClass('NSThread')
 
 
+def onMainThread(func):
+
+  @functools.wraps(func)
+  def wrapper(*args, **kwargs):
+    if NSThread.isMainThread:
+      func(*args, **kwargs)
+      return
+    block = Block(functools.partial(func, *args, **kwargs), None)
+    dispatch_async(dispatch_get_main_queue(), block)
+
+  return wrapper
+
+
+'''
+# wip: 要検討
 def onMainThread(func=None, *, sync=True):
   if func is None:
     return functools.partial(onMainThread, sync=sync)
@@ -24,7 +39,8 @@ def onMainThread(func=None, *, sync=True):
   @functools.wraps(func)
   def wrapper(*args, **kwargs):
     if NSThread.isMainThread:
-      return func(*args, **kwargs)
+      func(*args, **kwargs)
+      return 
 
     queue = dispatch_get_main_queue()
     results = []  # 戻り値キャプチャ用
@@ -43,4 +59,5 @@ def onMainThread(func=None, *, sync=True):
       return None  # asyncは戻り値なし
 
   return wrapper
+'''
 

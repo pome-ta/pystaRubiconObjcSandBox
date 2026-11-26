@@ -1,7 +1,7 @@
 from enum import IntEnum
 
-from pyrubicon.objc.api import ObjCInstance
-from pyrubicon.objc.runtime import objc_id
+from pyrubicon.objc import ObjCInstance  # api
+from pyrubicon.objc import objc_id  # runtime
 
 from .constants import framework as Metal
 

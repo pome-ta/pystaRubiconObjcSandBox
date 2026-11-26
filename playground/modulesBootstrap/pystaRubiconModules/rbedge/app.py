@@ -1,81 +1,117 @@
-from pyrubicon.objc import ObjCClass  # api
-
-from objc_frameworks.UIKit import UIModalPresentationStyle
+from pyrubicon.objc import (
+  NSObject,
+  ObjCClass,
+  ObjCInstance,
+  objc_method,
+  objc_property,
+)  # api
+from pyrubicon.objc import (
+  objc_id,
+  send_super,
+)  # runtime
 
 from .lifeCycle import loop
+from .enumerations import (
+  UISceneActivationState,
+  UIModalPresentationStyle,
+)
 from .objcMainThread import onMainThread
 from .rootNavigationController import RootNavigationController
-
-from rbedge import pdbr
+from .functions import NSStringFromClass
 
 UIApplication = ObjCClass('UIApplication')
-UIViewController = ObjCClass('UIViewController')  # todo: アノテーション用
 
 
-class App:
+class App(NSObject):
 
-  def __init__(
+  viewController = objc_property(ObjCInstance)
+  navigationClass = objc_property(ObjCClass)
+  sharedViewController = objc_property(ObjCInstance)
+
+  @objc_method
+  def dealloc(self) -> None:
+    # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
+    #print(f'- {NSStringFromClass(__class__)}: dealloc')
+    pass
+
+  @objc_method
+  def configureWithViewController_navigationClass_(
     self,
-    viewController: UIViewController,
-    modalPresentationStyle: UIModalPresentationStyle
-    | int = UIModalPresentationStyle.pageSheet,
-  ):
+    viewController: ObjCInstance,
+    navigationClass: ObjCClass,
+  ) -> ObjCInstance:
+    self = ObjCInstance(send_super(
+      __class__,
+      self,
+      'init',
+      restype=objc_id,
+    ))
+    if self is None:
+      return None
+
     self.viewController = viewController
+    self.navigationClass = navigationClass
+
+    sharedApplication = UIApplication.sharedApplication
+    objectEnumerator = sharedApplication.connectedScenes.objectEnumerator()
+
+    next(sharedScene for _scene in iter(objectEnumerator.nextObject, None)
+         if (sharedScene := _scene).activationState == 0)
+
+    sceneWindow = sharedScene.keyWindow if (
+      _delegate := sharedScene.delegate) is None else _delegate.window
+
+    self.sharedViewController = sceneWindow.rootViewController
+
+    return self
+
+  @objc_method
+  def initWithViewController_(
+    self,
+    viewController: ObjCInstance,
+  ) -> ObjCInstance:
+    return self.configureWithViewController_navigationClass_(
+      viewController,
+      RootNavigationController,
+    )
+
+  @objc_method
+  def initWithViewController_navigationClass_(
+    self,
+    viewController: ObjCInstance,
+    navigationClass: ObjCClass,
+  ) -> ObjCInstance:
+    return self.configureWithViewController_navigationClass_(
+      viewController,
+      navigationClass,
+    )
+
+  @objc_method
+  def presentWithStyle_(self, style: int) -> None:
+
     # xxx: style 指定を力技で確認
     _automatic = UIModalPresentationStyle.automatic  # -2
     _blurOverFullScreen = UIModalPresentationStyle.blurOverFullScreen  # 8
     _pageSheet = UIModalPresentationStyle.pageSheet  # 1
 
-    self.modalPresentationStyle = modalPresentationStyle if isinstance(
-      modalPresentationStyle, int
+    modalPresentationStyle = style if isinstance(
+      style, int
     ) and _automatic <= modalPresentationStyle <= _blurOverFullScreen else _pageSheet
 
-    self.set_rootViewController()
+    @onMainThread
+    def _main_thread_present() -> None:
 
-  def set_rootViewController(self) -> None:
-    sharedApplication = UIApplication.sharedApplication
-    objectEnumerator = sharedApplication.connectedScenes.objectEnumerator()
+      presentController = self.navigationClass.alloc(
+      ).initWithRootViewController_(self.viewController)
+      presentController.setModalPresentationStyle_(modalPresentationStyle)
 
-    windowScene = next(_scene
-                       for _scene in iter(objectEnumerator.nextObject, None)
-                       if _scene.activationState == 0)
-
-    rootViewController = windowScene.keyWindow.rootViewController
-    self.rootViewController = rootViewController
-
-  def present(
-    self,
-    NavigationController=RootNavigationController,
-  ) -> None:
-
-    @onMainThread(sync=False)
-    def present_viewController(
-      viewController: UIViewController,
-      style: int,
-    ) -> None:
-
-      presentViewController = NavigationController.alloc(
-      ).initWithRootViewController_(viewController)
-
-      presentViewController.setModalPresentationStyle_(style)
-
-      self.rootViewController.presentViewController_animated_completion_(
-        presentViewController,
-        True,
-        None,
+      self.sharedViewController.presentViewController(
+        presentController,
+        animated=True,
+        completion=None,
       )
 
-    present_viewController(
-      self.viewController,
-      self.modalPresentationStyle,
-    )
-    self.main_loop()
-
-  def main_loop(self) -> None:
-    try:
-      loop.run_forever()
-    except Exception as e:
-      loop.stop()
-    finally:
-      loop.close()
+    _main_thread_present()
+    #print('s: --- main_loop ---')
+    loop.run_forever()
 

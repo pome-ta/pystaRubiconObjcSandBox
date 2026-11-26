@@ -1,6 +1,10 @@
 import ctypes
 
-from pyrubicon.objc.types import CGFloat, CGPoint, CGRect
+from pyrubicon.objc import (
+  CGFloat,
+  CGPoint,
+  CGRect,
+)  # types
 from .constants import framework as CoreGraphics
 
 CGPointZero = CGPoint.in_dll(CoreGraphics, 'CGPointZero')
