@@ -14,7 +14,7 @@
 
 - inspector に無駄な情報を出したくない
   - 「無駄」とは、bootstrap を使いローカルmodule をimport できるようにする処理の形跡のこと
-- 実行ファイル側のボイラーテンプレートをできるだけ簡素にする
+- 実行ファイル側のボイラープレートをできるだけ簡素にする
   - 何をしてるのか？は、判断できる程度に
 
 
@@ -72,17 +72,22 @@ if __name__ == '__main__':
   try:
     import bootstrap
 
-  except ModuleNotFoundError:
-    import pathlib, runpy
+  except ModuleNotFoundError as e:
+    if e.name != 'bootstrap':
+      raise
+
+    import pathlib as _pathlib, runpy as _runpy
 
     _SCRIPT_NAME = 'bootstrap.py'
-    try:
-      next(_script_path for _dir in pathlib.Path(__file__).resolve().parents
-           if (_script_path := _dir / _SCRIPT_NAME).is_file())
-    except StopIteration:
-      raise FileNotFoundError(f'{_SCRIPT_NAME} not found')
-
-    runpy.run_path(_script_path)
+    _runpy.run_path(
+      next(
+        filter(
+          _pathlib.Path.is_file,
+          (_dir / _SCRIPT_NAME
+           for _dir in _pathlib.Path(__file__).resolve().parents),
+        ),
+        f'{_SCRIPT_NAME} not found',
+      ))
 ```
 
 
