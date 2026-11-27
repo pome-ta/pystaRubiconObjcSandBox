@@ -10,14 +10,13 @@ from pyrubicon.objc import (
   send_super,
 )  # runtime
 
+from objc_frameworks.UIKit import UISceneActivationState, UIModalPresentationStyle
+from objc_frameworks.Foundation import NSStringFromClass
+
 from .lifeCycle import loop
-from .enumerations import (
-  UISceneActivationState,
-  UIModalPresentationStyle,
-)
+
 from .objcMainThread import onMainThread
 from .rootNavigationController import RootNavigationController
-from .functions import NSStringFromClass
 
 UIApplication = ObjCClass('UIApplication')
 
@@ -57,11 +56,13 @@ class App(NSObject):
 
     next(sharedScene for _scene in iter(objectEnumerator.nextObject, None)
          if (sharedScene := _scene).activationState == 0)
-
+    '''
     sceneWindow = sharedScene.keyWindow if (
       _delegate := sharedScene.delegate) is None else _delegate.window
 
     self.sharedViewController = sceneWindow.rootViewController
+    '''
+    self.sharedViewController = sharedScene.keyWindow.rootViewController
 
     return self
 
@@ -95,8 +96,8 @@ class App(NSObject):
     _pageSheet = UIModalPresentationStyle.pageSheet  # 1
 
     modalPresentationStyle = style if isinstance(
-      style, int
-    ) and _automatic <= modalPresentationStyle <= _blurOverFullScreen else _pageSheet
+      style,
+      int) and _automatic <= style <= _blurOverFullScreen else _pageSheet
 
     @onMainThread
     def _main_thread_present() -> None:
