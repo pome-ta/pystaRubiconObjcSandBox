@@ -26,47 +26,40 @@
 
 
 ```python
-# Pythonista3 直接実行用、もろもろのpath の依存関係を通す
-import sys
-import pathlib
+# Pythonista3 直接実行用: もろもろのpath の依存関係を通す
+from pathlib import Path as _Path
+import sys as _sys
 
-# main とする作業ディレクトリ名`$ python -m app` としたいところ
+__all__: list[str] = [
+  '_setup',
+]
+
 _SRC_DIR_NAME = 'app'
-# リポジトリ的にtop 階層となるディレクトリ名
-_ROOT_DIR_NAME = 'modulesBootstrap'
-# 取り込みたいmodule 一式が格納されてるディレクトリ名
 _MODULES_DIR_NAME = 'pystaRubiconModules'
 
-
-def _insert(path: pathlib.Path) -> None:
-  sys.path.insert(0, str(path))
-
-
-def _setup_module(
-  dir_path: pathlib.Path,
-  module_name: str,
-) -> None:
-  if (module_path := dir_path / module_name).exists():
-    _insert(module_path)
-
-  else:
-    raise ModuleNotFoundError(f'{module_path}')
+# 上に書いたディレクトリほど import 探索の優先度が高くなる
+SEARCH_DIRS = (
+  _SRC_DIR_NAME,  # 1. 作業用トップディレクトリ(最優先)
+  _MODULES_DIR_NAME,  # 2. 共通ローカルモジュール群
+)
+ROOT_DIR = _Path(__file__).resolve().parent
 
 
-def _main(file_path: str) -> None:
-  try:
-    _dir_path = next((p for _p in pathlib.Path(file_path).resolve().parents
-                      if (p := _p).name == _ROOT_DIR_NAME), )
-  except StopIteration:
-    raise FileNotFoundError(f'./{_ROOT_DIR_NAME} not found')
+def _setup(root_dir: _Path = ROOT_DIR) -> None:
+  _target_paths = []
+  for dir_name in SEARCH_DIRS:
+    if not (dir_path := root_dir / dir_name).is_dir():
+      raise FileNotFoundError(f'Directory not found: {dir_path}')
+    _target_paths.append(str(dir_path))
 
-  _setup_module(_dir_path, _MODULES_DIR_NAME)
-  _setup_module(_dir_path, _SRC_DIR_NAME)
+  target_set = set(_target_paths)
+  _sys.path[:] = [
+    *_target_paths,
+    *(p for p in _sys.path if p not in target_set),
+  ]
 
 
-# todo: 副作用的に実行
-_main(__file__)
-
+_setup()
 
 ```
 
