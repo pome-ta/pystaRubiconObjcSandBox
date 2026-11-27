@@ -71,22 +71,20 @@ _setup()
 if __name__ == '__main__':
   try:
     import bootstrap
-
   except ModuleNotFoundError as e:
-    if e.name != 'bootstrap':
+    _TARGET_NAME = 'bootstrap'
+    if e.name != _TARGET_NAME:
       raise
-
     import pathlib as _pathlib, runpy as _runpy
-
-    _SCRIPT_NAME = 'bootstrap.py'
+    
     _runpy.run_path(
       next(
         filter(
           _pathlib.Path.is_file,
-          (_dir / _SCRIPT_NAME
+          (_dir / f'{_TARGET_NAME}.py'
            for _dir in _pathlib.Path(__file__).resolve().parents),
         ),
-        f'{_SCRIPT_NAME} not found',
+        f'{_TARGET_NAME} not found',
       ))
 ```
 
