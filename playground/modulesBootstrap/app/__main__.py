@@ -3,16 +3,27 @@ if __name__ == '__main__':
     import bootstrap
 
   except ModuleNotFoundError:
-    import pathlib, runpy
+    #import pathlib.Path as _Path, runpy as _runpy
+    from pathlib import Path as _Path
+    from runpy import run_path as _run_path
 
-    _SCRIPT_NAME = 'bootstrap.py'
+    #_SCRIPT_NAME = 'bootstrap.py'
+    _SCRIPT = 'bootstrap.py'
+
     try:
-      next(_script_path for _dir in pathlib.Path(__file__).resolve().parents
+      next(_script for _dir in _Path(__file__).resolve().parents
+           if (_script := _dir / _SCRIPT).is_file())
+    except StopIteration:
+      raise FileNotFoundError(f'{_SCRIPT_NAME} not found')
+    _run_path(_script)
+    '''
+    try:
+      next(_script_path for _dir in _Path(__file__).resolve().parents
            if (_script_path := _dir / _SCRIPT_NAME).is_file())
     except StopIteration:
       raise FileNotFoundError(f'{_SCRIPT_NAME} not found')
-
-    runpy.run_path(_script_path)
+    _run_path(_script_path)
+    '''
 
 from pyrubicon.objc import ObjCClass, objc_method  # api
 from pyrubicon.objc import send_super  # runtime
