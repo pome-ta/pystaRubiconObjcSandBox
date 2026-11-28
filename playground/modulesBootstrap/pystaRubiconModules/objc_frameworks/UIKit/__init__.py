@@ -8,7 +8,7 @@ from .NSLayoutConstraint import UILayoutPriority
 from .UIView import UILayoutConstraintAxis, UIViewAutoresizing
 from .UIStackView import UIStackViewDistribution, UIStackViewAlignment
 from .NSText import NSTextAlignment
-from .UIControl import UIControlEvents
+from .UIControl import UIControlEvents, UIControlState
 from .UIFontDescriptor import UIFontTextStyle
 from .UIScrollView import UIScrollViewKeyboardDismissMode
 from .UIWindow import (

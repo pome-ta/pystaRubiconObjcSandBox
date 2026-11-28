@@ -46,3 +46,22 @@ class UIControlEvents(IntEnum):
   #[doc(alias = "UIControlEventAllEvents")]
   allEvents = 0xFFFFFFFF
 
+
+# ref: [UIControlState | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uicontrolstate?language=objc)
+class UIControlState(IntFlag):
+  # [UIControl.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UIControl.rs.html#132-149)
+  #[doc(alias = "UIControlStateNormal")]
+  normal = 0
+  #[doc(alias = "UIControlStateHighlighted")]
+  highlighted = 1 << 0
+  #[doc(alias = "UIControlStateDisabled")]
+  disabled = 1 << 1
+  #[doc(alias = "UIControlStateSelected")]
+  selected = 1 << 2
+  #[doc(alias = "UIControlStateFocused")]
+  focused = 1 << 3
+  #[doc(alias = "UIControlStateApplication")]
+  application = 0x00FF0000
+  #[doc(alias = "UIControlStateReserved")]
+  reserved = 0xFF000000
+
