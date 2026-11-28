@@ -48,7 +48,7 @@ class UIControlEvents(IntEnum):
 
 
 # ref: [UIControlState | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uicontrolstate?language=objc)
-class UIControlState(IntFlag):
+class UIControlState(IntEnum):
   # [UIControl.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UIControl.rs.html#132-149)
   #[doc(alias = "UIControlStateNormal")]
   normal = 0
