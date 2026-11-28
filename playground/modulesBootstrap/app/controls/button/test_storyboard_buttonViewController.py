@@ -17,7 +17,6 @@ if __name__ == '__main__':
         f'{_TARGET_NAME} not found',
       ))
 
-
 import ctypes
 
 from pyrubicon.objc import (
@@ -26,7 +25,7 @@ from pyrubicon.objc import (
   objc_method,
   objc_property,
 )  # api
-from pyrubicon.objc import send_super  # runtime
+from pyrubicon.objc import send_super, objc_id  # runtime
 from pyrubicon.objc import NSInteger  # types
 
 from objc_frameworks.Foundation import NSStringFromClass
@@ -37,19 +36,37 @@ from storyboard_buttonViewController import prototypes
 
 test_prototypes = prototypes if isinstance(prototypes, list) else [prototypes]
 
-UIColor = ObjCClass('UIColor')
-NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
-
 UITableViewController = ObjCClass('UITableViewController')
 UITableViewCell = ObjCClass('UITableViewCell')
+UIColor = ObjCClass('UIColor')
+NSLayoutConstraint = ObjCClass('NSLayoutConstraint')
 
 
 class ButtonViewControllerTest(UITableViewController):
 
   @objc_method
-  def dealloc(self):
+  def dealloc(self) -> None:
     # xxx: 呼ばない-> `send_super(__class__, self, 'dealloc')`
     print(f'\t- {NSStringFromClass(__class__)}: dealloc')
+    pass
+
+  @objc_method
+  def initWithStyle_(self, style: NSInteger) -> ObjCInstance:
+    self = ObjCInstance(
+      send_super(
+        __class__,
+        self,
+        'initWithStyle:',
+        style,
+        restype=objc_id,
+        argtypes=[
+          NSInteger,
+        ],
+      ))
+    if self is None:
+      return None
+    #print(f'\t{NSStringFromClass(__class__)}: initWithStyle_')
+    return self
 
   @objc_method
   def loadView(self) -> None:
@@ -65,21 +82,6 @@ class ButtonViewControllerTest(UITableViewController):
         prototype['cellClass'], prototype['identifier'])
       for prototype in test_prototypes
     ]
-
-  @objc_method
-  def initWithStyle_(self, style: NSInteger) -> ObjCInstance:
-    self = send_super(
-      __class__,
-      self,
-      'initWithStyle:',
-      style,
-      restype=ObjCInstance,
-      argtypes=[
-        NSInteger,
-      ],
-    )
-    #print(f'\t{NSStringFromClass(__class__)}: initWithStyle_')
-    return self
 
   @objc_method
   def viewDidLoad(self) -> None:
@@ -125,7 +127,6 @@ class ButtonViewControllerTest(UITableViewController):
 
   @objc_method
   def viewWillDisappear_(self, animated: bool) -> None:
-    print('\t↑ ---')
     send_super(
       __class__,
       self,
@@ -150,7 +151,7 @@ class ButtonViewControllerTest(UITableViewController):
         ctypes.c_bool,
       ],
     )
-    print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
+    #print(f'\t{NSStringFromClass(__class__)}: viewDidDisappear_')
 
   @objc_method
   def didReceiveMemoryWarning(self) -> None:
@@ -162,26 +163,37 @@ class ButtonViewControllerTest(UITableViewController):
     )
     print(f'\t{NSStringFromClass(__class__)}: didReceiveMemoryWarning')
 
+
+
   # --- UITableViewDataSource
   @objc_method
-  def tableView_numberOfRowsInSection_(self, tableView,
-                                       section: NSInteger) -> NSInteger:
+  def tableView_numberOfRowsInSection_(
+    self,
+    tableView,
+    section: NSInteger,
+  ) -> NSInteger:
 
     return len(test_prototypes)
 
   @objc_method
-  def tableView_cellForRowAtIndexPath_(self, tableView,
-                                       indexPath) -> ObjCInstance:
+  def tableView_cellForRowAtIndexPath_(
+    self,
+    tableView,
+    indexPath,
+  ) -> ObjCInstance:
 
     identifier = test_prototypes[indexPath.row]['identifier']
 
     cell = tableView.dequeueReusableCellWithIdentifier_forIndexPath_(
-      identifier, indexPath)
+      identifier,
+      indexPath,
+    )
 
     return cell
 
 
 if __name__ == '__main__':
+
   from rbedge.app import App
   from objc_frameworks.UIKit import UIModalPresentationStyle, UITableViewStyle
 

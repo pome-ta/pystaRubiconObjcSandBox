@@ -39,14 +39,17 @@ class PrototypeTableViewCell(UITableViewCell):
       objc_id,
     ]
 
-    self = send_super(
-      __class__,
-      self,
-      'initWithStyle:reuseIdentifier:',
-      *super_args,
-      restype=objc_id,
-      argtypes=super_argtypes,
-    )
+    self = ObjCInstance(
+      send_super(
+        __class__,
+        self,
+        'initWithStyle:reuseIdentifier:',
+        *super_args,
+        restype=objc_id,
+        argtypes=super_argtypes,
+      ))
+    if self is None:
+      return None
 
     self.overrideCell()
     return self
