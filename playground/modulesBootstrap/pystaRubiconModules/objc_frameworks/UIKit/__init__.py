@@ -24,4 +24,5 @@ from .UIWindow import (
 )
 from .UIMenuElement import UIMenuElementAttributes
 from .UIButton import UIButtonType
+from .UITableView import UITableViewStyle
 
