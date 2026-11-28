@@ -23,4 +23,5 @@ from .UIWindow import (
   UIKeyboardBoundsUserInfoKey,
 )
 from .UIMenuElement import UIMenuElementAttributes
+from .UIButton import UIButtonType
 
