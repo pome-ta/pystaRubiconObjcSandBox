@@ -1,6 +1,7 @@
 from enum import IntEnum
 
 
+# ref: [UIButtonType | Apple Developer Documentation](https://developer.apple.com/documentation/uikit/uibuttontype?language=objc)
 class UIButtonType(IntEnum):
   # [UIButton.rs - source](https://docs.rs/objc2-ui-kit/latest/src/objc2_ui_kit/generated/UIButton.rs.html#20-39)
   #[doc(alias = "UIButtonTypeCustom")]

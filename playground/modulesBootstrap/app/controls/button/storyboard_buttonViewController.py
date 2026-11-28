@@ -22,6 +22,7 @@ from pyrubicon.objc import ObjCClass, objc_method  # api
 from pyrubicon.objc import send_super  # runtime
 
 from objc_frameworks.Foundation import NSStringFromClass
+from objc_frameworks.UIKit import UIButtonType
 
 from rbedge import pdbr
 
